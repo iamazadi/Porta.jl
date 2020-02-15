@@ -10,3 +10,8 @@ function distance(x₁, y₁, x₂, y₂)
     sqrt(d²)
 end
 
+
+function circlearea(xc, yc, xp, yp)
+    area(distance(xc, yc, xp, yp))
+end
+
