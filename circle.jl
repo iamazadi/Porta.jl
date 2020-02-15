@@ -1,3 +1,8 @@
+function area(radius)
+    π * radius^2
+end
+
+
 function distance(x₁, y₁, x₂, y₂)
     dx = x₂ - x₁
     dy = y₂ - y₁
