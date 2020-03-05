@@ -5,15 +5,9 @@ using GeometryTypes
 using LinearAlgebra
 using ReferenceFrameRotations
 
-AbstractPlotting.set_theme!(
-    plot = (show_axis = false, 
-            scale_plot = false, 
-            showgrid = false, 
-            showticks = false),
-    color = :red,
-    arrowcolor = :red,
-    linecolor = :red
-)
+# Parameters for constructing the circle surface
+N = 30
+lspace = range(0.0, stop = 2pi, length = N)
 
 function locate(θ, ψ)
     y₁ = cos(θ)*cos(ψ)
@@ -70,8 +64,6 @@ function getcircle(A, B, C)
     r = 0.025
     R = Float64(norm(A - Q))
     # Construct a torus of revolution
-    N = 100
-    lspace = range(0.0, stop = 2pi, length = N)
     x = Q[1] .+ [(R + r * cos(θ)) * cos(ϕ) for θ in lspace, ϕ in lspace]
     y = Q[2] .+ [(R + r * cos(θ)) * sin(ϕ) for θ in lspace, ϕ in lspace]
     z = Q[3] .+ [r * sin(θ) for θ in lspace, ϕ in lspace]
@@ -84,7 +76,6 @@ function getcircle(A, B, C)
     # The axis of rotation
     u = cross(n, i)
     u = u / norm(u)
-    @show norm(u)
     # The angle of rotation
     θ = acos(dot(n, i)) / 2.0
     q = ReferenceFrameRotations.Quaternion(cos(θ), sin(θ)*u[1], sin(θ)*u[2], sin(θ)*u[3])
@@ -98,6 +89,12 @@ function getcircle(A, B, C)
     rotatedy = reshape(Float64.(rotatedy), (N, N))
     rotatedz = reshape(Float64.(rotatedz), (N, N))
     rotatedx, rotatedy, rotatedz
+end
+
+function animate(location, i)
+    θ = 0.5659736245
+    ψ = 0.937032369
+    location[] = locate(θ, ψ + (i/100.0) * 2pi)
 end
 
 sθ, oθ = textslider(-pi/2:0.01:pi/2, "θ", raw = true, camera = campixel!, start = 0)
@@ -122,14 +119,6 @@ pointC = @lift begin
     Point3f0(C[1], C[2], C[3])
 end
 
-center = @lift(getcenter($pointA, $pointB, $pointC))
-
-trianglex = @lift([$pointA[1], $pointB[1], $pointC[1], $center[1]])
-
-triangley = @lift([$pointA[2], $pointB[2], $pointC[2], $center[2]])
-
-trianglez = @lift([$pointA[3], $pointB[3], $pointC[3], $center[3]])
-
 circle = @lift(getcircle($pointA, $pointB, $pointC))
 
 scene = Scene(show_axis = false)
@@ -144,47 +133,22 @@ rectangles = [
 ]
 meshes = map(GLNormalMesh, rectangles)
 mesh!(scene, merge(meshes), transparency = true)
-
 m = GLNormalUVMesh(Sphere(Point3f0(0), 1f0), 60)
-
-twosphere = mesh!(scene, m, color = RGBAf0(0.75,0.75,0.75,0.5), shading = false, transparency = true)
-
-color = [:red, :green, :blue, :yellow]
-i = [0, 0, 0, 1]
-j = [1, 2, 3, 2]
-k = [2, 3, 1, 3]
-# indices interpreted as triangles (every 3 sequential indices)
-indices = [1, 2, 3,   1, 3, 4,   1, 4, 2,   2, 3, 4]
-triangle = mesh!(scene, trianglex, triangley, trianglez, indices, color = color)[end]
-
-circlemarker = surface!(scene, @lift($circle[1]), @lift($circle[2]), @lift($circle[3]), colormap = :Spectral)[end]
-
-marker = mesh!(scene, HyperSphere(Point3f0(0), 0.05f0))[end]
-markerA = mesh!(scene, HyperSphere(Point3f0(0), 0.1f0))[end]
-markerB = mesh!(scene, HyperSphere(Point3f0(0), 0.1f0))[end]
-markerC = mesh!(scene, HyperSphere(Point3f0(0), 0.1f0))[end]
-markerQ = mesh!(scene, HyperSphere(Point3f0(0), 0.05f0))[end]
-
+twosphere = mesh!(scene, m, color = RGBAf0(0.75,0.75,0.75,0.5), shading = false, transparency = true)[end]
+circlemarker = surface!(scene, @lift($circle[1]), @lift($circle[2]), @lift($circle[3]), color = @lift([RGBAf0($location[1], $location[2], $location[3]) for i in lspace, j in lspace]), shading = false)[end]
+marker = mesh!(scene, HyperSphere(Point3f0(0), 0.05f0), color = @lift(RGBf0($location[1], $location[2], $location[3])))[end]
 fullscene = hbox(scene, vbox(sθ, sψ), parent = Scene(resolution = (500, 500)))
 
 on(location) do val
     y = to_value(location)
     translate!(Absolute, marker, y[1], y[2], y[3])
-    marker[:color] = RGBf0(y[1], y[2], y[3])
-    # Get three points on the circle circumference
-    A, B, C = to_value(pointsABC)
-    Q = to_value(center)
-
-    translate!(Absolute, markerA, A[1], A[2], A[3])
-    translate!(Absolute, markerB, B[1], B[2], B[3])
-    translate!(Absolute, markerC, C[1], C[2], C[3])
-    translate!(Absolute, markerQ, Q[1], Q[2], Q[3])
-    markerA[:color] = RGBf0(y[1], y[2], y[3])
-    markerB[:color] = RGBf0(y[1], y[2], y[3])
-    markerC[:color] = RGBf0(y[1], y[2], y[3])
-    markerQ[:color] = RGBf0(y[1], y[2], y[3])
 end
 
-display(scene)
-Makie.save("plot.png", scene)
+record(scene, "thehopffibration.gif") do io
+    for i = 1:100
+        animate(location, i)     # animate scene
+        recordframe!(io) # record a new frame
+    end
+end
+
 
