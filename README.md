@@ -1,5 +1,5 @@
 # Geometrizer
-Geometrize the quantum instead of quantizing the geometry!
+Quantize the geometry instead of geometrizing the quantum!
 
 ![the Hopf fibration](plot.png "The Hopf fibration")
 
