@@ -1,4 +1,4 @@
-# Geometrizer
+# Geometric quantizer
 Quantize the geometry instead of geometrizing the quantum!
 
 ![the Hopf fibration](thehopffibration.gif "The Hopf fibration")
