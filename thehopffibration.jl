@@ -136,7 +136,7 @@ mesh!(scene, merge(meshes), transparency = true)
 m = GLNormalUVMesh(Sphere(Point3f0(0), 1f0), 60)
 twosphere = mesh!(scene, m, color = RGBAf0(0.75,0.75,0.75,0.5), shading = false, transparency = true)[end]
 circlemarker = surface!(scene, @lift($circle[1]), @lift($circle[2]), @lift($circle[3]), color = @lift([RGBAf0($location[1], $location[2], $location[3]) for i in lspace, j in lspace]), shading = false)[end]
-marker = mesh!(scene, HyperSphere(Point3f0(0), 0.05f0), color = @lift(RGBf0($location[1], $location[2], $location[3])))[end]
+marker = mesh!(scene, HyperSphere(Point3f0(0), 0.05f0), color = @lift(RGBf0($location[1], $location[2], $location[3])), shading = false)[end]
 fullscene = hbox(scene, vbox(sθ, sψ), parent = Scene(resolution = (500, 500)))
 
 on(location) do val
