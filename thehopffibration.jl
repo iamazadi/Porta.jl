@@ -20,7 +20,7 @@ function locate(θ, ψ)
     y₁ = cos(θ)*cos(ψ)
     y₂ = cos(θ)*sin(ψ)
     y₃ = sin(θ)
-    [y₁,y₂,y₃]
+    [y₁, y₂, y₃]
 end
 
 """
@@ -58,7 +58,7 @@ with the given point in the base space.
 """
 function points!(p)
     λ₁ = complex(cos(1), sin(1))
-    λ₂ = complex(cos(2), sin(2))
+    λ₂ = complex(cos(pi), sin(pi))
     x₁, x₂, x₃, x₄ = σ⁻¹(p[1], p[2], p[3])
     z₁ = λ₁ * complex(x₁, x₂)
     z₂ = λ₁ * complex(x₃, x₄)
@@ -155,15 +155,46 @@ function base!(θ, ψ)
 end
 
 """
-animate(location, θ, ψ, sweep)
+construct(scene, a)
 
-Moves a point on a path parallel to the equator on the base space
-with the given location Node which is an observable, 
-the coordinates in the base space: latitude (θ) and longitude(ψ) in radians,
-and the sweep angle which ranges from 0 to 2pi.
+Constructs a fiber with the given scene and the observable comprised of
+the latitude (θ) and longitude(ψ) in the base space,
+both of which are in radians.
 """
-function animate(location, θ, ψ, sweep)
-    location[] = [θ, ψ + sweep]
+function construct(scene, a)
+    base = surface!(scene, 
+                    @lift(base!($a[1], $a[2])[1]), 
+                    @lift(base!($a[1], $a[2])[2]), 
+                    @lift(base!($a[1], $a[2])[3]), 
+                    color = @lift([RGBAf0(locate($a[1], $a[2])[1], 
+                                          locate($a[1], $a[2])[2], 
+                                          locate($a[1], $a[2])[3])
+                                   for i in lspace, j in lspace]), 
+                    shading = false)
+    fiber = surface!(scene, 
+                     @lift(fiber!($a[1], $a[2])[1]),
+                     @lift(fiber!($a[1], $a[2])[2]), 
+                     @lift(fiber!($a[1], $a[2])[3]), 
+                     color = @lift([RGBAf0(locate($a[1], $a[2])[1], 
+                                           locate($a[1], $a[2])[2], 
+                                           locate($a[1], $a[2])[3])
+                                    for i in lspace, j in lspace]),
+                     shading = false)
+    base, fiber
+end
+
+"""
+animate(points, i)
+
+Moves the points on a path parallel to the equator in the base space
+with the given array of coordinate observables and the progress percentage.
+The coordinates are the latitude (θ) and longitude(ψ) in radians,
+and the progress percentage ranges from 1 to 100.
+"""
+function animate(points, i)
+    for point in points
+        point[] = [to_value(point)[1], (to_value(point)[2] - (i - 1) / 100 * 2pi) + i / 100 * 2pi]
+    end
 end
 
 sθ, oθ = textslider(-pi/2:0.01:pi/2, 
@@ -177,7 +208,7 @@ sψ, oψ = textslider(0:0.01:2pi,
                     start = 0)
 
 # The point on the base space
-a = @lift([$oθ, $oψ])
+# a = @lift([$oθ, $oψ])
 
 scene = Scene(show_axis = false)
 # The 3D coordinate marker
@@ -196,36 +227,30 @@ rectangles = [
 ]
 meshes = map(GLNormalMesh, rectangles)
 mesh!(scene, merge(meshes), transparency = true)
-sphere = mesh!(scene, 
+sphere = mesh!(scene,
                GLNormalUVMesh(Sphere(Point3f0(0), 1f0), 60), 
                color = RGBAf0(0.75,0.75,0.75,0.5), 
                shading = false, 
                transparency = true)
-fiber = surface!(scene, 
-                 @lift(fiber!($a[1], $a[2])[1]), 
-                 @lift(fiber!($a[1], $a[2])[2]), 
-                 @lift(fiber!($a[1], $a[2])[3]), 
-                 color = @lift([RGBAf0(locate($a[1], $a[2])[1], 
-                                       locate($a[1], $a[2])[2], 
-                                       locate($a[1], $a[2])[3])
-                                for i in lspace, j in lspace]),
-                 shading = false)
-base = surface!(scene, 
-                @lift(base!($a[1], $a[2])[1]), 
-                @lift(base!($a[1], $a[2])[2]), 
-                @lift(base!($a[1], $a[2])[3]), 
-                color = @lift([RGBAf0(locate($a[1], $a[2])[1], 
-                                      locate($a[1], $a[2])[2], 
-                                      locate($a[1], $a[2])[3])
-                               for i in lspace, j in lspace]), 
-                shading = false)
-fullscene = hbox(scene, vbox(sθ, sψ), parent = Scene(resolution = (500, 500)))
+coordinates = [[0.565, 2.204], # iran
+               [0.647, 1.670], # us
+               [-0.441, 2.334], # australia
+               [0.541, 0.608], # isreal
+               [0.625, 1.818]] # china
+fibers = []
+points = []
+for i in coordinates
+    point = Node(i)
+    push!(points, point)
+    push!(fibers, construct(scene, point))
+end
+fullscene = hbox(scene,
+                 vbox(sθ, sψ),
+                 parent = Scene(resolution = (500, 500)))
 
 record(scene, "output.gif") do io
-    for sweep in range(0, stop = 2pi, length = 50)
-        θ = 0.5659736245
-        ψ = 0.937032369
-        animate(a, θ, ψ, sweep) # animate scene
+    for i in 1:100
+        animate(points, i) # animate scene
         recordframe!(io) # record a new frame
     end
 end
