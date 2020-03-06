@@ -5,7 +5,7 @@ using GeometryTypes
 using LinearAlgebra
 using ReferenceFrameRotations
 
-# Parameters for constructing the circle surface
+# Parameters for constructing the surfaces
 N = 30
 lspace = range(0.0, stop = 2pi, length = N)
 
@@ -166,32 +166,49 @@ function animate(location, θ, ψ, sweep)
     location[] = [θ, ψ + sweep]
 end
 
-sθ, oθ = textslider(-pi/2:0.01:pi/2, "θ", raw = true, camera = campixel!, start = 0)
-sψ, oψ = textslider(0:0.01:2pi, "ψ", raw = true, camera = campixel!, start = 0)
+sθ, oθ = textslider(-pi/2:0.01:pi/2, 
+                    "θ", 
+                    raw = true, 
+                    camera = campixel!, 
+                    start = 0)
+sψ, oψ = textslider(0:0.01:2pi, 
+                    "ψ", raw = true, 
+                    camera = campixel!, 
+                    start = 0)
 
+# The point on the base space
 a = @lift([$oθ, $oψ])
 
 scene = Scene(show_axis = false)
-
-# The 3D coordinate indicator
+# The 3D coordinate marker
 origin = Vec3f0(0); baselen = 0.05f0; dirlen = 0.5f0
 # create an array of differently colored boxes in the direction of the 3 axes
 rectangles = [
-    (HyperRectangle(Vec3f0(origin), Vec3f0(dirlen, baselen, baselen)), RGBAf0(0.5,1.0,0.5,0.9)),
-    (HyperRectangle(Vec3f0(origin), Vec3f0(baselen, dirlen, baselen)), RGBAf0(1.0,0.5,0.5,0.9)),
-    (HyperRectangle(Vec3f0(origin), Vec3f0(baselen, baselen, dirlen)), RGBAf0(0.5,0.5,1.0,0.9))
+    (HyperRectangle(Vec3f0(origin), 
+                    Vec3f0(dirlen, baselen, baselen)), 
+                    RGBAf0(0.5,1.0,0.5,0.9)),
+    (HyperRectangle(Vec3f0(origin), 
+                    Vec3f0(baselen, dirlen, baselen)), 
+                    RGBAf0(1.0,0.5,0.5,0.9)),
+    (HyperRectangle(Vec3f0(origin), 
+                    Vec3f0(baselen, baselen, dirlen)),
+                    RGBAf0(0.5,0.5,1.0,0.9))
 ]
 meshes = map(GLNormalMesh, rectangles)
 mesh!(scene, merge(meshes), transparency = true)
-m = GLNormalUVMesh(Sphere(Point3f0(0), 1f0), 60)
-sphere = mesh!(scene, m, color = RGBAf0(0.75,0.75,0.75,0.5), shading = false, transparency = true)
+sphere = mesh!(scene, 
+               GLNormalUVMesh(Sphere(Point3f0(0), 1f0), 60), 
+               color = RGBAf0(0.75,0.75,0.75,0.5), 
+               shading = false, 
+               transparency = true)
 fiber = surface!(scene, 
                  @lift(fiber!($a[1], $a[2])[1]), 
                  @lift(fiber!($a[1], $a[2])[2]), 
                  @lift(fiber!($a[1], $a[2])[3]), 
                  color = @lift([RGBAf0(locate($a[1], $a[2])[1], 
                                        locate($a[1], $a[2])[2], 
-                                       locate($a[1], $a[2])[3]) for i in lspace, j in lspace]), 
+                                       locate($a[1], $a[2])[3])
+                                for i in lspace, j in lspace]),
                  shading = false)
 base = surface!(scene, 
                 @lift(base!($a[1], $a[2])[1]), 
@@ -199,7 +216,8 @@ base = surface!(scene,
                 @lift(base!($a[1], $a[2])[3]), 
                 color = @lift([RGBAf0(locate($a[1], $a[2])[1], 
                                       locate($a[1], $a[2])[2], 
-                                      locate($a[1], $a[2])[3]) for i in lspace, j in lspace]), 
+                                      locate($a[1], $a[2])[3])
+                               for i in lspace, j in lspace]), 
                 shading = false)
 fullscene = hbox(scene, vbox(sθ, sψ), parent = Scene(resolution = (500, 500)))
 
@@ -211,5 +229,4 @@ record(scene, "output.gif") do io
         recordframe!(io) # record a new frame
     end
 end
-
 
