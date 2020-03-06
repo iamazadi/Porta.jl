@@ -34,18 +34,14 @@ end
 function getpoints(y₁, y₂, y₃)
     λ₁ = complex(cos(1), sin(1))
     λ₂ = complex(cos(2), sin(2))
-    λ₃ = complex(cos(3), sin(3))
     x₁, x₂, x₃, x₄ = σ⁻¹(y₁, y₂, y₃)
     p₁ = λ₁ * complex(x₁, x₂)
     p₂ = λ₁ * complex(x₃, x₄)
     q₁ = λ₂ * complex(x₁, x₂)
     q₂ = λ₂ * complex(x₃, x₄)
-    r₁ = λ₃ * complex(x₁, x₂)
-    r₂ = λ₃ * complex(x₃, x₄)
     p = σ(real(p₁), imag(p₁), real(p₂), imag(p₂))
     q = σ(real(q₁), imag(q₁), real(q₂), imag(q₂))
-    r = σ(real(r₁), imag(r₁), real(r₂), imag(r₂))
-    [p, q, r]
+    [p, q]
 end
 
 function getcenter(A, B, C)
@@ -57,7 +53,11 @@ function getcenter(A, B, C)
     numerator / denominator
 end
 
-function getcircle(A, B, C)
+function getcircle(location)
+    # Locate the point on the two sphere
+    C = locate(location[1], location[2])
+    # Find two other points on the circle
+    A, B = getpoints(C[1],C[2],C[3])
     # Get the circle center point
     Q = getcenter(A, B, C)
     # Find the small and big radii
@@ -88,7 +88,18 @@ function getcircle(A, B, C)
     rotatedx = reshape(Float64.(rotatedx), (N, N))
     rotatedy = reshape(Float64.(rotatedy), (N, N))
     rotatedz = reshape(Float64.(rotatedz), (N, N))
-    rotatedx, rotatedy, rotatedz
+    [rotatedx, rotatedy, rotatedz]
+end
+
+function getmarker(location)
+    # Locate the point on the two sphere
+    l = locate(location[1], location[2])
+    # Construct a two sphere
+    r = 0.05
+    x = l[1] .+ [r * cos(θ)*cos(ϕ) for θ in lspace, ϕ in lspace]
+    y = l[2] .+ [r * cos(θ)*sin(ϕ) for θ in lspace, ϕ in lspace]
+    z = l[3] .+ [r * sin(θ) for θ in lspace, ϕ in lspace]
+    [x, y, z]
 end
 
 function animate(location, i)
@@ -102,24 +113,11 @@ sψ, oψ = textslider(0:0.01:2pi, "ψ", raw = true, camera = campixel!, start = 
 
 location = @lift(locate($oθ, $oψ))
 
-pointsABC = @lift(getpoints($location[1], $location[2], $location[3]))
+circle = @lift(getcircle([$oθ $oψ]))
 
-pointA = @lift begin
-    A, B, C = $pointsABC
-    Point3f0(A[1], A[2], A[3])
-end
+marker = @lift(getmarker([$oθ $oψ]))
 
-pointB = @lift begin
-    A, B, C = $pointsABC
-    Point3f0(B[1], B[2], B[3])
-end
-
-pointC = @lift begin
-    A, B, C = $pointsABC
-    Point3f0(C[1], C[2], C[3])
-end
-
-circle = @lift(getcircle($pointA, $pointB, $pointC))
+color = @lift([RGBAf0($location[1], $location[2], $location[3]) for i in lspace, j in lspace])
 
 scene = Scene(show_axis = false)
 
@@ -134,21 +132,26 @@ rectangles = [
 meshes = map(GLNormalMesh, rectangles)
 mesh!(scene, merge(meshes), transparency = true)
 m = GLNormalUVMesh(Sphere(Point3f0(0), 1f0), 60)
-twosphere = mesh!(scene, m, color = RGBAf0(0.75,0.75,0.75,0.5), shading = false, transparency = true)[end]
-circlemarker = surface!(scene, @lift($circle[1]), @lift($circle[2]), @lift($circle[3]), color = @lift([RGBAf0($location[1], $location[2], $location[3]) for i in lspace, j in lspace]), shading = false)[end]
-marker = mesh!(scene, HyperSphere(Point3f0(0), 0.05f0), color = @lift(RGBf0($location[1], $location[2], $location[3])), shading = false)[end]
+twosphere = mesh!(scene, m, color = RGBAf0(0.75,0.75,0.75,0.5), shading = false, transparency = true)
+circlesurface = surface!(scene, 
+                         @lift($circle[1]), 
+                         @lift($circle[2]), 
+                         @lift($circle[3]), 
+                         color = color, 
+                         shading = false)
+markersurface = surface!(scene, 
+                         @lift($marker[1]), 
+                         @lift($marker[2]), 
+                         @lift($marker[3]), 
+                         color = color, 
+                         shading = false)
 fullscene = hbox(scene, vbox(sθ, sψ), parent = Scene(resolution = (500, 500)))
 
-on(location) do val
-    y = to_value(location)
-    translate!(Absolute, marker, y[1], y[2], y[3])
-end
-
-record(scene, "thehopffibration.gif") do io
-    for i = 1:100
-        animate(location, i)     # animate scene
-        recordframe!(io) # record a new frame
-    end
-end
+#record(scene, "thehopffibration.gif") do io
+#    for i = 1:100
+#        animate(location, i) # animate scene
+#        recordframe!(io) # record a new frame
+#    end
+#end
 
 
