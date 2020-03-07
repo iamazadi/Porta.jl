@@ -1,0 +1,8 @@
+name = "Porta"
+uuid = "fb2f1d7b-1de9-45a3-b106-388808110f78"
+authors = ["Mohammad Javad Azadi <mjazadi42@gmail.com>"]
+version = "0.1.0"
+
+[deps]
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+ReferenceFrameRotations = "74f56ac7-18b3-5285-802d-d4bd4f104033"
