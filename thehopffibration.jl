@@ -184,13 +184,13 @@ function construct(scene, a, g)
              @lift($base[2]),
              @lift($base[3]),
              color = color,
-             shading = false)
+             shading = true)
     surface!(scene, 
              @lift($fiber[1]),
              @lift($fiber[2]), 
              @lift($fiber[3]), 
              color = color,
-             shading = false)
+             shading = true)
 end
 
 """
@@ -260,13 +260,13 @@ mesh!(scene, merge(meshes), transparency = true)
 sphere = mesh!(scene,
                GLNormalUVMesh(Sphere(Point3f0(0), 1f0), 60), 
                color = RGBAf0(0.75,0.75,0.75,0.5), 
-               shading = false, 
-               transparency = true)
-coordinates = [[0.565, 2.204], # iran
-               [0.647, 1.670], # us
-               [-0.441, 2.334], # australia
-               [0.541, 0.608], # isreal
-               [0.625, 1.818]] # china
+               shading = true, 
+               transparency = false)
+coordinates = [[0.565, 2.204],
+               [0.647, 1.670],
+               [-0.441, 2.334],
+               [0.541, 0.608],
+               [0.625, 1.818]]
 points = []
 for i in coordinates
     point = Node(i)
