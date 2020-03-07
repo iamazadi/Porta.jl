@@ -12,8 +12,8 @@ lspace = range(0.0, stop = 2pi, length = N)
 """
 locate(θ, ψ)
 
-Locates the base point on the two sphere
-with the given latitude (θ) and longitude(ψ)
+Locates the point in the base space
+with the given corrdinates on the two sphere: latitude (θ) and longitude(ψ)
 both of which are measured in radians.
 """
 function locate(θ, ψ)
@@ -51,20 +51,16 @@ function σ(x₁, x₂, x₃, x₄)
 end
 
 """
-points!(a, g)
+points!(a)
 
 Finds 3 points on the fiber circle under stereographic projection 
-with the given point in the base space and the unit quaternion g
-for the three sphere rotation.
+with the given point in the base space.
 """
-function points!(a, g)
+function points!(a)
     λ₁ = complex(cos(1), sin(1))
     λ₂ = complex(cos(2), sin(2))
     λ₃ = complex(cos(3), sin(3))
-    v₁, v₂, v₃, v₄ = σ⁻¹(a[1], a[2], a[3])
-    q = ReferenceFrameRotations.Quaternion(v₁, v₂, v₃, v₄)
-    a₁, a₂, a₃ = vect(g * q)
-    w₁, w₂, w₃, w₄ = σ⁻¹(a₁, a₂, a₃)
+    w₁, w₂, w₃, w₄ = σ⁻¹(a[1], a[2], a[3])
     x₁ = λ₁ * complex(w₁, w₂)
     x₂ = λ₁ * complex(w₃, w₄)
     y₁ = λ₂ * complex(w₁, w₂)
@@ -97,24 +93,32 @@ function center!(A, B, C)
 end
 
 """
-fiber!(θ, ψ, g)
+rotate(y, g)
+
+Rotates the three sphere with the given unit quaternion g
+and returns the rotated version of the point a in the base space.
+"""
+function rotate(y, g)
+    x₁, x₂, x₃, x₄ = σ⁻¹(y[1], y[2], y[3])
+    q = ReferenceFrameRotations.Quaternion(x₁, x₂, x₃, x₄)
+    vect(g * q)
+end
+
+"""
+fiber!(a)
 
 Calculates the grid of a fiber circle under stereographic projection
-with the given coordinates in the base space: latitude (θ) and longitude(ψ)
-both of which are measured in radians,
-and the unit quternion g for the three sphere rotation.
+with the given coordinates in the base space.
 """
-function fiber!(θ, ψ, g)
-    # Locate the point on the two sphere
-    a = locate(θ, ψ)
+function fiber!(a)
     # Find 3 points on the circle
-    A, B, C = points!(a, g)
+    A, B, C = points!(a)
     # Get the circle center point
     Q = center!(A, B, C)
     # Find the small and big radii
     r = 0.025
     R = Float64(norm(A - Q))
-    # Construct a torus of revolution
+    # Construct a torus of revolution grid
     x = Q[1] .+ [(R + r * cos(i)) * cos(j) for i in lspace, j in lspace]
     y = Q[2] .+ [(R + r * cos(i)) * sin(j) for i in lspace, j in lspace]
     z = Q[3] .+ [r * sin(i) for i in lspace, j in lspace]
@@ -133,6 +137,7 @@ function fiber!(θ, ψ, g)
                                            sin(ϕ)*u[1],
                                            sin(ϕ)*u[2],
                                            sin(ϕ)*u[3])
+    # Rotate the grid
     rotatedpoints = [vect(q\[points[i][1]; 
                              points[i][2]; 
                              points[i][3]]*q) for i in 1:length(points)]
@@ -146,52 +151,46 @@ function fiber!(θ, ψ, g)
 end
 
 """
-base!(θ, ψ)
+base!(a)
 
-Calculates the grid of a marker on the base two sphere
-with the given coordinates in the base space: latitude (θ) and longitude(ψ),
-both of which are measured in radians.
+Calculates the marker grid for a point in the base space
+with the given coordinates in the base space.
 """
-function base!(θ, ψ)
-    # Locate the point on the two sphere
-    l = locate(θ, ψ)
-    # Construct a two sphere
+function base!(a)
+    # Construct a two sphere grid
     r = 0.05
-    x = l[1] .+ [r * cos(i)*cos(j) for i in lspace, j in lspace]
-    y = l[2] .+ [r * cos(i)*sin(j) for i in lspace, j in lspace]
-    z = l[3] .+ [r * sin(i) for i in lspace, j in lspace]
+    x = a[1] .+ [r * cos(i)*cos(j) for i in lspace, j in lspace]
+    y = a[2] .+ [r * cos(i)*sin(j) for i in lspace, j in lspace]
+    z = a[3] .+ [r * sin(i) for i in lspace, j in lspace]
     [x, y, z]
 end
 
 """
 construct(scene, a, g)
 
-Constructs a fiber with the given scene and the observable comprised of
-the latitude (θ) and longitude(ψ) in the base space
-both of which are in radians, and the unit quaternion g
-for the three sphere rotation.
+Constructs a fiber with the given scene, the observable point a
+in the base space and the unit quaternion g for the three sphere rotation.
 """
 function construct(scene, a, g)
-    """
-    base = surface!(scene, 
-                    @lift(base!($a[1], $a[2])[1]), 
-                    @lift(base!($a[1], $a[2])[2]), 
-                    @lift(base!($a[1], $a[2])[3]), 
-                    color = @lift([RGBAf0(locate($a[1], $a[2])[1], 
-                                          locate($a[1], $a[2])[2], 
-                                          locate($a[1], $a[2])[3])
-                                   for i in lspace, j in lspace]), 
-                    shading = false)
-    """
-    fiber = surface!(scene, 
-                     @lift(fiber!($a[1], $a[2], $g)[1]),
-                     @lift(fiber!($a[1], $a[2], $g)[2]), 
-                     @lift(fiber!($a[1], $a[2], $g)[3]), 
-                     color = @lift([RGBAf0(locate($a[1], $a[2])[1], 
-                                           locate($a[1], $a[2])[2], 
-                                           locate($a[1], $a[2])[3])
-                                    for i in lspace, j in lspace]),
-                     shading = false)
+    # Locate the point in the base space and then rotate the three sphere
+    y = @lift(rotate(locate($a[1], $a[2]), $g))
+    color = @lift([RGBAf0($y[1], $y[2], $y[3]) for i in lspace, j in lspace])
+    # Calculate the marker grid for a point in the base space
+    base = @lift(base!($y))
+    # Calculate the marker grid for a fiber under the streographic projection
+    fiber = @lift(fiber!($y))
+    surface!(scene, 
+             @lift($base[1]),
+             @lift($base[2]),
+             @lift($base[3]),
+             color = color,
+             shading = false)
+    surface!(scene, 
+             @lift($fiber[1]),
+             @lift($fiber[2]), 
+             @lift($fiber[3]), 
+             color = color,
+             shading = false)
 end
 
 """
@@ -204,7 +203,8 @@ and the progress percentage ranges from 1 to 100.
 """
 function animate(points, i)
     for point in points
-        point[] = [to_value(point)[1], (to_value(point)[2] - (i - 1) / 100 * 2pi) + i / 100 * 2pi]
+        val = to_value(point)
+        point[] = [val[1], (val[2] - (i - 1) / 100 * 2pi) + i / 100 * 2pi]
     end
 end
 
@@ -225,7 +225,10 @@ sϕ, oϕ = textslider(0:0.01:2pi,
 θ = Node(0.0)
 ψ = Node(0.0)
 ϕ = Node(4.0)
-g = @lift(ReferenceFrameRotations.Quaternion(cos($θ), sin($θ)*cos($ψ)*cos($ϕ), sin($θ)*cos($ψ)*sin($ϕ), sin($θ)*sin($ψ)))
+g = @lift(ReferenceFrameRotations.Quaternion(cos($θ),
+                                             sin($θ)*cos($ψ)*cos($ϕ),
+                                             sin($θ)*cos($ψ)*sin($ϕ),
+                                             sin($θ)*sin($ψ)))
 # Using sliders to find the perfect rotation axis
 on(oθ) do val
     θ[] = val
@@ -273,12 +276,12 @@ end
 fullscene = hbox(scene,
                  vbox(sθ, sψ, sϕ),
                  parent = Scene(resolution = (500, 500)))
-
+"""
 record(scene, "output.gif") do io
     for i in range(0, stop = 2pi, length = 100)
         θ[] = i # animate scene
         recordframe!(io) # record a new frame
     end
 end
-
+"""
 
