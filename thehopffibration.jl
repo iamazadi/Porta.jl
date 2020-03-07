@@ -51,22 +51,30 @@ function σ(x₁, x₂, x₃, x₄)
 end
 
 """
-points!(p)
+points!(a, g)
 
-Finds 2 points on the fiber circle under stereographic projection 
-with the given point in the base space.
+Finds 3 points on the fiber circle under stereographic projection 
+with the given point in the base space and the unit quaternion g
+for the three sphere rotation.
 """
-function points!(p)
+function points!(a, g)
     λ₁ = complex(cos(1), sin(1))
-    λ₂ = complex(cos(pi), sin(pi))
-    x₁, x₂, x₃, x₄ = σ⁻¹(p[1], p[2], p[3])
-    z₁ = λ₁ * complex(x₁, x₂)
-    z₂ = λ₁ * complex(x₃, x₄)
-    w₁ = λ₂ * complex(x₁, x₂)
-    w₂ = λ₂ * complex(x₃, x₄)
-    q = σ(real(z₁), imag(z₁), real(z₂), imag(z₂))
-    r = σ(real(w₁), imag(w₁), real(w₂), imag(w₂))
-    [q, r]
+    λ₂ = complex(cos(2), sin(2))
+    λ₃ = complex(cos(3), sin(3))
+    v₁, v₂, v₃, v₄ = σ⁻¹(a[1], a[2], a[3])
+    q = ReferenceFrameRotations.Quaternion(v₁, v₂, v₃, v₄)
+    a₁, a₂, a₃ = vect(g * q)
+    w₁, w₂, w₃, w₄ = σ⁻¹(a₁, a₂, a₃)
+    x₁ = λ₁ * complex(w₁, w₂)
+    x₂ = λ₁ * complex(w₃, w₄)
+    y₁ = λ₂ * complex(w₁, w₂)
+    y₂ = λ₂ * complex(w₃, w₄)
+    z₁ = λ₃ * complex(w₁, w₂)
+    z₂ = λ₃ * complex(w₃, w₄)
+    p = σ(real(x₁), imag(x₁), real(x₂), imag(x₂))
+    q = σ(real(y₁), imag(y₁), real(y₂), imag(y₂))
+    r = σ(real(z₁), imag(z₁), real(z₂), imag(z₂))
+    [p, q, r]
 end
 
 """
@@ -89,17 +97,18 @@ function center!(A, B, C)
 end
 
 """
-fiber!(θ, ψ)
+fiber!(θ, ψ, g)
 
-Calculates the grid of a fiber circle under sterographic projection
-with the given coordinates in the base space: latitude (θ) and longitude(ψ),
-both of which are measured in radians.
+Calculates the grid of a fiber circle under stereographic projection
+with the given coordinates in the base space: latitude (θ) and longitude(ψ)
+both of which are measured in radians,
+and the unit quternion g for the three sphere rotation.
 """
-function fiber!(θ, ψ)
+function fiber!(θ, ψ, g)
     # Locate the point on the two sphere
-    C = locate(θ, ψ)
-    # Find two other points on the circle
-    A, B = points!(C)
+    a = locate(θ, ψ)
+    # Find 3 points on the circle
+    A, B, C = points!(a, g)
     # Get the circle center point
     Q = center!(A, B, C)
     # Find the small and big radii
@@ -155,13 +164,15 @@ function base!(θ, ψ)
 end
 
 """
-construct(scene, a)
+construct(scene, a, g)
 
 Constructs a fiber with the given scene and the observable comprised of
-the latitude (θ) and longitude(ψ) in the base space,
-both of which are in radians.
+the latitude (θ) and longitude(ψ) in the base space
+both of which are in radians, and the unit quaternion g
+for the three sphere rotation.
 """
-function construct(scene, a)
+function construct(scene, a, g)
+    """
     base = surface!(scene, 
                     @lift(base!($a[1], $a[2])[1]), 
                     @lift(base!($a[1], $a[2])[2]), 
@@ -171,16 +182,16 @@ function construct(scene, a)
                                           locate($a[1], $a[2])[3])
                                    for i in lspace, j in lspace]), 
                     shading = false)
+    """
     fiber = surface!(scene, 
-                     @lift(fiber!($a[1], $a[2])[1]),
-                     @lift(fiber!($a[1], $a[2])[2]), 
-                     @lift(fiber!($a[1], $a[2])[3]), 
+                     @lift(fiber!($a[1], $a[2], $g)[1]),
+                     @lift(fiber!($a[1], $a[2], $g)[2]), 
+                     @lift(fiber!($a[1], $a[2], $g)[3]), 
                      color = @lift([RGBAf0(locate($a[1], $a[2])[1], 
                                            locate($a[1], $a[2])[2], 
                                            locate($a[1], $a[2])[3])
                                     for i in lspace, j in lspace]),
                      shading = false)
-    base, fiber
 end
 
 """
@@ -197,18 +208,34 @@ function animate(points, i)
     end
 end
 
-sθ, oθ = textslider(-pi/2:0.01:pi/2, 
-                    "θ", 
-                    raw = true, 
+sθ, oθ = textslider(0:0.01:2pi, 
+                    "θ", raw = true, 
                     camera = campixel!, 
                     start = 0)
 sψ, oψ = textslider(0:0.01:2pi, 
                     "ψ", raw = true, 
                     camera = campixel!, 
                     start = 0)
+sϕ, oϕ = textslider(0:0.01:2pi, 
+                    "ϕ", raw = true, 
+                    camera = campixel!, 
+                    start = 0)
 
-# The point on the base space
-# a = @lift([$oθ, $oψ])
+# The three sphere rotation axis
+θ = Node(0.0)
+ψ = Node(0.0)
+ϕ = Node(4.0)
+g = @lift(ReferenceFrameRotations.Quaternion(cos($θ), sin($θ)*cos($ψ)*cos($ϕ), sin($θ)*cos($ψ)*sin($ϕ), sin($θ)*sin($ψ)))
+# Using sliders to find the perfect rotation axis
+on(oθ) do val
+    θ[] = val
+end
+on(oψ) do val
+    ψ[] = val
+end
+on(oϕ) do val
+    ϕ[] = val
+end
 
 scene = Scene(show_axis = false)
 # The 3D coordinate marker
@@ -237,21 +264,21 @@ coordinates = [[0.565, 2.204], # iran
                [-0.441, 2.334], # australia
                [0.541, 0.608], # isreal
                [0.625, 1.818]] # china
-fibers = []
 points = []
 for i in coordinates
     point = Node(i)
+    construct(scene, point, g)
     push!(points, point)
-    push!(fibers, construct(scene, point))
 end
 fullscene = hbox(scene,
-                 vbox(sθ, sψ),
+                 vbox(sθ, sψ, sϕ),
                  parent = Scene(resolution = (500, 500)))
 
 record(scene, "output.gif") do io
-    for i in 1:100
-        animate(points, i) # animate scene
+    for i in range(0, stop = 2pi, length = 100)
+        θ[] = i # animate scene
         recordframe!(io) # record a new frame
     end
 end
+
 
