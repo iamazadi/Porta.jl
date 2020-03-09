@@ -108,21 +108,20 @@ function rotate(y, g)
 end
 
 """
-fiber!(a, r=0.025, N=30)
+fiber!(a; r=0.025, N=30)
 
 Calculates the grid of a fiber circle under stereographic projection
 with the given coordinates in the base space.
 The optional arguments are the radius of the spherical grid
 and the square root of the number of points in the grid.
 """
-function fiber!(a, r=0.025, N=30)
+function fiber!(a; r=0.025, N=30)
     lspace = range(0.0, stop = 2pi, length = N)
     # Find 3 points on the circle
     A, B, C = points!(a)
     # Get the circle center point
     Q = center!(A, B, C)
     # Find the small and big radii
-    r = 0.025
     R = Float64(LinearAlgebra.norm(A - Q))
     # Construct a torus of revolution grid
     x = Q[1] .+ [(R + r * cos(i)) * cos(j) for i in lspace, j in lspace]
@@ -158,14 +157,14 @@ function fiber!(a, r=0.025, N=30)
 end
 
 """
-base!(a, r=0.05, N=30)
+base!(a; r=0.05, N=30)
 
 Calculates the marker grid for a point in the base space
 with the given coordinates in the base space.
 The optional arguments are the radius of the spherical grid
 and the square root of the number of points in the grid.
 """
-function base!(a, r=0.05, N=30)
+function base!(a; r=0.05, N=30)
     lspace = range(0.0, stop = 2pi, length = N)
     # Construct a two sphere grid
     x = a[1] .+ [r * cos(i)*cos(j) for i in lspace, j in lspace]
