@@ -16,8 +16,8 @@ the height of the petals B, the latitude of the flower P,
 the rotation of the flower Q, and the total number of points in the grid.
 """
 function flower!(;N=4, A=.5, B=-pi/7, P=pi/2, Q=0, number=300)
-    N = 2
-    A = .3
+    N = 7
+    A = .4
     B = -pi/7
     P = pi/3
     Q = 0
@@ -35,27 +35,21 @@ in the base space.
 """
 function construct(scene, y)
     # The radius parameter for constructing surfaces
-    r=0.05
+    r=0.1
     # The square root of the number of points in the grid
-    N=90
+    N=30
     lspace = range(0.0, stop = 2pi, length = N)
-    # Locate the point in the base space and then rotate the three sphere
-    #y = @lift(locate($a[1], $a[2]))
     # Calculate the marker grid for a point in the base space
     v = to_value(y)
-    color = RGBAf0(v[1]/4+rand()*3/4, v[2]/4+rand()*3/4, v[3]/4+rand()*3/4, 0.9)
-    #color = @lift([RGBAf0($y[1]/2 + 0.5,
-    #                      $y[2]/2 + 0.5,
-    #                      $y[3]/2 + 0.5) for i in lspace, j in lspace])
+    color = RGBAf0(v[1]/5+rand()*4/5, v[2]/5+rand()*4/5, v[3]/5+rand()*4/5, 1.0)
     # Calculate the marker grid for a fiber under streographic projection
     fiber = @lift(fiber!($y, r = r, N = N))
-    
     surface!(scene, 
              @lift($fiber[1]),
              @lift($fiber[2]), 
              @lift($fiber[3]), 
              color = [color for i in lspace, j in lspace],
-             shading = false)
+             shading = true)
 end
 
 """
@@ -85,7 +79,7 @@ end
 scene = Scene(show_axis = false, backgroundcolor = :black, resolution = (400, 400))
 
 points = []
-number = 128
+number = 420
 x, y, z = flower!(number = number)
 # Rotate the flower
 u = [sqrt(3)/3, sqrt(3)/3, sqrt(3)/3]
