@@ -28,32 +28,33 @@ function flower!(;N=4, A=.5, B=-pi/7, P=pi/2, Q=0, number=300)
 end
 
 """
-construct(scene, a, g)
+construct(scene, a)
 
-Constructs a fiber with the given scene, the observable point a
-in the base space and the unit quaternion g for the three sphere rotation.
+Constructs a fiber with the given scene and the observable point a
+in the base space.
 """
-function construct(scene, y, g)
+function construct(scene, y)
     # The radius parameter for constructing surfaces
-    r=0.07
+    r=0.05
     # The square root of the number of points in the grid
-    N=50
+    N=30
     lspace = range(0.0, stop = 2pi, length = N)
     # Locate the point in the base space and then rotate the three sphere
-    # y = @lift(rotate(locate($a[1], $a[2]), $g))
     #y = @lift(locate($a[1], $a[2]))
     # Calculate the marker grid for a point in the base space
-    #base = @lift(base!($y, r, N))
-    #color = @lift([RGBAf0($y[3], $y[1], $y[2]) for i in lspace, j in lspace])
-    c = RGBAf0(rand(), rand(), rand(), 1.0)
-    color = [c for i in lspace, j in lspace]
+    v = to_value(y)
+    color = RGBAf0(v[1]*2/3+rand()/3, v[2]*2/3+rand()/3, v[3]*2/3+rand()/3, 0.9)
+    #color = @lift([RGBAf0($y[1]/2 + 0.5,
+    #                      $y[2]/2 + 0.5,
+    #                      $y[3]/2 + 0.5) for i in lspace, j in lspace])
     # Calculate the marker grid for a fiber under streographic projection
     fiber = @lift(fiber!($y, r = r, N = N))
+    
     surface!(scene, 
              @lift($fiber[1]),
              @lift($fiber[2]), 
              @lift($fiber[3]), 
-             color = color,
+             color = [color for i in lspace, j in lspace],
              shading = true)
 end
 
@@ -81,66 +82,44 @@ function animate(points, i)
     end
 end
 
-sθ, oθ = textslider(0:0.01:2pi, 
-                    "θ",
-                    raw = true, 
-                    camera = campixel!, 
-                    start = 0)
-sψ, oψ = textslider(0:0.01:2pi, 
-                    "ψ",
-                    raw = true, 
-                    camera = campixel!, 
-                    start = 0)
-sϕ, oϕ = textslider(0:0.01:2pi, 
-                    "ϕ",
-                    raw = true, 
-                    camera = campixel!, 
-                    start = 0)
-
-# The three sphere rotation axis
-θ = Node(0.0)
-ψ = Node(0.0)
-ϕ = Node(0.0)
-g = @lift(ReferenceFrameRotations.Quaternion(cos($θ),
-                                             sin($θ)*cos($ψ)*cos($ϕ),
-                                             sin($θ)*cos($ψ)*sin($ϕ),
-                                             sin($θ)*sin($ψ)))
-# Using sliders to find the perfect rotation axis
-on(oθ) do val
-    θ[] = val
-end
-on(oψ) do val
-    ψ[] = val
-end
-on(oϕ) do val
-    ϕ[] = val
-end
-
-scene = Scene(show_axis = false, backgroundcolor = :black)
+scene = Scene(show_axis = false, backgroundcolor = :black, resolution = (640, 640))
 
 points = []
-number = 400
+number = 900
 x, y, z = flower!(number = number)
+# Rotate the flower
+u = [0, 1, 0]
+ϕ = Node(0.0)
+q = @lift(ReferenceFrameRotations.Quaternion(cos($ϕ), 
+                                             sin($ϕ)*u[1],
+                                             sin($ϕ)*u[2],
+                                             sin($ϕ)*u[3]))
+rotatedpoints = @lift([ReferenceFrameRotations.vect($q\[x[i]; y[i]; z[i]]*$q)
+                       for i in 1:number])
 for i in 1:number
-    point = Node([x[i], y[i], z[i]])
-    construct(scene, point, g)
+    point = @lift([$rotatedpoints[i][1],
+                   $rotatedpoints[i][2],
+                   $rotatedpoints[i][3]])
+    construct(scene, point)
     push!(points, point)
 end
 
-fullscene = hbox(scene,
-                 vbox(sθ, sψ, sϕ),
-                 parent = Scene(resolution = (640, 640)))
-
-eyepos = Vec3f0(1, 0, 10)
+eyepos = Vec3f0(1, 0, 20)
 lookat = Vec3f0(0)
 update_cam!(scene, eyepos, lookat)
 scene.center = false # prevent scene from recentering on display
 
-record(scene, "hopfflower.gif") do io
+record(scene, "flower.gif") do io
+    for i in 1:3
+        recordframe!(io) # record a new frame
+    end
     for i in 1:100
         # animate scene
-        # θ[] = i
+            ϕ[] = i*pi/2/100
         animate(points, i)
+        recordframe!(io) # record a new frame
+    end
+    for i in 1:3
         recordframe!(io) # record a new frame
     end
 end
