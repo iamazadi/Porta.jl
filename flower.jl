@@ -16,7 +16,7 @@ the height of the petals B, the latitude of the flower P,
 the rotation of the flower Q, and the total number of points in the grid.
 """
 function flower!(;N=4, A=.5, B=-pi/7, P=pi/2, Q=0, number=300)
-    N = 7
+    N = 2
     A = .3
     B = -pi/7
     P = pi/3
@@ -37,13 +37,13 @@ function construct(scene, y)
     # The radius parameter for constructing surfaces
     r=0.05
     # The square root of the number of points in the grid
-    N=30
+    N=90
     lspace = range(0.0, stop = 2pi, length = N)
     # Locate the point in the base space and then rotate the three sphere
     #y = @lift(locate($a[1], $a[2]))
     # Calculate the marker grid for a point in the base space
     v = to_value(y)
-    color = RGBAf0(v[1]/3+rand()*2/3, v[2]/3+rand()*2/3, v[3]/3+rand()*2/3, 0.8)
+    color = RGBAf0(v[1]/4+rand()*3/4, v[2]/4+rand()*3/4, v[3]/4+rand()*3/4, 0.9)
     #color = @lift([RGBAf0($y[1]/2 + 0.5,
     #                      $y[2]/2 + 0.5,
     #                      $y[3]/2 + 0.5) for i in lspace, j in lspace])
@@ -54,7 +54,8 @@ function construct(scene, y)
              @lift($fiber[1]),
              @lift($fiber[2]), 
              @lift($fiber[3]), 
-             color = [color for i in lspace, j in lspace])
+             color = [color for i in lspace, j in lspace],
+             shading = false)
 end
 
 """
@@ -81,10 +82,10 @@ function animate(points, i)
     end
 end
 
-scene = Scene(show_axis = false, backgroundcolor = :black, resolution = (500, 500))
+scene = Scene(show_axis = false, backgroundcolor = :black, resolution = (400, 400))
 
 points = []
-number = 300
+number = 128
 x, y, z = flower!(number = number)
 # Rotate the flower
 u = [sqrt(3)/3, sqrt(3)/3, sqrt(3)/3]
@@ -103,7 +104,7 @@ for i in 1:number
     push!(points, point)
 end
 
-eyepos = Vec3f0(1, 0, 5)
+eyepos = Vec3f0(1, 0, 6)
 lookat = Vec3f0(0)
 update_cam!(scene, eyepos, lookat)
 scene.center = false # prevent scene from recentering on display

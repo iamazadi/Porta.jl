@@ -66,9 +66,9 @@ in the base space and the unit quaternion g for the three sphere rotation.
 """
 function construct(scene, a, g, direction)
     if direction > 0
-        shade = 1.0
+        shade = 0.45
     else
-        shade = 0.7
+        shade = 0.9
     end
     # The radius parameter for constructing surfaces
     r=0.025
@@ -79,24 +79,16 @@ function construct(scene, a, g, direction)
     # y = @lift(rotate(locate($a[1], $a[2]), $g))
     y = @lift(locate($a[1], $a[2]))
     # Calculate the marker grid for a point in the base space
-    #base = @lift(base!($y, r, N))
-    color = @lift([RGBAf0($y[2]/5, $y[1]/5, shade) for i in lspace, j in lspace])
+    v = to_value(y)
+    color = RGBAf0(v[1]*4/5+rand()/5, v[2]*4/5+rand()/5, (v[3]*4/5+rand()/5)/10+shade, 1.0)
     # Calculate the marker grid for a fiber under the streographic projection
     sweep = pi/2
     fiber = @lift(cutfiber!($a[1], $a[2], sweep, r, N))
-    
-    #surface!(scene, 
-    #         @lift($base[1]),
-    #         @lift($base[2]),
-    #        @lift($base[3]),
-    #         color = color,
-    #         shading = true)
-    
     surface!(scene, 
              @lift($fiber[1]),
              @lift($fiber[2]), 
              @lift($fiber[3]), 
-             color = color,
+             color = [color for i in lspace, j in lspace],
              shading = true)
 end
 
@@ -181,7 +173,7 @@ for i in 1:length(latitudes)
 end
 fullscene = hbox(scene,
                  vbox(sθ, sψ, sϕ),
-                 parent = Scene(resolution = (500, 500)))
+                 parent = Scene(resolution = (400, 400)))
 update_cam!(scene, FRect3D(Vec3f0(-0.75), Vec3f0(1.5)))
 scene.center = false
 record(scene, "londontsai.gif") do io
