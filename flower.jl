@@ -41,7 +41,7 @@ function construct(scene, y)
     lspace = range(0.0, stop = 2pi, length = N)
     # Calculate the marker grid for a point in the base space
     v = to_value(y)
-    color = RGBAf0(v[1]/5+rand()*4/5, v[2]/5+rand()*4/5, v[3]/5+rand()*4/5, 1.0)
+    color = RGBAf0(v[1]/4+rand()*3/4, v[2]/4+rand()*3/4, v[3]/4+rand()*3/4, 0.9)
     # Calculate the marker grid for a fiber under streographic projection
     fiber = @lift(fiber!($y, r = r, N = N))
     surface!(scene, 
