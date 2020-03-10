@@ -124,9 +124,9 @@ function fiber!(a; r=0.025, N=30)
     # Find the small and big radii
     R = Float64(LinearAlgebra.norm(A - Q))
     # Construct a torus of revolution grid
-    x = Q[1] .+ [(R + r * cos(i)) * cos(j) for i in lspace, j in lspace]
-    y = Q[2] .+ [(R + r * cos(i)) * sin(j) for i in lspace, j in lspace]
-    z = Q[3] .+ [r * sin(i) for i in lspace, j in lspace]
+    x = (Q[1] .+ [(R + r * cos(i)) * cos(j) for i in lspace, j in lspace]) ./ R
+    y = (Q[2] .+ [(R + r * cos(i)) * sin(j) for i in lspace, j in lspace]) ./ R
+    z = (Q[3] .+ [r * sin(i) for i in lspace, j in lspace]) ./ R
     points = [[x[i], y[i], z[i]] for i in 1:length(x)]
     # Get the normal to the plane containing the points
     n = LinearAlgebra.cross(A - Q, B - Q)
@@ -143,13 +143,13 @@ function fiber!(a; r=0.025, N=30)
                                            sin(ϕ)*u[2],
                                            sin(ϕ)*u[3])
     # Rotate the grid
-    rotatedpoints = [ReferenceFrameRotations.vect(q\[points[i][1]; 
-                                                     points[i][2]; 
-                                                     points[i][3]]*q)
-                                                     for i in 1:length(points)]
-    rotatedx = [rotatedpoints[i][1] for i in 1:length(rotatedpoints)]
-    rotatedy = [rotatedpoints[i][2] for i in 1:length(rotatedpoints)]
-    rotatedz = [rotatedpoints[i][3] for i in 1:length(rotatedpoints)]
+    rotated = [ReferenceFrameRotations.vect(q\[points[i][1]; 
+                                               points[i][2]; 
+                                               points[i][3]]*q)
+                                               for i in 1:length(points)]
+    rotatedx = [rotated[i][1] for i in 1:length(rotated)]
+    rotatedy = [rotated[i][2] for i in 1:length(rotated)]
+    rotatedz = [rotated[i][3] for i in 1:length(rotated)]
     rotatedx = reshape(Float64.(rotatedx), (N, N))
     rotatedy = reshape(Float64.(rotatedy), (N, N))
     rotatedz = reshape(Float64.(rotatedz), (N, N))

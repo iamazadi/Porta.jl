@@ -35,7 +35,7 @@ in the base space.
 """
 function construct(scene, y)
     # The radius parameter for constructing surfaces
-    r=0.05
+    r=0.025
     # The square root of the number of points in the grid
     N=30
     lspace = range(0.0, stop = 2pi, length = N)
@@ -43,7 +43,7 @@ function construct(scene, y)
     #y = @lift(locate($a[1], $a[2]))
     # Calculate the marker grid for a point in the base space
     v = to_value(y)
-    color = RGBAf0(v[1]*2/3+rand()/3, v[2]*2/3+rand()/3, v[3]*2/3+rand()/3, 0.9)
+    color = RGBAf0(v[1]/3+rand()*2/3, v[2]/3+rand()*2/3, v[3]/3+rand()*2/3, 0.9)
     #color = @lift([RGBAf0($y[1]/2 + 0.5,
     #                      $y[2]/2 + 0.5,
     #                      $y[3]/2 + 0.5) for i in lspace, j in lspace])
@@ -88,7 +88,7 @@ points = []
 number = 900
 x, y, z = flower!(number = number)
 # Rotate the flower
-u = [0, 1, 0]
+u = [0.0, sqrt(2)/2, sqrt(2)/2]
 ϕ = Node(0.0)
 q = @lift(ReferenceFrameRotations.Quaternion(cos($ϕ), 
                                              sin($ϕ)*u[1],
@@ -104,22 +104,16 @@ for i in 1:number
     push!(points, point)
 end
 
-eyepos = Vec3f0(1, 0, 20)
+eyepos = Vec3f0(1, 0, 5)
 lookat = Vec3f0(0)
 update_cam!(scene, eyepos, lookat)
 scene.center = false # prevent scene from recentering on display
 
 record(scene, "flower.gif") do io
-    for i in 1:3
-        recordframe!(io) # record a new frame
-    end
     for i in 1:100
         # animate scene
-            ϕ[] = i*pi/2/100
+            ϕ[] = i*pi/100
         animate(points, i)
-        recordframe!(io) # record a new frame
-    end
-    for i in 1:3
         recordframe!(io) # record a new frame
     end
 end
