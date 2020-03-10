@@ -1,7 +1,7 @@
 # Geometric quantizer
 Quantize the geometry instead of geometrizing the quantum!
 
-![the Hopf fibration](output.gif "The Hopf fibration")
+![the Hopf fibration](londontsai.gif "The Hopf fibration inspired by one of the London Tsai's prints")
 
 ![the Hopf flower](flower.gif "The Hopf flower")
 
