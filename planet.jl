@@ -67,14 +67,16 @@ function rotate_array(x₁, x₂, x₃, g)
     x, y, z
 end
 
-scene = Scene(show_axis = false, backgroundcolor = :black, resolution = (400, 400))
+universe = Scene(show_axis = false, backgroundcolor = :black)
+# Using 3 Sliders for controlling the rotation axis and angle
+sg₁, og₁ = textslider(-2pi:0.01:2pi, "g₁", start = 1)
+sg₂, og₂ = textslider(-2pi:0.01:2pi, "g₂", start = 1)
+sg₃, og₃ = textslider(-2pi:0.01:2pi, "g₃", start = 1)
+g = @lift(ReferenceFrameRotations.Quaternion(cos($og₁), 
+                                             sin($og₁) * cos($og₂) * cos($og₃),
+                                             sin($og₁) * cos($og₂) * sin($og₃),
+                                             sin($og₁) * sin($og₂)))
 
-u = [sqrt(3)/3, sqrt(3)/3, sqrt(3)/3]
-ψ = Node(0.0)
-q = @lift(ReferenceFrameRotations.Quaternion(cos($ψ), 
-                                             sin($ψ)*u[1],
-                                             sin($ψ)*u[2],
-                                             sin($ψ)*u[3]))
 points = []
 countries = Dict("iran" => RGBAf0(1.0, 1.0, 1.0, 1.0), # white
                  "us" => RGBAf0(0.0, 1.0, 1.0, 1.0), # blue
@@ -106,11 +108,11 @@ for country in countries
     for i in 1:length(θ)
         x₁[i], x₂[i], x₃[i] = locate(θ[i], ϕ[i])
     end
-    rotated = @lift(rotate_array(x₁, x₂, x₃, $q))
+    rotated = @lift(rotate_array(x₁, x₂, x₃, $g))
     N = 30
     xyz = @lift(construct($rotated[1], $rotated[2], $rotated[3], N))
     push!(points, xyz)
-    surface!(scene,
+    surface!(universe,
              @lift($xyz[1]),
              @lift($xyz[2]),
              @lift($xyz[3]),
@@ -119,13 +121,15 @@ end
 
 eyepos = Vec3f0(3, 3, 3)
 lookat = Vec3f0(0)
-update_cam!(scene, eyepos, lookat)
-scene.center = false # prevent scene from recentering on display
-
-record(scene, "planet.gif") do io
+update_cam!(universe, eyepos, lookat)
+universe.center = false # prevent scene from recentering on display
+scene = hbox(universe, vbox(sg₁, sg₂, sg₃), parent = Scene(resolution = (500, 500)))
+"""
+record(universe, "planet.gif") do io
     for i in 1:100
-        ψ[] = i*2pi/100 # animate scene
+        og₁[] = 2pi*i/100 # animate scene
         recordframe!(io) # record a new frame
     end
 end
+"""
 
