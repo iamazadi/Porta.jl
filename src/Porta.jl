@@ -3,8 +3,8 @@ module Porta
 export locate
 export σ
 export σ⁻¹
-export points!
-export center!
+export get_points
+export get_center
 export rotate
 export fiber!
 export base!
@@ -54,41 +54,38 @@ function σ(x₁, x₂, x₃, x₄)
 end
 
 """
-points!(a)
+get_points(y, angle)
 
-Finds 3 points on the fiber circle under stereographic projection 
-with the given point in the base space.
+Finds 2 more points on the fiber circle under stereographic projection 
+with the given point in the base space which is also on the circle
+and the phase angle between the points along the circle.
 """
-function points!(a)
-    λ₁ = complex(cos(1), sin(1))
-    λ₂ = complex(cos(2), sin(2))
-    λ₃ = complex(cos(3), sin(3))
-    w₁, w₂, w₃, w₄ = σ⁻¹(a[1], a[2], a[3])
+function get_points(y, angle)
+    λ₁ = complex(cos(-angle), sin(-angle))
+    λ₂ = complex(cos(angle), sin(angle))
+    w₁, w₂, w₃, w₄ = σ⁻¹(y[1], y[2], y[3])
     x₁ = λ₁ * complex(w₁, w₂)
     x₂ = λ₁ * complex(w₃, w₄)
-    y₁ = λ₂ * complex(w₁, w₂)
-    y₂ = λ₂ * complex(w₃, w₄)
-    z₁ = λ₃ * complex(w₁, w₂)
-    z₂ = λ₃ * complex(w₃, w₄)
-    p = σ(real(x₁), imag(x₁), real(x₂), imag(x₂))
-    q = σ(real(y₁), imag(y₁), real(y₂), imag(y₂))
-    r = σ(real(z₁), imag(z₁), real(z₂), imag(z₂))
-    [p, q, r]
+    z₁ = λ₂ * complex(w₁, w₂)
+    z₂ = λ₂ * complex(w₃, w₄)
+    x = σ(real(x₁), imag(x₁), real(x₂), imag(x₂))
+    z = σ(real(z₁), imag(z₁), real(z₂), imag(z₂))
+    x, y, z
 end
 
 """
-center!(A, B, C)
+get_center(X, Y, Z)
 
 Finds the center point of the fiber circle under stereographic projection
 with the given 3 points on the circle circumference.
 """
-function center!(A, B, C)
-    a = LinearAlgebra.norm(B - C)
-    b = LinearAlgebra.norm(A - C)
-    c = LinearAlgebra.norm(A - B)
-    numerator = a^2 * (b^2 + c^2 - a^2) * A + 
-                b^2 * (a^2 + c^2 - b^2) * B + 
-                c^2 * (a^2 + b^2 - c^2) * C
+function get_center(X, Y, Z)
+    a = LinearAlgebra.norm(Y - Z)
+    b = LinearAlgebra.norm(X - Z)
+    c = LinearAlgebra.norm(X - Y)
+    numerator = a^2 * (b^2 + c^2 - a^2) * X + 
+                b^2 * (a^2 + c^2 - b^2) * Y + 
+                c^2 * (a^2 + b^2 - c^2) * Z
     denominator = a^2 * (b^2 + c^2 - a^2) + 
                   b^2 * (a^2 + c^2 - b^2) + 
                   c^2 * (a^2 + b^2 - c^2)
