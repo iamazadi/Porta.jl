@@ -5,6 +5,7 @@ using AbstractPlotting
 using Makie
 using CSV
 using StatsBase
+using ReferenceFrameRotations
 using Porta
 
 
@@ -50,7 +51,7 @@ function get_pullback(points, segments)
     samples = size(points, 1)
     pullback = Array{Float64}(undef, segments, samples, 3)
     for i in 1:samples
-        angle = 2pi / segments
+        angle = 2pi / (segments-1)
         # Get the base point
         B = points[i, :]
         X, Y, Z = get_points(B, angle)
@@ -61,39 +62,70 @@ function get_pullback(points, segments)
         for j in 1:segments
             X, Y, Z = get_points(B, angle)
             pullback[j, i, :] = Z ./ radius
-            angle += 2pi / segments
+            angle += 2pi / (segments-1)
         end
     end
     pullback
 end
 
-samples = 3000
+
+sg₁, og₁ = textslider(0:0.01:2pi, "g₁", start = pi/6)
+sg₂, og₂ = textslider(0:0.01:2pi, "g₂", start = 0)
+sg₃, og₃ = textslider(0:0.01:2pi, "g₃", start = pi/6)
+# The three sphere rotations axis
+g = @lift(ReferenceFrameRotations.Quaternion(cos($og₁),
+                                             sin($og₁)*cos($og₂)*cos($og₃),
+                                             sin($og₁)*cos($og₂)*sin($og₃),
+                                             sin($og₁)*sin($og₂)))
+
+samples = 300
 segments = 30
 # Made with Natural Earth.
 # Free vector and raster map data @ naturalearthdata.com.
-countries = Dict("iran" => RGBAf0(1.0, 0.0, 0.0, 1.0), # red
-                 "us" => RGBAf0(0.0, 1.0, 0.0, 1.0), # green
-                 "china" => RGBAf0(0.0, 0.0, 1.0, 1.0)) # blue
+countries = Dict("iran" => (1.0, 0.0, 0.0), # red
+                 "us" => (0.0, 1.0, 0.0), # green
+                 "china" => (0.0, 0.0, 1.0), # blue
+                 "ukraine" => (1.0, 1.0, 0.0), # yellow
+                 "australia" => (0.0, 1.0, 1.0), # cyan
+                 "germany" => (1.0, 0.0, 1.0), #magenta
+                 "israel" => (1.0, 1.0, 1.0)) # white
 path = "data/natural_earth_vector"
-universe = Scene()
+universe = Scene(backgroundcolor = :black, show_axis=false)
 for country in countries
     dataframe = CSV.read(joinpath(path, "$(country[1])-nodes.csv"))
     points = sample_points(dataframe, samples)
     count = size(points, 1)
-    color = fill(country[2], segments, count)
-    pullback = get_pullback(points, segments)
-    for i in segments
-        meshscatter!(universe,
-                     pullback[i, :, 1],
-                     pullback[i, :, 2],
-                     pullback[i, :, 3],
-                     markersize = 0.01,
-                     color = country[2])
+    color = fill(RGBAf0(country[2]..., 1.0), segments, count)
+    color[1:6, :] = fill(RGBAf0(country[2]..., 0.3), 6, count)
+    rotated = @lift begin
+        R = similar(points)
+        for i in 1:count
+            R[i, :] = rotate(points[i, :], $g)
+        end
+        R
     end
+    pullback = @lift(get_pullback($rotated, segments))
     surface!(universe,
-             pullback[:, :, 1],
-             pullback[:, :, 2],
-             pullback[:, :, 3],
+             @lift($pullback[:, :, 1]),
+             @lift($pullback[:, :, 2]),
+             @lift($pullback[:, :, 3]),
              color = color)
 end
+
+scene = hbox(universe,
+             vbox(sg₁, sg₂, sg₃),
+             parent = Scene(resolution = (400, 400)))
+
+eyepos = Vec3f0(1, 1, -1)
+lookat = Vec3f0(0)
+update_cam!(universe, eyepos, lookat)
+universe.center = false # prevent scene from recentering on display
+
+record(universe, "planet.gif") do io
+    for i in 1:100
+        og₂[] = i*2pi/100 # animate scene
+        recordframe!(io) # record a new frame
+    end
+end
+
 
