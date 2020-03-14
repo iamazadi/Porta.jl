@@ -28,22 +28,22 @@ function flower!(;N=4, A=.5, B=-pi/7, P=pi/2, Q=0, number=300)
 end
 
 """
-construct(scene, a)
+construct(scene, point)
 
-Constructs a fiber with the given scene and the observable point a
+Constructs a fiber with the given scene and the observable point
 in the base space.
 """
-function construct(scene, y)
+function construct(scene, point)
     # The radius parameter for constructing surfaces
     r=0.1
     # The square root of the number of points in the grid
     N=30
     lspace = range(0.0, stop = 2pi, length = N)
     # Calculate the marker grid for a point in the base space
-    v = to_value(y)
-    color = RGBAf0(v[1]/3+rand()*2/3, v[2]/3+rand()*2/3, v[3]/3+rand()*2/3, 0.9)
+    v = to_value(point)
+    color = RGBAf0(v[1]/2+rand()/2, v[2]/2+rand()/2, v[3]/2+rand()/2, 0.9)
     # Calculate the marker grid for a fiber under streographic projection
-    fiber = @lift(fiber!($y, r = r, N = N))
+    fiber = @lift(fiber!($point, r = r, N = N))
     surface!(scene, 
              @lift($fiber[1]),
              @lift($fiber[2]), 
@@ -62,17 +62,8 @@ and longitude(ψ) in radians, and the progress percentage ranges from 1 to 100.
 """
 function animate(points, i)
     for point in points
-        x, y, z = to_value(point)
-        r = sqrt(x^2 + y^2 + z^2)
-        θ = asin(z/r)
-        if x > 0
-                ϕ = atan(y/x)
-        elseif y > 0
-                ϕ = atan(y/x) + pi
-        else
-                ϕ = atan(y/x) - pi
-        end
-        point[] = locate(θ, ϕ + (i-1)/100 * 2pi - i/100 * 2pi)
+        θ, ϕ = convert_to_geographic(to_value(point))
+        point[] = convert_to_cartesian([θ + (i-1)/100 * 2pi - i/100 * 2pi, ϕ])
     end
 end
 

@@ -1,6 +1,7 @@
 module Porta
 
-export locate
+export convert_to_cartesian
+export convert_to_geographic
 export σ
 export σ⁻¹
 export get_points
@@ -12,19 +13,42 @@ export base!
 import LinearAlgebra
 import ReferenceFrameRotations
 
-"""
-locate(θ, ψ)
 
-Locates the point in the base space
-with the given corrdinates on the two sphere: latitude (θ) and longitude(ψ)
-both of which are measured in radians.
 """
-function locate(θ, ψ)
-    y₁ = cos(θ) * cos(ψ)
-    y₂ = cos(θ) * sin(ψ)
-    y₃ = sin(θ)
+convert_to_cartesian(point)
+
+Converts a point in the geographic coordinate system to a point in the
+cartesian one with the given point in radians.
+"""
+function convert_to_cartesian(point)
+    θ, ψ = point
+    y₁ = cos(ψ) * cos(θ)
+    y₂ = cos(ψ) * sin(θ)
+    y₃ = sin(ψ)
     [y₁, y₂, y₃]
 end
+
+
+"""
+convert_to_geographic(point)
+
+Converts a point in the cartesian coordinate system to a point in the
+geographic one with the given point.
+"""
+function convert_to_geographic(point)
+    x, y, z = point
+    r = sqrt(x^2 + y^2 + z^2)
+    ψ = asin(z/r)
+    if x > 0
+        θ = atan(y/x)
+    elseif y > 0
+        θ = atan(y/x) + pi
+    else
+        θ = atan(y/x) - pi
+    end
+    [θ, ψ]
+end
+
 
 """
 σ⁻¹(y₁, y₂, y₃)
@@ -40,6 +64,7 @@ function σ⁻¹(y₁, y₂, y₃)
     [x₁, x₂, x₃, x₄]
 end
 
+
 """
 σ(x₁, x₂, x₃, x₄)
 
@@ -52,6 +77,7 @@ function σ(x₁, x₂, x₃, x₄)
     y₃ = x₃ / (1 - x₄)
     [y₁, y₂, y₃]
 end
+
 
 """
 get_points(y, angle)
@@ -73,6 +99,7 @@ function get_points(y, angle)
     x, y, z
 end
 
+
 """
 get_center(X, Y, Z)
 
@@ -92,32 +119,34 @@ function get_center(X, Y, Z)
     numerator / denominator
 end
 
-"""
-rotate(y, g)
 
-Rotates the three sphere with the given unit quaternion g
-and returns the rotated version of the point a in the base space.
 """
-function rotate(y, g)
-    x₁, x₂, x₃, x₄ = σ⁻¹(y[1], y[2], y[3])
-    q = ReferenceFrameRotations.Quaternion(x₁, x₂, x₃, x₄)
-    ReferenceFrameRotations.vect(g * q)
+rotate(point, g)
+
+Rotates a point in the base space by rotating the corresponding three sphere
+with the given point and the unit quaternion.
+"""
+function rotate(point, g)
+    q = ReferenceFrameRotations.Quaternion(σ⁻¹(point...)...)
+    r = g * q
+    σ(real(r), imag(r)...)
 end
 
+
 """
-fiber!(a; r=0.025, N=30)
+fiber!(point; r=0.025, N=30)
 
 Calculates the grid of a fiber circle under stereographic projection
 with the given coordinates in the base space.
 The optional arguments are the radius of the spherical grid
 and the square root of the number of points in the grid.
 """
-function fiber!(a; r=0.025, N=30)
+function fiber!(point; r=0.025, N=30)
     lspace = range(0.0, stop = 2pi, length = N)
     # Find 3 points on the circle
-    A, B, C = points!(a)
+    A, B, C = get_points(point, pi/4)
     # Get the circle center point
-    Q = center!(A, B, C)
+    Q = get_center(A, B, C)
     # Find the small and big radii
     R = Float64(LinearAlgebra.norm(A - Q))
     # Construct a torus of revolution grid
@@ -153,6 +182,7 @@ function fiber!(a; r=0.025, N=30)
     [rotatedx, rotatedy, rotatedz]
 end
 
+
 """
 base!(a; r=0.05, N=30)
 
@@ -169,5 +199,6 @@ function base!(a; r=0.05, N=30)
     z = a[3] .+ [r * sin(i) for i in lspace, j in lspace]
     [x, y, z]
 end
+
 
 end # module

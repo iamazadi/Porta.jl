@@ -15,19 +15,20 @@ with the given coordinates in the base space (in randians.)
 The optional arguments are the sweep angle of the fiber, the radius of
 the spherical grid and the square root of the number of points in the grid.
 """
-function cutfiber!(θ, ψ, sweep=pi/2, r=0.025, N=30)
-    corrected_sweep = sweep - sweep*(θ/(pi/2)) * 0.95
+function cutfiber!(point, sweep=pi/2, r=0.025, N=30)
+    θ, ψ = point
+    corrected_sweep = sweep - sweep*(ψ/(pi/2)) * 0.95
     lspace = range(0, stop = 2pi, length = N)
     lspace2 = range(pi-corrected_sweep, stop = pi+corrected_sweep, length = N)
     # Find 3 points on the circle
-    A, B, C = points!(locate(θ, ψ))
+    A, B, C = get_points(convert_to_cartesian(point), pi/4)
     # Get the circle center point
-    Q = Porta.center!(A, B, C)
+    Q = get_center(A, B, C)
     # Find the small and big radii
     R = Float64(LinearAlgebra.norm(A - Q))
     # Construct a torus of revolution grid
-    x = Q[1] .+ [(R + r * cos(i)) * cos(j + ψ + pi/2) for i in lspace, j in lspace2]
-    y = Q[2] .+ [(R + r * cos(i)) * sin(j + ψ + pi/2) for i in lspace, j in lspace2]
+    x = Q[1] .+ [(R + r * cos(i)) * cos(j + θ + pi/2) for i in lspace, j in lspace2]
+    y = Q[2] .+ [(R + r * cos(i)) * sin(j + θ + pi/2) for i in lspace, j in lspace2]
     z = Q[3] .+ [r * sin(i) for i in lspace, j in lspace2]
     points = [[x[i], y[i], z[i]] for i in 1:length(x)]
     # Get the normal to the plane containing the points
@@ -77,13 +78,13 @@ function construct(scene, a, g, direction)
     lspace = range(0.0, stop = 2pi, length = N)
     # Locate the point in the base space and then rotate the three sphere
     # y = @lift(rotate(locate($a[1], $a[2]), $g))
-    y = @lift(locate($a[1], $a[2]))
+    y = @lift(convert_to_cartesian($a))
     # Calculate the marker grid for a point in the base space
     v = to_value(y)
     color = RGBAf0(v[1]*4/5+rand()/5, v[2]*4/5+rand()/5, (v[3]*4/5+rand()/5)/10+shade, 1.0)
     # Calculate the marker grid for a fiber under the streographic projection
     sweep = pi/2
-    fiber = @lift(cutfiber!($a[1], $a[2], sweep, r, N))
+    fiber = @lift(cutfiber!($a, sweep, r, N))
     surface!(scene, 
              @lift($fiber[1]),
              @lift($fiber[2]), 
@@ -105,9 +106,9 @@ function animate(item, i)
     for point in points
         val = to_value(point)
         if direction > 0
-            point[] = [val[1], (val[2] - (i-1)/100 * 2pi) + i/100 * 2pi]
+            point[] = [(val[1] - (i-1)/100 * 2pi) + i/100 * 2pi, val[2]]
         else
-            point[] = [val[1], (val[2] + (i-1)/100 * 2pi) - i/100 * 2pi]
+            point[] = [(val[1] + (i-1)/100 * 2pi) - i/100 * 2pi, val[2]]
         end
     end
 end
@@ -165,7 +166,7 @@ for i in 1:length(latitudes)
     direction = (-1)^i
     #for j in range(0, stop = 2pi, length = 30)
     for j in range(pi/4, stop = 2pi - pi/4, length = 30)
-        point = Node([latitudes[i], j+i])
+        point = Node([j+i, latitudes[i]])
         construct(scene, point, g, direction)
         push!(torus, point)
     end
