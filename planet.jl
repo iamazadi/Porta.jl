@@ -69,35 +69,49 @@ end
 
 function get_manifold(points, segments, cut)
     samples = size(points, 1)
-    manifold = Array{Complex}(undef, segments, samples, 3)
-    α = (2pi-cut) / (segments-1)
+    leftover_segments = Integer(floor((cut / 2pi) * segments))
+    manifold_segments = segments - leftover_segments
+    manifold = Array{Float64}(undef, manifold_segments, samples, 3)
+    leftover = Array{Float64}(undef, leftover_segments, samples, 3)
+    α = (2pi-cut) / (manifold_segments-1)
+    γ = cut / (leftover_segments-1)
     for i in 1:samples
-            ϕ, θ = points[i, :]
-        z, w = τ(ϕ, θ)
+        z, w = τ(points[i, :]...)
         for j in 1:segments
-            z, w = S¹action(α, z, w)
-            x₁ = (real(w) + 1) * sin(α*j)
-            x₂ = (real(w) + 1) * cos(α*j)
-            x₃ = imag(w)
-            manifold[j, i, :] = [x₁, x₂, x₃]
+            if j ≤ manifold_segments
+                x₁ = (real(w) + 1) * sin(α*(j-1))
+                x₂ = (real(w) + 1) * cos(α*(j-1))
+                x₃ = imag(w)
+                manifold[j, i, :] = [x₁, x₂, x₃]
+                if j != manifold_segments
+                    z, w = S¹action(α, z, w)
+                end
+            else
+                index = j-manifold_segments
+                x₁ = (real(w) + 1) * sin((2pi-cut)+γ*(index-1))
+                x₂ = (real(w) + 1) * cos((2pi-cut)+γ*(index-1))
+                x₃ = imag(w)
+                leftover[index, i, :] = [x₁, x₂, x₃]
+                z, w = S¹action(γ, z, w)
+            end
         end
     end
-    manifold
+    manifold, leftover
 end
 
 
 universe = Scene(backgroundcolor = :black, show_axis=false)
 sg, og = textslider(0:0.05:2pi, "g", start = 0)
 
-max_samples = 3000
-segments = 90
+max_samples = 1000
+segments = 30
 # Made with Natural Earth.
 # Free vector and raster map data @ naturalearthdata.com.
 countries = Dict("iran" => [1.0, 0.0, 0.0], # red
                  "us" => [0.0, 1.0, 0.0], # green
                  "china" => [0.0, 0.0, 1.0], # blue
                  "ukraine" => [1.0, 1.0, 0.0], # yellow
-                 #"australia" => [0.0, 1.0, 1.0], # cyan
+                 "australia" => [0.0, 1.0, 1.0], # cyan
                  "germany" => [1.0, 0.0, 1.0], #magenta
                  "israel" => [1.0, 1.0, 1.0]) # white
 path = "data/natural_earth_vector"
@@ -106,6 +120,7 @@ for country in countries
     points = sample(dataframe, max_samples)
     samples = size(points, 1)
     specific = RGBAf0(country[2]..., 1.0)
+    ghost = RGBAf0(country[2]..., 0.2)
     inverse = RGBAf0((1 .- country[2])..., 1.0)
     
     rotated = @lift begin
@@ -118,20 +133,33 @@ for country in countries
     end
     
     cut = 2pi/360*80
-    manifold = @lift(get_manifold($rotated, segments, cut))
-    color = fill(specific, segments, samples)
+    leftover_segments = Integer(floor((cut / 2pi) * segments))
+    manifold_segments = segments - leftover_segments
+    manifold_color = fill(specific, manifold_segments, samples)
+    manifolds = @lift(get_manifold($rotated, segments, cut))
+    manifold = @lift($manifolds[1])
     surface!(universe,
              @lift($manifold[:, :, 1]),
              @lift($manifold[:, :, 2]),
              @lift($manifold[:, :, 3]),
-             color = color)
+             color = manifold_color)
+    if country[1] in ["iran", "us", "australia"]
+        ghost_color = fill(ghost, leftover_segments, samples)
+        leftover = @lift($manifolds[2])
+        surface!(universe,
+                 @lift($leftover[:, :, 1]),
+                 @lift($leftover[:, :, 2]),
+                 @lift($leftover[:, :, 3]),
+                 color = ghost_color,
+                 transparency = true)
+     end
 end
 
 scene = hbox(universe,
              vbox(sg),
              parent = Scene(resolution = (400, 400)))
 
-eyepos = Vec3f0(-2, 3, 0)
+eyepos = Vec3f0(-2, 2, 0)
 lookat = Vec3f0(0)
 update_cam!(universe, eyepos, lookat)
 universe.center = false # prevent scene from recentering on display
