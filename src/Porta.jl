@@ -101,18 +101,18 @@ end
 
 
 """
-get_center(X, Y, Z)
+get_center(A, B, C)
 
 Finds the center point of the fiber circle under stereographic projection
 with the given 3 points on the circle circumference.
 """
-function get_center(X, Y, Z)
-    a = LinearAlgebra.norm(Y - Z)
-    b = LinearAlgebra.norm(X - Z)
-    c = LinearAlgebra.norm(X - Y)
-    numerator = a^2 * (b^2 + c^2 - a^2) * X + 
-                b^2 * (a^2 + c^2 - b^2) * Y + 
-                c^2 * (a^2 + b^2 - c^2) * Z
+function get_center(A, B, C)
+    a = LinearAlgebra.norm(B - C)
+    b = LinearAlgebra.norm(A - C)
+    c = LinearAlgebra.norm(A - B)
+    numerator = a^2 * (b^2 + c^2 - a^2) * A + 
+                b^2 * (a^2 + c^2 - b^2) * B + 
+                c^2 * (a^2 + b^2 - c^2) * C
     denominator = a^2 * (b^2 + c^2 - a^2) + 
                   b^2 * (a^2 + c^2 - b^2) + 
                   c^2 * (a^2 + b^2 - c^2)

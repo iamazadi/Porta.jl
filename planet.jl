@@ -87,24 +87,17 @@ end
 
 
 universe = Scene(backgroundcolor = :black, show_axis=false)
-sg₁, og₁ = textslider(0:0.05:2pi, "g₁", start = 0)
-sg₂, og₂ = textslider(0:0.05:2pi, "g₂", start = 0)
-sg₃, og₃ = textslider(0:0.05:2pi, "g₃", start = 0)
-# The three sphere rotations axis
-g = @lift(ReferenceFrameRotations.Quaternion(cos($og₁),
-                                             sin($og₁)*cos($og₂)*cos($og₃),
-                                             sin($og₁)*cos($og₂)*sin($og₃),
-                                             sin($og₁)*sin($og₂)))
+sg, og = textslider(0:0.05:2pi, "g", start = 0)
 
-max_samples = 300
-segments = 30
+max_samples = 3000
+segments = 90
 # Made with Natural Earth.
 # Free vector and raster map data @ naturalearthdata.com.
 countries = Dict("iran" => [1.0, 0.0, 0.0], # red
                  "us" => [0.0, 1.0, 0.0], # green
                  "china" => [0.0, 0.0, 1.0], # blue
                  "ukraine" => [1.0, 1.0, 0.0], # yellow
-                 "australia" => [0.0, 1.0, 1.0], # cyan
+                 #"australia" => [0.0, 1.0, 1.0], # cyan
                  "germany" => [1.0, 0.0, 1.0], #magenta
                  "israel" => [1.0, 1.0, 1.0]) # white
 path = "data/natural_earth_vector"
@@ -118,13 +111,13 @@ for country in countries
     rotated = @lift begin
         R = similar(points)
         for i in 1:samples
-            cartesian = convert_to_cartesian(points[i, :])
-            R[i, :] = convert_to_geographic(rotate(cartesian, $g))
+                  ϕ, θ = points[i, :]
+            R[i, :] = [ϕ + $og, θ]
         end
         R
     end
     
-    cut = pi/2
+    cut = 2pi/360*80
     manifold = @lift(get_manifold($rotated, segments, cut))
     color = fill(specific, segments, samples)
     surface!(universe,
@@ -135,10 +128,10 @@ for country in countries
 end
 
 scene = hbox(universe,
-             vbox(sg₁, sg₂, sg₃),
+             vbox(sg),
              parent = Scene(resolution = (400, 400)))
 
-eyepos = Vec3f0(-2, 3, -2)
+eyepos = Vec3f0(-2, 3, 0)
 lookat = Vec3f0(0)
 update_cam!(universe, eyepos, lookat)
 universe.center = false # prevent scene from recentering on display
@@ -146,10 +139,7 @@ universe.center = false # prevent scene from recentering on display
 record(universe, "planet.gif") do io
     frames = 100
     for i in 1:frames
-        # animate scene
-        og₁[] = i*2pi/frames
-        #og₂[] = i*2pi/frames
-        #og₃[] = i*2pi/frames
+        og[] = i*2pi/frames # animate scene
         recordframe!(io) # record a new frame
     end
 end
