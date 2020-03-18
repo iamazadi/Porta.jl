@@ -1,4 +1,6 @@
 using LinearAlgebra
+using FileIO
+using Colors
 using AbstractPlotting
 using Makie
 using CSV
@@ -76,21 +78,22 @@ function get_manifold(points, segments, cut)
     α = (2pi-cut) / (manifold_segments-1)
     γ = cut / (leftover_segments-1)
     for i in 1:samples
-        z, w = τ(points[i, :]...)
+            ϕ, θ = points[i, :]
+        z, w = σ(ϕ, -θ)
         for j in 1:segments
             if j ≤ manifold_segments
-                x₁ = (real(w) + 1) * sin(α*(j-1))
-                x₂ = (real(w) + 1) * cos(α*(j-1))
-                x₃ = imag(w)
+                x₁ = (real(z) + 1) * sin(α*(j-1))
+                x₂ = (real(z) + 1) * cos(α*(j-1))
+                x₃ = imag(z)
                 manifold[j, i, :] = [x₁, x₂, x₃]
                 if j != manifold_segments
                     z, w = S¹action(α, z, w)
                 end
             else
                 index = j-manifold_segments
-                x₁ = (real(w) + 1) * sin((2pi-cut)+γ*(index-1))
-                x₂ = (real(w) + 1) * cos((2pi-cut)+γ*(index-1))
-                x₃ = imag(w)
+                x₁ = (real(z) + 1) * sin((2pi-cut)+γ*(index-1))
+                x₂ = (real(z) + 1) * cos((2pi-cut)+γ*(index-1))
+                x₃ = imag(z)
                 leftover[index, i, :] = [x₁, x₂, x₃]
                 z, w = S¹action(γ, z, w)
             end
@@ -103,24 +106,25 @@ end
 universe = Scene(backgroundcolor = :black, show_axis=false)
 sg, og = textslider(0:0.05:2pi, "g", start = 0)
 
-max_samples = 1000
+max_samples = 300
 segments = 30
 # Made with Natural Earth.
 # Free vector and raster map data @ naturalearthdata.com.
-countries = Dict("iran" => [1.0, 0.0, 0.0], # red
-                 "us" => [0.0, 1.0, 0.0], # green
-                 "china" => [0.0, 0.0, 1.0], # blue
-                 "ukraine" => [1.0, 1.0, 0.0], # yellow
-                 "australia" => [0.0, 1.0, 1.0], # cyan
-                 "germany" => [1.0, 0.0, 1.0], #magenta
-                 "israel" => [1.0, 1.0, 1.0]) # white
+countries = Dict("iran" => [0.0, 1.0, 0.29], # green
+                 "us" => [0.494, 1.0, 0.0], # green
+                 "china" => [1.0, 0.639, 0.0], # orange
+                 "ukraine" => [0.0, 0.894, 1.0], # cyan
+                 "australia" => [1.0, 0.804, 0.0], # orange
+                 "germany" => [0.914, 0.0, 1.0], # purple
+                 "israel" => [0.0, 1.0, 0.075]) # green
 path = "data/natural_earth_vector"
+cut = 2pi/360*80
 for country in countries
     dataframe = CSV.read(joinpath(path, "$(country[1])-nodes.csv"))
     points = sample(dataframe, max_samples)
     samples = size(points, 1)
     specific = RGBAf0(country[2]..., 1.0)
-    ghost = RGBAf0(country[2]..., 0.2)
+    ghost = RGBAf0(country[2]..., 0.3)
     inverse = RGBAf0((1 .- country[2])..., 1.0)
     
     rotated = @lift begin
@@ -132,7 +136,6 @@ for country in countries
         R
     end
     
-    cut = 2pi/360*80
     leftover_segments = Integer(floor((cut / 2pi) * segments))
     manifold_segments = segments - leftover_segments
     manifold_color = fill(specific, manifold_segments, samples)
@@ -155,14 +158,63 @@ for country in countries
      end
 end
 
+disk_segments = 10
+disk_samples = 30
+phase = -pi/2 #+ pi/100
+align = 0.35
+lspace = range(0, stop = 2pi, length = disk_samples)
+disk1 = @lift begin
+    p = Array{Float64}(undef, disk_segments, disk_samples, 3)
+    for i in 1:disk_segments
+        p[i, :, 1] = [0 for j in lspace]
+        p[i, :, 2] = [(i+align)/10*sin(j+$og+phase)+1 for j in lspace]
+        p[i, :, 3] = [(i+align)/10*cos(j+$og+phase) for j in lspace]
+    end
+    p
+end
+
+disk2 = @lift begin
+    p = Array{Float64}(undef, disk_segments, disk_samples, 3)
+    for i in 1:disk_segments
+        p[i, :, 1] = [((i+align)/10*sin(j+$og+phase+cut)+1)*sin(2pi-cut) for j in lspace]
+        p[i, :, 2] = [((i+align)/10*sin(j+$og+phase+cut)+1)*cos(2pi-cut) for j in lspace]
+        p[i, :, 3] = [(i+align)/10*cos(j+$og+phase+cut) for j in lspace]
+    end
+    p
+end
+
+image = try
+    load("data/BaseMap.png")
+catch e
+    @warn("Loading the globe map failed. Using random image, so this test will fail! (error: $e)")
+    rand(RGBAf0, 100, 100) # don't error test when e.g. offline
+end
+
+surface!(universe,
+         @lift($disk1[:, :, 1]),
+         @lift($disk1[:, :, 2]),
+         @lift($disk1[:, :, 3]),
+         color = image,
+         transparency = false,
+         shading = false)
+         
+surface!(universe,
+         @lift($disk2[:, :, 1]),
+         @lift($disk2[:, :, 2]),
+         @lift($disk2[:, :, 3]),
+         color = image,
+         transparency = false,
+         shading = false)
+
 scene = hbox(universe,
              vbox(sg),
              parent = Scene(resolution = (400, 400)))
 
-eyepos = Vec3f0(-2, 2, 0)
-lookat = Vec3f0(0)
-update_cam!(universe, eyepos, lookat)
+# update eye position
+eye_position, lookat, upvector = Vec3f0(-1.5, 1.5, 1.5), Vec3f0(0), Vec3f0(0, 0, 1.0)
+update_cam!(universe, eye_position, lookat, upvector)
 universe.center = false # prevent scene from recentering on display
+
 
 record(universe, "planet.gif") do io
     frames = 100
