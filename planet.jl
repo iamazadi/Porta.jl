@@ -82,8 +82,8 @@ function get_manifold(points, segments, cut)
         z, w = σ(ϕ, -θ)
         for j in 1:segments
             if j ≤ manifold_segments
-                x₁ = (real(z) + 1) * sin(α*(j-1))
-                x₂ = (real(z) + 1) * cos(α*(j-1))
+                x₁ = (real(z) + 2) * sin(α*(j-1))
+                x₂ = (real(z) + 2) * cos(α*(j-1))
                 x₃ = imag(z)
                 manifold[j, i, :] = [x₁, x₂, x₃]
                 if j != manifold_segments
@@ -91,8 +91,8 @@ function get_manifold(points, segments, cut)
                 end
             else
                 index = j-manifold_segments
-                x₁ = (real(z) + 1) * sin((2pi-cut)+γ*(index-1))
-                x₂ = (real(z) + 1) * cos((2pi-cut)+γ*(index-1))
+                x₁ = (real(z) + 2) * sin((2pi-cut)+γ*(index-1))
+                x₂ = (real(z) + 2) * cos((2pi-cut)+γ*(index-1))
                 x₃ = imag(z)
                 leftover[index, i, :] = [x₁, x₂, x₃]
                 z, w = S¹action(γ, z, w)
@@ -107,10 +107,10 @@ universe = Scene(backgroundcolor = :black, show_axis=false)
 sg, og = textslider(0:0.05:2pi, "g", start = 0)
 
 max_samples = 300
-segments = 30
+segments = 90
 # Made with Natural Earth.
 # Free vector and raster map data @ naturalearthdata.com.
-countries = Dict("iran" => [0.0, 1.0, 0.29], # green
+countries = Dict("iran" => [1.0, 0.0, 0.0], # red
                  "us" => [0.494, 1.0, 0.0], # green
                  "china" => [1.0, 0.639, 0.0], # orange
                  "ukraine" => [0.0, 0.894, 1.0], # cyan
@@ -124,7 +124,7 @@ for country in countries
     points = sample(dataframe, max_samples)
     samples = size(points, 1)
     specific = RGBAf0(country[2]..., 1.0)
-    ghost = RGBAf0(country[2]..., 0.3)
+    ghost = RGBAf0(country[2]..., 0.5)
     inverse = RGBAf0((1 .- country[2])..., 1.0)
     
     rotated = @lift begin
@@ -160,14 +160,14 @@ end
 
 disk_segments = 10
 disk_samples = 30
-phase = -pi/2 #+ pi/100
+phase = -pi/2 + pi/100
 align = 0.35
 lspace = range(0, stop = 2pi, length = disk_samples)
 disk1 = @lift begin
     p = Array{Float64}(undef, disk_segments, disk_samples, 3)
     for i in 1:disk_segments
         p[i, :, 1] = [0 for j in lspace]
-        p[i, :, 2] = [(i+align)/10*sin(j+$og+phase)+1 for j in lspace]
+        p[i, :, 2] = [(i+align)/10*sin(j+$og+phase)+2 for j in lspace]
         p[i, :, 3] = [(i+align)/10*cos(j+$og+phase) for j in lspace]
     end
     p
@@ -176,15 +176,51 @@ end
 disk2 = @lift begin
     p = Array{Float64}(undef, disk_segments, disk_samples, 3)
     for i in 1:disk_segments
-        p[i, :, 1] = [((i+align)/10*sin(j+$og+phase+cut)+1)*sin(2pi-cut) for j in lspace]
-        p[i, :, 2] = [((i+align)/10*sin(j+$og+phase+cut)+1)*cos(2pi-cut) for j in lspace]
+        p[i, :, 1] = [((i+align)/10*sin(j+$og+phase+cut)+2)*sin(2pi-cut)
+                      for j in lspace]
+        p[i, :, 2] = [((i+align)/10*sin(j+$og+phase+cut)+2)*cos(2pi-cut)
+                      for j in lspace]
         p[i, :, 3] = [(i+align)/10*cos(j+$og+phase+cut) for j in lspace]
+    end
+    p
+end
+
+diskgrid_segments = 20
+diskgrid_samples = 60
+grid_lspace = range(0, stop = 2pi, length = diskgrid_samples)
+diskgrid1 = @lift begin
+    p = Array{Float64}(undef, diskgrid_segments, diskgrid_samples, 3)
+    for i in 1:diskgrid_segments
+        p[i, :, 1] = [0 for j in grid_lspace]
+        p[i, :, 2] = [2i/diskgrid_segments*sin(j+$og+phase)+2
+                      for j in grid_lspace]
+        p[i, :, 3] = [2i/diskgrid_segments*cos(j+$og+phase)
+                      for j in grid_lspace]
+    end
+    p
+end
+
+diskgrid2 = @lift begin
+    p = Array{Float64}(undef, diskgrid_segments, diskgrid_samples, 3)
+    for i in 1:diskgrid_segments
+        p[i, :, 1] = [(2i/diskgrid_segments*sin(j+$og+phase+cut)+2)*sin(2pi-cut)
+                      for j in grid_lspace]
+        p[i, :, 2] = [(2i/diskgrid_segments*sin(j+$og+phase+cut)+2)*cos(2pi-cut)
+                      for j in grid_lspace]
+        p[i, :, 3] = [2i/diskgrid_segments*cos(j+$og+phase+cut)
+                      for j in grid_lspace]
     end
     p
 end
 
 image = try
     load("data/BaseMap.png")
+catch e
+    @warn("Loading the globe map failed. Using random image, so this test will fail! (error: $e)")
+    rand(RGBAf0, 100, 100) # don't error test when e.g. offline
+end
+grid_image = try
+    load("data/boqugrid.png")
 catch e
     @warn("Loading the globe map failed. Using random image, so this test will fail! (error: $e)")
     rand(RGBAf0, 100, 100) # don't error test when e.g. offline
@@ -206,20 +242,47 @@ surface!(universe,
          transparency = false,
          shading = false)
 
+surface!(universe,
+         @lift($diskgrid1[:, :, 1]),
+         @lift($diskgrid1[:, :, 2]),
+         @lift($diskgrid1[:, :, 3]),
+         color = grid_image,
+         transparency = false,
+         shading = false)
+
+surface!(universe,
+         @lift($diskgrid2[:, :, 1]),
+         @lift($diskgrid2[:, :, 2]),
+         @lift($diskgrid2[:, :, 3]),
+         color = grid_image,
+         transparency = false,
+         shading = false)
+
 scene = hbox(universe,
              vbox(sg),
              parent = Scene(resolution = (400, 400)))
 
 # update eye position
-eye_position, lookat, upvector = Vec3f0(-1.5, 1.5, 1.5), Vec3f0(0), Vec3f0(0, 0, 1.0)
-update_cam!(universe, eye_position, lookat, upvector)
+eye_position, lookat, upvector = Vec3f0(-4, 4, 4), Vec3f0(0), Vec3f0(0, 0, 1.0)
+update_cam!(universe, eye_position, lookat)
 universe.center = false # prevent scene from recentering on display
+
+stars = 10_000
+scatter!(
+    universe,
+    map(i-> (randn(Point3f0) .- 0.5) .* 10, 1:stars),
+    glowwidth = 1, glowcolor = (:white, 0.1), color = rand(stars),
+    colormap = [(:white, 0.4), (:blue, 0.4), (:gold, 0.4)],
+    markersize = rand(range(0.0001, stop = 0.025, length = 100), stars),
+    show_axis = false, transparency = true
+)
 
 
 record(universe, "planet.gif") do io
     frames = 100
     for i in 1:frames
         og[] = i*2pi/frames # animate scene
+        rotate_cam!(universe, 4pi/frames, 0.0, 0.0)
         recordframe!(io) # record a new frame
     end
 end
