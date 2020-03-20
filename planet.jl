@@ -108,44 +108,28 @@ end
 
 
 """
-get_manifold(points, segments, distance, cut)
+get_manifold(points, segments, distance, start, finish)
 
 Calculates a grid of points in R³ for constructing a surface in a specific way
-with the given points in the base space (a 2-sphere,) the number of cross
-sections, the distance from the z axis and the angle that determines how much
-of the grid is the leftover after the cut.
+with the given points in the base space, the number of segments, the distance
+from z axis, and the start and finish angles that determine where to cut.
 """
-function get_manifold(points, segments, distance, cut)
+function get_manifold(points, segments, distance, start, finish)
     samples = size(points, 1)
-    leftover_segments = Integer(floor((cut / 2pi) * segments))
-    manifold_segments = segments - leftover_segments
-    manifold = Array{Float64}(undef, manifold_segments, samples, 3)
-    leftover = Array{Float64}(undef, leftover_segments, samples, 3)
-    α = (2pi-cut) / (manifold_segments-1)
-    γ = cut / (leftover_segments-1)
+    manifold = Array{Float64}(undef, segments, samples, 3)
+    α = (finish - start) / (segments - 1)
     for i in 1:samples
             ϕ, θ = points[i, :]
-        z, w = σ(ϕ, -θ)
+        z, w = S¹action(start, σ(ϕ, -θ)...)
         for j in 1:segments
-            if j ≤ manifold_segments
-                x₁ = (real(z) + distance) * sin(α*(j-1))
-                x₂ = (real(z) + distance) * cos(α*(j-1))
-                x₃ = imag(z)
-                manifold[j, i, :] = [x₁, x₂, x₃]
-                if j != manifold_segments
-                    z, w = S¹action(α, z, w)
-                end
-            else
-                index = j-manifold_segments
-                x₁ = (real(z) + distance) * sin((2pi-cut)+γ*(index-1))
-                x₂ = (real(z) + distance) * cos((2pi-cut)+γ*(index-1))
-                x₃ = imag(z)
-                leftover[index, i, :] = [x₁, x₂, x₃]
-                z, w = S¹action(γ, z, w)
-            end
+            x₁ = (real(z) + distance) * sin(start + (α * (j - 1)))
+            x₂ = (real(z) + distance) * cos(start + (α * (j - 1)))
+            x₃ = imag(z)
+            manifold[j, i, :] = [x₁, x₂, x₃]
+            z, w = S¹action(α, z, w)
         end
     end
-    manifold, leftover
+    manifold
 end
 
 # The scene object that contains other visual objects
@@ -155,8 +139,18 @@ sg, og = textslider(0:0.05:2pi, "g", start = 0)
 
 # The maximum number of points to sample from the dataset for each country
 max_samples = 300
-# The number of cross sections for constructing a manifold
 segments = 90
+# The angle to cut the manifolds for a better visualization
+cut = 2pi/360*80
+# The manifold and ghost segments determine where to cut the fibers
+ghost_segments = Integer((cut / 2pi) * segments)
+manifold_segments = segments - ghost_segments
+manifold_start = 0
+manifold_finish = 2pi - cut
+ghost_start = 2pi - cut
+ghost_finish = 2pi
+# The distance from z axis
+distance = pi/2
 # Made with Natural Earth.
 # Free vector and raster map data @ naturalearthdata.com.
 countries = Dict("iran" => [1.0, 0.0, 0.0], # red
@@ -168,19 +162,14 @@ countries = Dict("iran" => [1.0, 0.0, 0.0], # red
                  "israel" => [0.0, 1.0, 0.075]) # green
 # The path to the dataset
 path = "data/natural_earth_vector"
-# The angle to cut the manifolds for a better visualization
-cut = 2pi/360*80
-# The distance from the z axis
-distance = 2
 # Construct a manifold for each country in the dictionary
 for country in countries
     dataframe = CSV.read(joinpath(path, "$(country[1])-nodes.csv"))
+    # Sample a random subset of the points
     points = sample(dataframe, max_samples)
     samples = size(points, 1)
-    specific = RGBAf0(country[2]..., 1.0)
-    ghost = RGBAf0(country[2]..., 0.5)
-    inverse = RGBAf0((1 .- country[2])..., 1.0)
-    
+    color = fill(RGBAf0(country[2]..., 1.0), manifold_segments, samples)
+    # Rotate the points by adding to the longitudes
     rotated = @lift begin
         R = similar(points)
         for i in 1:samples
@@ -189,90 +178,94 @@ for country in countries
         end
         R
     end
-    
-    leftover_segments = Integer(floor((cut / 2pi) * segments))
-    manifold_segments = segments - leftover_segments
-    manifold_color = fill(specific, manifold_segments, samples)
-    manifolds = @lift(get_manifold($rotated, segments, distance, cut))
-    manifold = @lift($manifolds[1])
+    manifold = @lift(get_manifold($rotated,
+                                  manifold_segments,
+                                  distance,
+                                  manifold_start,
+                                  manifold_finish))
     surface!(universe,
              @lift($manifold[:, :, 1]),
              @lift($manifold[:, :, 2]),
              @lift($manifold[:, :, 3]),
-             color = manifold_color)
+             color = color)
     if country[1] in ["iran", "us", "australia"]
-        ghost_color = fill(ghost, leftover_segments, samples)
-        leftover = @lift($manifolds[2])
+        ghost = @lift(get_manifold($rotated,
+                                   ghost_segments,
+                                   distance,
+                                   ghost_start,
+                                   ghost_finish))
         surface!(universe,
-                 @lift($leftover[:, :, 1]),
-                 @lift($leftover[:, :, 2]),
-                 @lift($leftover[:, :, 3]),
-                 color = ghost_color,
+                 @lift($ghost[:, :, 1]),
+                 @lift($ghost[:, :, 2]),
+                 @lift($ghost[:, :, 3]),
+                 color = color,
                  transparency = true)
      end
 end
 
-# Construct the 2 disks that show the base map
 disk_segments = 20
 disk_samples = 60
-# Parameters for aligning the base map and the fibers
+# Parameters for the base map and fibers alignment
 longitude_align = -pi/2
 latitude_align = 0.35
-lspace = range(0, stop = 2pi, length = disk_samples)
-disk1 = @lift begin
+
+"""
+get_disk(radius, segments, samples, x, y, phase, distance, rotation)
+
+Calculates a grid of points in R³ for constructing a disk in a specific way
+with the given radius, segments, samples, longitude alignment, latitude
+alignment, the phase, the distance from z axis and the rotation around z axis.
+the initial position of a disk is in the x = 0 plane.
+"""
+function get_disk(radius, segments, samples, x, y, distance, phase, rotation)
     p = Array{Float64}(undef, disk_segments, disk_samples, 3)
-    for i in 1:disk_segments
-        p[i, :, 1] = [0 for j in lspace]
-        p[i, :, 2] = [(i+latitude_align)/disk_segments*
-                      sin(j+$og+longitude_align) + distance for j in lspace]
-        p[i, :, 3] = [(i+latitude_align)/disk_segments*
-                      cos(j+$og+longitude_align) for j in lspace]
+    lspace = range(0, stop = 2pi, length = disk_samples)
+    for i in 1:segments
+        yₐ = (i + y) / segments
+        xₐ = phase + x + 2pi - rotation
+        p[i, :, 1] = [(radius * yₐ * sin(j + xₐ) + distance) * sin(rotation)
+                      for j in lspace]
+        p[i, :, 2] = [(radius * yₐ * sin(j + xₐ) + distance) * cos(rotation)
+                      for j in lspace]
+        p[i, :, 3] = [yₐ * cos(j + xₐ) for j in lspace] .* radius
     end
     p
 end
 
-disk2 = @lift begin
-    p = Array{Float64}(undef, disk_segments, disk_samples, 3)
-    for i in 1:disk_segments
-        p[i, :, 1] = [((i+latitude_align)/disk_segments*
-                       sin(j+$og+longitude_align+cut)+distance)*sin(2pi-cut)
-                      for j in lspace]
-        p[i, :, 2] = [((i+latitude_align)/disk_segments*
-                       sin(j+$og+longitude_align+cut)+distance)*cos(2pi-cut)
-                      for j in lspace]
-        p[i, :, 3] = [(i+latitude_align)/disk_segments*
-                      cos(j+$og+longitude_align+cut) for j in lspace]
-    end
-    p
-end
-
+# Construct the 2 disks that show the base map
+disk1 = @lift(get_disk(1,
+                       disk_segments,
+                       disk_samples,
+                       longitude_align,
+                       latitude_align,
+                       distance,
+                       $og,
+                       0))
+disk2 = @lift(get_disk(1,
+                       disk_segments,
+                       disk_samples,
+                       longitude_align,
+                       latitude_align,
+                       distance,
+                       $og,
+                       2pi-cut))
 # Construct the 2 disks that show the guidance grid
-grid1 = @lift begin
-    p = Array{Float64}(undef, disk_segments, disk_samples, 3)
-    for i in 1:disk_segments
-        p[i, :, 1] = [0 for j in lspace]
-        p[i, :, 2] = [2i/disk_segments*sin(j+$og+longitude_align)+distance
-                      for j in lspace]
-        p[i, :, 3] = [2i/disk_segments*cos(j+$og+longitude_align)
-                      for j in lspace]
-    end
-    p
-end
-
-grid2 = @lift begin
-    p = Array{Float64}(undef, disk_segments, disk_samples, 3)
-    for i in 1:disk_segments
-        p[i, :, 1] = [(2i/disk_segments*
-                       sin(j+$og+longitude_align+cut)+distance)*sin(2pi-cut)
-                      for j in lspace]
-        p[i, :, 2] = [(2i/disk_segments*
-                       sin(j+$og+longitude_align+cut)+distance)*cos(2pi-cut)
-                      for j in lspace]
-        p[i, :, 3] = [2i/disk_segments*cos(j+$og+longitude_align+cut)
-                      for j in lspace]
-    end
-    p
-end
+grid1 = @lift(get_disk(distance,
+                       disk_segments,
+                       disk_samples,
+                       longitude_align,
+                       latitude_align,
+                       distance,
+                       $og,
+                       0))
+grid2 = @lift(get_disk(distance,
+                       disk_segments,
+                       disk_samples,
+                       longitude_align,
+                       latitude_align,
+                       distance,
+                       $og,
+                       2pi-cut))
 
 base_image = load("data/BaseMap.png")
 grid_image = load("data/boqugrid.png")
@@ -282,7 +275,6 @@ surface!(universe,
          @lift($disk1[:, :, 2]),
          @lift($disk1[:, :, 3]),
          color = base_image,
-         transparency = false,
          shading = false)
          
 surface!(universe,
@@ -290,7 +282,6 @@ surface!(universe,
          @lift($disk2[:, :, 2]),
          @lift($disk2[:, :, 3]),
          color = base_image,
-         transparency = false,
          shading = false)
 
 surface!(universe,
@@ -298,7 +289,6 @@ surface!(universe,
          @lift($grid1[:, :, 2]),
          @lift($grid1[:, :, 3]),
          color = grid_image,
-         transparency = false,
          shading = false)
 
 surface!(universe,
@@ -306,7 +296,6 @@ surface!(universe,
          @lift($grid2[:, :, 2]),
          @lift($grid2[:, :, 3]),
          color = grid_image,
-         transparency = false,
          shading = false)
 
 # Instantiate a horizontal box for holding the visuals and the controls
@@ -330,6 +319,7 @@ scatter!(
     show_axis = false, transparency = true
 )
 
+
 record(universe, "planet.gif") do io
     frames = 100
     for i in 1:frames
@@ -338,4 +328,5 @@ record(universe, "planet.gif") do io
         recordframe!(io) # record a new frame
     end
 end
+
 
