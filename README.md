@@ -37,5 +37,5 @@ Please orient yourself through [The Unofficial Portal Wiki](https://theportal.wi
 - Quaternions [using ReferenceFrameRotations for now.]
 - The Hopf fibration [done.]
 - Maxwell's equations [TODO]
-- Planet Hopf or something similar to let the viewer know where they are. [TODO]
+- Planet Hopf or something similar to let the viewer know where they are. [done.]
 - Documentation [TODO]
