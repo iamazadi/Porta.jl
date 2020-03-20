@@ -132,6 +132,25 @@ function get_manifold(points, segments, distance, start, finish)
     manifold
 end
 
+"""
+build_surface(scene, points, color, transparency, shading)
+
+Builds a surface with the given scene, points, color, transparency and shading.
+"""
+function build_surface(scene,
+                       points,
+                       color;
+                       transparency=false,
+                       shading = true)
+    surface!(scene,
+             @lift($points[:, :, 1]),
+             @lift($points[:, :, 2]),
+             @lift($points[:, :, 3]),
+             color = color,
+             transparency = transparency,
+             shading = shading)
+end
+
 # The scene object that contains other visual objects
 universe = Scene(backgroundcolor = :black, show_axis=false)
 # Use a slider for rotating the base space in an interactive way
@@ -169,6 +188,7 @@ for country in countries
     points = sample(dataframe, max_samples)
     samples = size(points, 1)
     color = fill(RGBAf0(country[2]..., 1.0), manifold_segments, samples)
+    ghost_color = fill(RGBAf0(country[2]..., 0.5), ghost_segments, samples)
     # Rotate the points by adding to the longitudes
     rotated = @lift begin
         R = similar(points)
@@ -183,31 +203,22 @@ for country in countries
                                   distance,
                                   manifold_start,
                                   manifold_finish))
-    surface!(universe,
-             @lift($manifold[:, :, 1]),
-             @lift($manifold[:, :, 2]),
-             @lift($manifold[:, :, 3]),
-             color = color)
+    build_surface(universe, manifold, color)
     if country[1] in ["iran", "us", "australia"]
         ghost = @lift(get_manifold($rotated,
                                    ghost_segments,
                                    distance,
                                    ghost_start,
                                    ghost_finish))
-        surface!(universe,
-                 @lift($ghost[:, :, 1]),
-                 @lift($ghost[:, :, 2]),
-                 @lift($ghost[:, :, 3]),
-                 color = color,
-                 transparency = true)
+        build_surface(universe, ghost, ghost_color, transparency = false)
      end
 end
 
 disk_segments = 20
 disk_samples = 60
 # Parameters for the base map and fibers alignment
-longitude_align = -pi/2
-latitude_align = 0.35
+longitude_align = -pi/2 + pi / 100
+latitude_align = 1.4
 
 """
 get_disk(radius, segments, samples, x, y, phase, distance, rotation)
@@ -270,33 +281,10 @@ grid2 = @lift(get_disk(distance,
 base_image = load("data/BaseMap.png")
 grid_image = load("data/boqugrid.png")
 
-surface!(universe,
-         @lift($disk1[:, :, 1]),
-         @lift($disk1[:, :, 2]),
-         @lift($disk1[:, :, 3]),
-         color = base_image,
-         shading = false)
-         
-surface!(universe,
-         @lift($disk2[:, :, 1]),
-         @lift($disk2[:, :, 2]),
-         @lift($disk2[:, :, 3]),
-         color = base_image,
-         shading = false)
-
-surface!(universe,
-         @lift($grid1[:, :, 1]),
-         @lift($grid1[:, :, 2]),
-         @lift($grid1[:, :, 3]),
-         color = grid_image,
-         shading = false)
-
-surface!(universe,
-         @lift($grid2[:, :, 1]),
-         @lift($grid2[:, :, 2]),
-         @lift($grid2[:, :, 3]),
-         color = grid_image,
-         shading = false)
+build_surface(universe, disk1, base_image, shading = false)
+build_surface(universe, disk2, base_image, shading = false)
+build_surface(universe, grid1, grid_image, shading = false)
+build_surface(universe, grid2, grid_image, shading = false)
 
 # Instantiate a horizontal box for holding the visuals and the controls
 scene = hbox(universe,
