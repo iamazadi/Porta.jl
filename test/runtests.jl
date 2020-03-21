@@ -12,7 +12,7 @@ Calculates a unit quaternion in the form of C², in a random way.
 """
 function get_unit_quaternion()
     θ = 2pi * rand()
-    ψ₁ = 2pi * rand()
+    ψ₁ = 2pi * rand() - pi
     ψ₂ = pi * rand() - pi / 2
     u = [cos(θ),
          sin(θ) * cos(ψ₂) * cos(ψ₁),
@@ -28,7 +28,7 @@ get_unit_3vec()
 Calculates a unit vector of size 3, in a random way.
 """
 function get_unit_3vec()
-    ψ₁ = 2pi * rand()
+    ψ₁ = 2pi * rand() - pi
     ψ₂ = pi * rand() - pi / 2
     [cos(ψ₂) * cos(ψ₁), cos(ψ₂) * sin(ψ₁), sin(ψ₂)]
 end
