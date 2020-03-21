@@ -47,67 +47,6 @@ end
 
 
 """
-π(z, w)
-
-Sends a point on a unit 3-sphere to a point on a unit 2-sphere with the given
-complex numbers representing a unit quaternion. S³ ↦ S² (x,y,z)
-"""
-function π(z, w)
-    x₁ = real(z)
-    x₂ = imag(z)
-    x₃ = real(w)
-    x₄ = imag(w)
-    [2(x₁*x₃ + x₂*x₄), 2(x₂*x₃ - x₁*x₄), x₁^2+x₂^2-x₃^2-x₄^2]
-end
-
-
-"""
-σ(ϕ, θ; β=0)
-
-Sends a point on a 2-sphere to a point on a 3-sphere with the given longitude
-and latitude coordinate in radians. S² ↦ S³
-"""
-function σ(ϕ, θ; β=0)
-    exp(-im * (β + ϕ)) * sqrt((1 + sin(θ)) / 2), sqrt((1 - sin(θ)) / 2)
-end
-
-
-"""
-τ(ϕ, θ; β=0)
-
-Sends a point on a 2-sphere to a point on a 3-sphere with the given longitude
-and latitude coordinate in radians. S² ↦ S³
-"""
-function τ(ϕ, θ; β=0)
-    sqrt((1 + sin(θ)) / 2), exp(im * (β + ϕ)) * sqrt((1 - sin(θ)) / 2)
-end
-
-
-"""
-S¹action(α, z, w)
-
-Performs a group action corresponding to moving along the circumference of a
-circle with the given angle and the complex numbers representing a unit
-quaternion on a 3-sphere.
-"""
-function S¹action(α, z, w)
-    exp(im * α) * z, exp(im * α) * w
-end
-
-
-"""
-λ(z, w)
-
-Sends a point on a 3-sphere to a point in the plane x₄=0 with the given complex
-numbers representing a unit quaternion. This is the stereographic projection.
-S³ ↦ R³
-"""
-function λ(z, w)
-    [real(z), imag(z), real(w)] ./ (1 - imag(w))
-end
-
-
-"""
 get_manifold(points, segments, distance, start, finish)
 
 Calculates a grid of points in R³ for constructing a surface in a specific way

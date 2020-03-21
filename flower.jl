@@ -7,6 +7,56 @@ using AbstractPlotting
 using Makie
 using ReferenceFrameRotations
 
+
+"""
+get_fiber(point; r=0.025, N=30)
+
+Calculates the grid of a fiber circle under stereographic projection with the
+given coordinates in the base space. The optional arguments are the radius of
+the spherical grid and the square root of the number of points in the grid.
+"""
+function get_fiber(point; r=0.025, N=30)
+    lspace = range(0.0, stop = 2pi, length = N)
+    # Find 3 points on the circle
+    A, B, C = get_points(point, pi/4)
+    # Get the circle center point
+    Q = get_center(A, B, C)
+    # Find the small and big radii
+    R = Float64(LinearAlgebra.norm(A - Q))
+    # Construct a torus of revolution grid
+    x = (Q[1] .+ [(R + r * cos(i)) * cos(j) for i in lspace, j in lspace]) ./ R
+    y = (Q[2] .+ [(R + r * cos(i)) * sin(j) for i in lspace, j in lspace]) ./ R
+    z = (Q[3] .+ [r * sin(i) for i in lspace, j in lspace]) ./ R
+    points = [[x[i], y[i], z[i]] for i in 1:length(x)]
+    # Get the normal to the plane containing the points
+    n = LinearAlgebra.cross(A - Q, B - Q)
+    n = n / LinearAlgebra.norm(n)
+    # The initial normal to the circle
+    i = [0.0, 0.0, 1.0]
+    # The axis of rotation
+    u = LinearAlgebra.cross(n, i)
+    u = u / LinearAlgebra.norm(u)
+    # The angle of rotation
+      ϕ = acos(LinearAlgebra.dot(n, i)) / 2.0
+    q = ReferenceFrameRotations.Quaternion(cos(ϕ), 
+                                           sin(ϕ)*u[1],
+                                           sin(ϕ)*u[2],
+                                           sin(ϕ)*u[3])
+    # Rotate the grid
+    rotated = [ReferenceFrameRotations.vect(q\[points[i][1]; 
+                                               points[i][2]; 
+                                               points[i][3]]*q)
+                                               for i in 1:length(points)]
+    rotatedx = [rotated[i][1] for i in 1:length(rotated)]
+    rotatedy = [rotated[i][2] for i in 1:length(rotated)]
+    rotatedz = [rotated[i][3] for i in 1:length(rotated)]
+    rotatedx = reshape(Float64.(rotatedx), (N, N))
+    rotatedy = reshape(Float64.(rotatedy), (N, N))
+    rotatedz = reshape(Float64.(rotatedz), (N, N))
+    [rotatedx, rotatedy, rotatedz]
+end
+
+
 """
 flower!(;N=4, A=.5, B=-pi/7, P=pi/2, Q=0, number=300)
 
@@ -43,7 +93,7 @@ function construct(scene, point)
     v = to_value(point)
     color = RGBAf0(v[1]/2+rand()/2, v[2]/2+rand()/2, v[3]/2+rand()/2, 0.9)
     # Calculate the marker grid for a fiber under streographic projection
-    fiber = @lift(fiber!($point, r = r, N = N))
+    fiber = @lift(get_fiber($point, r = r, N = N))
     surface!(scene, 
              @lift($fiber[1]),
              @lift($fiber[2]), 

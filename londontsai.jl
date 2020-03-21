@@ -7,6 +7,48 @@ using AbstractPlotting
 using Makie
 using ReferenceFrameRotations
 
+
+"""
+get_fiber_points(y, angle)
+
+Finds 2 more points on a fiber circle under stereographic projection with the
+given point in the base space which is also on the circle and the phase angle
+between the points along the circle.
+"""
+function get_fiber_points(y, angle)
+    λ₁ = complex(cos(-angle), sin(-angle))
+    λ₂ = complex(cos(angle), sin(angle))
+    w₁, w₂, w₃, w₄ = σ⁻¹(y[1], y[2], y[3])
+    x₁ = λ₁ * complex(w₁, w₂)
+    x₂ = λ₁ * complex(w₃, w₄)
+    z₁ = λ₂ * complex(w₁, w₂)
+    z₂ = λ₂ * complex(w₃, w₄)
+    x = σ(real(x₁), imag(x₁), real(x₂), imag(x₂))
+    z = σ(real(z₁), imag(z₁), real(z₂), imag(z₂))
+    x, y, z
+end
+
+
+"""
+get_fiber_center(A, B, C)
+
+Finds the center point of a fiber circle under stereographic projection with
+the given 3 points on the circle circumference.
+"""
+function get_fiber_center(A, B, C)
+    a = LinearAlgebra.norm(B - C)
+    b = LinearAlgebra.norm(A - C)
+    c = LinearAlgebra.norm(A - B)
+    numerator = a^2 * (b^2 + c^2 - a^2) * A + 
+                b^2 * (a^2 + c^2 - b^2) * B + 
+                c^2 * (a^2 + b^2 - c^2) * C
+    denominator = a^2 * (b^2 + c^2 - a^2) + 
+                  b^2 * (a^2 + c^2 - b^2) + 
+                  c^2 * (a^2 + b^2 - c^2)
+    numerator / denominator
+end
+
+
 """
 cutfiber!(θ, ψ, sweep=pi/2, r=0.025, N=30)
 
