@@ -1,11 +1,9 @@
 using LinearAlgebra
+using StatsBase
 using FileIO
 using Colors
-using AbstractPlotting
 using Makie
 using CSV
-using StatsBase
-using ReferenceFrameRotations
 using Porta
 
 
@@ -59,27 +57,28 @@ function get_manifold(points, segments, distance, start, finish)
     α = (finish - start) / (segments - 1)
     for i in 1:samples
             ϕ, θ = points[i, :]
-        z, w = S¹action(start, σ(ϕ, -θ)...)
+        z, w = S¹action(start, σmap([ϕ, -θ]))
         for j in 1:segments
             x₁ = (real(z) + distance) * sin(start + (α * (j - 1)))
             x₂ = (real(z) + distance) * cos(start + (α * (j - 1)))
             x₃ = imag(z)
             manifold[j, i, :] = [x₁, x₂, x₃]
-            z, w = S¹action(α, z, w)
+            z, w = S¹action(α, [z, w])
         end
     end
     manifold
 end
 
+
 """
-build_surface(scene, points, color, transparency, shading)
+build_surface(scene, points, color; transparency, shading)
 
 Builds a surface with the given scene, points, color, transparency and shading.
 """
 function build_surface(scene,
                        points,
                        color;
-                       transparency=false,
+                       transparency = false,
                        shading = true)
     surface!(scene,
              @lift($points[:, :, 1]),
@@ -90,6 +89,7 @@ function build_surface(scene,
              shading = shading)
 end
 
+
 # The scene object that contains other visual objects
 universe = Scene(backgroundcolor = :black, show_axis=false)
 # Use a slider for rotating the base space in an interactive way
@@ -97,21 +97,21 @@ sg, og = textslider(0:0.05:2pi, "g", start = 0)
 
 # The maximum number of points to sample from the dataset for each country
 max_samples = 300
-segments = 90
+segments = 60
 # The angle to cut the manifolds for a better visualization
-cut = 2pi/360*80
+cut = 2pi / 360 * 80
 # The manifold and ghost segments determine where to cut the fibers
-ghost_segments = Integer((cut / 2pi) * segments)
+ghost_segments = Integer(floor((cut / 2pi) * segments))
 manifold_segments = segments - ghost_segments
 manifold_start = 0
 manifold_finish = 2pi - cut
 ghost_start = 2pi - cut
 ghost_finish = 2pi
 # The distance from z axis
-distance = pi/2
+distance = pi / 2
 # Made with Natural Earth.
 # Free vector and raster map data @ naturalearthdata.com.
-countries = Dict("iran" => [1.0, 0.0, 0.0], # red
+countries = Dict("iran" => [0.0, 1.0, 0.29], # green
                  "us" => [0.494, 1.0, 0.0], # green
                  "china" => [1.0, 0.639, 0.0], # orange
                  "ukraine" => [0.0, 0.894, 1.0], # cyan
