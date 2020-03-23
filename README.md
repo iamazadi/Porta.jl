@@ -10,12 +10,11 @@ Quantize the geometry instead of geometrizing the quantum!
 This project aims to help with Eric Weinstein's Graph, Wall, Tome (GWT) project.
 
 ## Requirements
-CSV
-DataFrames
-LinearAlgebra
-ReferenceFrameRotations
-StatsBase
-Makie
+CSV,
+DataFrames,
+LinearAlgebra,
+StatsBase,
+Makie.
 
 ## Installation
 You can install this package by first downloading the code and then navigating to its directory.
@@ -34,8 +33,8 @@ Please orient yourself through [The Unofficial Portal Wiki](https://theportal.wi
 ## Status
 - Complex numbers [Julia already supports complex numbers.]
 - Spheres [we have stereographic projections.]
-- Quaternions [using ReferenceFrameRotations for now.]
+- Quaternions [3D rotations added.]
 - The Hopf fibration [done.]
-- Maxwell's equations [TODO]
 - Planet Hopf or something similar to let the viewer know where they are. [done.]
 - Documentation [TODO]
+- Maxwell's equations [TODO]
