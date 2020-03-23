@@ -12,7 +12,8 @@ This project aims to help with Eric Weinstein's Graph, Wall, Tome (GWT) project.
 ## Requirements
 CSV,
 DataFrames,
-StatsBase.
+StatsBase,
+Makie.
 
 ## Installation
 You can install this package by first downloading the code and then navigating to its directory.
