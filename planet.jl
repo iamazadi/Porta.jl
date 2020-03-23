@@ -79,7 +79,7 @@ function build_surface(scene,
                        points,
                        color;
                        transparency = false,
-                       shading = true)
+                       shading = false)
     surface!(scene,
              @lift($points[:, :, 1]),
              @lift($points[:, :, 2]),
@@ -91,7 +91,7 @@ end
 
 
 # The scene object that contains other visual objects
-universe = Scene(backgroundcolor = :black, show_axis=false)
+universe = Scene(backgroundcolor = :white, show_axis=false)
 # Use a slider for rotating the base space in an interactive way
 sg, og = textslider(0:0.05:2pi, "g", start = 0)
 
@@ -235,23 +235,11 @@ eye_position, lookat, upvector = Vec3f0(-4, 4, 4), Vec3f0(0), Vec3f0(0, 0, 1.0)
 update_cam!(universe, eye_position, lookat)
 universe.center = false # prevent scene from recentering on display
 
-# Add stars to the scene to fill the background with something
-stars = 10_000
-scatter!(
-    universe,
-    map(i-> (randn(Point3f0) .- 0.5) .* 10, 1:stars),
-    glowwidth = 1, glowcolor = (:white, 0.1), color = rand(stars),
-    colormap = [(:white, 0.4), (:blue, 0.4), (:gold, 0.4)],
-    markersize = rand(range(0.0001, stop = 0.025, length = 100), stars),
-    show_axis = false, transparency = true
-)
-
-
 record(universe, "planet.gif") do io
     frames = 100
     for i in 1:frames
         og[] = i*2pi/frames # animate scene
-        rotate_cam!(universe, 4pi/frames, 0.0, 0.0)
+        rotate_cam!(universe, 2pi/frames, 0.0, 0.0)
         recordframe!(io) # record a new frame
     end
 end
