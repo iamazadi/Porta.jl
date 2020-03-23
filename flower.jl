@@ -1,33 +1,118 @@
-using Porta
 using LinearAlgebra
-using Colors
-using FileIO
-using GeometryTypes
-using AbstractPlotting
 using Makie
-using ReferenceFrameRotations
+using Porta
 
 
 """
-get_fiber(point; r=0.025, N=30)
+get_center(A, B, C)
 
-Calculates the grid of a fiber circle under stereographic projection with the
-given coordinates in the base space. The optional arguments are the radius of
-the spherical grid and the square root of the number of points in the grid.
+Finds the center point of the fiber circle under stereographic projection
+with the given 3 points on the circle circumference.
 """
-function get_fiber(point; r=0.025, N=30)
-    lspace = range(0.0, stop = 2pi, length = N)
+function get_center(A, B, C)
+    a = LinearAlgebra.norm(B - C)
+    b = LinearAlgebra.norm(A - C)
+    c = LinearAlgebra.norm(A - B)
+    numerator = a^2 * (b^2 + c^2 - a^2) * A + 
+                b^2 * (a^2 + c^2 - b^2) * B + 
+                c^2 * (a^2 + b^2 - c^2) * C
+    denominator = a^2 * (b^2 + c^2 - a^2) + 
+                  b^2 * (a^2 + c^2 - b^2) + 
+                  c^2 * (a^2 + b^2 - c^2)
+    numerator / denominator
+end
+
+
+"""
+get_flower(;N=4, A=.5, B=-pi/7, P=pi/2, Q=0, number=300)
+
+Calculates the x, y and z points of a flower in the base space.
+with the given number of petals N, the fattness of the petals A,
+the height of the petals B, the latitude of the flower P,
+the rotation of the flower Q, and the total number of points in the grid.
+"""
+function get_flower(;N=4, A=.5, B=-pi/7, P=pi/2, Q=0, number=300)
+    N = 7
+    A = .5
+    B = -pi/7
+    P = pi/3
+    Q = 0
+    t = range(0, stop = 2pi, length = number)
+    az = 2pi .* t + A .* cos.(N .* 2pi .* t) .+ Q
+    po = B .* sin.(N .* 2pi .* t) .+ P
+    x = cos.(az).*sin.(po)
+    y = sin.(az).*sin.(po)
+    z = cos.(po)
+    points = Array{Float64}(undef, number, 2)
+    for i in 1:number
+        points[i, :] = convert_to_geographic([x[i], y[i], z[i]])
+    end
+    points
+end
+
+
+"""
+build_surface(scene, points, color; transparency, shading)
+
+Builds a surface with the given scene, points, color, transparency and shading.
+"""
+function build_surface(scene,
+                       points,
+                       color;
+                       transparency = false,
+                       shading = true)
+    surface!(scene,
+             @lift($points[:, :, 1]),
+             @lift($points[:, :, 2]),
+             @lift($points[:, :, 3]),
+             color = color,
+             transparency = transparency,
+             shading = shading)
+end
+
+
+"""
+rotate3D_geographic(point, q)
+
+Rotates a point in the 3D space with the given point and the unit quaternion.
+"""
+function rotate3D_geographic(point, q)
+    c = convert_to_cartesian(point)
+    p = Quaternion(c[1], c[2], c[3], 0.0)
+    R = conj(q) * p * q
+    convert_to_geographic([R[1], R[2], R[3]])
+end
+
+
+"""
+rotate3D_cartesian(point, q)
+
+Rotates a point in the 3D space with the given point and the unit quaternion.
+"""
+function rotate3D_cartesian(point, q)
+    p = Quaternion(point..., 0.0)
+    R = conj(q) * p * q
+    [R[1], R[2], R[3]]
+end
+
+
+"""
+get_fiber(point, segments, samples; r=0.025)
+
+Calculates a torus of revolution for building a surface in a specific way with
+the given point in the base space, the number of segments, the number of
+samples and the radius of the smaller circle in the torus of revolution.
+"""
+function get_fiber(point, segments, samples; r=0.025)
     # Find 3 points on the circle
-    A, B, C = get_points(point, pi/4)
-    # Get the circle center point
+    b = λ⁻¹map(convert_to_cartesian(point))
+    A = λmap(S¹action(pi / 6, b))
+    B = λmap(S¹action(pi / 4, b))
+    C = λmap(S¹action(pi / 3, b))
+    # The fiber circle center
     Q = get_center(A, B, C)
-    # Find the small and big radii
-    R = Float64(LinearAlgebra.norm(A - Q))
-    # Construct a torus of revolution grid
-    x = (Q[1] .+ [(R + r * cos(i)) * cos(j) for i in lspace, j in lspace]) ./ R
-    y = (Q[2] .+ [(R + r * cos(i)) * sin(j) for i in lspace, j in lspace]) ./ R
-    z = (Q[3] .+ [r * sin(i) for i in lspace, j in lspace]) ./ R
-    points = [[x[i], y[i], z[i]] for i in 1:length(x)]
+    # The bigger radius
+    R = norm(Q - A)
     # Get the normal to the plane containing the points
     n = LinearAlgebra.cross(A - Q, B - Q)
     n = n / LinearAlgebra.norm(n)
@@ -37,118 +122,62 @@ function get_fiber(point; r=0.025, N=30)
     u = LinearAlgebra.cross(n, i)
     u = u / LinearAlgebra.norm(u)
     # The angle of rotation
-      ϕ = acos(LinearAlgebra.dot(n, i)) / 2.0
-    q = ReferenceFrameRotations.Quaternion(cos(ϕ), 
-                                           sin(ϕ)*u[1],
-                                           sin(ϕ)*u[2],
-                                           sin(ϕ)*u[3])
-    # Rotate the grid
-    rotated = [ReferenceFrameRotations.vect(q\[points[i][1]; 
-                                               points[i][2]; 
-                                               points[i][3]]*q)
-                                               for i in 1:length(points)]
-    rotatedx = [rotated[i][1] for i in 1:length(rotated)]
-    rotatedy = [rotated[i][2] for i in 1:length(rotated)]
-    rotatedz = [rotated[i][3] for i in 1:length(rotated)]
-    rotatedx = reshape(Float64.(rotatedx), (N, N))
-    rotatedy = reshape(Float64.(rotatedy), (N, N))
-    rotatedz = reshape(Float64.(rotatedz), (N, N))
-    [rotatedx, rotatedy, rotatedz]
-end
-
-
-"""
-flower!(;N=4, A=.5, B=-pi/7, P=pi/2, Q=0, number=300)
-
-Calculates the x, y and z points of a flower in the base space.
-with the given number of petals N, the fattness of the petals A,
-the height of the petals B, the latitude of the flower P,
-the rotation of the flower Q, and the total number of points in the grid.
-"""
-function flower!(;N=4, A=.5, B=-pi/7, P=pi/2, Q=0, number=300)
-    N = 7
-    A = .4
-    B = -pi/7
-    P = pi/3
-    Q = 0
-    t = range(0, stop = 2pi, length = number)
-    az = 2pi .* t + A .* cos.(N .* 2pi .* t) .+ Q
-    po = B .* sin.(N .* 2pi .* t) .+ P
-    cos.(az).*sin.(po), sin.(az).*sin.(po), cos.(po)
-end
-
-"""
-construct(scene, point)
-
-Constructs a fiber with the given scene and the observable point
-in the base space.
-"""
-function construct(scene, point)
-    # The radius parameter for constructing surfaces
-    r=0.1
-    # The square root of the number of points in the grid
-    N=30
-    lspace = range(0.0, stop = 2pi, length = N)
-    # Calculate the marker grid for a point in the base space
-    v = to_value(point)
-    color = RGBAf0(v[1]/2+rand()/2, v[2]/2+rand()/2, v[3]/2+rand()/2, 0.9)
-    # Calculate the marker grid for a fiber under streographic projection
-    fiber = @lift(get_fiber($point, r = r, N = N))
-    surface!(scene, 
-             @lift($fiber[1]),
-             @lift($fiber[2]), 
-             @lift($fiber[3]), 
-             color = [color for i in lspace, j in lspace],
-             shading = false)
-end
-
-"""
-animate(points, i)
-
-Moves the points on a path parallel to the equator in the base space
-with the given array of coordinate observables, the direction indicator
-and the progress percentage. The coordinates are the latitude (θ)
-and longitude(ψ) in radians, and the progress percentage ranges from 1 to 100.
-"""
-function animate(points, i)
-    for point in points
-        θ, ϕ = convert_to_geographic(to_value(point))
-        point[] = convert_to_cartesian([θ + (i-1)/100 * 2pi - i/100 * 2pi, ϕ])
+    angle = acos(LinearAlgebra.dot(n, i)) / 2.0
+    q = Quaternion(sin(angle)*u[1],
+                   sin(angle)*u[2],
+                   sin(angle)*u[3],
+                   cos(angle))
+    # Construct a torus of revolution grid
+    manifold = Array{Float64}(undef, segments, samples, 3)
+    for i in 1:segments
+        for j in 1:samples
+            longitude = i * 2pi / (segments - 1)
+            latitude = j * 2pi / (samples - 1)
+            x₁ = (Q[1] + (R + r * cos(longitude)) * cos(latitude)) / R
+            x₂ = (Q[2] + (R + r * cos(longitude)) * sin(latitude)) / R
+            x₃ = (Q[3] + r * sin(longitude)) / R
+            manifold[i, j, :] = rotate3D_cartesian([x₁, x₂, x₃], q)
+        end
     end
+    manifold
 end
 
-scene = Scene(show_axis = false, backgroundcolor = :black, resolution = (400, 400))
 
-points = []
-number = 420
-x, y, z = flower!(number = number)
-# Rotate the flower
+# The scene object that contains other visual objects
+universe = Scene(backgroundcolor = :black, show_axis=false, resolution = (400, 400))
+
+# Calculate a unit quaternion as the rotation axis
 u = [sqrt(3)/3, sqrt(3)/3, sqrt(3)/3]
 ϕ = Node(0.0)
-q = @lift(ReferenceFrameRotations.Quaternion(cos($ϕ), 
-                                             sin($ϕ)*u[1],
-                                             sin($ϕ)*u[2],
-                                             sin($ϕ)*u[3]))
-rotatedpoints = @lift([ReferenceFrameRotations.vect($q\[x[i]; y[i]; z[i]]*$q)
-                       for i in 1:number])
+q = @lift(Quaternion(sin($ϕ)*u[1],
+                     sin($ϕ)*u[2],
+                     sin($ϕ)*u[3],
+                     cos($ϕ)))
+segments = 30
+samples = 30
+number = 420
+points = get_flower(number = number)
 for i in 1:number
-    point = @lift([$rotatedpoints[i][1],
-                   $rotatedpoints[i][2],
-                   $rotatedpoints[i][3]])
-    construct(scene, point)
-    push!(points, point)
+    rotated = @lift(rotate3D_geographic(points[i, :], $q))
+    fiber = @lift(get_fiber($rotated, segments, samples))
+    color = @lift begin
+        x₁, x₂, x₃ = convert_to_cartesian($rotated)
+        fill(RGBAf0(rand()/2+x₁/2, rand()/2+x₂/2, rand()/2+x₃/2, 1.0),
+             segments,
+             samples)
+    end
+    build_surface(universe, fiber, color, shading = false)
 end
 
-eyepos = Vec3f0(1, 0, 6)
-lookat = Vec3f0(0)
-update_cam!(scene, eyepos, lookat)
-scene.center = false # prevent scene from recentering on display
+# update eye position
+eye_position, lookat, upvector = Vec3f0(0.01, 0, 6), Vec3f0(0), Vec3f0(0, 0, 1.0)
+update_cam!(universe, eye_position, lookat)
+universe.center = false # prevent scene from recentering on display
 
-record(scene, "flower.gif") do io
-    for i in 1:100
-        # animate scene
-            ϕ[] = i*pi/100
-        animate(points, i)
+record(universe, "flower.gif") do io
+    frames = 100
+    for i in 1:frames
+            ϕ[] = i*pi/frames # animate scene
         recordframe!(io) # record a new frame
     end
 end
