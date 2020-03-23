@@ -1,4 +1,4 @@
-name = "Porta.jl"
+name = "Porta"
 uuid = "fb2f1d7b-1de9-45a3-b106-388808110f78"
 authors = ["Mohammad Javad Azadi <mjazadi42@gmail.com>"]
 version = "0.1.0"
