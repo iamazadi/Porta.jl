@@ -10,6 +10,7 @@ Quantize the geometry instead of geometrizing the quantum!
 This project aims to help with Eric Weinstein's Graph, Wall, Tome (GWT) project.
 
 ## Requirements
+LinearAlgebra,
 CSV,
 DataFrames,
 StatsBase,

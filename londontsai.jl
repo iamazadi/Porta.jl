@@ -51,7 +51,6 @@ end
 universe = Scene(backgroundcolor = :orange, show_axis=false)
 # Use a slider for rotating the base space in an interactive way
 sg, og = textslider(0:0.05:2pi, "g", start = 0)
-
 segments = 100
 samples = 100
 # Construct a manifold for each country in the dictionary
