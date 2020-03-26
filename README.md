@@ -16,8 +16,7 @@ StatsBase,
 Makie.
 
 ## Installation
-You can install this package by first downloading the code and then navigating to its directory.
-In the code directory use:
+You can install this using:
 
 ```julia-repl
 julia> Pkg.update()
