@@ -144,7 +144,7 @@ end
 
 
 # The scene object that contains other visual objects
-universe = Scene(backgroundcolor = :black, show_axis=false, resolution = (400, 400))
+universe = Scene(backgroundcolor = :black, show_axis=false, resolution = (360, 360))
 
 # Calculate a unit quaternion as the rotation axis
 u = [sqrt(3)/3, sqrt(3)/3, sqrt(3)/3]
@@ -175,7 +175,7 @@ update_cam!(universe, eye_position, lookat)
 universe.center = false # prevent scene from recentering on display
 
 record(universe, "flower.gif") do io
-    frames = 100
+    frames = 180
     for i in 1:frames
             ϕ[] = i*pi/frames # animate scene
         recordframe!(io) # record a new frame

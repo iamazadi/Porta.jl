@@ -92,7 +92,7 @@ end
 # Instantiate a horizontal box for holding the visuals and the controls
 scene = hbox(universe,
              vbox(sg),
-             parent = Scene(resolution = (400, 400)))
+             parent = Scene(resolution = (360, 360)))
 
 # update eye position
 eye_position, lookat, upvector = Vec3f0(-2, 0, 2), Vec3f0(0), Vec3f0(0, 0, 1.0)
@@ -113,7 +113,7 @@ scatter!(
 
 
 record(universe, "londontsai.gif") do io
-    frames = 100
+    frames = 180
     for i in 1:frames
         og[] = i*2pi/frames # animate scene
         rotate_cam!(universe, 0.0, 2pi/frames, 0.0)

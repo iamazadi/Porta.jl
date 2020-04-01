@@ -79,7 +79,7 @@ function build_surface(scene,
                        points,
                        color;
                        transparency = false,
-                       shading = false)
+                       shading = true)
     surface!(scene,
              @lift($points[:, :, 1]),
              @lift($points[:, :, 2]),
@@ -91,7 +91,7 @@ end
 
 
 # The scene object that contains other visual objects
-universe = Scene(backgroundcolor = :white, show_axis=false)
+universe = Scene(backgroundcolor = :black, show_axis=false)
 # Use a slider for rotating the base space in an interactive way
 sg, og = textslider(0:0.05:2pi, "g", start = 0)
 
@@ -153,8 +153,8 @@ for country in countries
      end
 end
 
-disk_segments = 20
-disk_samples = 60
+disk_segments = 30
+disk_samples = 30
 # Parameters for the base map and fibers alignment
 longitude_align = -pi/2 + pi / 100
 latitude_align = 1.4
@@ -171,7 +171,7 @@ function get_disk(radius, segments, samples, x, y, distance, phase, rotation)
     p = Array{Float64}(undef, disk_segments, disk_samples, 3)
     lspace = range(0, stop = 2pi, length = disk_samples)
     for i in 1:segments
-        yₐ = (i + y) / segments
+        yₐ = ((i-1) + y) / segments
         xₐ = phase + x + 2pi - rotation
         p[i, :, 1] = [(radius * yₐ * sin(j + xₐ) + distance) * sin(rotation)
                       for j in lspace]
@@ -228,18 +228,17 @@ build_surface(universe, grid2, grid_image, shading = false)
 # Instantiate a horizontal box for holding the visuals and the controls
 scene = hbox(universe,
              vbox(sg),
-             parent = Scene(resolution = (400, 400)))
+             parent = Scene(resolution = (360, 360)))
 
 # update eye position
-eye_position, lookat, upvector = Vec3f0(-4, 4, 4), Vec3f0(0), Vec3f0(0, 0, 1.0)
+eye_position, lookat, upvector = Vec3f0(-3, 3, 2), Vec3f0(0), Vec3f0(0, 0, 0.001)
 update_cam!(universe, eye_position, lookat)
 universe.center = false # prevent scene from recentering on display
 
 record(universe, "planet.gif") do io
-    frames = 100
+    frames = 180
     for i in 1:frames
         og[] = i*2pi/frames # animate scene
-        rotate_cam!(universe, 2pi/frames, 0.0, 0.0)
         recordframe!(io) # record a new frame
     end
 end
