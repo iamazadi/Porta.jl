@@ -297,8 +297,29 @@ for i in 1:length(vertices)
         end
     end
 end
+faces = []
+for i in 1:length(vertices)
+    for j in i:length(vertices)
+        for k in j:length(vertices)
+            a = vertices[i]
+            b = vertices[j]
+            c = vertices[k]
+            ab = norm(a - b)
+            ac = norm(a - c)
+            bc = norm(b - c)
+            if isapprox(ab, 1, atol = TOLERANCE) &&
+               isapprox(ac, 1, atol = TOLERANCE) &&
+               isapprox(bc, 1, atol = TOLERANCE)
+                push!(faces, [a, b, c])
+            end
+        end
+    end
+end
 gold = [0.8314, 0.6863, 0.2157]
 saturated = [0.9098, 0.7255, 0.1373]
+rosegold = [0.718, 0.431, 0.475]
+platinum = [0.898, 0.894, 0.886]
+silver = [0.752, 0.752, 0.752]
 manifolds = []
 for i in 1:length(edges)
     # First use 3-sphere rotations to rotate the points
@@ -320,25 +341,36 @@ for vertex in vertices
     x = @lift([$rotated[1]])
     y = @lift([$rotated[2]])
     z = @lift([$rotated[3]])
-    color = RGBAf0(gold..., 0.9)
-    meshscatter!(scene, x, y, z, markersize = sqrt(2)*radius, color = color, shading = false)
+    color = RGBAf0(rosegold..., 0.9)
+    meshscatter!(scene, x, y, z, markersize = 2radius, color = color, shading = true)
+end
+
+for i in 1:length(faces)
+    a, b, c = faces[i]
+    rotateda = @lift(compressed_σ($q * a))
+    rotatedb = @lift(compressed_σ($q * b))
+    rotatedc = @lift(compressed_σ($q * c))
+    l = @lift([($rotateda[1], $rotateda[2], $rotateda[3]),
+               ($rotatedb[1], $rotatedb[2], $rotatedb[3]),
+               ($rotatedc[1], $rotatedc[2], $rotatedc[3])])
+    indices = [1, 2, 3,   2, 3, 1,   3, 1, 2]
+    color = [RGBAf0(gold..., rand()), RGBAf0(saturated..., rand()), RGBAf0(rosegold..., rand())]
+    mesh!(scene, l, color = color)
 end
 
 # update eye position
-eye_position, lookat, upvector = Vec3f0(2.0, 0.0, 2.0), Vec3f0(0.0), Vec3f0(0.0, 0.0, 0.0001)
+eye_position, lookat, upvector = Vec3f0(2, 2, 2), Vec3f0(0), Vec3f0(0.0, 0.0, 0.0001)
 update_cam!(scene, eye_position, lookat)
 scene.center = false # prevent scene from recentering on display
 
-hbox(scene, vbox(sθ, sϕ, sψ), parent = Scene(resolution = (360, 360)))
-
+#fullscene = hbox(scene, vbox(sθ, sϕ, sψ), parent = Scene(resolution = (500, 500)))
 
 record(scene, "24-cell.gif") do io
     frames = 180
     for i in 1:frames
         # animate scene
-        θ[] = pi / 4 + i*2pi/frames
-        ϕ[] = tanh(10(frames - i)/frames)*2pi
-        ψ[] = tanh(10i/frames)*2pi
+        ϕ[] = i/frames*2pi
+        ψ[] = -tanh(10i/frames)*2pi
         recordframe!(io) # record a new frame
     end
 end
