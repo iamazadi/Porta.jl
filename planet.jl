@@ -91,7 +91,7 @@ end
 
 
 # The scene object that contains other visual objects
-universe = Scene(backgroundcolor = :black, show_axis=false)
+universe = Scene(backgroundcolor = :black, show_axis=false, resolution = (360, 360))
 # Use a slider for rotating the base space in an interactive way
 sg, og = textslider(0:0.05:2pi, "g", start = 0)
 
@@ -226,9 +226,9 @@ build_surface(universe, grid1, grid_image, shading = false)
 build_surface(universe, grid2, grid_image, shading = false)
 
 # Instantiate a horizontal box for holding the visuals and the controls
-scene = hbox(universe,
-             vbox(sg),
-             parent = Scene(resolution = (360, 360)))
+#scene = hbox(universe,
+#             vbox(sg),
+#             parent = Scene(resolution = (360, 360)))
 
 # update eye position
 eye_position, lookat, upvector = Vec3f0(-3, 3, 2), Vec3f0(0), Vec3f0(0, 0, 0.001)
