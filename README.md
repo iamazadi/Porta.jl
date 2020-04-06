@@ -1,19 +1,21 @@
-# Geometric quantizer
-Quantize the geometry instead of geometrizing the quantum!
+# Build Visual Models
 
 ![the Hopf fibration](londontsai.gif "The Hopf fibration inspired by one of the London Tsai's prints")
 ![the Hopf flower](flower.gif "The Hopf flower")
 ![the Hopf planet](planet.gif "The Hopf planet")
 ![24-cell](24-cell.gif "24-cell")
+![600-cell](600-cell.gif "600-cell")
 
 This project aims to help with Eric Weinstein's Graph, Wall, Tome (GWT) project.
 
 ## Requirements
-LinearAlgebra,
-CSV,
-DataFrames,
-StatsBase,
-Makie.
+- LinearAlgebra
+- CSV
+- DataFrames
+- StatsBase
+- Makie
+- Combinatorics
+- AbstractAlgebra
 
 ## Installation
 You can install this using:
