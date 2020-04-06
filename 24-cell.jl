@@ -368,10 +368,10 @@ scene.center = false # prevent scene from recentering on display
 record(scene, "24-cell.gif") do io
     frames = 180
     for i in 1:frames
-        # animate scene
-        ϕ[] = i/frames*2pi
-        ψ[] = -tanh(10i/frames)*2pi
         recordframe!(io) # record a new frame
+        # animate scene
+        ϕ[] = cos(i/frames*pi/2)*2pi
+        ψ[] = sin(i/frames*pi/2)*2pi
     end
 end
 
