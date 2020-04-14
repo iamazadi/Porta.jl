@@ -8,6 +8,8 @@ H = Quaternions.Quaternion
 
 const TOLERANCE = 1e-7
 const GOLDEN_RATIO = (1 + sqrt(5)) / 2
+const RADIUS = 0.025
+const SEGMENTS = 60
 
 
 """
@@ -237,6 +239,60 @@ function build_surface(scene,
 end
 
 
+"""
+get_faces(vertices, distance)
+
+Calculates the faces in a manifold with the given vertices and the distance
+between each vertex in a face.
+"""
+function get_faces(vertices, distance)
+    array = []
+    for i in 1:length(vertices)
+        for j in i:length(vertices)
+            for k in j:length(vertices)
+                a = vertices[i]
+                b = vertices[j]
+                c = vertices[k]
+                ab = norm(a - b)
+                ac = norm(a - c)
+                bc = norm(b - c)
+                if isapprox(ab, distance, atol = TOLERANCE) &&
+                   isapprox(ac, distance, atol = TOLERANCE) &&
+                   isapprox(bc, distance, atol = TOLERANCE)
+                    push!(array, [a, b, c])
+                end
+            end
+        end
+    end
+    unique(array)
+end
+
+
+"""
+get_Hopf_vertices(vertices)
+
+Filters the extra vertices that are on the same Hopf fiber with the given
+vertices on a 3-sphere.
+"""
+function get_Hopf_vertices(vertices)
+    array = []
+    for i in 1:length(vertices)
+        a = π(vertices[i])
+        exists = false
+        for j in 1:length(array)
+            b = π(array[j])
+            if isapprox(a, b, atol = TOLERANCE)
+                exists = true
+            end
+        end
+        if !exists
+            push!(array, vertices[i])
+        end
+    end
+    unique(array)
+end
+
+
 # The scene object that contains other visual objects
 scene = Scene(backgroundcolor = :white, show_axis=false, resolution = (360, 360))
 # Use a slider for rotating the base space in an interactive way
@@ -247,53 +303,21 @@ sψ, ψ = textslider(0:0.01:2pi, "ψ", start = 0)
 u = @lift([cos($ϕ) * cos($ψ), cos($ϕ) * sin($ψ), sin($ϕ)])
 q = @lift(H(cos($θ), sin($θ) * $u[1], sin($θ) * u[2], sin($θ) * $u[3]))
 vertices = get_vertices()
+# Cut a 3-sphere into 2 pieces and get the first one
+#f(x) = abs(Complex(x.s, x.v1)) < abs(Complex(x.v2, x.v3))
+#vertices = filter(f, total_vertices)
+fiber_vertices = get_Hopf_vertices(vertices)
+faces = get_faces(vertices)
+α₁ = Node(fill(0.0, length(fiber_vertices))
+α₂ = Node(fill(1.0, length(faces))
 
-fiber_vertices = []
-for i in 1:length(vertices)
-    a = π(vertices[i])
-    exists = false
-    for j in 1:length(fiber_vertices)
-        b = π(fiber_vertices[j])
-        if isapprox(a, b, atol = TOLERANCE)
-            exists = true
-        end
-    end
-    if !exists
-        push!(fiber_vertices, vertices[i])
-    end
-end
-fiber_vertices = unique(fiber_vertices)
-α₁ = Node(0.0)
-α₂ = Node(1.0)
-radius = 0.025
-segments = 60
 for vertex in fiber_vertices
-    fiber = @lift(get_fiber($q * vertex, segments = segments, r = radius) ./ GOLDEN_RATIO)
+    fiber = @lift(get_fiber($q * vertex, segments = SEGMENTS, r = RADIUS) ./ GOLDEN_RATIO)
     color = @lift(fill(RGBAf0(compressed_σ($q * vertex)..., $α₁),
-                       segments,
-                       segments))
+                       SEGMENTS,
+                       SEGMENTS))
     build_surface(scene, fiber, color, shading = true, transparency = true)
 end
-
-faces = []
-for i in 1:length(vertices)
-    for j in i:length(vertices)
-        for k in j:length(vertices)
-            a = vertices[i]
-            b = vertices[j]
-            c = vertices[k]
-            ab = norm(a - b)
-            ac = norm(a - c)
-            bc = norm(b - c)
-            if isapprox(ab, 1/GOLDEN_RATIO, atol = TOLERANCE) &&
-               isapprox(ac, 1/GOLDEN_RATIO, atol = TOLERANCE) &&
-               isapprox(bc, 1/GOLDEN_RATIO, atol = TOLERANCE)
-                push!(faces, [a, b, c])
-            end
-        end
-    end
-end
-faces = unique(faces)
 
 for i in 1:length(faces)
     a, b, c = faces[i]
@@ -315,7 +339,7 @@ update_cam!(scene, eye_position, lookat)
 scene.center = false # prevent scene from recentering on display
 
 #fullscene = hbox(scene, vbox(sθ, sϕ, sψ), parent = Scene(resolution = (500, 500)))
-
+"""
 record(scene, "600-cell.gif") do io
     frames = 180
     for i in 1:frames
@@ -332,5 +356,5 @@ record(scene, "600-cell.gif") do io
             ϕ[] = sin(i / frames * pi/2) * 2pi
     end
 end
-
+"""
 
