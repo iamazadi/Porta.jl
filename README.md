@@ -6,7 +6,7 @@
 ![24-cell](24-cell.gif "24-cell")
 ![600-cell](600-cell.gif "600-cell")
 
-This project aims to help with Eric Weinstein's Graph, Wall, Tome (GWT) project.
+This project aims to help with Eric Weinstein's Graph, Wall, Tome (GWT) project. Watch some of the visual models on [YouTube](https://www.youtube.com/channel/UCY8FW_kvEfGDj5i5j_rkaqA).
 
 ## Requirements
 - LinearAlgebra
@@ -21,12 +21,12 @@ This project aims to help with Eric Weinstein's Graph, Wall, Tome (GWT) project.
 You can install this using:
 
 ```julia-repl
-julia> Pkg.update()
+julia> using Pkg
 julia> Pkg.add("Porta")
 ```
 
 ## Usage
-Please orient yourself through [The Unofficial Portal Wiki](https://theportal.wiki/wiki/Graph,_Wall,_Tome)! The ideal state would be a tool that you could use for visualizing and inspecting the equations on the famous wall, located at [Stony Brook University](http://www.math.stonybrook.edu/~tony/scgp/wall-story/wall-story.html). Also, join our unofficial community of The Portal podcast on Discord: [Invitation Link Here!](https://discord.gg/U8QQFc2)
+Please orient yourself through [The Portal - Unofficial Wiki](https://theportal.wiki/wiki/Graph,_Wall,_Tome)! The ideal state would be a tool that you could use for visualizing and inspecting the equations on the famous wall, located at [Stony Brook University](http://www.math.stonybrook.edu/~tony/scgp/wall-story/wall-story.html). Also, click and navigate through the story of what will be in the project: [Interactive Wall](https://dev.theportal.dev/wall/).
 
 ## Status
 - Complex numbers [Julia already supports complex numbers.]
@@ -34,5 +34,7 @@ Please orient yourself through [The Unofficial Portal Wiki](https://theportal.wi
 - Quaternions [3D rotations added.]
 - The Hopf fibration [done.]
 - Planet Hopf or something similar to let the viewer know where they are. [done.]
+- SU(2) linear algebra [TODO]
+- 7-manifolds [TODO]
 - Documentation [TODO]
 - Maxwell's equations [TODO]
