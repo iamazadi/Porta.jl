@@ -307,15 +307,13 @@ vertices = get_vertices()
 #f(x) = abs(Complex(x.s, x.v1)) < abs(Complex(x.v2, x.v3))
 #vertices = filter(f, total_vertices)
 fiber_vertices = get_Hopf_vertices(vertices)
-faces = get_faces(vertices)
-α₁ = Node(fill(0.0, length(fiber_vertices))
-α₂ = Node(fill(1.0, length(faces))
+faces = get_faces(vertices, 1/GOLDEN_RATIO)
+α₁ = Node(0.0)
+α₂ = Node(1.0)
 
 for vertex in fiber_vertices
     fiber = @lift(get_fiber($q * vertex, segments = SEGMENTS, r = RADIUS) ./ GOLDEN_RATIO)
-    color = @lift(fill(RGBAf0(compressed_σ($q * vertex)..., $α₁),
-                       SEGMENTS,
-                       SEGMENTS))
+    color = @lift(fill(RGBAf0(compressed_σ($q * vertex)..., $α₁), SEGMENTS, SEGMENTS))
     build_surface(scene, fiber, color, shading = true, transparency = true)
 end
 
@@ -326,10 +324,9 @@ for i in 1:length(faces)
     rotatedc = @lift(compressed_σ($q * c))
     l = @lift([$rotateda, $rotatedb, $rotatedc])
     indices = [1, 2, 3,   2, 3, 1,   3, 1, 2]
-    r = rand(3)
-    color = @lift([RGBAf0($rotateda..., r[1] * $α₂),
-                   RGBAf0($rotatedb..., r[2] * $α₂),
-                   RGBAf0($rotatedc..., r[3] * $α₂)])
+    color = @lift([RGBAf0($rotateda..., rand() * $α₂),
+                   RGBAf0($rotatedb..., rand() * $α₂),
+                   RGBAf0($rotatedc..., rand() * $α₂)])
     mesh!(scene, l, color = color)
 end
 
@@ -339,9 +336,9 @@ update_cam!(scene, eye_position, lookat)
 scene.center = false # prevent scene from recentering on display
 
 #fullscene = hbox(scene, vbox(sθ, sϕ, sψ), parent = Scene(resolution = (500, 500)))
-"""
+
 record(scene, "600-cell.gif") do io
-    frames = 180
+    frames = 90
     for i in 1:frames
         recordframe!(io) # record a new frame
         # animate the scene
@@ -349,12 +346,12 @@ record(scene, "600-cell.gif") do io
                               2 - 2sin(i / frames * pi) + 0.00001,
                               2 + 2sin(i / frames * pi))
         update_cam!(scene, eye_position, lookat)
-        α₁[] = sin(i / frames * pi)
-        α₂[] = 1.0 - sin(i / frames * pi)
+        α₁[] = cos(i / frames * 2pi)
+        α₂[] = 1 - sin(i / frames * 2pi)
         θ[] = i / frames * 2pi
         ψ[] = cos(i / frames * pi/2) * 2pi
             ϕ[] = sin(i / frames * pi/2) * 2pi
     end
 end
-"""
+
 

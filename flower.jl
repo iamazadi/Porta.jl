@@ -1,6 +1,72 @@
 using LinearAlgebra
 using Makie
-using Porta
+
+
+"""
+λmap(p)
+Sends a point on a 3-sphere to a point in the plane x₄=0 with the given point
+in the form of 2 complex numbers representing a unit quaternion. This is the
+stereographic projection of a 3-sphere. S³ ↦ R³
+"""
+function λmap(p)
+    [real(p[1]), imag(p[1]), real(p[2])] ./ (1 - imag(p[2]))
+end
+
+
+"""
+λ⁻¹map(p)
+Sends a point on the plane back to a point on a unit sphere with the given
+point. This is the inverse stereographic projection of a 3-sphere.
+"""
+function λ⁻¹map(p)
+    x₁ = 2p[1] / (1 + p[1]^2 + p[2]^2 + p[3]^2)
+    x₂ = 2p[2] / (1 + p[1]^2 + p[2]^2 + p[3]^2)
+    x₃ = 2p[3] / (1 + p[1]^2 + p[2]^2 + p[3]^2)
+    x₄ = (-1 + p[1]^2 + p[2]^2 + p[3]^2) / (1 + p[1]^2 + p[2]^2 + p[3]^2)
+    [Complex(x₁, x₂), Complex(x₃, x₄)]
+end
+
+
+"""
+S¹action(α, p)
+Performs a group action corresponding to moving along the circumference of a
+circle with the given angle and the point in the form of 2 complex numbers
+representing a unit quaternion.
+"""
+function S¹action(α, p)
+    [exp(im * α) * p[1], exp(im * α) * p[2]]
+end
+
+
+"""
+convert_to_cartesian(p)
+Converts a point in the geographic coordinate system to a point in the
+cartesian one with the given point in radians.
+"""
+function convert_to_cartesian(p)
+    [cos(p[2]) * cos(p[1]),
+     cos(p[2]) * sin(p[1]),
+     sin(p[2])]
+end
+
+
+"""
+convert_to_geographic(p)
+Converts a point in the cartesian coordinate system to a point in the
+geographic one with the given point.
+"""
+function convert_to_geographic(p)
+    r = sqrt(p[1]^2 + p[2]^2 + p[3]^2)
+    if p[1] > 0
+          ϕ = atan(p[2] / p[1])
+    elseif p[2] > 0
+          ϕ = atan(p[2] / p[1]) + pi
+    else
+          ϕ = atan(p[2] / p[1]) - pi
+    end
+    θ = asin(p[3] / r)
+    [ϕ, θ]
+end
 
 
 """
@@ -13,11 +79,11 @@ function get_center(A, B, C)
     a = LinearAlgebra.norm(B - C)
     b = LinearAlgebra.norm(A - C)
     c = LinearAlgebra.norm(A - B)
-    numerator = a^2 * (b^2 + c^2 - a^2) * A + 
-                b^2 * (a^2 + c^2 - b^2) * B + 
+    numerator = a^2 * (b^2 + c^2 - a^2) * A +
+                b^2 * (a^2 + c^2 - b^2) * B +
                 c^2 * (a^2 + b^2 - c^2) * C
-    denominator = a^2 * (b^2 + c^2 - a^2) + 
-                  b^2 * (a^2 + c^2 - b^2) + 
+    denominator = a^2 * (b^2 + c^2 - a^2) +
+                  b^2 * (a^2 + c^2 - b^2) +
                   c^2 * (a^2 + b^2 - c^2)
     numerator / denominator
 end
@@ -175,11 +241,9 @@ update_cam!(universe, eye_position, lookat)
 universe.center = false # prevent scene from recentering on display
 
 record(universe, "flower.gif") do io
-    frames = 180
+    frames = 90
     for i in 1:frames
             ϕ[] = i*pi/frames # animate scene
         recordframe!(io) # record a new frame
     end
 end
-
-

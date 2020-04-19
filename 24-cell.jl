@@ -366,7 +366,7 @@ scene.center = false # prevent scene from recentering on display
 #fullscene = hbox(scene, vbox(sθ, sϕ, sψ), parent = Scene(resolution = (500, 500)))
 
 record(scene, "24-cell.gif") do io
-    frames = 180
+    frames = 90
     for i in 1:frames
         recordframe!(io) # record a new frame
         # animate scene
