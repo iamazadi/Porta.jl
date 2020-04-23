@@ -1,10 +1,11 @@
 # Build Visual Models
 
-![the Hopf fibration](londontsai.gif "The Hopf fibration inspired by one of the London Tsai's prints")
-![the Hopf flower](flower.gif "The Hopf flower")
-![the Hopf planet](planet.gif "The Hopf planet")
-![24-cell](24-cell.gif "24-cell")
-![600-cell](600-cell.gif "600-cell")
+![the Hopf fibration](gallery/londontsai.gif "The Hopf fibration inspired by one of the London Tsai's prints")
+![the Hopf flower](gallery/flower.gif "The Hopf flower")
+![the Hopf planet](gallery/planet.gif "The Hopf planet")
+![24-cell](gallery/24-cell.gif "24-cell")
+![600-cell](gallery/600-cell.gif "600-cell")
+![surfaces](gallery/surfaces.png "surfaces")
 
 This project aims to help with Eric Weinstein's Graph, Wall, Tome (GWT) project. Watch some of the visual models on [YouTube](https://www.youtube.com/channel/UCY8FW_kvEfGDj5i5j_rkaqA).
 
@@ -18,10 +19,13 @@ This project aims to help with Eric Weinstein's Graph, Wall, Tome (GWT) project.
 - AbstractAlgebra
 
 ## Installation
-You can install this using:
+You can install Porta by running this (in the REPL):
 
 ```julia-repl
-julia> using Pkg
+]add Porta
+```
+or,
+```julia-repl
 julia> Pkg.add("Porta")
 ```
 
