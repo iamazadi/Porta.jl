@@ -26,7 +26,7 @@ You can install Porta by running this (in the REPL):
 ```
 or,
 ```julia-repl
-julia> Pkg.add("Porta")
+Pkg.add("Porta")
 ```
 
 ## Usage
