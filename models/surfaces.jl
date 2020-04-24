@@ -43,7 +43,7 @@ arrowhead = @lift([head(p($olx, $oly), ξ($olθ), $olϵ)])
 
 # Instantiate a horizontal box for holding the visuals and the controls
 box = vbox(slϵ, slx, sly, slθ)
-scene = hbox(universe, box, parent = Scene(resolution = (720, 720)))
+scene = hbox(universe, box, parent = Scene(resolution = (360, 360)))
 contour!(universe,
          lspace,
          lspace,
