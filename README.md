@@ -5,7 +5,7 @@
 ![the Hopf planet](gallery/planet.gif "The Hopf planet")
 ![24-cell](gallery/24-cell.gif "24-cell")
 ![600-cell](gallery/600-cell.gif "600-cell")
-![surfaces](gallery/surfaces.png "surfaces")
+![surfaces](gallery/surfaces.jpg "surfaces")
 
 This project aims to help with Eric Weinstein's Graph, Wall, Tome (GWT) project. Watch some of the visual models on [YouTube](https://www.youtube.com/channel/UCY8FW_kvEfGDj5i5j_rkaqA).
 

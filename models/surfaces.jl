@@ -31,9 +31,9 @@ universe = surface(lspace, lspace, f(lspace, lspace), colormap = :cinferno)
 xm, ym, zm = minimum(scene_limits(universe))
 
 slϵ, olϵ = textslider(0.0001:0.01:1.0, "ϵ", start = 0.0001)
-slx, olx = textslider(-2.0:0.01:2.0, "x", start = -0.5)
+slx, olx = textslider(-2.0:0.01:2.0, "x", start = 0.5)
 sly, oly = textslider(-2.0:0.01:2.0, "y", start = 0.5)
-slθ, olθ = textslider(0.0:0.01:pi/2, "θ", start = 0.0)
+slθ, olθ = textslider(0.0:0.01:pi/2, "θ", start = pi/4)
 p(x, y) = [x y]
 ξ(x) = [cos(x) sin(x)]
 tail(x) = Point3f0(x[1], x[2], zm)
@@ -66,5 +66,5 @@ arrows!(universe,
         linecolor = (:black, 2.0),
         linewidth = 3)
 center!(universe) # center the Scene on the display
-#Makie.save("gallery/surfaces.png", scene)
+Makie.save("gallery/surfaces.jpg", scene)
 display(scene)
