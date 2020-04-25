@@ -1,48 +1,60 @@
 using LinearAlgebra
 using Makie
 
-
+ϵ = 1e-1
 f(x,y) = (-x .* exp.(-x .^ 2 .- (y') .^ 2)) .* 4
-#Φ(p) = f(p[1], p[2])
-#struct dΦ
-#    u::Float64
-#    v::Float64
-#end
-#struct ξ
-#    a::Float64
-#    b::Float64
-#end
-#vect(dΦ) = [dΦ.u; dΦ.v]
-#vect(ξ) = [ξ.a; ξ.b]
-#dΦ(p::Array{Float64,1}) = dΦ((Φ([p[1] + ϵ, p[2]]) - Φ(p)) / ϵ,
-#                             (Φ([p[1], p[2] + ϵ]) - Φ(p)) / ϵ)
-#ξ(Φ, p) = vect(dΦ(p)) * vect(ξ(p))
-
-∂(i, p, ϵ) = begin
-    p′ = similar(p)
-    p′ .= p
-    p′[i] = p[i] + ϵ
-    (f(p′[1], p′[2]) - f(p[1], p[2])) / ϵ
+f(A) = begin
+    x , y = eachcol(A)
+    (-x .* exp.(-x .^ 2 .- y .^ 2)) .* 4
+end
+d(Φ, A) = begin
+    rows, cols = size(A)
+    D = Matrix{Float64}(undef, rows, cols)
+    E = Matrix{Float64}(I, cols, cols) .* ϵ
+    for (i, v) in enumerate(eachrow(A))
+        P = repeat(v, 1, cols)
+        P′ = P + E
+        D[i, :] .= (f(transpose(P′)) - f(transpose(P))) ./ ϵ
+    end
+    D
+end
+θ = pi/4
+ξ = [cos(θ); sin(θ)]
+ξΦ(Φ, ξ, A) = begin
+    derivative = d(Φ, A)
+    D = similar(derivative)
+    for (i, v) in enumerate(eachrow(derivative))
+        D[i, :] .= v .* ξ
+    end
+    D
 end
 
 N = 51
 lspace = range(-2, stop = 2, length = N)
-universe = surface(lspace, lspace, f(lspace, lspace), colormap = :cinferno)
+points = f(lspace, lspace)
+
+universe = surface(lspace,
+                   lspace,
+                   f(lspace, lspace),
+                   colormap = :cinferno)
 xm, ym, zm = minimum(scene_limits(universe))
 
-slϵ, olϵ = textslider(0.0001:0.01:1.0, "ϵ", start = 0.0001)
-slx, olx = textslider(-2.0:0.01:2.0, "x", start = 0.5)
-sly, oly = textslider(-2.0:0.01:2.0, "y", start = 0.5)
-slθ, olθ = textslider(0.0:0.01:pi/2, "θ", start = pi/4)
-p(x, y) = [x y]
-ξ(x) = [cos(x) sin(x)]
-tail(x) = Point3f0(x[1], x[2], zm)
-head(p, ξ, ϵ) = Point3f0(ξ[1] * ∂(1, p, ϵ), ξ[2] * ∂(2, p, ϵ), 0)
-arrowtail = @lift([tail(p($olx, $oly))])
-arrowhead = @lift([head(p($olx, $oly), ξ($olθ), $olϵ)])
+slu, olu = textslider(-2.0:0.01:2.0, "u", start = -0.5)
+slv, olv = textslider(-2.0:0.01:2.0, "v", start = -0.09)
+slξ, olξ = textslider(0.0:0.01:2pi, "ξ", start = 0)
+
+tail(x) = [Point3f0(x[i, 1], x[i, 2], f(x[i, 1], x[i, 2])) for i in 1:size(x, 1)]
+head(x, f, ξ) = begin
+    derivative = ξΦ(f, ξ, x)
+    magnitude = dot(derivative[1, :], ξ)
+    [Point3f0(ξ[1]*ϵ, ξ[2]*ϵ, f(ξ[1]*ϵ, ξ[2]*ϵ)) .* magnitude for i in 1:size(x, 1)]
+end
+P = @lift([$olu $olv])
+arrowtail = @lift(tail($P))
+arrowhead = @lift(head($P, f, [cos($olξ); sin($olξ)]))
 
 # Instantiate a horizontal box for holding the visuals and the controls
-box = vbox(slϵ, slx, sly, slθ)
+box = vbox(slu, slv, slξ)
 scene = hbox(universe, box, parent = Scene(resolution = (360, 360)))
 contour!(universe,
          lspace,
@@ -66,5 +78,14 @@ arrows!(universe,
         linecolor = (:black, 2.0),
         linewidth = 3)
 center!(universe) # center the Scene on the display
-Makie.save("gallery/surfaces.jpg", scene)
+#Makie.save("gallery/surfaces.jpg", scene)
 display(scene)
+
+record(scene, "gallery/surfaces.gif") do io
+    frames = 90
+    for i = 1:frames
+        progress = i / frames
+        olξ[] = progress * 2pi # animate scene
+        recordframe!(io) # record a new frame
+    end
+end
