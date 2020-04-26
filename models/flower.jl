@@ -239,6 +239,7 @@ end
 eye_position, lookat, upvector = Vec3f0(0.01, 0, 6), Vec3f0(0), Vec3f0(0, 0, 1.0)
 update_cam!(universe, eye_position, lookat)
 universe.center = false # prevent scene from recentering on display
+#Makie.save("gallery/porta.jpg", universe)
 
 record(universe, "flower.gif") do io
     frames = 90
