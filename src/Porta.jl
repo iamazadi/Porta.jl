@@ -3,7 +3,8 @@ __precompile__()
 
 module Porta
 
-include("hopf.jl")
-include("surfaces.jl")
+include("thehopffibration.jl")
+include("data.jl")
+include("signal.jl")
 
 end # module
