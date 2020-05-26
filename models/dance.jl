@@ -1,26 +1,77 @@
 using LinearAlgebra
+using GeometryBasics
 using Makie
 using Porta
 
 
 samples = 360
-segments = 72
-radius = 0.005
+segments = 36
+radius = 0.01
 const FPS = 24 # frames per second
-R = 1.0
+basemapcenter = [-sqrt(2); sqrt(2); -sqrt(2)]
 θ = Node(0.0)
 
-function makehopf(scene)
-    lspace = range(0, stop = 2pi, length = samples)
-    basepoints = convert(Array{Complex}, R .* Complex.(cos.(lspace), sin.(lspace)))
-    fiberactions = [fill(0.0, samples) fill(2pi, samples)]
-    q = ℍ([cos(0); sin(0) .* [sqrt(3)/3; sqrt(3)/3; sqrt(3)/3]])
-    h = ⭕(basepoints, fiberactions, segments, radius, q)
+function makebasemap(scene, center)
+    function colormesh((geometry, color))
+        mesh1 = normal_mesh(geometry)
+        npoints = length(GeometryBasics.coordinates(mesh1))
+        return GeometryBasics.pointmeta(mesh1; color=fill(color, npoints))
+    end
+    basemapradius = 0.5
+    baselen = 0.05 * basemapradius; dirlen = 0.8 * basemapradius
+    rectangles = [
+        (Rect(Vec3f0(center...), Vec3f0(dirlen, baselen, baselen)), RGBAf0(0.3,0,0,0.3)),
+        (Rect(Vec3f0(center...), Vec3f0(baselen, dirlen, baselen)), RGBAf0(0,0.3,0,0.3)),
+        (Rect(Vec3f0(center...), Vec3f0(baselen, baselen, dirlen)), RGBAf0(0,0,0.3,0.3))
+    ]
+    meshes = map(colormesh, rectangles)
+    mesh!(scene, merge(meshes))
+    markerradius = 0.03 * basemapradius
+    basecolor = [0.3; 0.3; 0.3]
+    baseradius = 0.5
+    markercenter = [rand(samples) rand(samples) rand(samples)]
+    markercolor = [rand(samples) rand(samples) rand(samples)]
+    basemap = 🌐(center, basecolor, baseradius, markercenter, markercolor, markerradius, 30)
+    surface!(scene,
+             basemap.basemanifold[:, :, 1],
+             basemap.basemanifold[:, :, 2],
+             basemap.basemanifold[:, :, 3],
+             color = RGBAf0.(basemap.basecolor[:, :, 1],
+                             basemap.basecolor[:, :, 2],
+                             basemap.basecolor[:, :, 3],
+                             0.3),
+             transparency = true)
     surfacesx = []
     surfacesy = []
     surfacesz = []
     colors = []
-    surfaces = []
+    for i in 1:samples
+        surfacex = Node(basemap.markermanifold[i, :, :, 1])
+        surfacey = Node(basemap.markermanifold[i, :, :, 2])
+        surfacez = Node(basemap.markermanifold[i, :, :, 3])
+        color = Node(RGBAf0.(basemap.markercolor[i, :, :, 1],
+                             basemap.markercolor[i, :, :, 2],
+                             basemap.markercolor[i, :, :, 3],
+                             0.9))
+        push!(surfacesx, surfacex)
+        push!(surfacesy, surfacey)
+        push!(surfacesz, surfacez)
+        push!(colors, color)
+        surface!(scene, surfacex, surfacey, surfacez, color = color, transparency = true)
+    end
+    surfacesx, surfacesy, surfacesz, colors
+end
+
+function makehopf(scene, offset)
+    lspace = range(0, stop = 2pi, length = samples)
+    basepoints = convert(Array{Complex}, Complex.(cos.(lspace), sin.(lspace)))
+    fiberactions = [fill(0.0, samples) fill(2pi, samples)]
+    q = ℍ([cos(0); sin(0) .* [sqrt(3)/3; sqrt(3)/3; sqrt(3)/3]])
+    h = ⭕(basepoints, fiberactions, segments, radius, q, offset)
+    surfacesx = []
+    surfacesy = []
+    surfacesz = []
+    colors = []
     for i in 1:samples
         surfacex = Node(h.m[i, :, :, 1])
         surfacey = Node(h.m[i, :, :, 2])
@@ -33,11 +84,7 @@ function makehopf(scene)
         push!(surfacesy, surfacey)
         push!(surfacesz, surfacez)
         push!(colors, color)
-        push!(surfaces, surface!(scene,
-                                 surfacex,
-                                 surfacey,
-                                 surfacez,
-                                 color = color)[end])
+        surface!(scene, surfacex, surfacey, surfacez, color = color, transparency = true)
     end
     surfacesx, surfacesy, surfacesz, colors
 end
@@ -49,7 +96,15 @@ indices = convert(Array{Int64}, floor.(range(2, stop=total_samples-1, length=sam
 frames = chunks(signal, FPS)
 q = @lift(ℍ([cos($θ); sin($θ) .* [sqrt(3)/3; sqrt(3)/3; sqrt(3)/3]]))
 
-function animate(i, surfacesx, surfacesy, surfacesz, colors)
+function animate(i,
+                 hsurfacesx,
+                 hsurfacesy,
+                 hsurfacesz,
+                 hcolors,
+                 bsurfacesx,
+                 bsurfacesy,
+                 bsurfacesz,
+                 bcolors)
     f = fft(chunk(signal, i, FPS))[indices]
     basepoints = convert(Array{Complex}, f)
     M = [real.(f) imag.(f)]
@@ -57,37 +112,70 @@ function animate(i, surfacesx, surfacesy, surfacesz, colors)
     for j in 1:samples
         powers[j] = tanh(norm(M[j, :]))
     end
-    fiberactions = [fill(0.0, samples) replace(powers, NaN=>0.01) .* 2pi]
-    h = ⭕(basepoints, fiberactions, segments, radius, to_value(q))
+
+    G = geographic(basepoints)
+    latitudes = range(-pi/2, stop = pi/2, length = samples)
+    basepoints = ℂ([tanh.(real.(f)) .* pi latitudes fill(1.0, samples)])
+
+    #fiberactions = [fill(0.0, samples) replace(powers, NaN=>0.01) .* 2pi]
+    fiberactions = [fill(0.0, samples) tanh.(imag.(f)) .* 2pi]
+    h = ⭕(basepoints, fiberactions, segments, radius, to_value(q), [0.0; 0.0; 0.0])
+    basecolor = [0.3; 0.3; 0.3]
+    baseradius = 0.5
+    markercenter = ℝ³(basepoints)
+    markercolor = [h.c[:, 1, 1, 1] h.c[:, 1, 1, 2] h.c[:, 1, 1, 3]]
+    markerradius = 0.04 * baseradius
+    basemap = 🌐(basemapcenter,
+                 basecolor,
+                 baseradius,
+                 markercenter,
+                 markercolor,
+                 markerradius,
+                 segments)
     for j in 1:samples
-        surfacesx[j][] = h.m[j, :, :, 1]
-        surfacesy[j][] = h.m[j, :, :, 2]
-        surfacesz[j][] = h.m[j, :, :, 3]
-        rg = [0.9; 0.9; 0.9]
-        rg′ = 1 .- rg
-        colors[j][] = RGBAf0.((rg[1] .* h.c[j, :, :, 1]) .+ rg′[1] .* rand(Float64, size(h.c[j, :, :, 1])),
-                              (rg[2] .* h.c[j, :, :, 2]) .+ rg′[2] .* rand(Float64, size(h.c[j, :, :, 2])),
-                              (rg[3] .* h.c[j, :, :, 3]) .+ rg′[3] .* rand(Float64, size(h.c[j, :, :, 3])),
-                              0.9)
+        bsurfacesx[j][] = basemap.markermanifold[j, :, :, 1]
+        bsurfacesy[j][] = basemap.markermanifold[j, :, :, 2]
+        bsurfacesz[j][] = basemap.markermanifold[j, :, :, 3]
+        bcolors[j][] = RGBAf0.(basemap.markercolor[j, :, :, 1],
+                               basemap.markercolor[j, :, :, 2],
+                               basemap.markercolor[j, :, :, 3],
+                               0.9)
+        hsurfacesx[j][] = h.m[j, :, :, 1]
+        hsurfacesy[j][] = h.m[j, :, :, 2]
+        hsurfacesz[j][] = h.m[j, :, :, 3]
+        hcolors[j][] = RGBAf0.(h.c[j, :, :, 1],
+                               h.c[j, :, :, 2],
+                               h.c[j, :, :, 3],
+                               0.9)
     end
-    θ[] = 2pi * (i - 1) / frames
+    # θ[] = 2pi * (i - 1) / frames
 end
 
 function preparescene(scene)
-    eyeposition, lookat = Vec3f0(2, 2, 1), Vec3f0(0)
+    eyeposition, lookat = Vec3f0(2, 2, 2), Vec3f0(0)
     update_cam!(scene, eyeposition, lookat)
     scene.center = false # prevent scene from recentering on display
-    #rotate_cam!(universe, 0.0, 0.0, pi/2)
 end
 
 scene = Scene(backgroundcolor = :white, show_axis=false, resolution=(1920, 1080))
-surfacesx, surfacesy, surfacesz, colors = makehopf(scene)
+hsurfacesx, hsurfacesy, hsurfacesz, hcolors = makehopf(scene, [0.0; 0.0; 0.0])
+bsurfacesx, bsurfacesy, bsurfacesz, bcolors = makebasemap(scene, basemapcenter)
 
+preparescene(scene)
 preparescene(scene)
 record(scene, "gallery" * "/" * name * ".mkv") do io
     for i in 1:frames
+        sleep(1)
         @show (i / frames) * 100
-        animate(i, surfacesx, surfacesy, surfacesz, colors)
+        animate(i,
+                hsurfacesx,
+                hsurfacesy,
+                hsurfacesz,
+                hcolors,
+                bsurfacesx,
+                bsurfacesy,
+                bsurfacesz,
+                bcolors)
         recordframe!(io) # record a new frame
     end
 end

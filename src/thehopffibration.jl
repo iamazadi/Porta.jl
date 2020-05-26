@@ -1,13 +1,7 @@
-export ℍ
-export 💞
 export ⭕
+export HSVtoRGB
 
 import LinearAlgebra
-
-struct ℍ
-    su2::Array{Complex,2}
-    q::Array{Float64}
-end
 
 struct ⭕
     b::Array{Complex}
@@ -17,6 +11,7 @@ struct ⭕
     s::Integer
     r::Float64
     q::ℍ
+    p::Array{Float64}
 end
 
 λ(z₁, z₂) = begin
@@ -28,47 +23,6 @@ end
         c[i, :] = LinearAlgebra.normalize(y[i, :]) .* tanh(LinearAlgebra.norm(y[i, :]))
     end
     c
-end
-
-ℍ(q::Array{Float64}) = begin
-    z₁, z₂ = Complex(q[1], q[2]), Complex(q[3], q[4])
-    s = [z₁ conj(z₂); -z₂ conj(z₁)]
-    ℍ(s, q)
-end
-
-ℍ(s::Array{Complex,2}) = begin
-    q = [real(s[1]); imag(s[1]); -real(s[3]); -imag(s[3])]
-    ℍ(s, q)
-end
-
-Base.imag(h::ℍ) = [imag(h.su2[1]); -real(h.su2[3]); -imag(h.su2[3])]
-
-Base.adjoint(h::ℍ) = ℍ(convert(Array{Complex,2}, adjoint(h.su2)))
-
-function Base.:*(h₁::ℍ, h₂::ℍ)
-    s = h₁.su2 * h₂.su2
-    q = [real(s[1]); imag(s[1]); -real(s[3]); -imag(s[3])]
-    ℍ(s, q)
-end
-
-💞(p::Array{Float64}, h::ℍ) = imag(adjoint(h) * ℍ([0; p]) * h)
-
-function 💞(p::Array{Float64,2}, h::ℍ)
-    r = similar(p)
-    for i in 1:size(p, 1)
-        r[i, :] = 💞(p[i, :], h)
-    end
-    r
-end
-
-function 💞(p::Array{Float64,3}, center::Array{Float64}, h::ℍ)
-    r = similar(p)
-    c = reshape(repeat(center', size(p, 2)), size(p, 2), size(p, 3))
-    for i in 1:size(p, 1)
-        oldposition = p[i, :, :] - c
-        r[i, :, :] = 💞(oldposition, h) + c
-    end
-    r
 end
 
 HSVtoRGB(hsv) = begin
@@ -95,25 +49,12 @@ HSVtoRGB(hsv) = begin
     [R; G; B]
 end
 
-function geographic(y)
-    samples = size(y, 1)
-    g = Array{Float64,2}(undef, samples, 2)
-    for i in 1:samples
-        if y[i, 1] > 0
-            ϕ = atan(y[i, 2] / y[i, 1])
-        elseif y[i, 2] > 0
-            ϕ = atan(y[i, 2] / y[i, 1]) + pi
-        else
-            ϕ = atan(y[i, 2] / y[i, 1]) - pi
-        end
-        r = sqrt(LinearAlgebra.norm(y[i, :]))
-        θ = asin(y[i, 3] / r)
-        g[i, :] = [ϕ; θ]
-    end
-    g
-end
-
-function get_fibers(b::Array{Complex}, f::Array{Float64,2}, s::Integer, r::Float64, q::ℍ)
+function get_fibers(b::Array{Complex},
+                    f::Array{Float64,2},
+                    s::Integer,
+                    r::Float64,
+                    q::ℍ,
+                    offset::Array{Float64})
     samples = size(b, 1)
     θ₁, θ₂ = f[:, 1], f[:, 2]
     x, y = real.(b), imag.(b)
@@ -124,7 +65,7 @@ function get_fibers(b::Array{Complex}, f::Array{Float64,2}, s::Integer, r::Float
     ξ₁, η = g[:, 1] .+ pi, (g[:, 2] .+ (pi / 2)) ./ 2
     Q = [1.0; 0.0; 0.0; 0.0]
     nᵢ = [0; 0; 1]
-    s2 = Integer(s ÷ 3)
+    s2 = Integer(s ÷ 10)
     ψ = range(0, stop = 2pi, length = s2)
     zero = fill(0, s2)
     m = Array{Float64,4}(undef, samples, s, s2, 3)
@@ -143,7 +84,7 @@ function get_fibers(b::Array{Complex}, f::Array{Float64,2}, s::Integer, r::Float
         rotatedz₁, rotatedz₂
     end
     for i in 1:samples
-        factor = η[i] / (pi / 2)
+        factor = η[i]
         lspace = range(θ₁[i], stop = θ₂[i], length = s)
         ξ₂ = Array{Float64}(undef, s)
         for j in 1:s
@@ -157,7 +98,7 @@ function get_fibers(b::Array{Complex}, f::Array{Float64,2}, s::Integer, r::Float
         ξ₂ = ξ₂ .- ξ₁[i] .- (pi / 2)
         z₁, z₂ = construct(η[i], ξ₁[i], ξ₂, q)
         p = λ(z₁, z₂)
-        ξ₂′ = ξ₂ .+ 1e-10
+        ξ₂′ = ξ₂ .+ 1e-3
         z₁′, z₂′ = construct(η[i], ξ₁[i], ξ₂′, q)
         p′ = λ(z₁′, z₂′)
         P = [real(z₁[1]); imag(z₁[1]); real(z₂[1]); imag(z₂[1])]
@@ -171,13 +112,13 @@ function get_fibers(b::Array{Complex}, f::Array{Float64,2}, s::Integer, r::Float
             β = acos(LinearAlgebra.dot(n, nᵢ)) / 2
             h2 = ℍ([cos(β); sin(β) .* u])
             m[i, j, :, :] = 💞([r .* cos.(ψ) r .* sin.(ψ) zero],
-                               h2) + repeat((p[j, :])', s2, 1)
+                               h2) + repeat((p[j, :])', s2, 1)  + repeat(offset', s2, 1)
         end
     end
     m, c
 end
 
-⭕(b::Array{Complex}, f::Array{Float64,2}, s::Int64, r::Float64, q::ℍ) = begin
-    m, c = get_fibers(b, f, s, r, q)
-    ⭕(b, f, m, c, s, r, q)
+⭕(b::Array{Complex}, f::Array{Float64,2}, s::Int64, r::Float64, q::ℍ, p::Array{Float64}) = begin
+    m, c = get_fibers(b, f, s, r, q, p)
+    ⭕(b, f, m, c, s, r, q, p)
 end
