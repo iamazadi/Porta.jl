@@ -66,7 +66,6 @@ end
 
 Signal(s::String; c=1) = begin
     y, fps = WAV.wavread(s)
-    #y = (y .+ 1) ./ 2 # Normalize the signal
     Signal(y[:, c], fps)
 end
 

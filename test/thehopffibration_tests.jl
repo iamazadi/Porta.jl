@@ -9,6 +9,6 @@ fiberactions = [fill(0, samples) fill(2pi, samples)]
 q = Porta.ℍ([cos(0); sin(0) .* [sqrt(3)/3; sqrt(3)/3; sqrt(3)/3]])
 p = [0.0; 0.0; 0.0]
 h = Porta.⭕(basepoints, fiberactions, segments, radius, q, p)
-segments2 = Integer(segments ÷ 10)
+segments2 = Integer(segments ÷ 3)
 Test.@test size(h.m) == (samples, segments, segments2, 3)
 Test.@test size(h.c) == size(h.m)

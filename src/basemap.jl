@@ -123,7 +123,6 @@ function sphere(center, radius, segments)
     manifold
 end
 
-
 function 🌐(basecenter::Array{Float64},
             basecolor::Array{Float64},
             baseradius::Float64,

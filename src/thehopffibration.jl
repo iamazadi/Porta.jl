@@ -56,24 +56,21 @@ function get_fibers(b::Array{Complex},
                     q::ℍ,
                     offset::Array{Float64})
     samples = size(b, 1)
-    θ₁, θ₂ = f[:, 1], f[:, 2]
-    x, y = real.(b), imag.(b)
-    d = x .^ 2 .+ y .^ 2 .+ 1
-    y₁, y₂, y₃ = 2x ./ d, 2y ./ d, (d .- 2) ./ d
-    g = geographic([y₁ y₂ y₃])
+    g = geographic(b)
     ϕ, θ = g[:, 1], g[:, 2]
-    ξ₁, η = g[:, 1] .+ pi, (g[:, 2] .+ (pi / 2)) ./ 2
+    ξ₁, η = ϕ .+ pi, (θ .+ (pi / 2)) ./ 2
+    θ₁, θ₂ = f[:, 1], f[:, 2]
     Q = [1.0; 0.0; 0.0; 0.0]
     nᵢ = [0; 0; 1]
-    s2 = Integer(s ÷ 10)
+    s2 = Integer(s ÷ 3)
     ψ = range(0, stop = 2pi, length = s2)
     zero = fill(0, s2)
     m = Array{Float64,4}(undef, samples, s, s2, 3)
     c = similar(m)
     construct(η, ξ₁, ξ₂, q) = begin
         samples = size(ξ₂, 1)
-        z₁ = exp.(im .* ξ₂) .* cos(η)
-        z₂ = exp.(im .* (ξ₂ .+ ξ₁)) .* sin(η)
+        z₁ = exp.(im .* (ξ₁ .+ ξ₂) ./ 2) .* sin.(η)
+        z₂ = exp.(im .* (ξ₂ .- ξ₁) ./ 2) .* cos.(η)
         rotatedz₁ = Array{Complex}(undef, samples)
         rotatedz₂ =  similar(rotatedz₁)
         for i in 1:samples
@@ -84,35 +81,29 @@ function get_fibers(b::Array{Complex},
         rotatedz₁, rotatedz₂
     end
     for i in 1:samples
-        factor = η[i]
-        lspace = range(θ₁[i], stop = θ₂[i], length = s)
-        ξ₂ = Array{Float64}(undef, s)
-        for j in 1:s
-            x = lspace[j]
-            if x < pi
-                ξ₂[j] = pi * tanh((factor + 1) * x)
-            else
-                ξ₂[j] = pi * tanh((factor + 1) * (x - 2pi)) + 2pi
-            end
-        end
-        ξ₂ = ξ₂ .- ξ₁[i] .- (pi / 2)
+        ξ₂ = range(2θ₁[i], stop = 2θ₂[i], length = s)
         z₁, z₂ = construct(η[i], ξ₁[i], ξ₂, q)
         p = λ(z₁, z₂)
-        ξ₂′ = ξ₂ .+ 1e-3
-        z₁′, z₂′ = construct(η[i], ξ₁[i], ξ₂′, q)
-        p′ = λ(z₁′, z₂′)
+        p′ = similar(p)
+        for j in 1:s
+            if j < s
+                p′[j, :] = p[j+1, :]
+            else
+                p′[j, :] = p[1, :]
+            end
+        end
         P = [real(z₁[1]); imag(z₁[1]); real(z₂[1]); imag(z₂[1])]
         hue = acos(LinearAlgebra.dot(P, Q)) / pi
-        #hue = (ϕ[i] + pi + 2θ[i] + pi) / 4pi
         rgb = HSVtoRGB([hue * 360; 1.0; 1.0])
         c[i, :, :, :] = reshape(repeat(rgb', s * s2), s, s2, 3)
         for j in 1:s
             n = LinearAlgebra.normalize(p′[j, :] - p[j, :])
             u = LinearAlgebra.normalize(LinearAlgebra.cross(nᵢ, n))
-            β = acos(LinearAlgebra.dot(n, nᵢ)) / 2
+            β = acos(LinearAlgebra.dot(nᵢ, n)) / 2
             h2 = ℍ([cos(β); sin(β) .* u])
-            m[i, j, :, :] = 💞([r .* cos.(ψ) r .* sin.(ψ) zero],
-                               h2) + repeat((p[j, :])', s2, 1)  + repeat(offset', s2, 1)
+            circle = [r .* cos.(ψ) r .* sin.(ψ) zero]
+            m[i, j, :, :] = 💞(circle,
+                               h2) + repeat((p[j, :])', s2, 1) + repeat(offset', s2, 1)
         end
     end
     m, c
