@@ -4,9 +4,9 @@ using Makie
 using Porta
 
 
-samples = 360
+samples = 36
 segments = 36
-radius = 0.01
+radius = 0.015
 const FPS = 24 # frames per second
 basemapcenter = [-sqrt(2); sqrt(2); 0.0]
 θ = Node(0.0)
@@ -152,7 +152,7 @@ hsurfacesx, hsurfacesy, hsurfacesz, hcolors = makehopf(scene, [0.0; 0.0; 0.0])
 bsurfacesx, bsurfacesy, bsurfacesz, bcolors = makebasemap(scene, basemapcenter)
 
 preparescene(scene)
-record(scene, "gallery" * "/" * name * ".mkv") do io
+record(scene, "gallery" * "/" * name * ".gif") do io
     for i in 1:frames
         sleep(1)
         @show (i / frames) * 100
