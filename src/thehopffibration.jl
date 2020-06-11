@@ -56,9 +56,6 @@ function get_fibers(b::Array{Complex},
                     q::ℍ,
                     offset::Array{Float64})
     samples = size(b, 1)
-    g = geographic(b)
-    ϕ, θ = g[:, 1], g[:, 2]
-    ξ₁, η = ϕ .+ pi, (θ .+ (pi / 2)) ./ 2
     θ₁, θ₂ = f[:, 1], f[:, 2]
     Q = [1.0; 0.0; 0.0; 0.0]
     nᵢ = [0; 0; 1]
@@ -67,10 +64,10 @@ function get_fibers(b::Array{Complex},
     zero = fill(0, s2)
     m = Array{Float64,4}(undef, samples, s, s2, 3)
     c = similar(m)
-    construct(η, ξ₁, ξ₂, q) = begin
+    construct(b, ξ₂, q) = begin
         samples = size(ξ₂, 1)
-        z₁ = exp.(im .* (ξ₁ .+ ξ₂) ./ 2) .* sin.(η)
-        z₂ = exp.(im .* (ξ₂ .- ξ₁) ./ 2) .* cos.(η)
+        z₁ = exp.(im .* (ξ₂ .+ imag.(b) ./ 2)) .* cos.(atan.(real.(b)))
+        z₂ = exp.(im .* (ξ₂ .- imag.(b) ./ 2)) .* sin.(atan.(real.(b)))
         rotatedz₁ = Array{Complex}(undef, samples)
         rotatedz₂ =  similar(rotatedz₁)
         for i in 1:samples
@@ -81,17 +78,10 @@ function get_fibers(b::Array{Complex},
         rotatedz₁, rotatedz₂
     end
     for i in 1:samples
-        ξ₂ = range(2θ₁[i], stop = 2θ₂[i], length = s)
-        z₁, z₂ = construct(η[i], ξ₁[i], ξ₂, q)
+        ξ₂ = range(θ₁[i], stop = θ₂[i], length = s)
+        z₁, z₂ = construct(b[i], ξ₂, q)
         p = λ(z₁, z₂)
-        p′ = similar(p)
-        for j in 1:s
-            if j < s
-                p′[j, :] = p[j+1, :]
-            else
-                p′[j, :] = p[1, :]
-            end
-        end
+        p′ = circshift(p, 1)
         P = [real(z₁[1]); imag(z₁[1]); real(z₂[1]); imag(z₂[1])]
         hue = acos(LinearAlgebra.dot(P, Q)) / pi
         rgb = HSVtoRGB([hue * 360; 1.0; 1.0])
