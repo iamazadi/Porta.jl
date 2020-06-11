@@ -4,11 +4,11 @@ using Makie
 using Porta
 
 
-samples = 36
+samples = 360
 segments = 36
-radius = 0.025
+radius = 0.01
 const FPS = 24 # frames per second
-basemapcenter = [-sqrt(2); sqrt(2); -sqrt(2)]
+basemapcenter = [-sqrt(2); sqrt(2); 0.0]
 θ = Node(0.0)
 
 function makebasemap(scene, center)
@@ -31,7 +31,7 @@ function makebasemap(scene, center)
     baseradius = 0.5
     markercenter = [rand(samples) rand(samples) rand(samples)]
     markercolor = [rand(samples) rand(samples) rand(samples)]
-    basemap = 🌐(center, basecolor, baseradius, markercenter, markercolor, markerradius, 30)
+    basemap = 🌐(center, basecolor, baseradius, markercenter, markercolor, markerradius, 36)
     surface!(scene,
              basemap.basemanifold[:, :, 1],
              basemap.basemanifold[:, :, 2],
@@ -108,8 +108,7 @@ function animate(i,
     sₜ = chunk(signal, i, FPS)
     f = fft(sₜ)[indices]
     basepoints = convert(Array{Complex}, f)
-    G = geographic(basepoints)
-    fiberactions = [fill(0.0, samples) tanh.(G[:, 3]) .* 2pi]
+    fiberactions = [fill(0.0, samples) tanh.(Base.abs.(basepoints)) .* 2pi]
     h = ⭕(basepoints, fiberactions, segments, radius, to_value(q), [0.0; 0.0; 0.0])
     basecolor = [0.3; 0.3; 0.3]
     baseradius = 0.5
@@ -122,7 +121,7 @@ function animate(i,
                  markercenter,
                  markercolor,
                  markerradius,
-                 30)
+                 36)
     for j in 1:samples
         bsurfacesx[j][] = basemap.markermanifold[j, :, :, 1]
         bsurfacesy[j][] = basemap.markermanifold[j, :, :, 2]
@@ -130,14 +129,14 @@ function animate(i,
         bcolors[j][] = RGBAf0.(basemap.markercolor[j, :, :, 1],
                                basemap.markercolor[j, :, :, 2],
                                basemap.markercolor[j, :, :, 3],
-                               tanh.(G[j, 3]))
+                               0.9)
         hsurfacesx[j][] = h.m[j, :, :, 1]
         hsurfacesy[j][] = h.m[j, :, :, 2]
         hsurfacesz[j][] = h.m[j, :, :, 3]
         hcolors[j][] = RGBAf0.(h.c[j, :, :, 1],
                                h.c[j, :, :, 2],
                                h.c[j, :, :, 3],
-                               tanh.(G[j, 3]))
+                               0.9)
     end
     θ[] = 2pi * (i - 1) / frames
 end
@@ -153,7 +152,7 @@ hsurfacesx, hsurfacesy, hsurfacesz, hcolors = makehopf(scene, [0.0; 0.0; 0.0])
 bsurfacesx, bsurfacesy, bsurfacesz, bcolors = makebasemap(scene, basemapcenter)
 
 preparescene(scene)
-record(scene, "gallery" * "/" * name * ".gif") do io
+record(scene, "gallery" * "/" * name * ".mkv") do io
     for i in 1:frames
         sleep(1)
         @show (i / frames) * 100
