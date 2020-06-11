@@ -66,6 +66,7 @@ end
 
 Signal(s::String; c=1) = begin
     y, fps = WAV.wavread(s)
+    y = (y .+ 1) ./ 2
     Signal(y[:, c], fps)
 end
 
@@ -87,7 +88,7 @@ per second.
 """
 function chunk(s::Signal, i::Int, cps::Int)
     samples_per_chunk = Int(fps(s) ÷ cps)
-    window = 2^12
+    window = 2^11
     start = (i - 1) * samples_per_chunk + 1
     finish = start + window
     total_samples = size(data(s), 1)
