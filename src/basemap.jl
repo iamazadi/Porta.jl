@@ -92,7 +92,7 @@ function geographic(y)
         else
             ϕ = atan(y[i, 2] / y[i, 1]) - pi
         end
-        r = sqrt(LinearAlgebra.norm(y[i, :]))
+        r = LinearAlgebra.norm(y[i, :])
         θ = asin(y[i, 3] / r)
         g[i, :] = [ϕ; θ; r]
     end
@@ -115,9 +115,8 @@ function sphere(center, radius, segments)
     for i in 1:segments
         θ = (i - 1) / (segments - 1) * pi - pi / 2
         for j in 1:segments
-            ϕ = j / (segments - 1) * 2pi
-            x, y, z = vec(cartesian([ϕ -θ 1.0])) .* radius + center
-            manifold[i, j, :] = [x; y; z]
+            ϕ = (j - 1) / (segments - 1) * 2pi - pi
+            manifold[i, j, :] = vec(cartesian([ϕ -θ radius])) + center
         end
     end
     manifold
@@ -136,13 +135,9 @@ function 🌐(basecenter::Array{Float64},
     markermanifold = Array{Float64,4}(undef, samples, segments, segments, 3)
     markercolor4 = similar(markermanifold)
     for i in 1:samples
-        markermanifold[i, :, :, :] = sphere(markercenter[i, :] .* baseradius,
+        markermanifold[i, :, :, :] = sphere((markercenter[i, :] .* baseradius) + basecenter,
                                             markerradius,
-                                            segments) + reshape(repeat(basecenter',
-                                                                       segments^2),
-                                                                segments,
-                                                                segments,
-                                                                3)
+                                            segments)
         markercolor4[i, :, :, :] = reshape(repeat(markercolor2[i, :]', segments^2),
                                            segments,
                                            segments,
