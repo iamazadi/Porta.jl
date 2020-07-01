@@ -23,5 +23,5 @@ docs/site/
 # environment.
 Manifest.toml
 
-# Audio files
-data/audio.wav
+# data files
+test/data/

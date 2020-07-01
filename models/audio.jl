@@ -90,7 +90,7 @@ function makehopf(scene, offset)
 end
 
 name = "audio"
-signal = Signal("data" * "/" * name * ".wav")
+signal = Signal("test/data" * "/" * name * ".wav")
 total_samples = Integer(fps(signal) ÷ FPS) - 2
 indices = convert(Array{Int64}, floor.(range(2, stop=total_samples-1, length=samples)))
 frames = chunks(signal, FPS)

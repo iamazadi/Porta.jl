@@ -3,20 +3,24 @@ __precompile__()
 
 module Porta
 
-dir = "./linearalgebra/"
+ladir = "./linearalgebra/"
+geodir = "./geometry/"
+emadir = "./ema/"
 
-include(dir * "innerproductreal.jl")
-include(dir * "determinant.jl")
-include(dir * "outerproductreal.jl")
-include(dir * "real3.jl")
-include(dir * "innerproductreal3.jl")
-include(dir * "outerproductreal3.jl")
-include(dir * "quaternion.jl")
-include(dir * "innerproductquaternion.jl")
-include(dir * "abstractalgebrautils.jl")
+include(ladir * "innerproductreal.jl")
+include(ladir * "determinant.jl")
+include(ladir * "outerproductreal.jl")
+include(ladir * "real3.jl")
+include(ladir * "innerproductreal3.jl")
+include(ladir * "outerproductreal3.jl")
+include(ladir * "quaternion.jl")
+include(ladir * "innerproductquaternion.jl")
+include(ladir * "abstractalgebrautils.jl")
+include(geodir * "riemannsphere.jl")
 include("rotations.jl")
-include("body.jl")
-#include("basemap.jl")
+include("calculus.jl")
+include(emadir * "data.jl")
+include(emadir * "body.jl")
 #include("thehopffibration.jl")
 #include("data.jl")
 #include("signal.jl")

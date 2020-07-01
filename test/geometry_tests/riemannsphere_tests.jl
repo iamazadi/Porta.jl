@@ -1,0 +1,17 @@
+z = convert(Complex, Complex(100rand(), 100rand()))
+z̄ = conj(z)
+r = RiemannSphere([z; z̄])
+s = Spherical(r)
+c = Cartesian(r)
+g = Geographic(r)
+
+
+@test isapprox(r, RiemannSphere(s))
+@test isapprox(r, RiemannSphere(c))
+@test isapprox(r, RiemannSphere(g))
+@test isapprox(s, Spherical(c))
+@test isapprox(s, Spherical(g))
+@test isapprox(c, Cartesian(s))
+@test isapprox(c, Cartesian(g))
+@test isapprox(g, Geographic(s))
+@test isapprox(g, Geographic(c))

@@ -223,7 +223,7 @@ countries = Dict("iran" => [0.0, 1.0, 0.29], # green
                  "germany" => [0.914, 0.0, 1.0], # purple
                  "israel" => [0.0, 1.0, 0.075]) # green
 # The path to the dataset
-path = "data/natural_earth_vector"
+path = "test/data/natural_earth_vector"
 # Construct a manifold for each country in the dictionary
 for country in countries
     dataframe = CSV.read(joinpath(path, "$(country[1])-nodes.csv"))
@@ -321,8 +321,8 @@ grid2 = @lift(get_disk(distance,
                        $og,
                        2pi-cut))
 
-base_image = load("data/BaseMap.png")
-grid_image = load("data/boqugrid.png")
+base_image = load("test/data/BaseMap.png")
+grid_image = load("test/data/boqugrid.png")
 
 build_surface(universe, disk1, base_image, shading = false)
 build_surface(universe, disk2, base_image, shading = false)
@@ -339,7 +339,7 @@ eye_position, lookat, upvector = Vec3f0(-3, 3, 2), Vec3f0(0), Vec3f0(0, 0, 0.001
 update_cam!(universe, eye_position, lookat)
 universe.center = false # prevent scene from recentering on display
 
-record(universe, "planet.gif") do io
+record(universe, "gallery/planet.gif") do io
     frames = 90
     for i in 1:frames
         og[] = i*2pi/frames # animate scene

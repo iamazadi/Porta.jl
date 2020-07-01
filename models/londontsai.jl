@@ -166,7 +166,7 @@ update_cam!(universe, eye_position, lookat)
 universe.center = false # prevent scene from recentering on display
 rotate_cam!(universe, 0.0, 0.0, pi/2)
 
-record(universe, "londontsai.gif") do io
+record(universe, "gallery/londontsai.gif") do io
     frames = 90
     for i in 1:frames
         og[] = i*2pi/frames # animate scene

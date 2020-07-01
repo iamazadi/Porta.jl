@@ -136,7 +136,7 @@ stiff_arrowtail = @lift(stiff_tail($P))
 yconst_stiff_arrowhead = @lift(stiff_head($P, f, [cos($olξ); 0]))
 xconst_stiff_arrowhead = @lift(stiff_head($P, f, [0; sin($olξ)]))
 
-arrowmesh = load("data/boquarrow.obj")
+arrowmesh = load("test/data/boquarrow.obj")
 arrow = mesh!(universe, arrowmesh, color = :gold)[end]
 scale!(arrow, 0.02, 0.02, 0.02)
 on(olu) do val

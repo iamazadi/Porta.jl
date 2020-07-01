@@ -241,7 +241,7 @@ update_cam!(universe, eye_position, lookat)
 universe.center = false # prevent scene from recentering on display
 #Makie.save("gallery/porta.jpg", universe)
 
-record(universe, "flower.gif") do io
+record(universe, "gallery/flower.gif") do io
     frames = 90
     for i in 1:frames
             ϕ[] = i*pi/frames # animate scene
