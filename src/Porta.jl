@@ -6,6 +6,7 @@ module Porta
 ladir = "./linearalgebra/"
 geodir = "./geometry/"
 emadir = "./ema/"
+pokerdir = "./poker"
 
 include(ladir * "innerproductreal.jl")
 include(ladir * "determinant.jl")
@@ -21,6 +22,9 @@ include("rotations.jl")
 include("calculus.jl")
 include(emadir * "data.jl")
 include(emadir * "body.jl")
+include(joinpath(pokerdir, "card.jl"))
+include(joinpath(pokerdir, "cardset.jl"))
+include(joinpath(pokerdir, "hands.jl"))
 #include("thehopffibration.jl")
 #include("data.jl")
 #include("signal.jl")

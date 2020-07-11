@@ -6,6 +6,7 @@ d = Int(floor(rand() * 5)) # dimension
 latestsdir = "./linearalgebra_tests/"
 geotestsdir = "./geometry_tests/"
 ematestsdir = "./ema_tests/"
+pokerdir = "./poker_tests"
 
 
 start = time()
@@ -31,5 +32,9 @@ start = time()
 @time @testset "The Calculus Tests" begin include("calculus_tests.jl") end
 @time @testset "The Data Tests" begin include(ematestsdir * "data_tests.jl") end
 @time @testset "The Body Tests" begin include(ematestsdir * "body_tests.jl") end
+@time @testset "The Card Tests" begin include(joinpath(pokerdir, "card_tests.jl")) end
+@time @testset "The Card Set Tests" begin
+    include(joinpath(pokerdir, "cardset_tests.jl")) end
+@time @testset "The Hands Tests" begin include(joinpath(pokerdir, "hands_tests.jl")) end
 elapsed = time() - start
 println("Testing took", elapsed)
