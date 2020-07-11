@@ -12,8 +12,9 @@ labfilename = "mngu0_s1_0001.lab"
 sample = readest(datadir * emadir * emafilename, datadir * labdir * labfilename)
 frames = length(sample.t)
 
-scene = Scene(camera = cam3d!)
-eye_position, lookat = [50.0; 0.0; 0.0], [0.0; 0.0; 0.0]
+scene = Scene(camera = cam3d!, show_axis=false, resolution=(360, 360))
+# scene.camera.eyeposition.val
+eye_position, lookat = [20.0; -10.0; 10.0], [0.0; 0.0; 0.0]
 imagename = "articulators"
 imagepath = datadir * imagename * ".jpg"
 
@@ -49,18 +50,19 @@ q = Quaternion(vec(h)[2:4]..., vec(h)[1])
 label_scene = text!(scene,
                     utterance,
                     position = (0, 0),
-                    textsize = 10,
+                    textsize = 5,
+                    rotation = pi/2,
+                    align = (:center, :center),
                     font = "Blackchancery")[end]
 
 center!(scene) # center the Scene on the display
-update_cam!(scene, eye_position, lookat) # update eye position
 scene.center = false # prevent scene from recentering on display
+update_cam!(scene, eye_position, lookat) # update eye position
 function animate(i)
     sprites[] = [getsprite(c.coordinates[i], c.orientation[i]) for c in sample.ema]
     search(i, s) = s.utt.utterances[findmin(abs.(s.utt.time .- s.t[i]))[2]]
     utterance[] = search(i, sample)
     translate!(label_scene, Vec3f0(lookat))
-    rotate!(label_scene, q)
 end
 
 record(scene, "gallery/speechproduction.gif", 1:frames; framerate = 200) do i
