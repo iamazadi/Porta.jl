@@ -11,6 +11,7 @@ emafilename = "mngu0_s1_0001.ema"
 labfilename = "mngu0_s1_0001.lab"
 sample = readest(datadir * emadir * emafilename, datadir * labdir * labfilename)
 frames = length(sample.t)
+framerate = 200
 
 scene = Scene(camera = cam3d!, show_axis=false, resolution=(360, 360))
 # scene.camera.eyeposition.val
@@ -65,6 +66,6 @@ function animate(i)
     translate!(label_scene, Vec3f0(lookat))
 end
 
-record(scene, "gallery/speechproduction.gif", 1:frames; framerate = 200) do i
+record(scene, "gallery/speechproduction.gif", 1:frames; framerate = framerate) do i
     animate(i) # animate scene
 end
