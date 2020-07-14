@@ -3,30 +3,18 @@ __precompile__()
 
 module Porta
 
-ladir = "./linearalgebra/"
-geodir = "./geometry/"
-emadir = "./ema/"
-pokerdir = "./poker"
 
-include(ladir * "innerproductreal.jl")
-include(ladir * "determinant.jl")
-include(ladir * "outerproductreal.jl")
-include(ladir * "real3.jl")
-include(ladir * "innerproductreal3.jl")
-include(ladir * "outerproductreal3.jl")
-include(ladir * "quaternion.jl")
-include(ladir * "innerproductquaternion.jl")
-include(ladir * "abstractalgebrautils.jl")
-include(geodir * "riemannsphere.jl")
-include("rotations.jl")
-include("calculus.jl")
-include(emadir * "data.jl")
-include(emadir * "body.jl")
-include(joinpath(pokerdir, "card.jl"))
-include(joinpath(pokerdir, "cardset.jl"))
-include(joinpath(pokerdir, "hands.jl"))
-#include("thehopffibration.jl")
-#include("data.jl")
-#include("signal.jl")
+# The default tolerance for comparing the equality of two numbers.
+const TOLERANCE = 1e-10
+
+
+groupsdir = "symmetrygroups"
+#fieldsdir = "fields"
+
+
+include(joinpath(groupsdir, "u1.jl"))
+#include(joinpath(groupsdir, "su2.jl"))
+#include(joinpath(fieldsdir, "complex.jl"))
+
 
 end # module
