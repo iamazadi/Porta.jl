@@ -14,7 +14,7 @@ logicdir = "logic"
 
 
 include(joinpath(logicdir, "propositionallogic.jl"))
-#include(joinpath(logicdir, "axioms.jl"))
+include(joinpath(logicdir, "predicatelogic.jl"))
 #include(joinpath(groupsdir, "u1.jl"))
 #include(joinpath(groupsdir, "su2.jl"))
 #include(joinpath(fieldsdir, "complex.jl"))

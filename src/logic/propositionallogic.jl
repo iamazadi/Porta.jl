@@ -1,4 +1,4 @@
-import Base.+
+import Base.:+
 import Base.:*
 import Base.:!
 
@@ -7,10 +7,11 @@ export Logic
 export Proposition
 export True
 export False
-export ↔
-export ⟹
 export T
 export F
+export ↑
+export ⟹
+export ↔
 
 
 ## Data Structures ##
@@ -45,9 +46,9 @@ end
 
 
 """
-    Represents a Proposition.
+    Represents a proposition.
 
-a variable that can take the value `true` or `false`. No other.
+A variable that can take the value `True` or `False`. No others.
 
 field: value.
 """
@@ -77,8 +78,8 @@ const F = False()
 
 Return the logical value of `p`.
 """
-value(p::True) = True()
-value(p::False) = False()
+value(p::True) = T
+value(p::False) = F
 value(p::Logic) = value(p.value)
 
 
@@ -92,6 +93,53 @@ Base.show(io::IO, p::False) = print(io, 'F')
 Base.show(io::IO, p::Logic) = show(io, value(p))
 
 
+## Binary Operators ##
+
+
+"""
+    p ↑ q
+
+Not both. Alternative denial. Logical NAND.
+"""
+↑(p::True, q::True) = F
+↑(p::True, q::False) = T
+↑(p::False, q::True) = T
+↑(p::False, q::False) = T
+↑(p::Logic, q::Logic) = value(p) ↑ value(q)
+
+
+"""
+    p * q
+
+Logical conjunction (AND).
+"""
+*(p::Logic, q::Logic) = (p ↑ q) ↑ (p ↑ q)
+
+
+"""
+    p + q
+
+Logical disjunction (OR).
+"""
++(p::Logic, q::Logic) = (p ↑ p) ↑ (q ↑ q)
+
+
+"""
+    p ⟹ q
+
+Logical implication.
+"""
+⟹(p::Logic, q::Logic) = p ↑ (q ↑ q)
+
+
+"""
+    ↔(p, q)
+
+Logical equality (=).
+"""
+↔(p::Logic, q::Logic) = (p ↑ q) ↑ ((p ↑ p) ↑ (q ↑ q))
+
+
 ## Unary Operators ##
 
 
@@ -100,9 +148,7 @@ Base.show(io::IO, p::Logic) = show(io, value(p))
 
 Negate the proposition `p`. Logical negation.
 """
-!(p::True) = False()
-!(p::False) = True()
-!(p::Logic) = !(value(p))
+!(p::Logic) = p ↑ p
 
 
 """
@@ -118,7 +164,7 @@ Returns a proposition identical to `p`. Logical identity.
 
 Returns a Proposition that is True for all `p`. Logical true.
 """
-True(p::Logic) = True()
+True(p::Logic) = T
 
 
 """
@@ -126,47 +172,4 @@ True(p::Logic) = True()
 
 Returns a Proposition that is False for all `p`. Logical false.
 """
-False(p::Logic) = False()
-
-
-## Binary Operators ##
-
-
-"""
-    p * q
-
-Logical conjunction (AND).
-"""
-*(p::True, q::True) = True()
-*(p::True, q::False) = False()
-*(p::False, q::True) = False()
-*(p::False, q::False) = False()
-*(p::Logic, q::Logic) = *(value(p), value(q))
-
-
-"""
-    ↔(p, q)
-
-Logical equality (=).
-"""
-↔(p::True, q::True) = True()
-↔(p::True, q::False) = False()
-↔(p::False, q::True) = False()
-↔(p::False, q::False) = True()
-↔(p::Logic, q::Logic) = ↔(value(p), value(q))
-
-
-"""
-    p + q
-
-Logical disjunction (OR).
-"""
-+(p::Logic, q::Logic) = ↔(p * q, ↔(p, q))
-
-
-"""
-    p ⟹ q
-
-Logical implication.
-"""
-⟹(p::Logic, q::Logic) = ↔((p + q), q)
+False(p::Logic) = F

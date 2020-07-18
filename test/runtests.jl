@@ -12,7 +12,8 @@ start = time()
 
 @time @testset "The Propositional Logic Tests" begin
     include(joinpath(logicdir, "propositionallogic_tests.jl")) end
-#@time @testset "The Axioms Tests" begin include(joinpath(logicdir, "axioms_tests.jl")) end
+@time @testset "The Predicate Logic Tests" begin
+    include(joinpath(logicdir, "predicatelogic_tests.jl")) end
 #@time @testset "The U(1) Tests" begin include(joinpath(groupsdir, "u1_tests.jl")) end
 #@time @testset "The SU(2) Tests" begin include(joinpath(groupsdir, "su2_tests.jl")) end
 #@time @testset "The Complex Tests" begin
