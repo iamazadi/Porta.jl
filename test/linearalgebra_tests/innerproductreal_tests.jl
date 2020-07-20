@@ -1,3 +1,4 @@
+d = rand(1:4)
 u, v, v₁, v₂ = rand(d), rand(d), rand(d), rand(d)
 α, β = rand(2)
 zero = fill(0.0, d)
