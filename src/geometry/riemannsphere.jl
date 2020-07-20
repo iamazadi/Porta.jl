@@ -83,10 +83,7 @@ length(g::Geographic) = length(g.a)
 
 
 Base.isapprox(r₁::RiemannSphere, r₂::RiemannSphere) = begin
-    all([isapprox(r₁.a[i], r₂.a[i]) for i in 1:length(r₁)]) end
-Base.isapprox(s₁::Spherical, s₂::Spherical) = begin
-    all([isapprox(s₁.a[i], s₂.a[i]) for i in 1:length(s₁)]) end
-Base.isapprox(c₁::Cartesian, c₂::Cartesian) = begin
-    all([isapprox(c₁.a[i], c₂.a[i]) for i in 1:length(c₁)]) end
-Base.isapprox(g₁::Geographic, g₂::Geographic) = begin
-    all([isapprox(g₁.a[i], g₂.a[i]) for i in 1:length(g₁)]) end
+    isapprox(Cartesian(r₁).a, Cartesian(r₂).a) end
+Base.isapprox(s₁::Spherical, s₂::Spherical) = isapprox(s₁.a, s₂.a)
+Base.isapprox(c₁::Cartesian, c₂::Cartesian) = isapprox(c₁.a, c₂.a)
+Base.isapprox(g₁::Geographic, g₂::Geographic) = isapprox(g₁.a, g₂.a)
