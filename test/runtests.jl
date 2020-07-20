@@ -3,8 +3,8 @@ using Porta
 
 
 logicdir = "logic_tests"
-#groupsdir = "symmetrygroups_tests"
-#fieldsdir = "fields_tests"
+linearalgebradir = "linearalgebra_tests"
+geometrydir = "geometry_tests"
 
 
 start = time()
@@ -14,10 +14,32 @@ start = time()
     include(joinpath(logicdir, "propositionallogic_tests.jl")) end
 @time @testset "The Predicate Logic Tests" begin
     include(joinpath(logicdir, "predicatelogic_tests.jl")) end
-#@time @testset "The U(1) Tests" begin include(joinpath(groupsdir, "u1_tests.jl")) end
-#@time @testset "The SU(2) Tests" begin include(joinpath(groupsdir, "su2_tests.jl")) end
-#@time @testset "The Complex Tests" begin
-#    include(joinpath(fieldsdir, "complex_tests.jl")) end
+
+
+@time @testset "The Inner Product of Reals Tests" begin
+    include(joinpath(linearalgebradir, "innerproductreal_tests.jl")) end
+@time @testset "The Outer Product of Reals Tests" begin
+    include(joinpath(linearalgebradir, "outerproductreal_tests.jl")) end
+@time @testset "The Determinant Tests" begin
+    include(joinpath(linearalgebradir, "determinant_tests.jl")) end
+@time @testset "The ℝ³ Tests" begin
+    include(joinpath(linearalgebradir, "real3_tests.jl")) end
+@time @testset "The Inner Product of ℝ³ Tests" begin
+    include(joinpath(linearalgebradir, "innerproductreal3_tests.jl")) end
+@time @testset "The Outer Product of ℝ³ Tests" begin
+    include(joinpath(linearalgebradir, "outerproductreal3_tests.jl")) end
+@time @testset "The Quaternions Tests" begin
+    include(joinpath(linearalgebradir, "quaternion_tests.jl")) end
+@time @testset "The Inner Product of Quaternions Tests" begin
+    include(joinpath(linearalgebradir, "innerproductquaternion_tests.jl")) end
+@time @testset "The Abstract Algebra Utilities Tests" begin
+    include(joinpath(linearalgebradir, "abstractalgebrautils_tests.jl")) end
+
+
+@time @testset "The Riemann Sphere Tests" begin
+    include(joinpath(geometrydir, "riemannsphere_tests.jl")) end
+@time @testset "The Stereographic Projection Tests" begin
+    include(joinpath(geometrydir, "stereographicprojection_tests.jl")) end
 
 
 elapsed = time() - start

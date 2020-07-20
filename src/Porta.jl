@@ -9,15 +9,27 @@ const TOLERANCE = 1e-10
 
 
 logicdir = "logic"
-#groupsdir = "symmetrygroups"
-#fieldsdir = "fields"
+linearalgebradir = "linearalgebra"
+geometrydir = "geometry"
 
 
 include(joinpath(logicdir, "propositionallogic.jl"))
 include(joinpath(logicdir, "predicatelogic.jl"))
-#include(joinpath(groupsdir, "u1.jl"))
-#include(joinpath(groupsdir, "su2.jl"))
-#include(joinpath(fieldsdir, "complex.jl"))
+
+
+include(joinpath(linearalgebradir, "innerproductreal.jl"))
+include(joinpath(linearalgebradir, "outerproductreal.jl"))
+include(joinpath(linearalgebradir, "determinant.jl"))
+include(joinpath(linearalgebradir, "real3.jl"))
+include(joinpath(linearalgebradir, "innerproductreal3.jl"))
+include(joinpath(linearalgebradir, "outerproductreal3.jl"))
+include(joinpath(linearalgebradir, "quaternion.jl"))
+include(joinpath(linearalgebradir, "innerproductquaternion.jl"))
+include(joinpath(linearalgebradir, "abstractalgebrautils.jl"))
+
+
+include(joinpath(geometrydir, "riemannsphere.jl"))
+include(joinpath(geometrydir, "stereographicprojection.jl"))
 
 
 end # module
