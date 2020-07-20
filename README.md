@@ -45,12 +45,13 @@ For client-side code read the tests, and for examples on how to build please che
 - Geometric Unity [TODO]
 
 ## References
-- A [graph] from Physics and Geometry, Edward Witten (1986)
-- The iconic [wall] of Stony Brook University
-- The Road to Reality, Sir Roger Penrose (2004)
-- A Portal Special [Presentation]- Geometric Unity: A First Look
+- Physics and Geometry, [Edward Witten] (1986)
+- The iconic wall of [Stony Brook University]
+- The Road to Reality, [Sir Roger Penrose] (2004)
+- A Portal Special Presentation- Geometric Unity: [A First Look]
 
 [channel]: (https://www.youtube.com/channel/UCY8FW_kvEfGDj5i5j_rkaqA)
-[graph]: (https://cds.cern.ch/record/181783/files/cer-000093203.pdf)
-[wall]: (http://www.math.stonybrook.edu/~tony/scgp/wall-story/wall-story.html)
-[Presentation]: (https://youtu.be/Z7rd04KzLcg)
+[Edward Witten]: (https://cds.cern.ch/record/181783/files/cer-000093203.pdf)
+[Stony Brook University]: (http://www.math.stonybrook.edu/~tony/scgp/wall-story/wall-story.html)
+[Sir Roger Penrose]: (https://www.amazon.com/Road-Reality-Complete-Guide-Universe/dp/0679776311)
+[A First Look]: (https://youtu.be/Z7rd04KzLcg)
