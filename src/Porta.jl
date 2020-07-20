@@ -17,20 +17,16 @@ include(joinpath(logicdir, "propositionallogic.jl"))
 include(joinpath(logicdir, "predicatelogic.jl"))
 
 
-include(joinpath(linearalgebradir, "innerproductreal.jl"))
-include(joinpath(linearalgebradir, "outerproductreal.jl"))
+include(joinpath(linearalgebradir, "abstractvectorspace.jl"))
 include(joinpath(linearalgebradir, "determinant.jl"))
 include(joinpath(linearalgebradir, "real3.jl"))
-include(joinpath(linearalgebradir, "innerproductreal3.jl"))
-include(joinpath(linearalgebradir, "outerproductreal3.jl"))
 include(joinpath(linearalgebradir, "quaternion.jl"))
-include(joinpath(linearalgebradir, "innerproductquaternion.jl"))
-include(joinpath(linearalgebradir, "abstractalgebrautils.jl"))
 
 
 include(joinpath(geometrydir, "riemannsphere.jl"))
 include(joinpath(geometrydir, "stereographicprojection.jl"))
 include(joinpath(geometrydir, "spacetime.jl"))
+include(joinpath(geometrydir, "rotations.jl"))
 
 
 end # module

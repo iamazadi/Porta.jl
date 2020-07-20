@@ -38,7 +38,7 @@ RiemannSphere(g::Geographic) = RiemannSphere(Spherical([1.0; g.a[1] + pi; pi / 2
 ζ⁻¹(z) = [angle(z); 2acot(abs(z))]
 Spherical(r::RiemannSphere) = Spherical([1.0; ζ⁻¹(r.a[1])])
 Spherical(c::Cartesian) = begin
-    r = abs(norm(c.a))
+    r = sqrt(c.a[1]^2 + c.a[2]^2 + c.a[3]^2)
     if c.a[1] > 0
         ϕ = atan(c.a[2] / c.a[1])
     elseif c.a[2] > 0

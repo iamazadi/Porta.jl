@@ -16,24 +16,12 @@ start = time()
     include(joinpath(logicdir, "predicatelogic_tests.jl")) end
 
 
-@time @testset "The Inner Product of Reals Tests" begin
-    include(joinpath(linearalgebradir, "innerproductreal_tests.jl")) end
-@time @testset "The Outer Product of Reals Tests" begin
-    include(joinpath(linearalgebradir, "outerproductreal_tests.jl")) end
 @time @testset "The Determinant Tests" begin
     include(joinpath(linearalgebradir, "determinant_tests.jl")) end
 @time @testset "The ℝ³ Tests" begin
     include(joinpath(linearalgebradir, "real3_tests.jl")) end
-@time @testset "The Inner Product of ℝ³ Tests" begin
-    include(joinpath(linearalgebradir, "innerproductreal3_tests.jl")) end
-@time @testset "The Outer Product of ℝ³ Tests" begin
-    include(joinpath(linearalgebradir, "outerproductreal3_tests.jl")) end
 @time @testset "The Quaternions Tests" begin
     include(joinpath(linearalgebradir, "quaternion_tests.jl")) end
-@time @testset "The Inner Product of Quaternions Tests" begin
-    include(joinpath(linearalgebradir, "innerproductquaternion_tests.jl")) end
-@time @testset "The Abstract Algebra Utilities Tests" begin
-    include(joinpath(linearalgebradir, "abstractalgebrautils_tests.jl")) end
 
 
 @time @testset "The Riemann Sphere Tests" begin
@@ -42,6 +30,8 @@ start = time()
     include(joinpath(geometrydir, "stereographicprojection_tests.jl")) end
 @time @testset "The Spacetime Tests" begin
     include(joinpath(geometrydir, "spacetime_tests.jl")) end
+@time @testset "The Rotations Tests" begin
+    include(joinpath(geometrydir, "rotations_tests.jl")) end
 
 
 elapsed = time() - start

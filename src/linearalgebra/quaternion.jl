@@ -1,35 +1,51 @@
 import Base.+
 import Base.-
 import Base.*
-import Base.vec
 import Base.conj
-import Base.isapprox
 
 
 export ℍ
 
 
-struct ℍ
+struct ℍ <: VectorSpace
     a::Array{Float64} # basis [1; i; j; k]
+    ℍ(a::Array{Float64,1}) = begin
+        @assert(length(a) == 4, "The input vector must contain exactly four elements.")
+        new(Float64.(a))
+    end
+    ℍ(a::Array{Int64,1}) = ℍ(Float64.(a))
+    ℍ(a::Real, b::Real, c::Real, d::Real) = ℍ([a; b; c; d])
+    ℍ(s::Array{Complex,2}) = ℍ(real(s[1,1]), imag(s[1,1]), -real(s[2,1]), -imag(s[2,1]))
+    ℍ(s::Array{Complex{Float64},2}) = ℍ(convert(Array{Complex,2}, s))
 end
 
 
-ℍ(a, b, c, d) = ℍ([Float64(a); Float64(b); Float64(c); Float64(d)])
-ℍ(s::Array{Complex,2}) = ℍ(real(s[1,1]), imag(s[1,1]), -real(s[2,1]), -imag(s[2,1]))
-ℍ(s::Array{Complex{Float64},2}) = ℍ(convert(Array{Complex,2}, s))
-x₁(h::ℍ) = h.a[1]
-x₂(h::ℍ) = h.a[2]
-x₃(h::ℍ) = h.a[3]
-x₄(h::ℍ) = h.a[4]
-Base.vec(h::ℍ) = [x₁(h); x₂(h); x₃(h); x₄(h)]
-ijk(h::ℍ) = vec(h)[2:4]
-z₁(h::ℍ) = Complex(x₁(h), x₂(h))
-z₂(h::ℍ) = Complex(x₃(h), x₄(h))
-SU2(h::ℍ) = [z₁(h) conj(z₂(h)); -z₂(h) conj(z₁(h))]
-Base.adjoint(h::ℍ) = ℍ(convert(Array{Complex,2}, adjoint(SU2(h))))
-Base.conj(h::ℍ) = adjoint(h)
-(+)(g::ℍ, h::ℍ) = ℍ(SU2(g) + SU2(h))
-(-)(g::ℍ, h::ℍ) = ℍ(SU2(g) - SU2(h))
-(*)(g::ℍ, h::ℍ) = ℍ(SU2(g) * SU2(h))
-(*)(λ::Number, h::ℍ) = ℍ(λ .* SU2(h))
-Base.isapprox(g::ℍ, h::ℍ) = isapprox(vec(g), vec(h))
+## Unary Operators ##
+
+
++(h::ℍ) = h
+-(h::ℍ) = ℍ(-vec(h))
+
+
+## Binary Operators ##
+
+
++(h1::ℍ, h2::ℍ) = ℍ(vec(h1) + vec(h2))
+-(h1::ℍ, h2::ℍ) = ℍ(vec(h1) - vec(h2))
+*(h::ℍ, λ::Real) = ℍ(λ .* vec(h))
+*(λ::Real, h::ℍ) = h * λ
+
+
+## Product Spaces ##
+
+
+adjoint(h::ℍ) = ℍ(convert(Array{Complex,2}, Base.adjoint(SU2(h))))
+conj(h::ℍ) = adjoint(h)
+z₁(h::ℍ) = Complex(h.a[1], h.a[2])
+z₂(h::ℍ) = Complex(h.a[3], h.a[4])
+SU2(h::ℍ) = [z₁(h) Base.conj(z₂(h)); -z₂(h) Base.conj(z₁(h))]
+(*)(h1::ℍ, h2::ℍ) = ℍ(SU2(h1) * SU2(h2))
+# the Hilbert-Schmidt norm and inner product
+# sometimes we call them Frobenius norm and inner product
+norm(h::ℍ) = sqrt(sum(map(x -> abs(x)^2, SU2(h))))
+dot(h1::ℍ, h2::ℍ) = sum(sum(map(*, SU2(h1), SU2(h2)), dims=1))

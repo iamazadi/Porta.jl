@@ -1,24 +1,52 @@
-import Base.+
-import Base.-
-import Base.*
-import Base.vec
-import Base.isapprox
+import Base.:+
+import Base.:-
+import Base.:*
 
 
 export ℝ³
+export cross
 
 
-struct ℝ³
-    p::Array{Float64} # basis [x; y; z]
+"""
+    Represents a point in ℝ³.
+
+field: a.
+"""
+struct ℝ³ <: VectorSpace
+    a::Array{Float64} # basis [x; y; z]
+    ℝ³(a::Array{Float64,1}) = begin
+        @assert(length(a) == 3, "The input vector must contain exactly three elements.")
+        new(Float64.(a))
+    end
+    ℝ³(a::Array{Int64,1}) = ℝ³(Float64.(a))
+    ℝ³(a::Real, b::Real, c::Real) = ℝ³([a; b; c])
 end
 
 
-ℝ³(a, b, c) = ℝ³([Float64(a); Float64(b); Float64(c)])
-x(r::ℝ³) = r.p[1]
-y(r::ℝ³) = r.p[2]
-z(r::ℝ³) = r.p[3]
-Base.vec(r::ℝ³) = [x(r); y(r); z(r)]
-(+)(p::ℝ³, r::ℝ³) = ℝ³(vec(p) + vec(r))
-(-)(p::ℝ³, r::ℝ³) = ℝ³(vec(p) - vec(r))
-(*)(λ::Number, r::ℝ³) = ℝ³(λ .* vec(r))
-Base.isapprox(p::ℝ³, r::ℝ³) = isapprox(vec(p), vec(r))
+
+## Unary Operators ##
+
+
++(r::ℝ³) = r
+-(r::ℝ³) = ℝ³(-vec(r))
+
+
+## Binary Operators ##
+
+
++(r1::ℝ³, r2::ℝ³) = ℝ³(vec(r1) + vec(r2))
+-(r1::ℝ³, r2::ℝ³) = ℝ³(vec(r1) - vec(r2))
+*(r::ℝ³, λ::Real) = ℝ³(λ .* vec(r))
+*(λ::Real, r::ℝ³) = r * λ
+
+
+"""
+    cross(r1, r2)
+
+Perform a cross product with the given vectors `r1` and `r2`.
+"""
+cross(r1::ℝ³, r2::ℝ³) = begin
+    M = transpose(reshape([vec(r1); vec(r1); vec(r2)], :, length(r1)))
+    M = convert(Array{Float64}, M)
+    ℝ³(map(x -> cofactor(M, 1, x), 1:length(r1)))
+end

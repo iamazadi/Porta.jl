@@ -1,3 +1,4 @@
+d = rand(2:4)
 A, B = rand(d, d), rand(d, d)
 α = rand()
 

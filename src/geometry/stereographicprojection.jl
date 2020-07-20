@@ -2,8 +2,8 @@ export σ
 
 
 """
-    σ(p)
+    σ(h)
 
-Map from S³ into ℝ³ using stereographic projection.
+Map from S³ into ℝ³ using stereographic projection with the given point `h`.
 """
-σ(p::ℍ) = ℝ³(p.a[1:3] ./ (1 - p.a[4]))
+σ(h::ℍ) = ℝ³(h.a[1:3] ./ (1 - h.a[4]))
