@@ -10,17 +10,17 @@ export ℍ
 
 
 struct ℍ
-    q::Array{Float64} # basis [1; i; j; k]
+    a::Array{Float64} # basis [1; i; j; k]
 end
 
 
 ℍ(a, b, c, d) = ℍ([Float64(a); Float64(b); Float64(c); Float64(d)])
 ℍ(s::Array{Complex,2}) = ℍ(real(s[1,1]), imag(s[1,1]), -real(s[2,1]), -imag(s[2,1]))
 ℍ(s::Array{Complex{Float64},2}) = ℍ(convert(Array{Complex,2}, s))
-x₁(h::ℍ) = h.q[1]
-x₂(h::ℍ) = h.q[2]
-x₃(h::ℍ) = h.q[3]
-x₄(h::ℍ) = h.q[4]
+x₁(h::ℍ) = h.a[1]
+x₂(h::ℍ) = h.a[2]
+x₃(h::ℍ) = h.a[3]
+x₄(h::ℍ) = h.a[4]
 Base.vec(h::ℍ) = [x₁(h); x₂(h); x₃(h); x₄(h)]
 ijk(h::ℍ) = vec(h)[2:4]
 z₁(h::ℍ) = Complex(x₁(h), x₂(h))
