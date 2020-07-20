@@ -30,6 +30,7 @@ include(joinpath(linearalgebradir, "abstractalgebrautils.jl"))
 
 include(joinpath(geometrydir, "riemannsphere.jl"))
 include(joinpath(geometrydir, "stereographicprojection.jl"))
+include(joinpath(geometrydir, "spacetime.jl"))
 
 
 end # module

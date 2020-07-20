@@ -40,6 +40,8 @@ start = time()
     include(joinpath(geometrydir, "riemannsphere_tests.jl")) end
 @time @testset "The Stereographic Projection Tests" begin
     include(joinpath(geometrydir, "stereographicprojection_tests.jl")) end
+@time @testset "The Spacetime Tests" begin
+    include(joinpath(geometrydir, "spacetime_tests.jl")) end
 
 
 elapsed = time() - start
