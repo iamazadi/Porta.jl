@@ -32,6 +32,8 @@ start = time()
     include(joinpath(geometrydir, "spacetime_tests.jl")) end
 @time @testset "The Rotations Tests" begin
     include(joinpath(geometrydir, "rotations_tests.jl")) end
+@time @testset "The Body Tests" begin
+    include(joinpath(geometrydir, "body_tests.jl")) end
 
 
 elapsed = time() - start

@@ -27,6 +27,7 @@ include(joinpath(geometrydir, "riemannsphere.jl"))
 include(joinpath(geometrydir, "stereographicprojection.jl"))
 include(joinpath(geometrydir, "spacetime.jl"))
 include(joinpath(geometrydir, "rotations.jl"))
+include(joinpath(geometrydir, "body.jl"))
 
 
 end # module
