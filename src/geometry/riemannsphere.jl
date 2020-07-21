@@ -3,40 +3,47 @@ import Base.length
 
 
 export RiemannSphere
+export ComplexPlane
 export Spherical
 export Cartesian
 export Geographic
 
 
-struct RiemannSphere
+"""
+    Represents a point in the Riemann sphere.
+"""
+abstract type RiemannSphere end
+
+
+struct ComplexPlane <: RiemannSphere
     a::Array{Complex} # basis [z; z̄]
 end
 
 
-struct Spherical
+struct Spherical <: RiemannSphere
     a::Array{Float64} # basis [r; ϕ; θ]
 end
 
 
-struct Cartesian
+struct Cartesian <: RiemannSphere
     a::Array{Float64} # basis [x; y; z]
 end
 
 
-struct Geographic
+struct Geographic <: RiemannSphere
     a::Array{Float64} # basis [ϕ; θ]
 end
 
 
 ζ(y₁, y₂, y₃) = (y₁ + im * y₂) / (1 - y₃)
 ζ(ϕ, θ) = cot(θ / 2) * exp(im * ϕ)
-RiemannSphere(s::Spherical) = RiemannSphere([ζ(s.a[2], s.a[3]); conj(ζ(s.a[2], s.a[3]))])
-RiemannSphere(c::Cartesian) = RiemannSphere([ζ(c.a...); conj(ζ(c.a...))])
-RiemannSphere(g::Geographic) = RiemannSphere(Spherical([1.0; g.a[1] + pi; pi / 2 - g.a[2]]))
+ComplexPlane(s::Spherical) = ComplexPlane([ζ(s.a[2], s.a[3]); conj(ζ(s.a[2], s.a[3]))])
+ComplexPlane(c::Cartesian) = ComplexPlane([ζ(c.a...); conj(ζ(c.a...))])
+ComplexPlane(g::Geographic) = ComplexPlane(Spherical([1.0; g.a[1] + pi; pi / 2 - g.a[2]]))
 
 
 ζ⁻¹(z) = [angle(z); 2acot(abs(z))]
-Spherical(r::RiemannSphere) = Spherical([1.0; ζ⁻¹(r.a[1])])
+Spherical(r::ComplexPlane) = Spherical([1.0; ζ⁻¹(r.a[1])])
 Spherical(c::Cartesian) = begin
     r = sqrt(c.a[1]^2 + c.a[2]^2 + c.a[3]^2)
     if c.a[1] > 0
@@ -52,7 +59,7 @@ end
 Spherical(g::Geographic) = Spherical([1.0; g.a[1] + pi; pi / 2 - g.a[2]])
 
 
-Cartesian(r::RiemannSphere) = begin
+Cartesian(r::ComplexPlane) = begin
     z, z̄ = r.a
     x, y = real(z), imag(z)
     d = x ^ 2 + y ^ 2 + 1
@@ -71,19 +78,25 @@ end
 Cartesian(g::Geographic) = Cartesian(Spherical(g))
 
 
-Geographic(r::RiemannSphere) = Geographic(Spherical(r))
+Geographic(r::ComplexPlane) = Geographic(Spherical(r))
 Geographic(s::Spherical) = Geographic([s.a[2] - pi; pi / 2 - s.a[3]])
-Geographic(c::Cartesian) = Geographic(RiemannSphere(c))
+Geographic(c::Cartesian) = Geographic(ComplexPlane(c))
 
 
-length(r::RiemannSphere) = length(r.a)
-length(s::Spherical) = length(s.a)
-length(c::Cartesian) = length(c.a)
-length(g::Geographic) = length(g.a)
+vec(r::RiemannSphere) = Base.vec(r.a)
+length(r::RiemannSphere) = length(vec(a))
 
 
-Base.isapprox(r₁::RiemannSphere, r₂::RiemannSphere) = begin
-    isapprox(Cartesian(r₁).a, Cartesian(r₂).a) end
-Base.isapprox(s₁::Spherical, s₂::Spherical) = isapprox(s₁.a, s₂.a)
-Base.isapprox(c₁::Cartesian, c₂::Cartesian) = isapprox(c₁.a, c₂.a)
-Base.isapprox(g₁::Geographic, g₂::Geographic) = isapprox(g₁.a, g₂.a)
+isapprox(z1::ComplexPlane, z2::ComplexPlane) = begin
+    Base.isapprox(Cartesian(z1).a, Cartesian(z2).a) end
+isapprox(r1::RiemannSphere, r2::RiemannSphere) = Base.isapprox(vec(r1), vec(r2))
+
+
+Cartesian(r::ℝ³) = Cartesian(vec(r))
+ComplexPlane(r::ℝ³) = ComplexPlane(Cartesian(r))
+Spherical(r::ℝ³) = Spherical(Cartesian(r))
+Geographic(r::ℝ³) = Geographic(Cartesian(r))
+
+
+ℝ³(r::Cartesian) = ℝ³(vec(r))
+ℝ³(r::RiemannSphere) = ℝ³(Cartesian(r))
