@@ -6,4 +6,4 @@ export σ
 
 Map from S³ into ℝ³ using stereographic projection with the given point `h`.
 """
-σ(h::ℍ) = ℝ³(h.a[1:3] ./ (1 - h.a[4]))
+σ(h::ℍ) = ℝ³(vec(h)[1:3] ./ (1 - vec(h)[4]))
