@@ -13,6 +13,7 @@ field: a.
 """
 struct Spacetime <: VectorSpace
     a::Array{Float64} # Basis [t; x; y; z]
+    Spacetime() = new(rand(4))
     Spacetime(a::Array{Float64,1}) = begin
         @assert(length(a) == 4, "The input vector must contain exactly four elements.")
         new(Float64.(a))
