@@ -13,13 +13,12 @@ export cross
 field: a.
 """
 struct ℝ³ <: VectorSpace
-    a::Array{Float64} # basis [x; y; z]
-    ℝ³(a::Array{Float64,1}) = begin
+    a::Array{Float64}
+    ℝ³(x₁::Real, x₂::Real, x₃::Real) = new(float.([x₁; x₂; x₃]))
+    ℝ³(a::Array) = begin
         @assert(length(a) == 3, "The input vector must contain exactly three elements.")
-        new(Float64.(a))
+        ℝ³(a...)
     end
-    ℝ³(a::Array{Int64,1}) = ℝ³(Float64.(a))
-    ℝ³(a::Real, b::Real, c::Real) = ℝ³([a; b; c])
 end
 
 
