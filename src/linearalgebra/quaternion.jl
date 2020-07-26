@@ -15,6 +15,8 @@ struct ℍ <: VectorSpace
     end
     ℍ(a::Array{Int64,1}) = ℍ(Float64.(a))
     ℍ(a::Real, b::Real, c::Real, d::Real) = ℍ([a; b; c; d])
+    ℍ(θ::Real, u::ℝ³) = ℍ([cos(θ / 2); vec(sin(θ / 2) * u)])
+    ℍ(z₁::Complex, z₂::Complex) = ℍ(real(z₁), imag(z₁), real(z₂), imag(z₂))
     ℍ(s::Array{Complex,2}) = ℍ(real(s[1,1]), imag(s[1,1]), -real(s[2,1]), -imag(s[2,1]))
     ℍ(s::Array{Complex{Float64},2}) = ℍ(convert(Array{Complex,2}, s))
 end
