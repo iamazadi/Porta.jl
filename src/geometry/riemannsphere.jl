@@ -1,11 +1,14 @@
+import Base.real
+import Base.imag
+import Base.abs
+import Base.angle
 import Base.isapprox
-import Base.length
 
 
 export RiemannSphere
-export ComplexPlane
-export Spherical
+export ComplexLine
 export Cartesian
+export Spherical
 export Geographic
 
 
@@ -15,88 +18,128 @@ export Geographic
 abstract type RiemannSphere end
 
 
-struct ComplexPlane <: RiemannSphere
-    a::Array{Complex} # basis [z; z̄]
+"""
+    Represents a point in a complex line.
+
+field: z.
+"""
+struct ComplexLine <: RiemannSphere
+    z::Complex
+    ComplexLine(z::Complex) = new(z)
 end
 
 
-struct Spherical <: RiemannSphere
-    a::Array{Float64} # basis [r; ϕ; θ]
-end
+"""
+    Represents a point in the Cartesian coordinate system.
 
-
+fields: x, y and z.
+"""
 struct Cartesian <: RiemannSphere
-    a::Array{Float64} # basis [x; y; z]
-end
-
-
-struct Geographic <: RiemannSphere
-    a::Array{Float64} # basis [ϕ; θ]
-end
-
-
-ζ(y₁, y₂, y₃) = (y₁ + im * y₂) / (1 - y₃)
-ζ(ϕ, θ) = cot(θ / 2) * exp(im * ϕ)
-ComplexPlane(s::Spherical) = ComplexPlane([ζ(s.a[2], s.a[3]); conj(ζ(s.a[2], s.a[3]))])
-ComplexPlane(c::Cartesian) = ComplexPlane([ζ(c.a...); conj(ζ(c.a...))])
-ComplexPlane(g::Geographic) = ComplexPlane(Spherical([1.0; g.a[1] + pi; pi / 2 - g.a[2]]))
-
-
-ζ⁻¹(z) = [angle(z); 2acot(abs(z))]
-Spherical(r::ComplexPlane) = Spherical([1.0; ζ⁻¹(r.a[1])])
-Spherical(c::Cartesian) = begin
-    r = sqrt(c.a[1]^2 + c.a[2]^2 + c.a[3]^2)
-    if c.a[1] > 0
-        ϕ = atan(c.a[2] / c.a[1])
-    elseif c.a[2] > 0
-        ϕ = atan(c.a[2] / c.a[1]) + pi
-    else
-        ϕ = atan(c.a[2] / c.a[1]) - pi
+    x::Float64
+    y::Float64
+    z::Float64
+    Cartesian(x::Real, y::Real, z::Real) = new(float(x), float(y), float(z))
+    Cartesian(a::Array) = begin
+        @assert(length(a) == 3, "The length of the input vector must be exactly 3.")
+        Cartesian(a...)
     end
-    θ = asin(c.a[3] / r)
-    Spherical([r; ϕ; pi / 2 - θ])
+    Cartesian(r::ℝ³) = Cartesian(vec(r))
 end
-Spherical(g::Geographic) = Spherical([1.0; g.a[1] + pi; pi / 2 - g.a[2]])
 
 
-Cartesian(r::ComplexPlane) = begin
-    z, z̄ = r.a
-    x, y = real(z), imag(z)
-    d = x ^ 2 + y ^ 2 + 1
-    y₁ = 2x / d
-    y₂ = 2y / d
-    y₃ = (d - 2) / d
-    Cartesian([y₁; y₂; y₃])
+"""
+    Represents a point in the spherical coordinate system.
+
+fields: r, ϕ and θ.
+"""
+struct Spherical <: RiemannSphere
+    r::Float64
+    ϕ::Float64
+    θ::Float64
+    Spherical(r::Real, ϕ::Real, θ::Real) = begin
+        @assert(r ≥ 0, "r must be non-negative.")
+        @assert(0 ≤ ϕ ≤ 2π, "ϕ must be in [0, 2π].")
+        @assert(0 ≤ θ ≤ π, "θ must be in [0, π].")
+        new(float(r), float(ϕ), float(θ))
+    end
+    Spherical(a::Array) = begin
+        @assert(length(a) == 3, "The length of the input vector must be exactly 3.")
+        Spherical(a...)
+    end
+end
+
+
+"""
+    Represents a point in the geographic coordinate system.
+
+fields: ϕ and θ.
+"""
+struct Geographic <: RiemannSphere
+    ϕ::Float64
+    θ::Float64
+    Geographic(ϕ::Real, θ::Real) = begin
+        @assert(-π ≤ ϕ ≤ π, "ϕ must be in [-π, π].")
+        @assert(-π/2 ≤ θ ≤ π/2, "θ must be in [-π/2, π/2].")
+        new(float(ϕ), float(θ))
+    end
+    Geographic(a::Array) = begin
+        @assert(length(a) == 2, "The length of the input vector must be exactly 2.")
+        Geographic(a...)
+    end
+end
+
+
+real(cl::ComplexLine) = Base.real(cl.z)
+imag(cl::ComplexLine) = Base.imag(cl.z)
+abs(cl::ComplexLine) = Base.abs(cl.z)
+angle(cl::ComplexLine) = Base.angle(cl.z)
+conj(cl::ComplexLine) = Base.conj(cl.z)
+
+vec(cl::ComplexLine) = [cl.z; conj(cl)]
+vec(c::Cartesian) = [c.x; c.y; c.z]
+
+isapprox(c1::Cartesian, c2::Cartesian) = Base.isapprox(vec(c1), vec(c2))
+isapprox(r1::RiemannSphere, r2::RiemannSphere) = isapprox(Cartesian(r1), Cartesian(r2))
+
+ℝ³(c::Cartesian) = ℝ³(vec(c))
+ℝ³(r::RiemannSphere) = ℝ³(Cartesian(r))
+
+norm(c::Cartesian) = norm(ℝ³(c))
+
+ComplexLine(r3::ℝ³) = ComplexLine(Cartesian(r3))
+ComplexLine(s::Spherical) = ComplexLine(cot(s.θ / 2) * exp(im * s.ϕ))
+ComplexLine(c::Cartesian) = ComplexLine((c.x + im * c.y) / (1 - c.z))
+ComplexLine(g::Geographic) = ComplexLine(Spherical(g))
+
+Cartesian(cl::ComplexLine) = begin
+    x, y = real(cl), imag(cl)
+    d = x^2 + y^2 + 1
+    Cartesian(2x / d, 2y / d, (d - 2) / d)
 end
 Cartesian(s::Spherical) = begin
-    r, ϕ, θ = s.a
-    y₁ = r * sin(θ) * cos(ϕ)
-    y₂ = r * sin(θ) * sin(ϕ)
-    y₃ = r * cos(θ)
-    Cartesian([y₁; y₂; y₃])
+    r, ϕ, θ = s.r, s.ϕ, s.θ
+    Cartesian(r * sin(θ) * cos(ϕ), r * sin(θ) * sin(ϕ), r * cos(θ))
 end
 Cartesian(g::Geographic) = Cartesian(Spherical(g))
 
-
-Geographic(r::ComplexPlane) = Geographic(Spherical(r))
-Geographic(s::Spherical) = Geographic([s.a[2] - pi; pi / 2 - s.a[3]])
-Geographic(c::Cartesian) = Geographic(ComplexPlane(c))
-
-
-vec(r::RiemannSphere) = Base.vec(r.a)
-length(r::RiemannSphere) = length(vec(a))
-
-
-isapprox(z1::ComplexPlane, z2::ComplexPlane) = begin
-    Base.isapprox(Cartesian(z1).a, Cartesian(z2).a) end
-isapprox(r1::RiemannSphere, r2::RiemannSphere) = Base.isapprox(vec(r1), vec(r2))
-
-
-Cartesian(r::ℝ³) = Cartesian(vec(r))
-ComplexPlane(r::ℝ³) = ComplexPlane(Cartesian(r))
+Spherical(cl::ComplexLine) = Spherical([1; angle(cl); 2acot(abs(cl))])
+Spherical(c::Cartesian) = begin
+    x, y, z = vec(c)
+    if x > 0
+        ϕ = atan(y / x)
+    elseif y > 0
+        ϕ = atan(y / x) + pi
+    else
+        ϕ = atan(y / x) - pi
+    end
+    r = norm(c)
+    θ = asin(z / r)
+    Spherical(r, ϕ, pi/2 - θ)
+end
+Spherical(g::Geographic) = Spherical(1, g.ϕ + pi, pi/2 - g.θ)
 Spherical(r::ℝ³) = Spherical(Cartesian(r))
+
+Geographic(s::Spherical) = Geographic(s.ϕ - pi, pi/2 - s.θ)
+Geographic(r::ComplexLine) = Geographic(Spherical(r))
+Geographic(c::Cartesian) = Geographic(ComplexLine(c))
 Geographic(r::ℝ³) = Geographic(Cartesian(r))
-
-
-ℝ³(r::Cartesian) = ℝ³(vec(r))
-ℝ³(r::RiemannSphere) = ℝ³(Cartesian(r))
