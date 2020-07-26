@@ -1,14 +1,15 @@
 p = ℝ³(rand(3))
-q = ℍ(rand() * 2pi, normalize(ℝ³(rand(3))))
-q₀ = ℍ(0, normalize(ℝ³(rand(3))))
-orientation = ℍ(2pi * ℝ³(rand(3)))
-orientation₀ = ℍ(0 * ℝ³(rand(3)))
+q = Quaternion(rand() * 2pi, normalize(ℝ³(rand(3))))
+q₀ = Quaternion(0, normalize(ℝ³(rand(3))))
 points = [ℝ³(rand(3)) for i in 1:5]
+i = ℝ³(1, 0, 0)
+j = ℝ³(0, 1, 0)
+k = ℝ³(0, 0, 1)
+g = getrotation(i, j)
 
 
 @test typeof(rotate(p, q)) == typeof(p)
 @test isapprox(rotate(p, q₀), p) # rotations with angle zero
 @test isapprox(rotate(q, q₀), rotate(q₀, q)) # non-commutativity in multiplication
-@test typeof(rotate(p, orientation)) == typeof(p) # rotations using Euler angles
-@test isapprox(rotate(p, orientation₀), p) # rotations using Euler angles zero
-@test typeof(rotate(points, q)) == typeof(points) # vector input
+@test typeof(rotate(points, q)) == typeof(points) # Array input
+@test isapprox(g, Quaternion(pi/4, k))

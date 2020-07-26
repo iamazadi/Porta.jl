@@ -1,9 +1,10 @@
-export σ
+export σmap
 
 
 """
-    σ(h)
+    σmap(s)
 
-Map from S³ into ℝ³ using stereographic projection with the given point `h`.
+Map from S³ into ℝ³ using stereographic projection with the given point `s`.
 """
-σ(h::ℍ) = ℝ³(vec(h)[1:3] ./ (1 - vec(h)[4]))
+σmap(q::Quaternion) = ℝ³(vec(q)[1:3] ./ (1 - vec(q)[4]))
+σmap(s::S³) = σmap(Quaternion(s))
