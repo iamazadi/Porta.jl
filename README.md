@@ -49,7 +49,7 @@ For client-side code read the tests, and for examples on how to build please che
 - The iconic [wall][3] of Stony Brook University
 - [The Road to Reality][4], Sir Roger Penrose (2004)
 - A [Portal][5] Special Presentation- Geometric Unity: A First Look
-- Dror Bar-Natan's [Planet Hopf][6]
+- [Planet Hopf][6], Dror Bar-Natan (2010)
 
 [1]: https://www.youtube.com/channel/UCY8FW_kvEfGDj5i5j_rkaqA
 [2]: https://cds.cern.ch/record/181783/files/cer-000093203.pdf
