@@ -2,7 +2,7 @@
 
 ![the Hopf fibration](gallery/londontsai.gif "The Hopf fibration inspired by one of the London Tsai's prints")
 ![the Hopf flower](gallery/flower.gif "The Hopf flower")
-![Planet Hopf](gallery/DrorBarNatan2010.gif "Planet Hopf")
+![Planet Hopf](gallery/drorbarnatan2010.gif "Planet Hopf")
 ![24-cell](gallery/24-cell.gif "24-cell")
 ![600-cell](gallery/600-cell.gif "600-cell")
 ![surfaces](gallery/surfaces.gif "surfaces")
