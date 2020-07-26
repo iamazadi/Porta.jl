@@ -14,8 +14,7 @@ function π(p::ℍ)
     z₁ = Complex(vec(p)[1], vec(p)[2])
     z₂ = Complex(vec(p)[3], vec(p)[4])
     z = z₂ / z₁
-    z̅ = conj(z)
-    Geographic(ComplexPlane([z; z̅]))
+    Geographic(ComplexLine(z))
 end
 
 
@@ -25,7 +24,7 @@ end
 Map from S² into the upper hemisphere of S² with the given point `p`.
 """
 function f(p::Geographic)
-    ϕ, θ = vec(p)
+    ϕ, θ = p.ϕ, p.θ
     r = sqrt((1 - sin(θ)) / 2)
     r .* (cos(ϕ), sin(ϕ))
 end
@@ -62,7 +61,7 @@ function sample(dataframe, max)
     count = length(longitudes)
     points = Array{Geographic,1}(undef, count)
     for i in 1:count
-        points[i] = Geographic([longitudes[i];  latitudes[i]])
+        points[i] = Geographic(longitudes[i], latitudes[i])
     end
     points
 end
@@ -88,18 +87,12 @@ end
 Calculate the pullback to S³ with the given point `p` and the given angle `α`.
 """
 function pullback(p::Geographic, α::Real, angle::Real=0)
-    ϕ, θ = vec(p)
-    ϕ = ϕ + angle
+    ϕ, θ = p.ϕ, p.θ
+    ϕ = ϕ - angle
     r = sqrt((1 - sin(θ)) / 2)
     ϕ, θ = r .* (cos(ϕ), sin(ϕ))
     ϕ, θ = ϕ + pi, (θ + pi / 2) / 2
-    z, w = sin(θ) * exp(im * (ϕ + α) / 2), cos(θ) * exp(im * (α - ϕ) / 2)
-    ℍ(real(z), imag(z), real(w), imag(w))
-end
-
-
-getso3(θ, u) = begin
-    ℍ([cos(θ); sin(θ) .* vec(u)])
+    ℍ(sin(θ) * exp(im * (ϕ + α) / 2), cos(θ) * exp(im * (α - ϕ) / 2))
 end
 
 
@@ -119,8 +112,7 @@ function getsurface(τ::Real, q::ℍ, p::Array{Geographic,1}, s::Int64)
     lspace = range(α₁, stop = α₂, length = s)
     for (i, α) in enumerate(lspace)
         for j in 1:number
-            point = Geographic(vec(p[j]) + [τ; 0])
-            surface[i, j] = σ(rotate(q, pullback(point, α)))
+            surface[i, j] = σ(rotate(q, pullback(p[j], α, τ)))
         end
     end
     surface
@@ -140,8 +132,7 @@ function S²(q::ℍ, α::Real, segments::Int=30)
     lspace2 = collect(range(pi / 2, stop = latitudeoffset, length = segments))
     for (i, θ) in enumerate(lspace2)
         for (j, ϕ) in enumerate(lspace)
-            point = Geographic([ϕ; θ])
-            h = pullback(point, 2α, 0)
+            h = pullback(Geographic(ϕ, θ), α, 0)
             s2[i, j] = σ(rotate(q, h))
         end
     end
@@ -172,9 +163,9 @@ scene = Scene(backgroundcolor = :white, show_axis=false, resolution = (360, 360)
 #             parent = Scene(resolution = (360, 360)))
 
 # The maximum number of points to sample from the dataset for each country
-maxsamples = 360
-segments = 60
-q = getso3(α₁, ℝ³(0, 0, 1))
+maxsamples = 300
+segments = 30
+q = ℍ(α₁, ℝ³(0, 0, 1))
 observables = []
 points = []
 for country in countries
@@ -188,30 +179,27 @@ for country in countries
 end
 
 
-α₁ = 0
-α₂ = 2(2pi - 80 / 180 * pi)
-
 s2color = load("test/data/BaseMap.png")
 s2observables = build(scene, S²(q, α₁, segments), s2color)
-s2observables2 = build(scene, S²(q, α₁, segments), s2color)
+s2observables2 = build(scene, S²(q, α₂, segments), s2color)
 
 frames = 90
 function animate(i)
     τ = i / frames * 2pi
     for (p, nodes) in zip(points, observables)
         x, y, z = nodes
-        surface = getsurface(τ, getso3(0, ℝ³(0, 0, 1)), p, segments)
+        surface = getsurface(τ, ℍ(0, ℝ³(0, 0, 1)), p, segments)
         x[] = map(i -> vec(i)[1] , surface[:, :])
         y[] = map(i -> vec(i)[2] , surface[:, :])
         z[] = map(i -> vec(i)[3] , surface[:, :])
     end
     x, y, z = s2observables
-    s2 = S²(getso3(-τ/2, ℝ³(0, 0, 1)), -τ/2, segments)
+    s2 = S²(ℍ(τ, ℝ³(0, 0, 1)), τ + α₁, segments)
     x[] = map(i -> vec(i)[1] , s2[:, :])
     y[] = map(i -> vec(i)[2] , s2[:, :])
     z[] = map(i -> vec(i)[3] , s2[:, :])
     x, y, z = s2observables2
-    s2 = S²(getso3(-τ/2, ℝ³(0, 0, 1)), -τ/2 + α₂/2, segments)
+    s2 = S²(ℍ(τ, ℝ³(0, 0, 1)), τ + α₂, segments)
     x[] = map(i -> vec(i)[1] , s2[:, :])
     y[] = map(i -> vec(i)[2] , s2[:, :])
     z[] = map(i -> vec(i)[3] , s2[:, :])
@@ -219,8 +207,10 @@ end
 
 
 # update eye position
-eyeposition, lookat, upvector = 1.0 .* Vec3f0(1.0, 5.0, 0.0), Vec3f0(0), Vec3f0(1, 0, 1)
 # scene.camera.eyeposition.val
+upvector = Vec3f0(1, 0, 1)
+eyeposition = 0.8 .* Vec3f0(1, 3, 0)
+lookat = Vec3f0(0.5, 0, 0)
 update_cam!(scene, eyeposition, lookat, upvector)
 scene.center = false # prevent scene from recentering on display
 
