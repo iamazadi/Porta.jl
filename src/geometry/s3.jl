@@ -59,7 +59,7 @@ vec(cp::ComplexPlane) = [cp.z₁; cp.z₂]
 
 adjoint(s::SU2) = SU2(convert(Array{Complex,2}, Base.adjoint(s.a)))
 
-conj(q::Quaternion) = Quaternion(vec(q)[1], -vec(q)[2], -vec(q)[3], -vec(q)[4])
+Base.conj(q::Quaternion) = Quaternion(vec(q)[1], -vec(q)[2], -vec(q)[3], -vec(q)[4])
 
 ComplexPlane(s::SU2) = ComplexPlane(s.a[1,1], -s.a[2,1])
 ComplexPlane(q::Quaternion) = ComplexPlane(vec(q)[1] + im * vec(q)[2],
