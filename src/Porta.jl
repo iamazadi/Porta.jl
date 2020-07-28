@@ -21,6 +21,7 @@ include(joinpath(linearalgebradir, "determinant.jl"))
 include(joinpath(linearalgebradir, "real3.jl"))
 include(joinpath(linearalgebradir, "real4.jl"))
 
+include(joinpath(geometrydir, "s1.jl"))
 include(joinpath(geometrydir, "s2.jl"))
 include(joinpath(geometrydir, "s3.jl"))
 include(joinpath(geometrydir, "stereographicprojection.jl"))

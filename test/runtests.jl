@@ -22,6 +22,7 @@ end
 end
 
 @time @testset "The Geometry Tests" begin
+    include(joinpath(geometrydir, "s1_tests.jl"))
     include(joinpath(geometrydir, "s2_tests.jl"))
     include(joinpath(geometrydir, "s3_tests.jl"))
     include(joinpath(geometrydir, "stereographicprojection_tests.jl"))
