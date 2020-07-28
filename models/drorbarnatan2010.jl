@@ -207,17 +207,17 @@ s2observables2 = build(scene, sphere(q, α₂, segments), s2color)
 
 frames = 90
 function animate(i)
-    τ = i / frames * 2pi
-    global α₁ = 2(40 / 180 * pi) + 2τ
-    global α₂ = 2(2pi - 40 / 180 * pi) + 2τ
+    τ = i / frames * 4pi
+    global α₁ = 2(40 / 180 * pi + τ)
+    global α₂ = 2(2pi - 40 / 180 * pi + τ)
     q = Quaternion(τ, ℝ³(0, 0, 1))
     for (p, nodes) in zip(points, observables)
         update(nodes, getsurface(q, p, segments))
     end
     update(s2observables, sphere(q, α₁, segments))
     update(s2observables2, sphere(q, α₂, segments))
-    global α₁ = 2(40 / 180 * pi) + 2τ
-    global α₂ = 2(-40 / 180 * pi) + 2τ
+    global α₁ = 2(40 / 180 * pi + τ)
+    global α₂ = 2(-40 / 180 * pi + τ)
     for (p, nodes) in zip(ghostpoints, ghosts)
         update(nodes, getsurface(q, p, segments))
     end
@@ -226,7 +226,7 @@ end
 # update eye position
 # scene.camera.eyeposition.val
 upvector = Makie.Vec3f0(1, 0, 1)
-eyeposition = Makie.Vec3f0(1/3, 1, 1/3) .* sqrt(3)
+eyeposition = Makie.Vec3f0(1, 2, 1)
 lookat = Makie.Vec3f0(0, 0, 0)
 Makie.update_cam!(scene, eyeposition, lookat, upvector)
 scene.center = false # prevent scene from recentering on display
