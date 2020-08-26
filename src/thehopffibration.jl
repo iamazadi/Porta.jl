@@ -1,7 +1,6 @@
-export ⭕
+export HopfFibration
 export HSVtoRGB
 
-import LinearAlgebra
 
 struct ⭕
     b::Array{Complex}
