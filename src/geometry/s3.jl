@@ -37,10 +37,10 @@ struct Quaternion <: S³
     Quaternion(r4::ℝ⁴) = new(r4)
     Quaternion(a::Real, b::Real, c::Real, d::Real) = new(ℝ⁴(a, b, c, d))
     Quaternion(a::Array) = begin
-        @assert(length(a) == 4, "The input vector must contain exactly four elements.")
+        @assert(length(a) == 4, "The input must be a 4-vector.")
         Quaternion(a...)
     end
-    Quaternion(θ::Real, u::ℝ³) = Quaternion([cos(θ); vec(sin(θ) * u)])
+    Quaternion(θ::Real, u::ℝ³) = Quaternion([cos(θ); vec(sin(θ) * normalize(u))])
 end
 
 
@@ -54,29 +54,37 @@ struct SU2 <: S³
 end
 
 
-vec(q::Quaternion) = vec(q.r)
-vec(cp::ComplexPlane) = [cp.z₁; cp.z₂]
+Base.vec(q::Quaternion) = vec(q.r)
+Base.vec(cp::ComplexPlane) = [cp.z₁; cp.z₂]
 
-adjoint(s::SU2) = SU2(convert(Array{Complex,2}, Base.adjoint(s.a)))
-
+Base.adjoint(s::SU2) = SU2(convert(Array{Complex,2}, adjoint(s.a)))
 Base.conj(q::Quaternion) = Quaternion(vec(q)[1], -vec(q)[2], -vec(q)[3], -vec(q)[4])
 
 ComplexPlane(s::SU2) = ComplexPlane(s.a[1,1], -s.a[2,1])
 ComplexPlane(q::Quaternion) = ComplexPlane(vec(q)[1] + im * vec(q)[2],
                                            vec(q)[3] + im * vec(q)[4])
-SU2(cp::ComplexPlane) = SU2([cp.z₁ Base.conj(cp.z₂); -cp.z₂ Base.conj(cp.z₁)])
+SU2(cp::ComplexPlane) = SU2([cp.z₁ conj(cp.z₂); -cp.z₂ conj(cp.z₁)])
 SU2(q::Quaternion) = SU2(ComplexPlane(q))
 Quaternion(cp::ComplexPlane) = Quaternion(real(cp.z₁),
                                           imag(cp.z₁),
                                           real(cp.z₂),
                                           imag(cp.z₂))
 Quaternion(s::SU2) = Quaternion(ComplexPlane(s))
+normalize(q::Quaternion) = Quaternion(normalize(q.r))
+norm(q::Quaternion) = norm(q.r)
+dot(q1::Quaternion, q2::Quaternion) = dot(q1.r, q2.r)
 
 (*)(s1::SU2, s2::SU2) = SU2(s1.a * s2.a)
 (*)(cp1::S³, cp2::S³) = ComplexPlane(SU2(cp1) * SU2(cp2))
 (*)(q1::Quaternion, q2::Quaternion) = Quaternion(SU2(q1) * SU2(q2))
+(*)(q::Quaternion, λ::Real) = Quaternion(λ * q.r)
+(*)(λ::Real, q::Quaternion) = q * λ
+(+)(q1::Quaternion, q2::Quaternion) = Quaternion(vec(q1) + vec(q2))
+(-)(q1::Quaternion, q2::Quaternion) = Quaternion(vec(q1) - vec(q2))
++(q::Quaternion) = q
+-(q::Quaternion) = Quaternion(-vec(q))
 
-isapprox(q1::Quaternion, q2::Quaternion) = Base.isapprox(vec(q1), vec(q2))
-isapprox(q::Quaternion, s::S³) = isapprox(q, Quaternion(s))
-isapprox(s::S³, q::Quaternion) = isapprox(Quaternion(s), q)
-isapprox(s1::S³, s2::S³) = isapprox(Quaternion(s1), Quaternion(s2))
+Base.isapprox(q1::Quaternion, q2::Quaternion) = isapprox(vec(q1), vec(q2))
+Base.isapprox(q::Quaternion, s::S³) = isapprox(q, Quaternion(s))
+Base.isapprox(s::S³, q::Quaternion) = isapprox(Quaternion(s), q)
+Base.isapprox(s1::S³, s2::S³) = isapprox(Quaternion(s1), Quaternion(s2))
