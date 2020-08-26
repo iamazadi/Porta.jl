@@ -8,6 +8,12 @@ using CSV
 using Porta
 
 
+α = 40
+α₁ = 2(α / 180 * pi)
+α₂ = 2(2pi - α / 180 * pi)
+scale = 1.0
+
+
 """
     πmap(p)
 
@@ -37,8 +43,10 @@ of samples limit. The second column of the dataframe should contain longitudes
 and the third one latitudes (in degrees.)
 """
 function sample(dataframe, max)
-    total_longitudes = dataframe[dataframe[:shapeid].<0.1, 2] ./ 180 .* pi
-    total_latitudes = dataframe[dataframe[:shapeid].<0.1, 3] ./ 180 .* pi
+    #total_longitudes = dataframe[dataframe[:shapeid].<0.1, 3] ./ 180 .* pi
+    #total_latitudes = dataframe[dataframe[:shapeid].<0.1, 4] ./ 180 .* pi
+    total_longitudes = dataframe[dataframe[:partid].==0, 3] ./ 180 .* pi
+    total_latitudes = dataframe[dataframe[:partid].==0, 4] ./ 180 .* pi
     sampled_longitudes = Array{Float64}(undef, max)
     sampled_latitudes = Array{Float64}(undef, max)
     count = length(total_longitudes)
@@ -81,11 +89,11 @@ end
 
 
 """
-    update(o, p)
+    updatestate(o, p)
 
 Update an array of observables `o` with the given array of points `p`.
 """
-function update(o, p::Array{ℝ³,2})
+function updatestate(o, p::Array{ℝ³,2})
     x, y, z = o
     x[] = map(i -> vec(i)[1] , p[:, :])
     y[] = map(i -> vec(i)[2] , p[:, :])
@@ -106,22 +114,18 @@ function pullback(p::Geographic, α::Real)
 end
 
 
-α₁ = 0
-α₂ = 2(2pi - 80 / 180 * pi)
-
-
 """
-    getsurface(q, p, s)
+    getsurface(q, p, scale, segments)
 
 Calculate a pullback surface using stereographic projection with the given S² rotation `q`,
-an array of points 'p' and the number of segments `s`.
+an array of points 'p', `scale` and the number of `segments`.
 """
-function getsurface(q::Quaternion, p::Array{Geographic,1}, s::Int)
-    surface = Array{ℝ³}(undef, s, length(p))
-    lspace = range(α₁, stop = α₂, length = s)
+function getsurface(q::Quaternion, p::Array{Geographic,1}, scale::Real, segments::Int)
+    surface = Array{ℝ³}(undef, segments, length(p))
+    lspace = range(α₁, stop = α₂, length = segments)
     for (i, α) in enumerate(lspace)
         for (j, point) in enumerate(p)
-            surface[i, j] = σmap(rotate(q, pullback(point, α)))
+            surface[i, j] = σmap(rotate(q, pullback(point, α))) * scale
         end
     end
     surface
@@ -129,11 +133,11 @@ end
 
 
 """
-    sphere(q, α)
+    sphere(q, α, scale, [segments])
 
-Calculate a Riemann sphere with the given S² rotation `q` and circle `α`.
+Calculate a Riemann sphere with the given S² rotation `q`, circle `α` and `scale`.
 """
-function sphere(q::Quaternion, α::Real, segments::Int=30)
+function sphere(q::Quaternion, α::Real, scale; segments::Int=30)
     latitudeoffset = -pi / 3
     s2 = Array{ℝ³}(undef, segments, segments)
     lspace = collect(range(-pi, stop = pi, length = segments)) #.+ longitudeoffset
@@ -141,7 +145,7 @@ function sphere(q::Quaternion, α::Real, segments::Int=30)
     for (i, θ) in enumerate(lspace2)
         for (j, ϕ) in enumerate(lspace)
             h = pullback(Geographic(ϕ, θ), α)
-            s2[i, j] = σmap(rotate(q, h))
+            s2[i, j] = σmap(rotate(q, h)) * scale
         end
     end
     s2
@@ -153,10 +157,15 @@ end
 countries = Dict("iran" => [0.0, 1.0, 0.29], # green
                  "us" => [0.494, 1.0, 0.0], # green
                  "china" => [1.0, 0.639, 0.0], # orange
-                 "ukraine" => [0.0, 0.894, 1.0], # cyan
+                 #"ukraine" => [0.0, 0.894, 1.0], # cyan
                  "australia" => [1.0, 0.804, 0.0], # orange
-                 "germany" => [0.914, 0.0, 1.0], # purple
-                 "israel" => [0.0, 1.0, 0.075]) # green
+                 #"germany" => [0.914, 0.0, 1.0], # purple
+                 "israel" => [0.0, 1.0, 0.075], # green
+                 "canada" => [0.91, 0.0, 1.0], # light purple
+                 "india" => [0.0, 0.122, 1.0], # blue
+                 "southkorea" => [1.0, 0.0, 0.592], # pink
+                 #"france" => [0.86, 1.0, 0.0], # green
+                 )
 # The path to the dataset
 path = "test/data/natural_earth_vector"
 
@@ -176,8 +185,8 @@ scene = Makie.Scene(backgroundcolor = :white,
 #             parent = Scene(resolution = (360, 360)))
 
 # The maximum number of points to sample from the dataset for each country
-maxsamples = 300
-segments = 30
+maxsamples = 360
+segments = 36
 q = Quaternion(α₁, ℝ³(0, 0, 1))
 observables = []
 ghosts = []
@@ -188,13 +197,16 @@ for country in countries
     dataframe = CSV.read(joinpath(path, "$(countryname)-nodes.csv"))
     # Sample a random subset of the points
     p = sample(dataframe, maxsamples)
-    color = fill(Makie.RGBAf0(country[2]..., 1.0), segments, length(p))
-    x, y, z = build(scene, getsurface(q, p, segments), color)
+    color = fill(Makie.RGBAf0(country[2]..., 0.9), segments, length(p))
+    x, y, z = build(scene, getsurface(q, p, scale, segments), color)
     push!(observables, (x, y, z))
     push!(points, p)
-    if countryname in ["iran", "us", "china"]
-        color = fill(Makie.RGBAf0(country[2]..., 0.5), segments, length(p))
-        x, y, z = build(scene, getsurface(q, p, segments), color, transparency = true)
+    if true#countryname in ["iran", "us", "china"]
+        color = fill(Makie.RGBAf0(country[2]..., 0.1), segments, length(p))
+        x, y, z = build(scene,
+                        getsurface(q, p, scale, segments),
+                        color,
+                        transparency = true)
         push!(ghosts, (x, y, z))
         push!(ghostpoints, p)
     end
@@ -202,34 +214,52 @@ end
 
 
 s2color = load("test/data/BaseMap.png")
-s2observables = build(scene, sphere(q, α₁, segments), s2color)
-s2observables2 = build(scene, sphere(q, α₂, segments), s2color)
+s2observables = build(scene, sphere(q, α₁, scale, segments = segments), s2color)
+s2observables2 = build(scene, sphere(q, α₂, scale, segments = segments), s2color)
 
-frames = 90
+frames = 360
 function animate(i)
-    τ = i / frames * 4pi
-    global α₁ = 2(40 / 180 * pi + τ)
-    global α₂ = 2(2pi - 40 / 180 * pi + τ)
-    q = Quaternion(τ, ℝ³(0, 0, 1))
+    step = 2(sqrt((i - 1) / frames) - 0.5) * pi
+    println("Step ", 100(i - 1) / frames)
+    ϕ = cos(step) * pi
+    θ = (sin(step) * pi) / 2
+    τ = (i - 1) / frames * 2pi
+    global α₁ = 2(α / 180 * pi + τ)
+    global α₂ = 2(2pi - α / 180 * pi + τ)
+    #global α₁ = 2(α / 180 * pi)
+    #global α₂ = 2(2pi - α / 180 * pi)
+    q = Quaternion(τ, ℝ³(Cartesian(f(Geographic(ϕ, θ)))))
+    #q = Quaternion(τ, ℝ³(0, 0, 1))
+    #dα = (i - 1) / frames * pi / 2
+    #dϕ₁ = (i - 1) / frames * 2pi
+    #dϕ₂ = (i - 1) / frames * 4pi
+    #q = Quaternion(ComplexPlane(sin(dα) * exp(im * (dϕ₁ / 4 + dϕ₂ / 4) / 2),
+    #                            cos(dα) * exp(im * (dϕ₂ / 4 - dϕ₁ / 4) / 2)))
     for (p, nodes) in zip(points, observables)
-        update(nodes, getsurface(q, p, segments))
+        updatestate(nodes, getsurface(q, p, scale, segments))
     end
-    update(s2observables, sphere(q, α₁, segments))
-    update(s2observables2, sphere(q, α₂, segments))
-    global α₁ = 2(40 / 180 * pi + τ)
-    global α₂ = 2(-40 / 180 * pi + τ)
+    updatestate(s2observables, sphere(q, α₁, scale, segments = segments))
+    updatestate(s2observables2, sphere(q, α₂, scale, segments = segments))
+    global α₁ = 2(α / 180 * pi + τ)
+    global α₂ = 2(-α / 180 * pi + τ)
+    #global α₁ = 2(α / 180 * pi)
+    #global α₂ = 2(-α / 180 * pi)
     for (p, nodes) in zip(ghostpoints, ghosts)
-        update(nodes, getsurface(q, p, segments))
+        updatestate(nodes, getsurface(q, p, scale, segments))
     end
+    # update eye position
+    # scene.camera.eyeposition.val
+    v₁ = σmap(rotate(q, pullback(Geographic(0, 0), α₁))) * scale
+    v₂ = σmap(rotate(q, pullback(Geographic(0, 0), α₂))) * scale
+    v₃ = σmap(rotate(q, pullback(Geographic(0, 0), α₁ + (α₂ - α₁) / 2))) * scale
+    n = cross(v₂, v₁)
+    upvector = Makie.Vec3f0(vec(n)...)
+    eyeposition = Makie.Vec3f0(vec(2pi * v₃)...) #./ sqrt(3)
+    lookat = Makie.Vec3f0(vec(v₃)...)
+    Makie.update_cam!(scene, eyeposition, lookat, upvector)
+    scene.center = false # prevent scene from recentering on display
 end
 
-# update eye position
-# scene.camera.eyeposition.val
-upvector = Makie.Vec3f0(1, 0, 1)
-eyeposition = Makie.Vec3f0(1, 2, 1)
-lookat = Makie.Vec3f0(0, 0, 0)
-Makie.update_cam!(scene, eyeposition, lookat, upvector)
-scene.center = false # prevent scene from recentering on display
 
 Makie.record(scene, "gallery/drorbarnatan2010.gif") do io
     for i in 1:frames
