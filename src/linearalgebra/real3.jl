@@ -49,3 +49,15 @@ cross(r1::ℝ³, r2::ℝ³) = begin
     M = convert(Array{Float64}, M)
     ℝ³(map(x -> cofactor(M, 1, x), 1:length(r1)))
 end
+
+
+Base.isapprox(a::Array{ℝ³},
+              b::Array{ℝ³};
+              atol::Float64 = TOLERANCE) = begin
+    for (elementa, elementb) in zip(a, b)
+        if isapprox(elementa, elementb, atol = atol) == false
+            return false
+        end
+    end
+    return true
+end

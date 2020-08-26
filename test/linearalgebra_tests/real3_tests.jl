@@ -20,3 +20,19 @@ zero = ℝ³([0.0; 0.0; 0.0])
 @test isapprox(dot(u, α * a + β * b), α * dot(u, a) + β * dot(u, b)) # linear
 @test dot(u, u) ≥ 0 && isapprox(dot(u, zero), 0) # positive semidefinite
 @test size(outer(u, v)) == (length(u), length(v))
+
+
+## isapprox
+
+segments = 5
+array1 = Array{ℝ³,2}(undef, segments, segments)
+for i in 1:segments
+    for j in 1:segments
+        array1[i, j] = ℝ³(rand(3))
+    end
+end
+
+array2 = map(x -> 2x, array1)
+
+@test isapprox(array1, array1, atol = TOLERANCE)
+@test isapprox(array1, array2, atol = TOLERANCE) == false
