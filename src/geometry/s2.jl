@@ -1,10 +1,3 @@
-import Base.real
-import Base.imag
-import Base.abs
-import Base.angle
-import Base.isapprox
-
-
 export S²
 export ComplexLine
 export Cartesian
@@ -88,17 +81,17 @@ struct Geographic <: S²
 end
 
 
-real(cl::ComplexLine) = Base.real(cl.z)
-imag(cl::ComplexLine) = Base.imag(cl.z)
-abs(cl::ComplexLine) = Base.abs(cl.z)
-angle(cl::ComplexLine) = Base.angle(cl.z)
-conj(cl::ComplexLine) = Base.conj(cl.z)
+Base.real(cl::ComplexLine) = real(cl.z)
+Base.imag(cl::ComplexLine) = imag(cl.z)
+Base.abs(cl::ComplexLine) = abs(cl.z)
+Base.angle(cl::ComplexLine) = angle(cl.z)
+Base.conj(cl::ComplexLine) = conj(cl.z)
 
-vec(cl::ComplexLine) = [cl.z; conj(cl)]
-vec(c::Cartesian) = [c.x; c.y; c.z]
+Base.vec(cl::ComplexLine) = [cl.z; conj(cl)]
+Base.vec(c::Cartesian) = [c.x; c.y; c.z]
 
-isapprox(c1::Cartesian, c2::Cartesian) = Base.isapprox(vec(c1), vec(c2))
-isapprox(s1::S², s2::S²) = isapprox(Cartesian(s1), Cartesian(s2))
+Base.isapprox(c1::Cartesian, c2::Cartesian) = isapprox(vec(c1), vec(c2))
+Base.isapprox(s1::S², s2::S²) = isapprox(Cartesian(s1), Cartesian(s2))
 
 ℝ³(c::Cartesian) = ℝ³(vec(c))
 ℝ³(s::S²) = ℝ³(Cartesian(s))
