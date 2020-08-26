@@ -2,9 +2,14 @@ using Test
 using Porta
 
 
+const TOLERANCE = 1e-7
+
+
 logicdir = "logic_tests"
 linearalgebradir = "linearalgebra_tests"
 geometrydir = "geometry_tests"
+bundlesdir = "bundles_tests"
+uidir = "ui_tests"
 
 
 start = time()
@@ -25,9 +30,25 @@ end
     include(joinpath(geometrydir, "s1_tests.jl"))
     include(joinpath(geometrydir, "s2_tests.jl"))
     include(joinpath(geometrydir, "s3_tests.jl"))
+    include(joinpath(geometrydir, "biquaternions_tests.jl"))
     include(joinpath(geometrydir, "stereographicprojection_tests.jl"))
     include(joinpath(geometrydir, "rotations_tests.jl"))
     include(joinpath(geometrydir, "body_tests.jl"))
+end
+
+
+@time @testset "The Bundles Tests" begin
+    include(joinpath(bundlesdir, "clifford_tests.jl"))
+end
+
+
+@time @testset "The UI Tests" begin
+    include(joinpath(uidir, "ui_tests.jl"))
+    include(joinpath(uidir, "arrow_tests.jl"))
+    include(joinpath(uidir, "cylinder_tests.jl"))
+    include(joinpath(uidir, "sphere_tests.jl"))
+    include(joinpath(uidir, "torus_tests.jl"))
+    include(joinpath(uidir, "triad_tests.jl"))
 end
 
 

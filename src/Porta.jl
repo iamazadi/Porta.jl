@@ -5,12 +5,14 @@ module Porta
 
 
 # The default tolerance for comparing the equality of two values.
-const TOLERANCE = 1e-10
+const TOLERANCE = 1e-7
 
 
 logicdir = "logic"
 linearalgebradir = "linearalgebra"
 geometrydir = "geometry"
+bundlesdir = "bundles"
+uidir = "ui"
 
 
 include(joinpath(logicdir, "propositionallogic.jl"))
@@ -24,9 +26,19 @@ include(joinpath(linearalgebradir, "real4.jl"))
 include(joinpath(geometrydir, "s1.jl"))
 include(joinpath(geometrydir, "s2.jl"))
 include(joinpath(geometrydir, "s3.jl"))
+include(joinpath(geometrydir, "biquaternions.jl"))
 include(joinpath(geometrydir, "stereographicprojection.jl"))
 include(joinpath(geometrydir, "rotations.jl"))
 include(joinpath(geometrydir, "body.jl"))
+
+include(joinpath(bundlesdir, "clifford.jl"))
+
+include(joinpath(uidir, "ui.jl"))
+include(joinpath(uidir, "arrow.jl"))
+include(joinpath(uidir, "cylinder.jl"))
+include(joinpath(uidir, "sphere.jl"))
+include(joinpath(uidir, "torus.jl"))
+include(joinpath(uidir, "triad.jl"))
 
 
 end # module
