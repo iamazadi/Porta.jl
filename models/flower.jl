@@ -169,7 +169,7 @@ Calculates a torus of revolution for building a surface in a specific way with
 the given point in the base space, the number of segments, the number of
 samples and the radius of the smaller circle in the torus of revolution.
 """
-function get_fiber(point, segments, samples; r=0.025)
+function get_fiber(point, segments, samples; r=0.01)
     # Find 3 points on the circle
     b = λ⁻¹map(convert_to_cartesian(point))
     A = λmap(S¹action(pi / 6, b))
@@ -211,6 +211,7 @@ end
 
 # The scene object that contains other visual objects
 universe = Scene(backgroundcolor = :black, show_axis=false, resolution = (360, 360))
+#universe = Scene(backgroundcolor = :black, show_axis=false, resolution = (2560, 1440))
 
 # Calculate a unit quaternion as the rotation axis
 u = [sqrt(3)/3, sqrt(3)/3, sqrt(3)/3]
@@ -219,9 +220,9 @@ q = @lift(Quaternion(sin($ϕ)*u[1],
                      sin($ϕ)*u[2],
                      sin($ϕ)*u[3],
                      cos($ϕ)))
-segments = 30
-samples = 30
-number = 420
+segments = 36
+samples = 36
+number = 360
 points = get_flower(number = number)
 for i in 1:number
     rotated = @lift(rotate3D_geographic(points[i, :], $q))
@@ -239,7 +240,7 @@ end
 eye_position, lookat, upvector = Vec3f0(0.01, 0, 6), Vec3f0(0), Vec3f0(0, 0, 1.0)
 update_cam!(universe, eye_position, lookat)
 universe.center = false # prevent scene from recentering on display
-#Makie.save("gallery/porta.jpg", universe)
+# Makie.save("gallery/porta.jpg", universe)
 
 record(universe, "gallery/flower.gif") do io
     frames = 90

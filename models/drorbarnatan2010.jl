@@ -217,7 +217,7 @@ s2color = load("test/data/BaseMap.png")
 s2observables = build(scene, sphere(q, α₁, scale, segments = segments), s2color)
 s2observables2 = build(scene, sphere(q, α₂, scale, segments = segments), s2color)
 
-frames = 360
+frames = 90
 function animate(i)
     step = 2(sqrt((i - 1) / frames) - 0.5) * pi
     println("Step ", 100(i - 1) / frames)
