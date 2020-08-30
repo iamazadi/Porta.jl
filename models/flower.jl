@@ -98,7 +98,7 @@ the height of the petals B, the latitude of the flower P,
 the rotation of the flower Q, and the total number of points in the grid.
 """
 function get_flower(;N=4, A=.5, B=-pi/7, P=pi/2, Q=0, number=300)
-    N = 7
+    N = 6
     A = .5
     B = -pi/7
     P = pi/3
@@ -210,8 +210,8 @@ end
 
 
 # The scene object that contains other visual objects
-universe = Scene(backgroundcolor = :black, show_axis=false, resolution = (360, 360))
-#universe = Scene(backgroundcolor = :black, show_axis=false, resolution = (2560, 1440))
+universe = Scene(backgroundcolor = :white, show_axis=false, resolution = (360, 360))
+#universe = Scene(backgroundcolor = :white, show_axis=false, resolution = (2560, 1440))
 
 # Calculate a unit quaternion as the rotation axis
 u = [sqrt(3)/3, sqrt(3)/3, sqrt(3)/3]
@@ -221,7 +221,7 @@ q = @lift(Quaternion(sin($ϕ)*u[1],
                      sin($ϕ)*u[3],
                      cos($ϕ)))
 segments = 36
-samples = 36
+samples = 72
 number = 360
 points = get_flower(number = number)
 for i in 1:number
@@ -229,7 +229,7 @@ for i in 1:number
     fiber = @lift(get_fiber($rotated, segments, samples))
     color = @lift begin
         x₁, x₂, x₃ = convert_to_cartesian($rotated)
-        fill(RGBAf0(rand()/2+x₁/2, rand()/2+x₂/2, rand()/2+x₃/2, 1.0),
+        fill(RGBAf0(rand()/3+2x₁/3, rand()/3+2x₂/3, rand()/3+2x₃/3, 0.9),
              segments,
              samples)
     end
@@ -237,15 +237,14 @@ for i in 1:number
 end
 
 # update eye position
-eye_position, lookat, upvector = Vec3f0(0.01, 0, 6), Vec3f0(0), Vec3f0(0, 0, 1.0)
+eye_position, lookat, upvector = Vec3f0(0.01, 0, 5), Vec3f0(0), Vec3f0(0, 0, 1.0)
 update_cam!(universe, eye_position, lookat)
 universe.center = false # prevent scene from recentering on display
 # Makie.save("gallery/porta.jpg", universe)
-
+frames = 90
 record(universe, "gallery/flower.gif") do io
-    frames = 90
     for i in 1:frames
-            ϕ[] = i*pi/frames # animate scene
+        ϕ[] = i*2pi/frames # animate scene
         recordframe!(io) # record a new frame
     end
 end
