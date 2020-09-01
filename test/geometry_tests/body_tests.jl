@@ -20,3 +20,37 @@ plane = getplane([0.0; 5.0; 3.5], Quaternion(1, 0, 0, 0), [1.0; 13.0; 13.0])
 @test size(box) == (4, 4)
 @test typeof(plane) == Array{Float64,3}
 @test size(plane) == (2, 2, 3)
+
+## whirl
+
+number = rand(5:10)
+points = [Geographic(rand() * 2pi - pi, rand() * pi - pi / 2) for i in 1:number]
+top = U1(rand() * 2pi - pi)
+bottom = U1(rand() * 2pi - pi)
+s3rotation = Quaternion(rand() * 2pi - pi, ℝ³(rand(3)))
+config = Biquaternion(Quaternion(rand() * 2pi - pi, ℝ³(rand(3))), ℝ³(rand(3)))
+segments = rand(5:10)
+whirl = constructwhirl(points,
+                       top = top,
+                       bottom = bottom,
+                       s3rotation = s3rotation,
+                       config = config,
+                       segments = segments)
+
+@test typeof(whirl) == Array{ℝ³,2}
+@test size(whirl) == (segments, number)
+
+
+## frame
+
+circle = U1(rand() * 2pi - pi)
+s3rotation = Quaternion(rand() * 2pi - pi, ℝ³(rand(3)))
+config = Biquaternion(Quaternion(rand() * 2pi - pi, ℝ³(rand(3))), ℝ³(rand(3)))
+segments = rand(5:10)
+frame = constructframe(circle,
+                       s3rotation = s3rotation,
+                       config = config,
+                       segments = segments)
+
+@test typeof(frame) == Array{ℝ³,2}
+@test size(frame) == (segments, segments)

@@ -3,6 +3,8 @@ export constructtorus
 export constructsphere
 export constructcylinder
 export constructbox
+export constructwhirl
+export constructframe
 export getplane
 
 
@@ -101,6 +103,97 @@ function constructbox(p::ℝ³, q::Quaternion, s::ℝ³)
               ℝ³(-x, +y, +z) ℝ³(x, +y, +z) ℝ³(-x, +y, +z) ℝ³(x, +y, +z);
               ℝ³(-x, +y, -z) ℝ³(x, +y, -z) ℝ³(-x, +y, -z) ℝ³(x, +y, -z)]
     map(x -> x + p, rotate(points, q))
+end
+
+
+"""
+    constructwhirl(points, [top, [bottom, [s3rotation, [config, [segments]]]]])
+
+Construct a whirl with the given `points` in the base space, `top`, `bottom`, S³
+rotation `s3rotation`, configuration `config` and the number of `segments`.
+"""
+function constructwhirl(points::Array{<:S²,1};
+                        top::S¹ = U1(-pi),
+                        bottom::S¹ = U1(pi),
+                        s3rotation::S³ = Quaternion(1, 0, 0, 0),
+                        config::Biquaternion = Biquaternion(ℝ³(0, 0, 0)),
+                        segments::Int = 36)
+    # Map from S² into its upper hemisphere
+    f(b::S²) = begin
+        p = Geographic(b)
+        r = sqrt((1 - sin(p.θ)) / 2)
+        Geographic(r * cos(p.ϕ), r * sin(p.ϕ))
+    end
+    # Map from S² into S³
+    function σ(b::S², f::S¹)
+        p = Geographic(b)
+        arg = angle(exp(-im * p.ϕ) * sqrt(1 + sin(p.θ)))
+        z = exp(im * angle(f)) * exp(-im * (arg + p.ϕ)) * sqrt(1 + sin(p.θ)) / sqrt(2)
+        w = exp(im * angle(f)) * exp(-im * arg) * sqrt(1 - sin(p.θ)) / sqrt(2)
+        Quaternion(ComplexPlane(z, w)) # σ ⊂ [|z| ≤ 1, w > 0]
+    end
+    # Map from S² into S³
+    function π(b::S², f::S¹)
+        p = Geographic(b)
+        arg = angle(exp(-im * p.ϕ) * sqrt(1 + sin(p.θ)))
+        z = exp(im * angle(f)) * exp(-im * arg) * sqrt(1 - sin(p.θ)) / sqrt(2)
+        w = exp(im * angle(f)) * exp(-im * (arg + p.ϕ)) * sqrt(1 + sin(p.θ)) / sqrt(2)
+        Quaternion(ComplexPlane(z, w)) # π ⊂ [z > 0, |w| ≤ 1]
+    end
+    array = Array{ℝ³,2}(undef, segments, length(points))
+    lspace = range(angle(top), stop = angle(bottom), length = segments)
+    for (i, α) in enumerate(lspace)
+        for (j, point) in enumerate(points)
+            array[i, j] = σmap(rotate(s3rotation, σ(f(point), U1(α))))
+        end
+    end
+    applyconfig(array, config)
+end
+
+
+"""
+    constructframe(circle, [s3rotation, [config, [segments]]])
+
+Construct a frame that is like an S³ cross-section under stereographic projection with the
+given `circle` that determines the phase angle in the fiber space, S³ rotation `s3rotation`,
+configuration `config` and the number of `segments`. The Clifford bundle does not have a
+cross section and so we restrict the base space coordinate chart to its upper hemisphere.
+"""
+function constructframe(circle::S¹;
+                        s3rotation::S³ = Quaternion(1, 0, 0, 0),
+                        config::Biquaternion = Biquaternion(ℝ³(0, 0, 0)),
+                        segments::Int = 36)
+    # Map from S² into its upper hemisphere
+    f(b::S²) = begin
+        p = Geographic(b)
+        r = sqrt((1 - sin(p.θ)) / 2)
+        Geographic(r * cos(p.ϕ), r * sin(p.ϕ))
+    end
+    # Map from S² into S³
+    function σ(b::S², f::S¹)
+        p = Geographic(b)
+        arg = angle(exp(-im * p.ϕ) * sqrt(1 + sin(p.θ)))
+        z = exp(im * angle(f)) * exp(-im * (arg + p.ϕ)) * sqrt(1 + sin(p.θ)) / sqrt(2)
+        w = exp(im * angle(f)) * exp(-im * arg) * sqrt(1 - sin(p.θ)) / sqrt(2)
+        Quaternion(ComplexPlane(z, w)) # σ ⊂ [|z| ≤ 1, w > 0]
+    end
+    # Map from S² into S³
+    function π(b::S², f::S¹)
+        p = Geographic(b)
+        arg = angle(exp(-im * p.ϕ) * sqrt(1 + sin(p.θ)))
+        z = exp(im * angle(f)) * exp(-im * arg) * sqrt(1 - sin(p.θ)) / sqrt(2)
+        w = exp(im * angle(f)) * exp(-im * (arg + p.ϕ)) * sqrt(1 + sin(p.θ)) / sqrt(2)
+        Quaternion(ComplexPlane(z, w)) # π ⊂ [z > 0, |w| ≤ 1]
+    end
+    array = Array{ℝ³,2}(undef, segments, segments)
+    lspaceϕ = collect(range(-pi, stop = pi, length = segments))
+    lspaceθ = collect(range(-pi / 2, stop = pi / 2, length = segments))
+    for (i, θ) in enumerate(lspaceθ)
+        for (j, ϕ) in enumerate(lspaceϕ)
+            array[i, j] = σmap(rotate(s3rotation, σ(f(Geographic(ϕ, θ)), circle)))
+        end
+    end
+    applyconfig(array, config)
 end
 
 
