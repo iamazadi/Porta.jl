@@ -49,6 +49,8 @@ end
     include(joinpath(uidir, "sphere_tests.jl"))
     include(joinpath(uidir, "torus_tests.jl"))
     include(joinpath(uidir, "triad_tests.jl"))
+    include(joinpath(uidir, "whirl_tests.jl"))
+    include(joinpath(uidir, "frame_tests.jl"))
 end
 
 

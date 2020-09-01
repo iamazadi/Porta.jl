@@ -39,6 +39,8 @@ include(joinpath(uidir, "cylinder.jl"))
 include(joinpath(uidir, "sphere.jl"))
 include(joinpath(uidir, "torus.jl"))
 include(joinpath(uidir, "triad.jl"))
+include(joinpath(uidir, "whirl.jl"))
+include(joinpath(uidir, "frame.jl"))
 
 
 end # module
