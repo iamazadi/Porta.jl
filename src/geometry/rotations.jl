@@ -1,5 +1,6 @@
 export rotate
 export getrotation
+export applyconfig
 
 
 rotate(g::Quaternion, q::Quaternion) = g * q
@@ -12,4 +13,15 @@ getrotation(i::ℝ³, n::ℝ³) = begin
     u = normalize(cross(i, n))
     θ = acos(dot(normalize(i), normalize(n)))
     Quaternion(θ, u)
+end
+
+
+"""
+    applyconfig(p, q)
+
+Apply a rigid body transformation in 3-space with the given array of points `p` and
+configuration `q`.
+"""
+function applyconfig(p::Array{ℝ³}, q::Biquaternion)
+    map(x -> x + gettranslation(q), rotate(p, getrotation(q)))
 end

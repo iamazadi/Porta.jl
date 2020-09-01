@@ -13,3 +13,11 @@ g = getrotation(i, j)
 @test isapprox(rotate(p, q₀), p) # rotations with angle zero
 @test typeof(rotate(points, q)) == typeof(points) # Array input
 @test isapprox(g, Quaternion(pi / 2, k))
+
+
+q = Biquaternion(Quaternion(rand() * 2pi - pi, ℝ³(rand(3))), ℝ³(rand(3)))
+transformed = applyconfig(points, q)
+
+@test typeof(transformed) == typeof(points)
+@test size(transformed) == size(points)
+@test isapprox(transformed, points) == false
