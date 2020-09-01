@@ -89,9 +89,21 @@ Base.conj(cl::ComplexLine) = conj(cl.z)
 
 Base.vec(cl::ComplexLine) = [cl.z; conj(cl)]
 Base.vec(c::Cartesian) = [c.x; c.y; c.z]
+Base.vec(s::Spherical) = [s.r; s.ϕ; s.θ]
+Base.vec(g::Geographic) = [g.ϕ; g.θ]
 
 Base.isapprox(c1::Cartesian, c2::Cartesian) = isapprox(vec(c1), vec(c2))
 Base.isapprox(s1::S², s2::S²) = isapprox(Cartesian(s1), Cartesian(s2))
+Base.isapprox(a::Array{<:S²,N} where N,
+              b::Array{<:S²,N} where N;
+              atol::Float64 = TOLERANCE) = begin
+    for (elementa, elementb) in zip(a, b)
+        if isapprox(vec(elementa), vec(elementb), atol = atol) == false
+            return false
+        end
+    end
+    return true
+end
 
 ℝ³(c::Cartesian) = ℝ³(vec(c))
 ℝ³(s::S²) = ℝ³(Cartesian(s))
@@ -131,6 +143,7 @@ end
 Spherical(g::Geographic) = Spherical(1, g.ϕ + pi, pi/2 - g.θ)
 Spherical(r::ℝ³) = Spherical(Cartesian(r))
 
+Geographic(g::Geographic) = g
 Geographic(s::Spherical) = Geographic(s.ϕ - pi, pi/2 - s.θ)
 Geographic(r::ComplexLine) = Geographic(Spherical(r))
 Geographic(c::Cartesian) = Geographic(ComplexLine(c))

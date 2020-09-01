@@ -17,3 +17,10 @@ r3 = ℝ³(1, 0, 0)
 
 @test isapprox(ℝ³(cl), ℝ³(c))
 @test isapprox(ComplexLine(r3), ComplexLine(Cartesian(r3)))
+
+number = rand(5:10)
+a = [Geographic(rand() * 2pi - pi, rand() * pi - pi / 2) for i in 1:number]
+b = [Geographic(rand() * 2pi - pi, rand() * pi - pi / 2) for i in 1:number]
+
+@test isapprox(a, a, atol = TOLERANCE)
+@test isapprox(a, b, atol = TOLERANCE) == false
