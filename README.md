@@ -1,8 +1,7 @@
 # Quantize the Geometry!
-
-![the Hopf fibration](gallery/londontsai.gif "The Hopf fibration inspired by one of the London Tsai's prints")
-![the Hopf flower](gallery/flower.gif "The Hopf flower")
 ![Planet Hopf](gallery/drorbarnatan2010.gif "Planet Hopf")
+![the Hopf fibration](gallery/londontsai.gif "The Hopf fibration inspired by London Tsai")
+![the Hopf flower](gallery/flower.gif "The Hopf flower")
 ![24-cell](gallery/24-cell.gif "24-cell")
 ![600-cell](gallery/600-cell.gif "600-cell")
 ![surfaces](gallery/surfaces.gif "surfaces")
@@ -11,6 +10,8 @@ This project helps with Eric Weinstein's the Graph-Wall-Tome (GWT) project. Watc
 
 ## Requirements
 - AbstractPlotting
+- CSV
+- DataFrames
 - FileIO
 - GLMakie
 - GeometryBasics
@@ -18,6 +19,7 @@ This project helps with Eric Weinstein's the Graph-Wall-Tome (GWT) project. Watc
 - Makie
 - Observables
 - WAV
+
 
 ## Installation
 You can install Porta by running this (in the REPL):
@@ -31,7 +33,7 @@ Pkg.add("Porta")
 ```
 
 ## Usage
-For client-side code read the tests, and for examples on how to build please check out the models directory.
+For client-side code read the tests, and for examples on how to build please check out the models directory. See [Planet Hopf](../blob/master/models/drorbarnatan2010.jl) as an example!
 
 ## Status
 - Logic [Doing]
@@ -52,6 +54,7 @@ For client-side code read the tests, and for examples on how to build please che
 - [Planet Hopf][6], Dror Bar-Natan (2010)
 
 [1]: https://www.youtube.com/channel/UCY8FW_kvEfGDj5i5j_rkaqA
+[2]: models/drorbarnatan2010.jl
 [2]: https://cds.cern.ch/record/181783/files/cer-000093203.pdf
 [3]: http://www.math.stonybrook.edu/~tony/scgp/wall-story/wall-story.html
 [4]: https://www.amazon.com/Road-Reality-Complete-Guide-Universe/dp/0679776311
