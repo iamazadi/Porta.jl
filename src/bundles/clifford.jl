@@ -1,5 +1,8 @@
 export Bundle
 export Clifford
+export σmap
+export τmap
+export S¹action
 
 
 abstract type Bundle end
@@ -42,4 +45,39 @@ Clifford(w::Complex, z::Complex, B::Complex) = begin
     # Aw = -Bz
     # A = -Bz/w
     Clifford(w, z, -B * z / w, B)
+end
+
+
+"""
+    σmap(b)
+
+A map that takes the base space to the total space. σ: S² → S³, σ ⊂ [|z₀| ≤ 1, z₁ > 0].
+"""
+function σmap(b::S²)
+    p = Geographic(b)
+    z₀ = exp(im * 0) * sqrt((1 + sin(p.θ)) / 2)
+    z₁ = exp(im * p.ϕ) * sqrt((1 - sin(p.θ)) / 2)
+    Quaternion(ComplexPlane(z₀, z₁))
+end
+
+
+"""
+    τmap(b)
+
+A map that takes the base space to the total space. σ: S² → S³, τ ⊂ [z₀ > 0, |z₁| ≤ 1].
+"""
+function τmap(b::S²)
+    z₀, z₁ = vec(ComplexPlane(σmap(b)))
+    Quaternion(ComplexPlane(z₁, z₀))
+end
+
+
+"""
+    S¹action(z, s)
+
+Aply the S¹ action on the S³ with the given point in the total space, `z`, and the circle
+`s` as in the structure group of the Cliffor bundle, `s` ∈ U(1).
+"""
+S¹action(z::S³, s::S¹) = begin
+    Quaternion(ComplexPlane(exp(im * angle(s)) .* vec(ComplexPlane(z))))
 end
