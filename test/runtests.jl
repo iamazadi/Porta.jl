@@ -33,9 +33,7 @@ end
     include(joinpath(geometrydir, "biquaternions_tests.jl"))
     include(joinpath(geometrydir, "stereographicprojection_tests.jl"))
     include(joinpath(geometrydir, "rotations_tests.jl"))
-    include(joinpath(geometrydir, "body_tests.jl"))
 end
-
 
 @time @testset "The Bundles Tests" begin
     include(joinpath(bundlesdir, "clifford_tests.jl"))
@@ -43,6 +41,7 @@ end
 
 
 @time @testset "The UI Tests" begin
+    include(joinpath(uidir, "body_tests.jl"))
     include(joinpath(uidir, "ui_tests.jl"))
     include(joinpath(uidir, "arrow_tests.jl"))
     include(joinpath(uidir, "cylinder_tests.jl"))
