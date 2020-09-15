@@ -5,7 +5,7 @@ import AbstractPlotting
 q1 = Biquaternion(Quaternion(rand(4)), ℝ³(rand(3)))
 scene = AbstractPlotting.Scene()
 radius = rand()
-segments = rand(30:36)
+segments = rand(5:10)
 color = AbstractPlotting.RGBAf0(rand(4)...)
 transparency = false
 sphere = Sphere(q1,
