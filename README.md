@@ -33,7 +33,7 @@ Pkg.add("Porta")
 ```
 
 ## Usage
-For client-side code read the tests, and for examples on how to build please check out the models directory. See [Planet Hopf](../blob/master/models/drorbarnatan2010.jl) as an example!
+For client-side code read the tests, and for examples on how to build please check out the models directory. See [Planet Hopf](../master/models/drorbarnatan2010.jl) as an example!
 
 ## Status
 - Logic [Doing]
