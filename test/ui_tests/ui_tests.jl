@@ -8,7 +8,7 @@ import AbstractPlotting
 
 scene = AbstractPlotting.Scene()
 transparency = false
-segments = 36
+segments = rand(5:10)
 radius = 1 + rand()
 value1 = constructsphere(q, radius, segments = segments)
 color = fill(AbstractPlotting.RGBAf0(rand(4)...), segments, segments)
@@ -24,14 +24,26 @@ value2 = getsurface(observable, segments)
 
 ## getsurface with different segments in the coordinate chart axes
 
+
+# Map from S² into its upper hemisphere
+s2tos2map(b::S²) = begin
+    p = Geographic(b)
+    r = sqrt((1 - sin(p.θ)) / 2)
+    Geographic(p.r, r * cos(p.ϕ), r * sin(p.ϕ))
+end
+
+
 number = rand(5:10)
-points = [Geographic(rand() * 2pi - pi, rand() * pi - pi / 2) for i in 1:number]
+points = [Geographic(rand(), rand() * 2pi - pi, rand() * pi - pi / 2) for i in 1:number]
 top = U1(rand() * 2pi - pi)
 bottom = U1(rand() * 2pi - pi)
 s3rotation = Quaternion(rand() * 2pi - pi, ℝ³(rand(3)))
 config = Biquaternion(Quaternion(rand() * 2pi - pi, ℝ³(rand(3))), ℝ³(rand(3)))
 segments = rand(5:10)
+s2tos3map = rand() > 0.5 ? σmap : τmap
 value1 = constructwhirl(points,
+                        s2tos3map,
+                        s2tos2map,
                         top = top,
                         bottom = bottom,
                         s3rotation = s3rotation,
@@ -71,7 +83,7 @@ value2 = getsurface(observable, segments)
 ## builsurface with image as color
 
 
-color = FileIO.load("data/basemap90grid.png")
+color = FileIO.load("../data/basemap_inferno.png")
 segments = rand(5:10)
 radius = 1 + rand()
 value1 = constructsphere(q, radius, segments = segments)
