@@ -47,10 +47,3 @@ function f₃(α::Real, ϕ₁::Real, ϕ₂::Real)
     x₄ = sin((ϕ₂ - ϕ₁) / 2) * cos(α)
     ℝ⁴(x₁, x₂, x₃, x₄)
 end
-
-
-"""
-    disance(r, θ, ϕ, ψ)
-
-Distance from 
-"""
