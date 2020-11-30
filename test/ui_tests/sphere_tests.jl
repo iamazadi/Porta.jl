@@ -21,3 +21,9 @@ value2 = getsurface(sphere.observable, segments)
 
 @test isapprox(sphere.q, q2)
 @test isapprox(value1, value2) == false
+
+color1 = AbstractPlotting.RGBAf0(rand(4)...)
+update(sphere, color1)
+color2 = Observables.to_value(sphere.color)[1] # Select element 1
+
+@test isapprox(color1, color2)
