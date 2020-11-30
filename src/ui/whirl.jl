@@ -9,8 +9,8 @@ export update
 """
     Represents a whirl.
 
-fields: points, s2tos2map, s2tos3map, top, bottom, s3rotation, config, segments, color and
-observable.
+fields: points, s2tos2map, s2tos3map, top, bottom, s3rotation, config, segments, color,
+observable and scale.
 """
 mutable struct Whirl <: Sprite
     points::Array{<:S²,1}
@@ -21,10 +21,11 @@ mutable struct Whirl <: Sprite
     s3rotation::S³
     config::Biquaternion
     segments::Int
-    color::AbstractPlotting.RGBAf0
+    color::Observables.Observable{Array{AbstractPlotting.ColorTypes.RGBA{Float32},2}}
     observable::Tuple{Observables.Observable{Array{Float64,2}},
                       Observables.Observable{Array{Float64,2}},
                       Observables.Observable{Array{Float64,2}}}
+    scale::Real
 end
 
 
@@ -33,11 +34,12 @@ end
           points,
           s2tos3map,
           s2tos2map,
-          [top, [bottom, [s3rotation, [config, [segments, [color, [transparency]]]]]]])
+          [top, [bottom, [s3rotation, [config, [segments, [color, [transparency
+           [,scale]]]]]]]])
 
 Construct a whirl with the given `scene`, `points` in the base space, `s2tos3map`,
 `s2tos2map`, `top`, `bottom`, S³ rotation `s3rotation`, configuration `config`, the number
-of `segments`, `color` and `transparency`.
+of `segments`, `color`, `transparency` and `scale`.
 """
 function Whirl(scene::AbstractPlotting.Scene,
                points::Array{<:S²,1},
@@ -52,7 +54,8 @@ function Whirl(scene::AbstractPlotting.Scene,
                                                                         0.2705,
                                                                         0.0,
                                                                         0.5),
-               transparency::Bool = false)
+               transparency::Bool = false,
+               scale::Real = 1.0)
     whirl = constructwhirl(points,
                            s2tos3map,
                            s2tos2map,
@@ -60,11 +63,12 @@ function Whirl(scene::AbstractPlotting.Scene,
                            bottom = bottom,
                            s3rotation = s3rotation,
                            config = config,
-                           segments = segments)
-    colorarray = fill(color, segments, segments)
+                           segments = segments,
+                           scale = scale)
+    colorarray = Observables.Observable(fill(color, size(whirl)...))
     observable = buildsurface(scene, whirl, colorarray, transparency = transparency)
-    Whirl(points, s2tos3map, s2tos2map, top, bottom, s3rotation, config, segments, color,
-          observable)
+    Whirl(points, s2tos3map, s2tos2map, top, bottom, s3rotation, config, segments,
+          colorarray, observable, scale)
 end
 
 
@@ -85,7 +89,8 @@ function update(whirl::Whirl, points::Array{<:S²,1})
                            bottom = whirl.bottom,
                            s3rotation = whirl.s3rotation,
                            config = whirl.config,
-                           segments = whirl.segments)
+                           segments = whirl.segments,
+                           scale = whirl.scale)
     updatesurface(value, whirl.observable)
 end
 
@@ -107,7 +112,8 @@ function update(whirl::Whirl, s2tos3map::Any, s2tos2map::Any)
                            bottom = whirl.bottom,
                            s3rotation = whirl.s3rotation,
                            config = whirl.config,
-                           segments = whirl.segments)
+                           segments = whirl.segments,
+                           scale = whirl.scale)
     updatesurface(value, whirl.observable)
 end
 
@@ -127,7 +133,8 @@ function update(whirl::Whirl, top::S¹, bottom::S¹)
                            bottom = whirl.bottom,
                            s3rotation = whirl.s3rotation,
                            config = whirl.config,
-                           segments = whirl.segments)
+                           segments = whirl.segments,
+                           scale = whirl.scale)
     updatesurface(value, whirl.observable)
 end
 
@@ -147,7 +154,8 @@ function update(whirl::Whirl, s3rotation::S³)
                            bottom = whirl.bottom,
                            s3rotation = whirl.s3rotation,
                            config = whirl.config,
-                           segments = whirl.segments)
+                           segments = whirl.segments,
+                           scale = whirl.scale)
     updatesurface(value, whirl.observable)
 end
 
@@ -166,6 +174,43 @@ function update(whirl::Whirl, config::Biquaternion)
                            bottom = whirl.bottom,
                            s3rotation = whirl.s3rotation,
                            config = whirl.config,
-                           segments = whirl.segments)
+                           segments = whirl.segments,
+                           scale = whirl.scale)
+    updatesurface(value, whirl.observable)
+end
+
+
+"""
+    update(whirl, color)
+
+Update a Whirl by changing its observable with the given `whirl` and `color`.
+"""
+function update(whirl::Whirl, color::AbstractPlotting.RGBAf0)
+    whirl.color[] = fill(color, whirl.segments, length(whirl.points))
+end
+
+
+"""
+    update(whirl, points, s3rotation, top, bottom)
+
+Update a Whirl by constructing it from scratch with the given base space `points`, S³
+rotation `s3rotation`, beginning U(1) action `top` and ending U(1) action `bottom`.
+"""
+function update(whirl::Whirl, points::Array{<:S²,1}, s3rotation::S³, top::S¹, bottom::S¹)
+    @assert(length(points) == length(whirl.points),
+            "The number of the given points must be equal to what it was before.")
+    whirl.points = points
+    whirl.s3rotation = s3rotation
+    whirl.top = top
+    whirl.bottom = bottom
+    value = constructwhirl(whirl.points,
+                           whirl.s2tos3map,
+                           whirl.s2tos2map,
+                           top = whirl.top,
+                           bottom = whirl.bottom,
+                           s3rotation = whirl.s3rotation,
+                           config = whirl.config,
+                           segments = whirl.segments,
+                           scale = whirl.scale)
     updatesurface(value, whirl.observable)
 end
