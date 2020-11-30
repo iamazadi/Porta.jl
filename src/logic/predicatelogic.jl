@@ -8,22 +8,13 @@ export exists
 
 A proposition-valued function of one or more variables.
 
-fields: value and x.
+fields: value and m.
 """
 struct Predicate <: Logic
     value::Logic
-    x::Tuple
-    Predicate(p::Logic, x...) = new(p, tuple(x...))
-    Predicate(P::Predicate, R::Predicate) = new(P.value * R.value, (P.x..., R.x...))
+    m::Number
+    Predicate(p::Logic, m::Number) = new(p, m)
 end
-
-
-"""
-    all(x, P)
-
-Construct a proposition with the given Predicate `P` and a single variable `x`.
-"""
-all(x, P::Predicate) = value(P)
 
 
 """
@@ -32,3 +23,11 @@ all(x, P::Predicate) = value(P)
 Construct a proposition with the given Predicate `P` and a single variable `x`.
 """
 exists(x, P::Predicate) = !all(x, !P)
+
+
+"""
+    all(x, P)
+
+Construct a proposition with the given Predicate `P` and a single variable `x`.
+"""
+all(x, P::Predicate) = value(P)

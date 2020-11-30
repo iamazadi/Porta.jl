@@ -21,6 +21,7 @@ segments = rand(5:10)
 color = AbstractPlotting.RGBAf0(rand(4)...)
 transparency = rand(1:2) == 1 ? true : false
 s2tos3map = rand() > 0.5 ? σmap : τmap
+scale = 1.0 + rand()
 whirl = Whirl(scene,
               points,
               s2tos3map,
@@ -31,7 +32,8 @@ whirl = Whirl(scene,
               config = config,
               segments = segments,
               color = color,
-              transparency = transparency)
+              transparency = transparency,
+              scale = scale)
 
 
 ## update points
@@ -79,3 +81,22 @@ value2 = getsurface(whirl.observable, whirl.segments, length(whirl.points))
 
 @test isapprox(whirl.config, config2)
 @test isapprox(value1, value2) == false
+
+color1 = AbstractPlotting.RGBAf0(rand(4)...)
+update(whirl, color1)
+color2 = Observables.to_value(whirl.color)[1] # Select element 1
+
+@test isapprox(color1, color2)
+
+## bulk update for reducing extra computation
+
+points3 = [Geographic(rand(), rand() * 2pi - pi, rand() * pi - pi / 2) for i in 1:number]
+s3rotation3 = Quaternion(rand() * 2pi - pi, ℝ³(rand(3)))
+top3 = U1(rand() * 2pi - pi)
+bottom3 = U1(rand() * 2pi - pi)
+update(whirl, points3, s3rotation3, top3, bottom3)
+
+@test isapprox(whirl.points, points3)
+@test isapprox(whirl.s3rotation, s3rotation3)
+@test isapprox(whirl.top, top3)
+@test isapprox(whirl.bottom, bottom3)

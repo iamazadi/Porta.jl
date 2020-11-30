@@ -1,3 +1,5 @@
+import WAV
+
 export Signal
 export data
 export fps
@@ -6,8 +8,7 @@ export chunks
 export chunk
 export dft
 export fft
-
-import WAV
+export getchunk
 
 
 """
@@ -66,7 +67,6 @@ end
 
 Signal(s::String; c=1) = begin
     y, fps = WAV.wavread(s)
-    y = (y .+ 1) ./ 2
     Signal(y[:, c], fps)
 end
 
@@ -79,18 +79,21 @@ seconds(s::Signal) = Int(size(data(s), 1) ÷ fps(s))
 
 chunks(s::Signal, cps::Int) = seconds(s) * cps
 
+
 """
-chunk(s::Signal, i::Int, cps::Int)
+chunk(s::Signal, i::Int, cps::Int [, offset])
 
 Gets a chunk of a signal such that there are a certain number of chunks per
 second with the given signal, the chunk ordinal number and the number of chunks
-per second.
+per second. The optional arguments offset determines the window offset from the center in
+the time dimension, and it's used for collecting multiple chunks to then average over.
 """
-function chunk(s::Signal, i::Int, cps::Int)
+function chunk(s::Signal, i::Int, cps::Int; offset::Int = 0)
     samples_per_chunk = Int(fps(s) ÷ cps)
-    window = 2^11
-    start = (i - 1) * samples_per_chunk + 1
-    finish = start + window
+    window = 2^(Int(ceil(log2(samples_per_chunk))))
+    origin = (i - 1) * samples_per_chunk + 1
+    start = origin + offset
+    finish = origin + window + offset
     total_samples = size(data(s), 1)
     if finish < total_samples
         return Signal(data(s)[start:finish-1], fps(s))
@@ -98,6 +101,7 @@ function chunk(s::Signal, i::Int, cps::Int)
         return Signal(data(s)[total_samples-window+1:end], fps(s))
     end
 end
+
 
 function fft(s::Signal)
     x = data(s)
@@ -117,5 +121,26 @@ function fft(s::Signal)
     end
 end
 
+
 # Discrete Fourier transform
 dft(s::Signal) = analyse(data(s))
+
+
+"""
+    getchunk(signal, i, FPS)
+
+Get the `i`th chunck of the given `signal`, then transform it using FFT anf return it.
+"""
+function getchunk(signal::Signal, i::Int, FPS::Int)
+    array = []
+    N = 5
+    for j in 1:N
+        sₜ = data(chunk(signal, i, FPS, offset = j))
+        push!(array, fft(Signal(sₜ, fps(signal))))
+    end
+    sum = array[1]
+    for j in 2:N
+        sum = sum .+ array[j]
+    end
+    average = sum ./ N
+end

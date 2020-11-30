@@ -65,7 +65,7 @@ end
 """
     update(cylinder, color)
 
-
+Update a Cylinder by changing its observable with the given `cylinder` and `color`.
 """
 function update(cylinder::Cylinder, color::AbstractPlotting.RGBAf0)
     cylinder.color[] = fill(color, cylinder.segments, cylinder.segments)

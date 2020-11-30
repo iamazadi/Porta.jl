@@ -110,12 +110,12 @@ end
     constructwhirl(points,
                    s2tos3map,
                    s2tos2map;
-                   [top, [bottom, [s3rotation, [config, [segments]]]]])
+                   [top, [bottom, [s3rotation, [config, [segments [, scale]]]]]])
 
 Construct a whirl with the given `points` in the base space, , a map from the base space to
 the total space `s2tos3map`, a conformal map that takes the base space to itself `s2tos2map`
-, `top` and `bottom` U(1) actions, S³ rotation `s3rotation`, configuration `config` and the
-number of `segments`.
+, `top` and `bottom` U(1) actions, S³ rotation `s3rotation`, configuration `config`, the
+number of `segments` and `scale`.
 """
 function constructwhirl(points::Array{<:S²,1},
                         s2tos3map,
@@ -124,12 +124,14 @@ function constructwhirl(points::Array{<:S²,1},
                         bottom::S¹ = U1(pi),
                         s3rotation::S³ = Quaternion(1, 0, 0, 0),
                         config::Biquaternion = Biquaternion(ℝ³(0, 0, 0)),
-                        segments::Int = 36)
+                        segments::Int = 36,
+                        scale::Real = 1.0)
     array = Array{ℝ³,2}(undef, segments, length(points))
     lspace = range(angle(top), stop = angle(bottom), length = segments)
     for (i, α) in enumerate(lspace)
         for (j, p) in enumerate(points)
-            array[i, j] = λmap(rotate(S¹action(s2tos3map(s2tos2map(p)), U1(α)), s3rotation))
+            array[i, j] = compressedλmap(rotate(S¹action(s2tos3map(s2tos2map(p)), U1(α)),
+                                         s3rotation)) * scale
         end
     end
     applyconfig(array, config)

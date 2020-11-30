@@ -50,23 +50,23 @@ end
 field: a.
 """
 struct SU2 <: S³
-    a::Array{Complex,2}
+    a::Array{<:Complex,2}
 end
 
 
 Base.vec(q::Quaternion) = vec(q.r)
 Base.vec(cp::ComplexPlane) = [cp.z₁; cp.z₂]
 
-Base.adjoint(s::SU2) = SU2(convert(Array{Complex,2}, adjoint(s.a)))
+Base.adjoint(s::SU2) = SU2(adjoint(s.a))
 Base.conj(q::Quaternion) = Quaternion(vec(q)[1], -vec(q)[2], -vec(q)[3], -vec(q)[4])
 
 ComplexPlane(z::Array{<:Complex,1}) = ComplexPlane(z...)
 ComplexPlane(z::ComplexPlane) = z
-ComplexPlane(s::SU2) = ComplexPlane(s.a[1,1], -s.a[2,1])
+ComplexPlane(s::SU2) = ComplexPlane(s.a[1,1], s.a[2,1])
 ComplexPlane(q::Quaternion) = ComplexPlane(vec(q)[1] + im * vec(q)[2],
                                            vec(q)[3] + im * vec(q)[4])
 
-SU2(cp::ComplexPlane) = SU2([cp.z₁ conj(cp.z₂); -cp.z₂ conj(cp.z₁)])
+SU2(cp::ComplexPlane) = SU2([cp.z₁ -conj(cp.z₂); cp.z₂ conj(cp.z₁)])
 SU2(q::Quaternion) = SU2(ComplexPlane(q))
 Quaternion(cp::ComplexPlane) = Quaternion(real(cp.z₁),
                                           imag(cp.z₁),
