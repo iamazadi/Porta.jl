@@ -83,7 +83,7 @@ value2 = getsurface(observable, segments)
 ## builsurface with image as color
 
 
-color = FileIO.load("../data/basemap_inferno.png")
+color = FileIO.load("../data/basemap_color.png")
 segments = rand(5:10)
 radius = 1 + rand()
 value1 = constructsphere(q, radius, segments = segments)
