@@ -39,3 +39,6 @@ normalize(vs::VectorSpace) = vs * (1 / norm(vs))
 Base.isapprox(vs1::VectorSpace, vs2::VectorSpace; atol::Float64 = TOLERANCE) = begin
     isapprox(vec(vs1), vec(vs2), atol = atol)
 end
+isapprox(a₁::Array{<:VectorSpace}, a₂::Array{<:VectorSpace}; atol::Real = TOLERANCE) = begin
+    all(map((i, j) -> isapprox(i, j, atol = atol), zip(a₁, a₂)))
+end
