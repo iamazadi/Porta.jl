@@ -23,7 +23,7 @@ struct U1 <: S¹
         new(z)
     end
     U1(α::Real) = begin
-        @assert(-pi ≤ α ≤ pi, "The phase angle must be in the interval [-π, π].")
+        #@assert(-pi ≤ α ≤ pi, "The phase angle must be in the interval [-π, π].")
         U1(exp(im * α))
     end
 end
