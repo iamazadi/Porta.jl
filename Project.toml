@@ -18,7 +18,7 @@ WAV = "8149f6b0-98f6-5db9-b78f-408fbbb8ef88"
 
 [compat]
 AbstractPlotting = "0.12, 0.13"
-CSV = "0.7"
+CSV = "0.7, 0.8"
 DataFrames = "0.21"
 FileIO = "1.4"
 GLMakie = "0.1"
