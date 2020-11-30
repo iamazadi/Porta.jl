@@ -16,7 +16,7 @@ circle = U1(rand() * 2pi - pi)
 s3rotation = Quaternion(rand() * 2pi - pi, ℝ³(rand(3)))
 config = Biquaternion(Quaternion(rand() * 2pi - pi, ℝ³(rand(3))), ℝ³(rand(3)))
 segments = rand(5:10)
-color = FileIO.load("../data/basemap_inferno.png")
+color = FileIO.load("../data/basemap_color.png")
 transparency = rand(1:2) == 1 ? true : false
 s2tos3map = rand() > 0.5 ? σmap : τmap
 frame = Frame(scene,

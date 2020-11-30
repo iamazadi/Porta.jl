@@ -13,6 +13,7 @@ linearalgebradir = "linearalgebra"
 geometrydir = "geometry"
 bundlesdir = "bundles"
 uidir = "ui"
+datadir = "data"
 
 
 include(joinpath(logicdir, "propositionallogic.jl"))
@@ -42,7 +43,7 @@ include(joinpath(uidir, "triad.jl"))
 include(joinpath(uidir, "whirl.jl"))
 include(joinpath(uidir, "frame.jl"))
 
-include("signal.jl")
+include(joinpath(datadir, "signal.jl"))
 
 
 end # module

@@ -15,7 +15,7 @@ mutable struct Sphere <: Sprite
     q::Biquaternion
     radius::Float64
     segments::Int
-    color::AbstractPlotting.RGBAf0
+    color::Observables.Observable{Array{AbstractPlotting.ColorTypes.RGBA{Float32},2}}
     observable::Tuple{Observables.Observable{Array{Float64,2}},
                       Observables.Observable{Array{Float64,2}},
                       Observables.Observable{Array{Float64,2}}}
@@ -38,9 +38,9 @@ function Sphere(q::Biquaternion,
                                                                          0.5),
                 transparency::Bool = false)
     sphere = constructsphere(q, radius, segments = segments)
-    colorarray = fill(color, segments, segments)
+    colorarray = Observables.Observable(fill(color, segments, segments))
     observable = buildsurface(scene, sphere, colorarray, transparency = transparency)
-    Sphere(q, radius, segments, color, observable)
+    Sphere(q, radius, segments, colorarray, observable)
 end
 
 
@@ -53,4 +53,14 @@ function update(sphere::Sphere, q::Biquaternion)
     sphere.q = q
     value = constructsphere(sphere.q, sphere.radius, segments = sphere.segments)
     updatesurface(value, sphere.observable)
+end
+
+
+"""
+    update(sphere, color)
+
+Update a Sphere by changing its observable with the given `sphere` and `color`.
+"""
+function update(sphere::Sphere, color::AbstractPlotting.RGBAf0)
+    sphere.color[] = fill(color, sphere.segments, sphere.segments)
 end

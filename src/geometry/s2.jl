@@ -70,8 +70,8 @@ struct Geographic <: S²
     θ::Float64
     Geographic(r::Real, ϕ::Real, θ::Real) = begin
         @assert(r ≥ 0, "r must be non-negative: $r")
-        @assert(-π ≤ ϕ ≤ π, "ϕ must be in [-π, π]: $ϕ")
-        @assert(-π/2 ≤ θ ≤ π/2, "θ must be in [-π/2, π/2]: $θ")
+        #@assert(-π ≤ ϕ ≤ π, "ϕ must be in [-π, π]: $ϕ")
+        #@assert(-π/2 ≤ θ ≤ π/2, "θ must be in [-π/2, π/2]: $θ")
         new(float(r), float(ϕ), float(θ))
     end
     Geographic(a::Array) = begin
