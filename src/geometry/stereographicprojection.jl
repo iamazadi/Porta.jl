@@ -16,3 +16,4 @@ compressedλmap(q::Quaternion) = begin
     normalize(p) * tanh(magnitude)
 end
 λmap(s::S³) = λmap(Quaternion(s))
+compressedλmap(s::S³) = λmap(Quaternion(s))
