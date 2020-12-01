@@ -27,3 +27,6 @@ Manifest.toml
 test/data/
 data/natural_earth_vector/temp1-nodes.csv
 data/natural_earth_vector/temp2-attributes.csv
+
+# interaction videos
+/gallery/interactions
