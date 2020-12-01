@@ -5,6 +5,10 @@ import AbstractPlotting
 
 using Porta
 
+# This model is inspired by exercise 3.12.3 from Mark J.D. Hamilton (2017)
+# The best description at the moment is: the orbit of SU(2)×U(1) acting on the vacuum vector
+# of the Higgs field
+
 
 ×(a::SU2, b::U1) = SU2(b.z .* a.a)
 gaction(A::SU2, u::U1, v::ComplexPlane) = ComplexPlane((A × u).a * vec(v))
