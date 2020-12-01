@@ -1,4 +1,5 @@
 # Quantize the Geometry!
+![Group actions](gallery/groupactions.gif "Group actions")
 ![Planet Hopf](gallery/drorbarnatan2010.gif "Planet Hopf")
 ![the Hopf fibration](gallery/londontsai.gif "The Hopf fibration inspired by London Tsai")
 ![the Hopf flower](gallery/flower.gif "The Hopf flower")
