@@ -131,7 +131,7 @@ function constructwhirl(points::Array{<:S²,1},
     for (i, α) in enumerate(lspace)
         for (j, p) in enumerate(points)
             array[i, j] = compressedλmap(rotate(S¹action(s2tos3map(s2tos2map(p)), U1(α)),
-                                         s3rotation)) * scale
+                                                s3rotation)) * scale
         end
     end
     applyconfig(array, config)
@@ -158,8 +158,8 @@ function constructframe(circle::S¹,
     for (i, θ) in enumerate(lspaceθ)
         for (j, ϕ) in enumerate(lspaceϕ)
             p = Geographic(1, ϕ, θ)
-            array[i, j] = λmap(rotate(S¹action(s2tos3map(s2tos2map(p)), circle),
-                                      s3rotation))
+            array[i, j] = compressedλmap(rotate(S¹action(s2tos3map(s2tos2map(p)), circle),
+                                                s3rotation))
         end
     end
     applyconfig(array, config)
