@@ -50,6 +50,7 @@ end
     include(joinpath(uidir, "triad_tests.jl"))
     include(joinpath(uidir, "whirl_tests.jl"))
     include(joinpath(uidir, "frame_tests.jl"))
+    include(joinpath(uidir, "coloring_tests.jl"))
 end
 
 

@@ -42,6 +42,7 @@ include(joinpath(uidir, "torus.jl"))
 include(joinpath(uidir, "triad.jl"))
 include(joinpath(uidir, "whirl.jl"))
 include(joinpath(uidir, "frame.jl"))
+include(joinpath(uidir, "coloring.jl"))
 
 include(joinpath(datadir, "signal.jl"))
 
