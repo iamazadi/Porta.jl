@@ -7,7 +7,8 @@
 ![600-cell](gallery/600-cell.gif "600-cell")
 ![surfaces](gallery/surfaces.gif "surfaces")
 
-This project helps with Eric Weinstein's the Graph-Wall-Tome (GWT) project. Watch visual models on this [channel][1].
+This project helps with Eric Weinstein's the Graph-Wall-Tome (GWT) project. Watch visual
+models on the YouTube [channel][1].
 
 ## Requirements
 - AbstractPlotting
@@ -34,7 +35,8 @@ Pkg.add("Porta")
 ```
 
 ## Usage
-For client-side code read the tests, and for examples on how to build please check out the models directory. See [Planet Hopf](../master/models/drorbarnatan2010.jl) as an example!
+For client-side code read the tests, and for examples on how to build please check out the
+models directory. See [Planet Hopf](../master/models/drorbarnatan2010.jl) as an example!
 
 ## Status
 - Logic [Doing]
@@ -55,7 +57,6 @@ For client-side code read the tests, and for examples on how to build please che
 - [Planet Hopf][6], Dror Bar-Natan (2010)
 
 [1]: https://www.youtube.com/channel/UCY8FW_kvEfGDj5i5j_rkaqA
-[2]: models/drorbarnatan2010.jl
 [2]: https://cds.cern.ch/record/181783/files/cer-000093203.pdf
 [3]: http://www.math.stonybrook.edu/~tony/scgp/wall-story/wall-story.html
 [4]: https://www.amazon.com/Road-Reality-Complete-Guide-Universe/dp/0679776311
