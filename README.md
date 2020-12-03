@@ -50,7 +50,7 @@ models directory. See [Planet Hopf](../master/models/drorbarnatan2010.jl) as an 
 - Geometric Unity [TODO]
 
 ## References
-- Physics and Geometry, [Edward Witten][2] (1986)
+- Physics and Geometry, [Edward Witten][2] (1987)
 - The iconic [wall][3] of Stony Brook University
 - [The Road to Reality][4], Sir Roger Penrose (2004)
 - A [Portal][5] Special Presentation- Geometric Unity: A First Look
