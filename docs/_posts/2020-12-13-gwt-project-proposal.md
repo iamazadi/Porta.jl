@@ -6,7 +6,7 @@ categories: gwt physics mathematics
 ---
 
 ### Statement Video
-[![statement video](/gallery/porta.jpg)](http://www.youtube.com/watch?v=FekbDYw8GPU)
+[![statement video](https://github.com/iamazadi/Porta.jl/blob/master/gallery/porta.jpg)](http://www.youtube.com/watch?v=FekbDYw8GPU)
 
 ### Description
 
