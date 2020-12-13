@@ -10,10 +10,11 @@ import DataFrames
 using Porta
 
 
-frames = 1800
-resolution = (1920, 1080)
-maxsamples = 180
-segments = 180
+startingframe = 10
+frames = 3600
+resolution = (3840, 2160)
+maxsamples = 360
+segments = 360
 speed = 1
 α = 40 / 180 * pi
 solidtop = U1(pi - 2α)
@@ -23,11 +24,7 @@ ghostbottom = solidtop
 
 
 # Map from S² into its upper hemisphere
-fmap(b::S²) = begin
-    p = Geographic(b)
-    r = sqrt((1 - sin(p.θ)) / 2)
-    Geographic(p.r, r * cos(p.ϕ), r * sin(p.ϕ))
-end
+fmap(b::S²) = b
 
 
 """
@@ -77,7 +74,7 @@ highlighted = ["us", "china", "iran"]
 # The path to the dataset
 path = "data/natural_earth_vector"
 # The scene object that contains other visual objects
-AbstractPlotting.reasonable_resolution() = (800, 800)
+# AbstractPlotting.reasonable_resolution() = (800, 800)
 AbstractPlotting.primary_resolution() = resolution
 scene = AbstractPlotting.Scene(backgroundcolor = :black,
                                show_axis = false,
@@ -142,7 +139,7 @@ framesprite1 = Frame(scene,
                      s3rotation = s3rotation,
                      config = config,
                      segments = segments,
-                     transparency = false)
+                     transparency = true)
 framesprite2 = Frame(scene,
                      ghosttop,
                      σmap,
@@ -151,7 +148,7 @@ framesprite2 = Frame(scene,
                      s3rotation = s3rotation,
                      config = config,
                      segments = segments,
-                     transparency = false)
+                     transparency = true)
 push!(framesprites, framesprite1)
 push!(framesprites, framesprite2)
 
@@ -163,16 +160,30 @@ Update the state of observables with the given frame number `i`.
 """
 function animate(i)
     step = (i - 1) / frames
-    u = ℝ³(0, 0, 1)
-    τ = step * speed * pi
-    q = Quaternion(τ, u)
+    #u = ℝ³(0, 0, 1)
+    #τ = step * speed * pi
+    #q = Quaternion(τ, u)
+    β = step * 2π
+    α = 80 / 180 * pi
+    solidtop = U1(pi - α) * U1(β)
+    solidbottom = U1(-pi) * U1(β)
+    ghosttop = U1(pi) * U1(β)
+    ghostbottom = solidtop
+    #f(b::S²) = Cartesian(rotate(ℝ³(Cartesian(b)), q))
 
-    f(b::S²) = Cartesian(rotate(ℝ³(Cartesian(b)), q))
-
-    for item in [solidwhirls; ghostwhirls; framesprites]
+    for item in solidwhirls
         #update(item, q)
-        update(item, σmap, f)
+        #update(item, σmap, f)
+        update(item, solidtop, solidbottom)
     end
+
+    for item in ghostwhirls
+        #update(item, q)
+        #update(item, σmap, f)
+        update(item, ghosttop, ghostbottom)
+    end
+    update(framesprite1, ghostbottom)
+    update(framesprite2, ghosttop)
 end
 
 
@@ -197,14 +208,15 @@ path = joinpath("gallery", "drorbarnatan2010.gif")
 #    end
 #end
 
-for i in 1:frames
+# ffmpeg -framerate 30 -i drorbarnatan2010_1080_%d.jpeg drorbarnatan2010_1080.mp4
+for i in startingframe:frames
     animate(i) # animate the scene
     filename = "gallery/planethopf/drorbarnatan2010_$(resolution[2])_$i.jpeg"
     FileIO.save(filename,
                 scene;
                 resolution = resolution,
-                pt_per_unit = 100.0,
-                px_per_unit = 100.0)
+                pt_per_unit = 400.0,
+                px_per_unit = 400.0)
     step = (i - 1) / frames
     println("Step: ", 100step)
     sleep(1)
