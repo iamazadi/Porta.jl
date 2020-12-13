@@ -9,8 +9,10 @@ using Porta
 # The best description at the moment is: the orbit of SU(2)×U(1) acting on the vacuum vector
 # of the Higgs field
 
-
-×(a::SU2, b::U1) = SU2(b.z .* a.a)
+τ₁ = SU2([0im -im/2; -im/2 0im])
+τ₂ = SU2([0im -1/2; 1/2 0im])
+τ₃ = SU2([-im/2 0im; 0im im/2])
+×(a::SU2, b::U1) = SU2(ℯ^(im * angle(b)) .* a.a)
 gaction(A::SU2, u::U1, v::ComplexPlane) = ComplexPlane((A × u).a * vec(v))
 
 orbit(α::Float64, v₀::Float64, segments::Int) = begin
@@ -18,9 +20,6 @@ orbit(α::Float64, v₀::Float64, segments::Int) = begin
     colors = Array{ℝ³,2}(undef, segments, segments)
     θlspace = range(-π/2, stop = π/2, length = segments)
     ϕlspace = range(-π, stop = π, length = segments)
-    τ₁ = SU2([0im -im/2; -im/2 0im])
-    τ₂ = SU2([0im -1/2; 1/2 0im])
-    τ₃ = SU2([-im/2 0im; 0im im/2])
     p = ComplexPlane([0im; v₀ + 0im])
     q = Quaternion(p)
     u1 = U1(α)
@@ -43,19 +42,23 @@ orbit(α::Float64, v₀::Float64, segments::Int) = begin
 end
 
 interactive = false
-segments = 60
+segments = 36
 frames = 240
 
 scene3d = AbstractPlotting.Scene(camera = AbstractPlotting.cam3d_cad!)
 
 v₀linspace = AbstractPlotting.LinRange(-1, 1, 100)
 αlinsapce = AbstractPlotting.LinRange(-π, π, 100)
+τ₃linsapce = AbstractPlotting.LinRange(0, 1, 100)
 v₀slider, v₀observable = AbstractPlotting.textslider(v₀linspace, "v₀", raw = true,
                                                      camera = AbstractPlotting.campixel!,
                                                      start = 1)
 αslider, αobservable = AbstractPlotting.textslider(αlinsapce, "α", raw = true,
                                                    camera = AbstractPlotting.campixel!,
                                                    start = 0)
+τ₃slider, τ₃observable = AbstractPlotting.textslider(τ₃linsapce, "τ₃", raw = true,
+                                                     camera = AbstractPlotting.campixel!,
+                                                     start = 0)
 transparency = true
 α = π / 4
 v₀ = 1.0
@@ -64,8 +67,8 @@ r3 = compressedλmap(p)
 config = Biquaternion(r3)
 radius = 0.05
 color = AbstractPlotting.RGBAf0(1.0, 0.2705, 0.0, 0.5)
-sprite = sphere = Sphere(config, scene3d, radius = radius, segments = segments,
-                         color = color, transparency = transparency)
+sprite = Sphere(config, scene3d, radius = radius, segments = segments, color = color,
+                transparency = transparency)
 array, colors = orbit(α, v₀, segments)
 colorarray = Observables.Observable(map(x -> AbstractPlotting.RGBAf0(vec(x)..., 0.9),
                                         colors))
@@ -73,39 +76,32 @@ colorarray = Observables.Observable(map(x -> AbstractPlotting.RGBAf0(vec(x)..., 
 #colorarray = Observables.Observable(fill(color, segments, segments))
 observable = buildsurface(scene3d, array, colorarray, transparency = transparency)
 
-Observables.on(v₀observable) do x
+animate() = begin
     α = Observables.to_value(αobservable)
     v₀ = Observables.to_value(v₀observable)
+    τ₃coefficient = Observables.to_value(τ₃observable)
+    A = (1 - τ₃coefficient) * (√2/2 * τ₁ + √2/2 * τ₂) + τ₃coefficient * τ₃
     array, colors = orbit(α, v₀, segments)
     updatesurface(array, observable)
-    colorarray[] = map(x -> AbstractPlotting.RGBAf0(vec(x)..., 0.9), colors)
+    colorarray[] = map(x -> AbstractPlotting.RGBAf0(vec(x)..., 0.5), colors)
     p = ComplexPlane([0im; v₀ + 0im])
-    r3 = compressedλmap(p)
+    u1 = U1(α)
+    p′ = gaction(A, u1, p)
+    r3 = compressedλmap(p′)
     config = Biquaternion(r3)
     update(sprite, config)
     q = normalize(Quaternion(p))
-    hue = acos(dot(q, Quaternion(0, 0, 0, 1))) / π * 360
+    q′ = normalize(Quaternion(p′))
+    hue = acos(dot(q, q′)) / π * 360
     color = AbstractPlotting.RGBAf0(hsvtorgb([hue; 1.0; 1.0])..., 0.5)
     update(sprite, color)
 end
 
-Observables.on(αobservable) do x
-    α = Observables.to_value(αobservable)
-    v₀ = Observables.to_value(v₀observable)
-    array, colors = orbit(α, v₀, segments)
-    updatesurface(array, observable)
-    colorarray[] = map(x -> AbstractPlotting.RGBAf0(vec(x)..., 0.9), colors)
-    p = ComplexPlane([0im; v₀ + 0im])
-    r3 = compressedλmap(p)
-    config = Biquaternion(r3)
-    update(sprite, config)
-    q = normalize(Quaternion(p))
-    hue = acos(dot(q, Quaternion(0, 0, 0, 1))) / π * 360
-    color = AbstractPlotting.RGBAf0(hsvtorgb([hue; 1.0; 1.0])..., 0.5)
-    update(sprite, color)
-end
+Observables.on(v₀observable) do x animate() end
+Observables.on(αobservable) do x animate() end
+Observables.on(τ₃observable) do x animate() end
 
-final = AbstractPlotting.hbox(scene3d, AbstractPlotting.vbox(αslider, v₀slider),
+final = AbstractPlotting.hbox(scene3d, AbstractPlotting.vbox(v₀slider, αslider, τ₃slider),
                               parent = AbstractPlotting.Scene(resolution = (500, 500)))
 
 n = ℝ³(0, 0, 1)
