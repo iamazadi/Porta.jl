@@ -10,7 +10,7 @@ import DataFrames
 using Porta
 
 
-startingframe = 10
+startingframe = 1
 frames = 3600
 resolution = (3840, 2160)
 maxsamples = 360
@@ -23,7 +23,7 @@ ghosttop = U1(pi)
 ghostbottom = solidtop
 
 
-# Map from S² into its upper hemisphere
+# Map from S² into itself
 fmap(b::S²) = b
 
 
@@ -104,7 +104,7 @@ for country in countries
         points = sample(dataframe, part, maxsamples)
         solidwhirl = Whirl(scene,
                            points,
-                           σmap,
+                           τmap,
                            fmap,
                            top = solidtop,
                            bottom = solidbottom,
@@ -117,7 +117,7 @@ for country in countries
         if countryname in highlighted
             ghostwhirl = Whirl(scene,
                                points,
-                               σmap,
+                               τmap,
                                fmap,
                                top = ghosttop,
                                bottom = ghostbottom,
@@ -130,10 +130,11 @@ for country in countries
         end
     end
 end
+
 framesprites = []
 framesprite1 = Frame(scene,
                      ghostbottom,
-                     σmap,
+                     τmap,
                      fmap,
                      color,
                      s3rotation = s3rotation,
@@ -142,7 +143,7 @@ framesprite1 = Frame(scene,
                      transparency = true)
 framesprite2 = Frame(scene,
                      ghosttop,
-                     σmap,
+                     τmap,
                      fmap,
                      color,
                      s3rotation = s3rotation,
@@ -208,10 +209,10 @@ path = joinpath("gallery", "drorbarnatan2010.gif")
 #    end
 #end
 
-# ffmpeg -framerate 30 -i drorbarnatan2010_1080_%d.jpeg drorbarnatan2010_1080.mp4
+# ffmpeg -framerate 60 -i drorbarnatan2010_2160_%d.jpeg drorbarnatan2010_2160.mp4
 for i in startingframe:frames
     animate(i) # animate the scene
-    filename = "gallery/planethopf/drorbarnatan2010_$(resolution[2])_$i.jpeg"
+    filename = "gallery/planethopf_g_action_tau_section/drorbarnatan2010_$(resolution[2])_$i.jpeg"
     FileIO.save(filename,
                 scene;
                 resolution = resolution,
