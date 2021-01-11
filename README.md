@@ -21,6 +21,7 @@ models on the YouTube [channel][1].
 - Makie
 - Observables
 - WAV
+- LinearAlgebra
 
 
 ## Installation
