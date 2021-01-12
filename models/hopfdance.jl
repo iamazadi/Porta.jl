@@ -23,7 +23,6 @@ exportmode = ["gif", "frames", "video"]
 exportmode = exportmode[1]
 modelname = "hopfdance"
 
-name = "hopfdance"
 audioname = "audio"
 extension = ".wav"
 audiopath = joinpath("data", audioname * extension)
@@ -266,7 +265,7 @@ if exportmode ∈ ["gif", "video"]
         end
     end
 elseif exportmode == "frames"
-    directory = joinpath("gallery", modelname, name)
+    directory = joinpath("gallery", modelname, audioname)
     if !isdir(directory)
         mkdir(directory)
     end
@@ -277,14 +276,14 @@ elseif exportmode == "frames"
         println("Generating frame $i took $elapsed (s).")
 
         start = time()
-        filename = joinpath(directory, "$(name)_$(resolution[2])_$i.jpeg")
-        FileIO.save(filename,
+        filepath = joinpath(directory, "$(audioname)_$(resolution[2])_$i.jpeg")
+        FileIO.save(filepath,
                     scene;
                     resolution = resolution,
                     pt_per_unit = 100.0,
                     px_per_unit = 100.0)
         elapsed = time() - start
-        println("Saving file $filename took $elapsed (s).")
+        println("Saving file $filepath took $elapsed (s).")
 
         step = (i - 1) / frames
         println("Completed step $(100step).\n")
