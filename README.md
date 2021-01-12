@@ -1,7 +1,7 @@
 # Quantize the Geometry!
 ![Group actions](gallery/groupactions.gif "Group actions")
 ![Hopf Dance](gallery/hopfdance.gif "Hopf Dance")
-![Planet Hopf](gallery/drorbarnatan2010.gif "Planet Hopf")
+![Planet Hopf](gallery/planethopf.gif "Planet Hopf")
 ![the Hopf fibration](gallery/londontsai.gif "The Hopf fibration inspired by London Tsai")
 ![the Hopf flower](gallery/flower.gif "The Hopf flower")
 ![24-cell](gallery/24-cell.gif "24-cell")
