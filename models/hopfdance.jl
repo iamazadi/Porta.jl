@@ -7,29 +7,32 @@ import Makie
 using Porta
 
 startframe = 1
-FPS = 30
-resolution = (1920, 1080)
-segments = 60
+FPS = 24
+resolution = (720, 360)
+segments = 36
 speed = 1
-number = 360 * 4
+number = 360
 factor = 0.01
-scale = 2.5
-basemapradius = 0.5
+scale = 1.0
+basemapradius = 1.0
 basemapsegments = segments
-basepointradius = 0.01
+basepointradius = 0.02
 basepointsegments = 10
 basepointtransparency = false
 exportmode = ["gif", "frames", "video"]
-exportmode = exportmde[1]
+exportmode = exportmode[1]
 modelname = "hopfdance"
 
-name = "audio"
+name = "hopfdance"
+audioname = "audio"
 extension = ".wav"
-path = joinpath("data", name * extension)
-signal = Signal(path)
-total_samples = Integer(fps(signal) ÷ FPS) - 2
-indices = convert(Array{Int64}, floor.(range(2, stop=total_samples-1, length=number)))
-frames = chunks(signal, FPS)
+audiopath = joinpath("data", audioname * extension)
+signal = Signal(audiopath)
+chunkspersecond = FPS
+totalsamples = Integer(getframerate(signal) ÷ chunkspersecond) - 2
+indices = convert(Array{Int64},
+                  floor.(range(2, stop = totalsamples-1, length = number)))
+frames = countchunks(signal, chunkspersecond)
 
 # The scene object that contains other visual objects
 AbstractPlotting.reasonable_resolution() = (800, 800)
@@ -39,22 +42,7 @@ scene = AbstractPlotting.Scene(backgroundcolor = :black,
                                resolution = resolution)
 
 
-# Map from S² into its upper hemisphere
 fmap(b::S²) = b
-
-
-hopfmap(b::S²) = begin
-    p = Geographic(b)
-    r, ϕ, θ = vec(p)
-    η = (θ + π / 2) / 2
-    ξ₁ = 4π
-    ξ₂ = 2(ϕ + π)
-    x₁ = cos((ξ₁ + ξ₂) / 2) * sin(η)
-    x₂ = sin((ξ₁ + ξ₂) / 2) * sin(η)
-    x₃ = cos((ξ₂ - ξ₁) / 2) * cos(η)
-    x₄ = sin((ξ₂ - ξ₁) / 2) * cos(η)
-    Quaternion(x₁, x₂, x₃, x₄)
-end
 
 
 """
@@ -88,47 +76,18 @@ function getbutterflycurve(points::Int)
 end
 
 
-"""
-   HSVtoRGB(color)
-
-Convert the given `color` from HSV space to RGB.
-"""
-HSVtoRGB(color) = begin
-    H, S, V = color
-    C = V * S
-    X = C * (1 - Base.abs((H / 60) % 2 - 1))
-    m = V - C
-    if 0 ≤ H < 60
-        R′, G′, B′ = C, X, 0
-    elseif 60 ≤ H < 120
-        R′, G′, B′ = X, C, 0
-    elseif 120 ≤ H < 180
-        R′, G′, B′ = 0, C, X
-    elseif 180 ≤ H < 240
-        R′, G′, B′ = 0, X, C
-    elseif 240 ≤ H < 300
-        R′, G′, B′ = X, 0, C
-    elseif 300 ≤ H < 360
-        R′, G′, B′ = C, 0, X
-    else
-        R′, G′, B′ = rand(3)
-    end
-    R, G, B = R′ + m, G′ + m, B′ + m
-    [R; G; B]
-end
-
-
 quaternionicrgb(p::Quaternion, q::Quaternion, s::Real, v::Real) = begin
     hue = acos(dot(p, q)) / π
-    rgb = HSVtoRGB([hue * 360; s; v])
+    rgb = hsvtorgb([hue * 360; s; v])
 end
 
 
 """
     getpoints(z [, segments])
 
-Get a circle of point in the base space with the given center `z` in the Riemann sphere.
-The optional argument `segments` determines how many points should the circle have.
+Get a circle of point in the base space with the given center `z` in the Riemann
+sphere. The optional argument `segments` determines how many points should the
+circle have.
 """
 function getpoints(z::S²; segments::Int = 30)
     g = Geographic(z)
@@ -143,7 +102,7 @@ function getpoints(z::S²; segments::Int = 30)
 end
 
 
-basemapconfig = Biquaternion(ℝ³(0, -4, 0))
+basemapconfig = Biquaternion(ℝ³(0, -1.25, 0))
 basemapcolor = AbstractPlotting.RGBAf0(0.25, 0.25, 0.25, 0.25)
 basemaptransparency = true
 basemap = Sphere(basemapconfig,
@@ -160,7 +119,7 @@ basepoints = Array{Sphere,1}(undef, number)
 for i in 1:number
     config = Biquaternion(ℝ³(Cartesian(curvepoints[i])) * basemapradius)
     hue = (i - 1) / number * 360
-    rgb = HSVtoRGB([hue, 1, 1])
+    rgb = hsvtorgb([hue, 1, 1])
     solidcolors[i] = AbstractPlotting.RGBAf0(rgb..., 0.9)
     ghostcolors[i] = AbstractPlotting.RGBAf0(rgb..., 0.1)
     transparency = false
@@ -173,7 +132,7 @@ for i in 1:number
     basepoints[i] = sphere
 end
 
-bundleconfig = Biquaternion(ℝ³(0, 0, 0))
+bundleconfig = Biquaternion(ℝ³(0, 1.25, 0))
 s3rotation = Quaternion(1, 0, 0, 0)
 solidwhirls = Array{Whirl,1}(undef, number)
 ghostwhirls = Array{Whirl,1}(undef, number)
@@ -231,7 +190,8 @@ f(z, a, b, c, d) = (a * z + b) / (c * z + d)
 Update the state of observables with the given frame number `i`.
 """
 function animate(i::Int)
-    frequencies = getchunk(signal, i, FPS)[indices]
+    frequencies = getdata(getchunk(signal, i,
+                                   chunkspersecond = chunkspersecond))[indices]
     step = (i - 1) / frames
     τ = step * speed * 2pi
     u = ℝ³(1, 0, 0)
@@ -286,7 +246,7 @@ end
 
 
 n = ℝ³(0, 0, 1)
-v = ℝ³(-1, 0, 1) * 5
+v = ℝ³(-1, 0, 1) * 2.5
 # update eye position
 # scene.camera.eyeposition.val
 upvector = GeometryBasics.Vec3f0(vec(n)...)
@@ -295,11 +255,14 @@ lookat = GeometryBasics.Vec3f0(0, 0, 0)
 Makie.update_cam!(scene, eyeposition, lookat, upvector)
 scene.center = false # prevent scene from recentering on display
 if exportmode ∈ ["gif", "video"]
-    oitputextension = exportmode == "gif" ? "gif" : "mkv"
-    Makie.record(scene, "$modelname.$outputextension", framerate = FPS) do io
+    outputextension = exportmode == "gif" ? "gif" : "mkv"
+    Makie.record(scene, "gallery/$modelname.$outputextension",
+                 framerate = FPS) do io
         for i in startframe:frames
             animate(i) # animate the scene
             Makie.recordframe!(io) # record a new frame
+            step = (i - 1) / frames
+            println("Completed step $(100step).\n")
         end
     end
 elseif exportmode == "frames"
