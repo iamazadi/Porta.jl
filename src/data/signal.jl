@@ -1,146 +1,201 @@
 import WAV
 
 export Signal
-export data
-export fps
-export seconds
-export chunks
-export chunk
-export dft
-export fft
+export getdata
+export getframerate
+export analyse
+export synthesize
+export performdft
+export performfft
+export countseconds
+export countchunks
 export getchunk
+export getfftchunk
 
 
 """
-analyse(signal)
+    Represents an audio signal.
 
-Converts a signal from the time domain to the frequency domain
-with the given signal.
+fields: data and framerate.
 """
-function analyse(signal)
-    N = size(signal, 1)
+struct Signal
+    data::Array{Complex,1}
+    framerate::Float64
+end
+
+
+"""
+    Signal(filepath [, channel])
+
+Read a wave file and instantiate a Signal with the given `filepath` and
+`channel`. Stereo audio files should contain 2 channels.
+"""
+Signal(filepath::String; channel::Int = 1) = begin
+    data, framerate = WAV.wavread(filepath)
+    Signal(Complex.(data[:, channel]), framerate)
+end
+
+
+getdata(signal::Signal) = signal.data
+getframerate(signal::Signal) = signal.framerate
+
+
+"""
+    countseconds(signal)
+
+Return the period of an audio signal in seconds with the given `signal`.
+"""
+function countseconds(signal::Signal)
+    Int(length(getdata(signal)) ÷ getframerate(signal))
+end
+
+
+"""
+    countchunks(signal, chunkspersecond)
+
+Return the number of data chunks that an audio signal contains with the given
+`signal` and chunks per second `chunkspersecond`.
+"""
+function countchunks(signal::Signal, chunkspersecond::Int)
+    countseconds(signal) * chunkspersecond
+end
+
+
+"""
+    analyse(signal)
+
+Convert an audio signal from time domain to frequency domain with the given
+`signal`.
+"""
+function analyse(signal::Signal)
+    data = getdata(signal)
+    framerate = getframerate(signal)
+    N = length(data)
     f(ω) = begin
         scale = 1 / sqrt(N)
         estimate = 0
         for t = 0:N-1
-            estimate += signal[t+1] * exp(-im * 2π * ω / N * t)
+            estimate += data[t+1] * exp(-im * 2π * ω / N * t)
         end
         scale * estimate
     end
-    Ω = Array{Complex}(undef, N)
+    Ω = Array{Complex,1}(undef, N)
     for ω = 0:N-1
         Ω[ω+1] = f(ω)
     end
-    Ω
+    Signal(Ω, framerate)
 end
 
 
 """
-synthesize(signal)
+    synthesize(signal)
 
-Converts a signal from the frequency domain to the time domain
-with the given signal.
+Convert an audio signal from frequency domain to time domain with the given
+`signal`.
 """
-function synthesize(signal)
-    N = size(signal, 1)
+function synthesize(signal::Signal)
+    data = getdata(signal)
+    framerate = getframerate(signal)
+    N = length(data)
     f(t) = begin
         scale = 1 / sqrt(N)
         estimate = 0
         for ω = 0:N-1
-            estimate += signal[ω+1] * exp(im * 2π * ω / N * t)
+            estimate += data[ω+1] * exp(im * 2π * ω / N * t)
         end
         scale * estimate
     end
-    T = Array{Complex}(undef, N)
+    T = Array{Complex,1}(undef, N)
     for t = 0:N-1
-        D[t+1] = f(t)
+        T[t+1] = f(t)
     end
-    T
+    Signal(T, framerate)
 end
-
-
-struct Signal
-    data::Array{Float64}
-    fps::Float64
-end
-
-
-Signal(s::String; c=1) = begin
-    y, fps = WAV.wavread(s)
-    Signal(y[:, c], fps)
-end
-
-
-data(s::Signal) = s.data
-
-fps(s::Signal) = s.fps
-
-seconds(s::Signal) = Int(size(data(s), 1) ÷ fps(s))
-
-chunks(s::Signal, cps::Int) = seconds(s) * cps
 
 
 """
-chunk(s::Signal, i::Int, cps::Int [, offset])
+    performdft(signal)
 
-Gets a chunk of a signal such that there are a certain number of chunks per
-second with the given signal, the chunk ordinal number and the number of chunks
-per second. The optional arguments offset determines the window offset from the center in
-the time dimension, and it's used for collecting multiple chunks to then average over.
+Perform a Discrete Fourier Transform (DFT) on an audio signal with the given
+`signal`.
 """
-function chunk(s::Signal, i::Int, cps::Int; offset::Int = 0)
-    samples_per_chunk = Int(fps(s) ÷ cps)
-    window = 2^(Int(ceil(log2(samples_per_chunk))))
-    origin = (i - 1) * samples_per_chunk + 1
-    start = origin + offset
-    finish = origin + window + offset
-    total_samples = size(data(s), 1)
-    if finish < total_samples
-        return Signal(data(s)[start:finish-1], fps(s))
-    else
-        return Signal(data(s)[total_samples-window+1:end], fps(s))
-    end
+function performdft(signal::Signal)
+    analyse(signal)
 end
 
 
-function fft(s::Signal)
-    x = data(s)
-    N = size(x, 1)
+"""
+    performfft(signal)
+
+Perform Fast Fourier Transform (FFT) on an audio signal with the given `signal`.
+"""
+function performfft(signal::Signal)
+    data = getdata(signal)
+    framerate = getframerate(signal)
+    N = length(data)
     if N % 2 > 0
-        println("Must be a power of 2.")
-        return analyse(x)
+        println("The length of a data chunk must be a power of 2.")
+        return analyse(signal)
     elseif N ≤ 2
-        return analyse(x)
+        return analyse(signal)
     else
-        e = fft(Signal(view(x, 2:2:N), fps(s)))
-        o = fft(Signal(view(x, 1:2:N-1), fps(s)))
+        e = getdata(performfft(Signal(view(data, 2:2:N), framerate)))
+        o = getdata(performfft(Signal(view(data, 1:2:N-1), framerate)))
         r = convert(Array{Int64}, floor.(range(0, stop=N-1, length=N)))
         v = exp.(-im .* 2pi .* r ./ N)
         i = Integer(N ÷ 2)
-        return [e .+ v[1:i] .* o; e .+ v[i+1:end] .* o]
+        return Signal([e .+ v[1:i] .* o; e .+ v[i+1:end] .* o], framerate)
     end
 end
 
 
-# Discrete Fourier transform
-dft(s::Signal) = analyse(data(s))
+"""
+    getchunk(signal, i, [, chunkspersecond [, offset]])
+
+Return a chunk of an audio signal with the given `signal`, the chunk ordinal
+number `i` and the number of chunks per second `chunkspersecond`. The optional
+arguments `offset` shifts the sampling window in the time dimension. Supply
+`offset` for collecting multiple consecutive chunks and then taking the average.
+"""
+function getchunk(signal::Signal, i::Int; chunkspersecond::Int = 30,
+                  offset::Int = 0)
+    data = getdata(signal)
+    framerate = getframerate(signal)
+    samplesperchunk = Int(framerate ÷ chunkspersecond)
+    window = 2^(Int(ceil(log2(samplesperchunk))))
+    origin = (i - 1) * samplesperchunk + 1
+    start = origin + offset
+    finish = origin + window + offset
+    totalsamples = size(data, 1)
+    if finish ≤ totalsamples
+        return Signal(data[start:finish-1], framerate)
+    else
+        return Signal(data[total_samples-window+1:end], framerate)
+    end
+end
 
 
 """
-    getchunk(signal, i, FPS)
+    getfftchunk(signal, i, chunkspersecond , samples)
 
-Get the `i`th chunck of the given `signal`, then transform it using FFT anf return it.
+Get a chunck of an audio signal under FFT by averaging over a number of
+consecutive samples such that two consecutive samples differ only in a single
+frame in the time dimension, with the given `signal`, the chunk cardinal number
+`i`, the number of chunks per second `chunkspersecond` and the number of
+consecutive `samples` to use before taking the average.
 """
-function getchunk(signal::Signal, i::Int, FPS::Int)
+function getfftchunk(signal::Signal, i::Int, chunkspersecond::Int, samples::Int)
+    framerate = getframerate(signal)
     array = []
-    N = 5
-    for j in 1:N
-        sₜ = data(chunk(signal, i, FPS, offset = j))
-        push!(array, fft(Signal(sₜ, fps(signal))))
+    for j in 1:samples
+        sₜ = getdata(getchunk(signal, i, chunkspersecond = chunkspersecond,
+                              offset = j))
+        push!(array, getdata(performfft(Signal(sₜ, framerate))))
     end
     sum = array[1]
-    for j in 2:N
+    for j in 2:samples
         sum = sum .+ array[j]
     end
-    average = sum ./ N
+    average = sum ./ samples
+    Signal(average, framerate)
 end
