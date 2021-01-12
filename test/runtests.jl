@@ -10,6 +10,7 @@ linearalgebradir = "linearalgebra_tests"
 geometrydir = "geometry_tests"
 bundlesdir = "bundles_tests"
 uidir = "ui_tests"
+datadir = "data_tests"
 
 
 start = time()
@@ -53,6 +54,10 @@ end
     include(joinpath(uidir, "coloring_tests.jl"))
 end
 
+
+@time @testset "The Data Tests" begin
+    include(joinpath(datadir, "signal_tests.jl"))
+end
 
 elapsed = time() - start
 println("Testing took", elapsed)

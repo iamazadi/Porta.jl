@@ -46,5 +46,4 @@ include(joinpath(uidir, "coloring.jl"))
 
 include(joinpath(datadir, "signal.jl"))
 
-
 end # module
