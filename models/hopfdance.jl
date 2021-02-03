@@ -24,10 +24,12 @@ exportmode = exportmode[1]
 modelname = "hopfdance"
 
 
-# Your Intro by Audionautix is licensed under a Creative Commons Attribution 4.0
-# license. https://creativecommons.org/licenses/by/4.0/
+# Loping Sting by Kevin MacLeod is licensed under a Creative Commons Attribution
+# 4.0 license. https://creativecommons.org/licenses/by/4.0/
 
-# Artist: http://audionautix.com/
+# Source: http://incompetech.com/music/royalty-free/index.html?isrc=USUAN1200014
+
+# Artist: http://incompetech.com/
 
 audioname = "audio"
 extension = ".wav"
