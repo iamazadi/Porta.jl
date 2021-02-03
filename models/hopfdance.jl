@@ -2,35 +2,43 @@ import FileIO
 import GeometryBasics
 import Observables
 import AbstractPlotting
-import Makie
+import GLMakie
 
 using Porta
 
-startframe = 1
-FPS = 24
-resolution = (720, 360)
-segments = 36
+startframe = 14210
+FPS = 60
+resolution = (3840, 2160)
+segments = 90
 speed = 1
-number = 360
-factor = 0.01
+#number = 360 * 5
+factor = 0.0025
 scale = 1.0
-basemapradius = 1.0
+basemapradius = 1.025
 basemapsegments = segments
-basepointradius = 0.02
+basepointradius = 0.025
 basepointsegments = 10
-basepointtransparency = false
+basepointtransparency = true
 exportmode = ["gif", "frames", "video"]
-exportmode = exportmode[1]
+exportmode = exportmode[2]
 modelname = "hopfdance"
+
+
+# Your Intro by Audionautix is licensed under a Creative Commons Attribution 4.0
+# license. https://creativecommons.org/licenses/by/4.0/
+
+# Artist: http://audionautix.com/
 
 audioname = "audio"
 extension = ".wav"
 audiopath = joinpath("data", audioname * extension)
 signal = Signal(audiopath)
 chunkspersecond = FPS
-totalsamples = Integer(getframerate(signal) ÷ chunkspersecond) - 2
-indices = convert(Array{Int64},
-                  floor.(range(2, stop = totalsamples-1, length = number)))
+#totalsamples = Integer(getframerate(signal) ÷ chunkspersecond) - 1
+totalsamples = length(getdata(getfftchunk(signal,1, chunkspersecond, 3)))
+number = totalsamples
+#indices = convert(Array{Int64},
+#                  floor.(range(2, stop = totalsamples-1, length = number)))
 frames = countchunks(signal, chunkspersecond)
 
 # The scene object that contains other visual objects
@@ -101,8 +109,9 @@ function getpoints(z::S²; segments::Int = 30)
 end
 
 
-basemapconfig = Biquaternion(ℝ³(0, -1.25, 0))
-basemapcolor = AbstractPlotting.RGBAf0(0.25, 0.25, 0.25, 0.25)
+#basemapconfig = Biquaternion(ℝ³(0, -1.25, 0))
+basemapconfig = Biquaternion(ℝ³(0, 0, 0))
+basemapcolor = AbstractPlotting.RGBAf0(0.75, 0.75, 0.75, 0.25)
 basemaptransparency = true
 basemap = Sphere(basemapconfig,
                  scene,
@@ -121,7 +130,6 @@ for i in 1:number
     rgb = hsvtorgb([hue, 1, 1])
     solidcolors[i] = AbstractPlotting.RGBAf0(rgb..., 0.9)
     ghostcolors[i] = AbstractPlotting.RGBAf0(rgb..., 0.1)
-    transparency = false
     sphere = Sphere(basemapconfig * config,
                     scene,
                     radius = basepointradius,
@@ -131,7 +139,8 @@ for i in 1:number
     basepoints[i] = sphere
 end
 
-bundleconfig = Biquaternion(ℝ³(0, 1.25, 0))
+#bundleconfig = Biquaternion(ℝ³(0, 1.25, 0))
+bundleconfig = Biquaternion(ℝ³(0, 0, 0))
 s3rotation = Quaternion(1, 0, 0, 0)
 solidwhirls = Array{Whirl,1}(undef, number)
 ghostwhirls = Array{Whirl,1}(undef, number)
@@ -173,7 +182,9 @@ for i in 1:number
     ghostwhirls[i] = ghostwhirl
 end
 
-a, b, c, d = [ComplexLine((float(i) + im)^i) for i in (-3, -2, 2, 3)]
+#a, b, c, d = [ComplexLine((float(i) + im)^i) for i in (-5, -2, 3, 7)]
+a, b = ComplexLine(1 + im), ComplexLine(0.5 - 1.5 * im)
+c, d = ComplexLine(-2 + 3 * im), ComplexLine(-1 + 0 * im)
 basespacepoints = Array{ComplexLine,1}(undef, number)
 phases = Array{U1,2}(undef, number, 4)
 s3rotations = Array{Quaternion,1}(undef, number)
@@ -189,31 +200,41 @@ f(z, a, b, c, d) = (a * z + b) / (c * z + d)
 Update the state of observables with the given frame number `i`.
 """
 function animate(i::Int)
-    frequencies = getdata(getchunk(signal, i,
-                                   chunkspersecond = chunkspersecond))[indices]
+    frequencies = getdata(getfftchunk(signal, i, chunkspersecond, 3))#[indices]
     step = (i - 1) / frames
-    τ = step * speed * 2pi
-    u = ℝ³(1, 0, 0)
+    τ = -step * speed * 4pi
+    u = ℝ³(0, 1, 0)
     q = Quaternion(τ, u)
     a′, b′, c′, d′ = [ComplexLine(Cartesian(rotate(ℝ³(Cartesian(point)), q))).z
                       for point in (a, b, c, d)]
     point = getpointonpath(step)
-    point = ℝ³(Cartesian(ComplexLine(f(point.z, a′, b′, c′, d′))))
+    #println("ComplexLine(f(point.z, a′, b′, c′, d′)) = ", ComplexLine(f(point.z, a′, b′, c′, d′)))
+    point = ComplexLine(f(point.z, a′, b′, c′, d′))
+    if isnan(vec(point)[1]) || isnan(vec(point)[2])
+        point = Geographic(1, 0, π/2)
+    end
+    point = Cartesian(point)
     for (index, item) in enumerate(frequencies)
         z = item
         z = ComplexLine(f(π * z, a′, b′, c′, d′))
         basespacepoints[index] = z
-        basespacecircles[index] = getpoints(z, segments = basepointsegments)
-        realpart = abs(real(item))
-        imaginarypart = abs(imag(item))
+        #println("z = ", z)
+        z′ = z
+        if isnan(vec(z)[1]) || isnan(vec(z)[2])
+            z′ = Geographic(1, 0, π/2)
+        end
+        basespacecircles[index] = getpoints(z′, segments = basepointsegments)
+        realpart = real(item)
+        imaginarypart = imag(item)
         magnitude = abs(item)
-        α = 2π - (magnitude * 2π - π)
+        α = magnitude * 2π
         s = U1(α)
-        g = Quaternion(α, point)
-        h = S¹action(τmap(z), s) * g
-        rgb = quaternionicrgb(h, q, 1.0, 1.0)
-        solidcolors[index] = AbstractPlotting.RGBAf0(rgb..., realpart)
-        ghostcolors[index] = AbstractPlotting.RGBAf0(rgb..., imaginarypart)
+        g = Quaternion(α, ℝ³(Cartesian(z)))
+        h = S¹action(τmap(point), s) * g
+        rgb = quaternionicrgb(h, q, 0.1 * abs(realpart) + 0.1 * rand() + 0.8,
+                              0.1 * abs(imaginarypart) + 0.1 * rand() + 0.8)
+        solidcolors[index] = AbstractPlotting.RGBAf0(rgb..., abs(realpart))
+        ghostcolors[index] = AbstractPlotting.RGBAf0(rgb..., abs(imaginarypart))
         solidtop = U1(pi - 2α)
         ghostbottom = solidtop
         phases[index, 1] = solidtop
@@ -232,43 +253,67 @@ function animate(i::Int)
     for (index, item) in enumerate(solidwhirls)
         solidtop = phases[index, 1]
         solidbottom = phases[index, 2]
-        update(item, basespacecircles[index], s3rotations[index], solidtop, solidbottom)
+        update(item, basespacecircles[index], s3rotations[index], solidtop,
+               solidbottom)
         update(item, solidcolors[index])
     end
     for (index, item) in enumerate(ghostwhirls)
         ghosttop = phases[index, 3]
         ghostbottom = phases[index, 4]
-        update(item, basespacecircles[index], s3rotations[index], ghosttop, ghostbottom)
+        update(item, basespacecircles[index], s3rotations[index], ghosttop,
+               ghostbottom)
         update(item, ghostcolors[index])
     end
+
+    z = Complex(0 + 0im)
+    z = ComplexLine(f(π * z, a′, b′, c′, d′))
+    z = ℝ³(Cartesian(z))
+
+    z₀ = Complex(0 + im)
+    z₀ = ComplexLine(f(π * z₀, a′, b′, c′, d′))
+    z₀ = ℝ³(Cartesian(z₀))
+
+    n = normalize(z₀ - z)
+    #v = ℝ³(-1, 0, 1) * 2.5
+    v = ℝ³(-1, 0, 1) * 2.1
+    distance = norm(v)
+    v = normalize(z) * distance
+    # update eye position
+    # scene.camera.eyeposition.val
+    upvector = GeometryBasics.Vec3f0(vec(n)...)
+    eyeposition = GeometryBasics.Vec3f0(vec(v)...)
+    lookat = GeometryBasics.Vec3f0(0, 0, 0)
+    AbstractPlotting.update_cam!(scene, eyeposition, lookat, upvector)
+    scene.center = false # prevent scene from recentering on display
 end
 
 
 n = ℝ³(0, 0, 1)
-v = ℝ³(-1, 0, 1) * 2.5
+#v = ℝ³(-1, 0, 1) * 2.5
+v = ℝ³(-1, 0, 1) * 2.1
 # update eye position
 # scene.camera.eyeposition.val
 upvector = GeometryBasics.Vec3f0(vec(n)...)
 eyeposition = GeometryBasics.Vec3f0(vec(v)...)
 lookat = GeometryBasics.Vec3f0(0, 0, 0)
-Makie.update_cam!(scene, eyeposition, lookat, upvector)
+AbstractPlotting.update_cam!(scene, eyeposition, lookat, upvector)
 scene.center = false # prevent scene from recentering on display
 if exportmode ∈ ["gif", "video"]
     outputextension = exportmode == "gif" ? "gif" : "mkv"
-    Makie.record(scene, "gallery/$modelname.$outputextension",
-                 framerate = FPS) do io
+    AbstractPlotting.record(scene, "gallery/$modelname.$outputextension",
+                            framerate = FPS) do io
         for i in startframe:frames
             animate(i) # animate the scene
-            Makie.recordframe!(io) # record a new frame
+            AbstractPlotting.recordframe!(io) # record a new frame
             step = (i - 1) / frames
             println("Completed step $(100step).\n")
         end
     end
 elseif exportmode == "frames"
+    directory = joinpath("gallery", modelname)
+    !isdir(directory) && mkdir(directory)
     directory = joinpath("gallery", modelname, audioname)
-    if !isdir(directory)
-        mkdir(directory)
-    end
+    !isdir(directory) && mkdir(directory)
     for i in startframe:frames
         start = time()
         animate(i) # animate the scene
@@ -276,17 +321,46 @@ elseif exportmode == "frames"
         println("Generating frame $i took $elapsed (s).")
 
         start = time()
-        filepath = joinpath(directory, "$(audioname)_$(resolution[2])_$i.jpeg")
+
+        paddingnumber = length(digits(frames))
+        imageid = lpad(i, paddingnumber, "0")
+        imagename = "$(audioname)_$(resolution[2])p_$(FPS)fps_$imageid.jpeg"
+        filepath = joinpath(directory, imagename)
         FileIO.save(filepath,
                     scene;
                     resolution = resolution,
-                    pt_per_unit = 100.0,
-                    px_per_unit = 100.0)
+                    pt_per_unit = 400.0,
+                    px_per_unit = 400.0)
         elapsed = time() - start
         println("Saving file $filepath took $elapsed (s).")
 
         step = (i - 1) / frames
         println("Completed step $(100step).\n")
         sleep(1)
+
+        stitch() = begin
+            part = i ÷ (frames / 10)
+            exportdir = joinpath(directory, "export")
+            !isdir(exportdir) && mkdir(exportdir)
+            #WxH = "$(resolution[1])x$(resolution[2])"
+            WxH = "1920x1080"
+            commonpart = "$(audioname)_$(resolution[2])p_$(FPS)fps"
+            inputname = "$(commonpart)_%0$(paddingnumber)d.jpeg"
+            inputpath = joinpath(directory, inputname)
+            outputname = "$(commonpart)_$(part).mp4"
+            outputpath = joinpath(exportdir, outputname)
+            outputwithaudioname = "$(commonpart)_withaudio_$(part).mp4"
+            outputwithaudiopath = joinpath(exportdir, outputwithaudioname)
+            command1 = `ffmpeg -y -f image2 -framerate $FPS -i $inputpath -s $WxH -pix_fmt yuvj420p $outputpath`
+            run(command1)
+            sleep(1)
+            command2 = `ffmpeg -y -i $outputpath -i $audiopath -c:v copy -map 0:v:0 -map 1:a:0 -c:a aac -b:a 192k -shortest $(outputwithaudiopath)`
+            run(command2)
+        end
+
+        if isapprox(i % (frames / 10), 0)
+            stitch()
+            sleep(1)
+        end
     end
 end
