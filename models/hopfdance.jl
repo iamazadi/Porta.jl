@@ -6,10 +6,10 @@ import GLMakie
 
 using Porta
 
-startframe = 14210
-FPS = 60
-resolution = (3840, 2160)
-segments = 90
+startframe = 1
+FPS = 24
+resolution = (360, 360)
+segments = 60
 speed = 1
 #number = 360 * 5
 factor = 0.0025
@@ -20,7 +20,7 @@ basepointradius = 0.025
 basepointsegments = 10
 basepointtransparency = true
 exportmode = ["gif", "frames", "video"]
-exportmode = exportmode[2]
+exportmode = exportmode[1]
 modelname = "hopfdance"
 
 
