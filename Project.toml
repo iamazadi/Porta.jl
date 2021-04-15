@@ -16,6 +16,7 @@ Observables = "510215fc-4207-5dde-b226-833fc4488ee2"
 WAV = "8149f6b0-98f6-5db9-b78f-408fbbb8ef88"
 
 [compat]
+AbstractPlotting = "0.17"
 CSV = "0.7, 0.8"
 DataFrames = "0.21, 0.22"
 FileIO = "1.4"
