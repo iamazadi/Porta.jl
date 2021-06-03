@@ -17,7 +17,7 @@ WAV = "8149f6b0-98f6-5db9-b78f-408fbbb8ef88"
 
 [compat]
 CSV = "0.7, 0.8"
-DataFrames = "0.21, 0.22"
+DataFrames = "0.21, 0.22, 1"
 FileIO = "1.4"
 GeometryBasics = "0.3"
 ImageMagick = "1.1"
