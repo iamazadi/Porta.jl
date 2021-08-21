@@ -9,13 +9,13 @@ signal = Signal(filepath, channel = channel)
 ## get properties
 
 framerate = getframerate(signal)
-@test isapprox(framerate, 16000)
+@test isapprox(framerate, 44100)
 data = getdata(signal)
 @test typeof(data) <: Array{Complex,1}
 
 ## get chunks
 seconds = countseconds(signal)
-@test seconds == 3
+@test seconds == 4
 
 chunkspersecond = rand(24:30)
 chunksnumber = countchunks(signal, chunkspersecond)
