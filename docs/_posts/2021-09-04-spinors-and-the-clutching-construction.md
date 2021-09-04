@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Welcome to Jekyll!"
+title:  "Spinors and the Clutching Construction"
 ---
 
 # Spinors and the Clutching Construction
