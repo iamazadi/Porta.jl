@@ -7,7 +7,7 @@ title:  "Spinors and the Clutching Construction"
 
 # What's the connection between spinors and the clutching construction?
 
-This post serves as both the transcription of a math video under the same title and also as an update on the [Graph-Wall-Tome](https://theportal.wiki/wiki/Graph,_Wall,_Tome) project.
+This post serves as both the transcription of a math video under the same title and also as an update to the [Graph-Wall-Tome](https://theportal.wiki/wiki/Graph,_Wall,_Tome) project.
 [![cover](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/cover.JPG)](https://youtu.be/5R1o2WE_iEQ)
 
 ### Why should we care?
