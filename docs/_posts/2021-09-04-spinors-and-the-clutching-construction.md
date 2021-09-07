@@ -53,7 +53,7 @@ Sir Roger Penrose is the prominent figure at the nexus of physics and geometry. 
 ### Hopf fibration
 In the standard cosmological models (FLRW,) the universe can be thought of as a 3-surface at each point of cosmological instant of time. Now, if we further assume that the curvature is positive, and we keep out the cosmological constant, then we're going to have a 3-surface as a 3-sphere at each point of time, by keeping time constant (see **a** in the picture below.) The way that we can visualize a 3-sphere using our visual cortex is to use the Hopf fibration. And also the stereographic projection to bring it down to the Euclidean 3-space that we're familiar with. The picture is inspired by Dror Bar-Natan from the University of Toronto. In the base space, in order to see where you are we've used the geographical map. And at each point of the base space there's a circle. And it's obvious that the circles are linked and this doesn't lead to a trivial bundle. As a 3-surface embedded in a 4-dimensional Euclidean space it has a hole with an interesting topology.
 
-![flrw](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/flrw.JPG "flrw")
+![flrw](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/flrw.GIF "flrw")
 [![planethopf](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/planethopf.jpg)](https://youtu.be/IOF8QzMGhQE)
 
 ### Paul Dirac
