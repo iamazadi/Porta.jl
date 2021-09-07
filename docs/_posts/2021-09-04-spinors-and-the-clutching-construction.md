@@ -23,7 +23,7 @@ If one wants to summarize our knowledge of physics in the briefest possible term
 ### Wall
 We've taken the liberty to undertake the iconic Wall at the Stony Brook University, and do some graffiti. By adding the cosmological constant to the Einstein equation at the center of the Wall. And closely related to this topic is the Dirac equation which remains the same as before.
 
-![wall](docs/_posts_images/cambridge.JPG "wall")
+![wall](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/cambridge.JPG "wall")
 
 ### Tome
 In this exposition, the main reference would be the Tome. The book by Sir Roger Penrose, called: The Roead to Reality. It has 34 chapters, but there are about a quarter of them most related to this. Including:
@@ -37,13 +37,13 @@ In this exposition, the main reference would be the Tome. The book by Sir Roger 
 - chapter 18, Minkowskian geometry
 - chapter 27, section 11, Cosmology
 
-![tome](../_posts_images/tome.PNG "tome")
+![tome](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/tome.PNG "tome")
 
 ### Sir Roger Penrose
 Sir Roger Penrose is the prominent figure at the nexus of physics and geometry. He was born in 1931. He did his undergraduate studies in University College London. Then, he went to Cambridge University to do his graduate studies. He got his P.h.D. in algebraic geometry. But a certain question in cosmology regarding the expnsion of the universe motivated him to work on physics problems.
 
-![ucl](../_posts_images/ucl.JPG "ucl")
-![cambridge](../_posts_images/cambridge.JPG "cambridge")
+![ucl](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/ucl.JPG "ucl")
+![cambridge](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/cambridge.JPG "cambridge")
 
 ### Hopf fibration
 In the standard cosmological models (FLRW,) the universe can be thought of as a 3-surface at each point of cosmological instant of time. Now, if we further assume that the curvature is positive, and we keep out the cosmological constant, then we're going to have a 3-surface as a 3-sphere at each point of time, by keeping time constant. The way that we can visualize a 3-sphere using our visual cortex is to use the Hopf fibration. And also the stereographic projection to bring it down to the Euclidean 3-space that we're familiar with. The picture is inspired by Dror Bar-Natan from the University of Toronto. In the base space, in order to see where you are we've used the geographical map. And at each point of the base space there's a circle. And it's obvious that the circles are linked and this doesn't lead to a trivial bundle. As a 3-surface embedded in a 4-dimensional Euclidean space it has a hole with an interesting topology.
@@ -51,11 +51,11 @@ In the standard cosmological models (FLRW,) the universe can be thought of as a 
 ### Paul Dirac
 Penrose attended one of Dirac's courses on spinors and quantum field theory. It was absolutely necessary for him to understand 2-component spinors. The way that Sir Roger Penrose explains spinors, it's a setting of a pole and a flag. And through 360 degrees of rotation of the pole the flag changes its sign.In order to get to the initial configuration the settings needs to be rotated 720 degrees. These are natural objects that can be found in the real life.
 
-![dirac](../_posts_images/dirac.GIF "dirac")
+![dirac](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/dirac.GIF "dirac")
 
 ### The belt trick
 
-![winedance](../_posts_images/winedance.GIF "winedance")
+![winedance](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/winedance.GIF "winedance")
 
 ### Exterior derivative
 ### Determine the clutching construction
