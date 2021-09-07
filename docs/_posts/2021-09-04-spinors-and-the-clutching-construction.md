@@ -5,9 +5,7 @@ title:  "Spinors and the Clutching Construction"
 
 <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
 
-# Spinors and the Clutching Construction
-
-## What's the connection between spinors and the clutching construction?
+# What's the connection between spinors and the clutching construction?
 
 ### Why should we care?
 Today, we're going to talk about an important mathematical object: spinors. It determines the properties of atoms in the form of electron shells. It's responsible for the stability of matter. Without it, the periodic table wouldn't exist. And also quarks which make up protons and neutrons.
@@ -41,6 +39,8 @@ In this exposition, the main reference would be the Tome. The book by Sir Roger 
 Sir Roger Penrose is the prominent figure at the nexus of physics and geometry. He was born in 1931. He did his undergraduate studies in University College London. Then, he went to Cambridge University to do his graduate studies. He got his P.h.D. in algebraic geometry. But a certain question in cosmology regarding the expnsion of the universe motivated him to work on physics problems.
 
 ### Hopf fibration
+In the standard cosmological models (FLRW,) the universe can be thought of as a 3-surface at each point of cosmological instant of time. Now, if we further assume that the curvature is positive, and we keep out the cosmological constant, then we're going to have a 3-surface as a 3-sphere at each point of time, by keeping time constant. The way that we can visualize a 3-sphere using our visual cortex is to use the Hopf fibration. And also the stereographic projection to bring it down to the Euclidean 3-space that we're familiar with. The picture is inspired by Dror Bar-Natan from the University of Toronto. In the base space, in order to see where you are we've used the geographical map. And at each point of the base space there's a circle. And it's obvious that the circles are linked and this doesn't lead to a trivial bundle. As a 3-surface embedded in a 4-dimensional Euclidean space it has a hole with an interesting topology.
+
 ### Paul Dirac
 ### The belt trick
 ### Exterior derivative
