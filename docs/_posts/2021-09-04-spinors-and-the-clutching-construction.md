@@ -63,7 +63,7 @@ Penrose attended one of Dirac's courses on spinors and quantum field theory. It 
 
 ### The belt trick
 
-![winedance](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/winedance.GIF "winedance")
+[![winedance](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/winedance.GIF)](https://youtu.be/mg93Dm-vYc8)
 
 ### Exterior derivative
 ### Determine the clutching construction
