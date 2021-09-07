@@ -7,6 +7,9 @@ title:  "Spinors and the Clutching Construction"
 
 # What's the connection between spinors and the clutching construction?
 
+This post serves as both the transcription of a math video under the same title and also as an update on the [Graph-Wall-Tome](https://theportal.wiki/wiki/Graph,_Wall,_Tome) project.
+[![cover](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/cover.JPG)](https://youtu.be/5R1o2WE_iEQ)
+
 ### Why should we care?
 Today, we're going to talk about an important mathematical object: spinors. It determines the properties of atoms in the form of electron shells. It's responsible for the stability of matter. Without it, the periodic table wouldn't exist. And also quarks which make up protons and neutrons.
 
@@ -48,7 +51,7 @@ Sir Roger Penrose is the prominent figure at the nexus of physics and geometry. 
 ![cambridge](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/cambridge.JPG "cambridge")
 
 ### Hopf fibration
-In the standard cosmological models (FLRW,) the universe can be thought of as a 3-surface at each point of cosmological instant of time. Now, if we further assume that the curvature is positive, and we keep out the cosmological constant, then we're going to have a 3-surface as a 3-sphere at each point of time, by keeping time constant. The way that we can visualize a 3-sphere using our visual cortex is to use the Hopf fibration. And also the stereographic projection to bring it down to the Euclidean 3-space that we're familiar with. The picture is inspired by Dror Bar-Natan from the University of Toronto. In the base space, in order to see where you are we've used the geographical map. And at each point of the base space there's a circle. And it's obvious that the circles are linked and this doesn't lead to a trivial bundle. As a 3-surface embedded in a 4-dimensional Euclidean space it has a hole with an interesting topology.
+In the standard cosmological models (FLRW,) the universe can be thought of as a 3-surface at each point of cosmological instant of time. Now, if we further assume that the curvature is positive, and we keep out the cosmological constant, then we're going to have a 3-surface as a 3-sphere at each point of time, by keeping time constant (see **a** in the picture below.) The way that we can visualize a 3-sphere using our visual cortex is to use the Hopf fibration. And also the stereographic projection to bring it down to the Euclidean 3-space that we're familiar with. The picture is inspired by Dror Bar-Natan from the University of Toronto. In the base space, in order to see where you are we've used the geographical map. And at each point of the base space there's a circle. And it's obvious that the circles are linked and this doesn't lead to a trivial bundle. As a 3-surface embedded in a 4-dimensional Euclidean space it has a hole with an interesting topology.
 
 ![flrw](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/flrw.JPG "flrw")
 [![planethopf](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/planethopf.jpg)](https://youtu.be/IOF8QzMGhQE)
