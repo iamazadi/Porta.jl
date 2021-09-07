@@ -257,9 +257,6 @@ let
         h - t
     end
 
-    t₁ = @lift($tail[1])
-    t₂ = @lift($tail[2])
-    t₃ = @lift($tail[3])
 
     tails₁ = @lift([$tail[1], $tail[1], $tail[1]])
     tails₂ = @lift([$tail[2], $tail[2], $tail[2]])
@@ -275,9 +272,9 @@ let
     conn_head₂ = @lift([$connectionhead[2]])
     conn_head₃ = @lift([$connectionhead[3]])
 
-    x₁ = @lift(xx .* 0.1 .+ $t₁)
-    y₁ = @lift(yy .* 0.1 .+ $t₂)
-    z₁ = @lift(zz .* 0.1 .+ $t₃)
+    x₁ = @lift(xx .* 0.1 .+ $tail[1])
+    y₁ = @lift(yy .* 0.1 .+ $tail[2])
+    z₁ = @lift(zz .* 0.1 .+ $tail[3])
 
     ambient =  Vec3f0(0.75, 0.75, 0.75)
     cmap = (:dodgerblue, :white) # how to include this into menu options?
@@ -327,5 +324,19 @@ let
         connect!(ang, sl5.value)
         tight_ticklabel_spacing!(cbar)
         display(fig)
+        framerate = 30
+        totaltime = 15
+        timestamps = range(0, totaltime, step=1/framerate)
+
+#=         record(fig, joinpath("gallery", "connection1form.mp4"), timestamps;
+            framerate = framerate) do t
+            p = t / totaltime
+            longitude = sin(p * 2π - π)
+            latitude = cos(p * π - π/2)
+            action = p * 2π
+            set_close_to!(sl3, longitude)
+            set_close_to!(sl4, latitude)
+            set_close_to!(sl5, action)
+        end =#
     end
 end
