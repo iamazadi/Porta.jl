@@ -21,7 +21,9 @@ It's the idea behind Chrostopher Nolan's Tenet. Remember? Similar pairs of objec
 In order to see how and what we know about spinors we're going to turn to the Graph. (Edits are suggested by the other EW.)
 
 Edward Witen*
-If one wants to summarize our knowledge of physics in the briefest possible terms, there are three really fundamental observations: (i) Spacetime is a pseudo-Riemannina manifold M, endowed with a metric tensor and goverened by geometrical laws. (ii) Over M is a principal G-bundle with a non-abelian structure group G. (iii) Fermions are sections of $$ (\hat{S}_{+} \otimes V_R) \oplus (\hat{S}_{-} \otimes V_{\tilde{R}}) $$. 
+
+If one wants to summarize our knowledge of physics in the briefest possible terms, there are three really fundamental observations: (i) Spacetime is a pseudo-Riemannina manifold M, endowed with a metric tensor and goverened by geometrical laws. (ii) Over M is a principal G-bundle with a non-abelian structure group G. (iii) Fermions are sections of $$ (\hat{S}_{+} \otimes V_R) \oplus (\hat{S}_{-} \otimes V_{\tilde{R}}) $$. $$ R $$ and $$ \tilde{R} $$ should be (complex) linear representations of G, and so they are not equivalent. The interaction between the Higgs field and the fermionic sections explains why the light fermions are light and presumably has its origins in a representation difference $$ \Delta $$ in some underlying theory. All of this, must be supplemented witht the understanding that the geometrical laws obeyed by the metric tensor, the Higgs field, the gauge fields, and the fermions are to be interpreted in quantum mechanical terms.
+
 ### Wall
 ### Tome
 ### Sir Roger Penrose
