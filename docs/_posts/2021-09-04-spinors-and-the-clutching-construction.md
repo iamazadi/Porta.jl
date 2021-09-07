@@ -7,8 +7,6 @@ title:  "Spinors and the Clutching Construction"
 
 # Spinors and the Clutching Construction
 
-$$ \nabla_\boldsymbol{x} J(\boldsymbol{x}) $$
-
 ## What's the connection between spinors and the clutching construction?
 
 ### Why should we care?
@@ -40,6 +38,8 @@ In this exposition, the main reference would be the Tome. The book by Sir Roger 
 - chapter 27, section 11, Cosmology
 
 ### Sir Roger Penrose
+Sir Roger Penrose is the prominent figure at the nexus of physics and geometry. He was born in 1931. He did his undergraduate studies in University College London. Then, he went to Cambridge University to do his graduate studies. He got his P.h.D. in algebraic geometry. But a certain question in cosmology regarding the expnsion of the universe motivated him to work on physics problems.
+
 ### Hopf fibration
 ### Paul Dirac
 ### The belt trick
