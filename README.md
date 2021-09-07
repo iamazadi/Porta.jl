@@ -35,6 +35,10 @@ or,
 ```julia-repl
 Pkg.add("Porta")
 ```
+or get the latest experimental code.
+```julia-repl
+]add https://github.com/iamazadi/Porta.jl.git
+```
 
 ## Usage
 For client-side code read the tests, and for examples on how to build please check out the
