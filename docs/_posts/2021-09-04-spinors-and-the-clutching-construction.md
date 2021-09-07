@@ -12,9 +12,16 @@ $$ \nabla_\boldsymbol{x} J(\boldsymbol{x}) $$
 ## What's the connection between spinors and the clutching construction?
 
 ### Why should we care?
-Today, we're going to talk about an important mathematical object: spinors. It's responsible for the stability of matter. Without it, the periodic table wouldn't exist. It determines the properties of atoms in the form of electron shells, and also quarks which make up protons and neutrons. 
+Today, we're going to talk about an important mathematical object: spinors. It determines the properties of atoms in the form of electron shells. It's responsible for the stability of matter. Without it, the periodic table wouldn't exist. And also quarks which make up protons and neutrons.
+
 ### Spinors in pop culture
+It's the idea behind Chrostopher Nolan's Tenet. Remember? Similar pairs of objects, one traveling forward through time, the other one going backwards! It's also closely related to the Mololith, in Sir Roger Penrose's favorite movie: A Space Odyssey: 2001. Spinors have been much like the Monolith for almost a century. When Paul Dirac put in order the discoveries of quantum physics, he discovered counterparts to electrons with negative energy. And in doing so, he opened a portal into a reality much larger than what we used to know at the time. So, spinors are really deep down in the reality and they're responsible for everything that we're seeing right now.
+
 ### Graph
+In order to see how and what we know about spinors we're going to turn to the Graph. (Edits are suggested by the other EW.)
+
+Edward Witen*
+If one wants to summarize our knowledge of physics in the briefest possible terms, there are three really fundamental observations: (i) Spacetime is a pseudo-Riemannina manifold M, endowed with a metric tensor and goverened by geometrical laws. (ii) Over M is a principal G-bundle with a non-abelian structure group G. (iii) Fermions are sections of $$ (\hat{S}_{+} \otimes V_R) \oplus (\hat{S}_{-} \otimes V_{\tilde{R}}) $$. 
 ### Wall
 ### Tome
 ### Sir Roger Penrose
