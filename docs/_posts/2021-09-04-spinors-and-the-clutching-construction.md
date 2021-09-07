@@ -28,7 +28,7 @@ If one wants to summarize our knowledge of physics in the briefest possible term
 ### Wall
 We've taken the liberty to undertake the iconic Wall at the Stony Brook University, and do some graffiti. By adding the cosmological constant to the Einstein equation at the center of the Wall. And closely related to this topic is the Dirac equation which remains the same as before.
 
-![wall](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/wall.PNG "wall")
+![wall](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/wall.JPG "wall")
 
 ### Tome
 In this exposition, the main reference would be the Tome. The book by Sir Roger Penrose, called: The Roead to Reality. It has 34 chapters, but there are about a quarter of them most related to this. Including:
