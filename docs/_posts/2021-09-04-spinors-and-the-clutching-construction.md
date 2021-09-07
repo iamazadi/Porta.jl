@@ -13,6 +13,8 @@ Today, we're going to talk about an important mathematical object: spinors. It d
 ### Spinors in the pop culture
 It's the idea behind Chrostopher Nolan's Tenet. Remember? Similar pairs of objects, one traveling forward through time, the other one going backwards! It's also closely related to the Mololith, in Sir Roger Penrose's favorite movie: A Space Odyssey: 2001. Spinors have been much like the Monolith for almost a century. When Paul Dirac put in order the discoveries of quantum physics, he discovered counterparts to electrons with negative energy. And in doing so, he opened a portal into a reality much larger than what we used to know at the time. So, spinors are really deep down in the reality and they're responsible for everything that we're seeing right now.
 
+[![hopfflower](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/hopfflower.JPG)](https://youtu.be/8oJ0ZqYRXEg)
+
 ### Graph
 In order to see how and what we know about spinors we're going to turn to the Graph. (Edits are suggested by the other EW.)
 
@@ -47,6 +49,9 @@ Sir Roger Penrose is the prominent figure at the nexus of physics and geometry. 
 
 ### Hopf fibration
 In the standard cosmological models (FLRW,) the universe can be thought of as a 3-surface at each point of cosmological instant of time. Now, if we further assume that the curvature is positive, and we keep out the cosmological constant, then we're going to have a 3-surface as a 3-sphere at each point of time, by keeping time constant. The way that we can visualize a 3-sphere using our visual cortex is to use the Hopf fibration. And also the stereographic projection to bring it down to the Euclidean 3-space that we're familiar with. The picture is inspired by Dror Bar-Natan from the University of Toronto. In the base space, in order to see where you are we've used the geographical map. And at each point of the base space there's a circle. And it's obvious that the circles are linked and this doesn't lead to a trivial bundle. As a 3-surface embedded in a 4-dimensional Euclidean space it has a hole with an interesting topology.
+
+![flrw](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/flrw.jpg "flrw")
+[![planethopf](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/planethopf.jpg)](https://youtu.be/IOF8QzMGhQE)
 
 ### Paul Dirac
 Penrose attended one of Dirac's courses on spinors and quantum field theory. It was absolutely necessary for him to understand 2-component spinors. The way that Sir Roger Penrose explains spinors, it's a setting of a pole and a flag. And through 360 degrees of rotation of the pole the flag changes its sign.In order to get to the initial configuration the settings needs to be rotated 720 degrees. These are natural objects that can be found in the real life.
