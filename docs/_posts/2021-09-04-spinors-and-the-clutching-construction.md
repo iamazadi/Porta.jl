@@ -14,7 +14,7 @@ $$ \nabla_\boldsymbol{x} J(\boldsymbol{x}) $$
 ### Why should we care?
 Today, we're going to talk about an important mathematical object: spinors. It determines the properties of atoms in the form of electron shells. It's responsible for the stability of matter. Without it, the periodic table wouldn't exist. And also quarks which make up protons and neutrons.
 
-### Spinors in pop culture
+### Spinors in the pop culture
 It's the idea behind Chrostopher Nolan's Tenet. Remember? Similar pairs of objects, one traveling forward through time, the other one going backwards! It's also closely related to the Mololith, in Sir Roger Penrose's favorite movie: A Space Odyssey: 2001. Spinors have been much like the Monolith for almost a century. When Paul Dirac put in order the discoveries of quantum physics, he discovered counterparts to electrons with negative energy. And in doing so, he opened a portal into a reality much larger than what we used to know at the time. So, spinors are really deep down in the reality and they're responsible for everything that we're seeing right now.
 
 ### Graph
@@ -28,6 +28,17 @@ If one wants to summarize our knowledge of physics in the briefest possible term
 We've taken the liberty to undertake the iconic Wall at the Stony Brook University, and do some graffiti. By adding the cosmological constant to the Einstein equation at the center of the Wall. And closely related to this topic is the Dirac equation which remains the same as before.
 
 ### Tome
+In this exposition, the main reference would be the Tome. The book by Sir Roger Penrose, called: The Roead to Reality. It has 34 chapters, but there are about a quarter of them most related to this. Including:
+- chapter 10, Surfaces
+- chapter 11, Hypercomplex numbers
+- chapter 12, Manifolds of n dimensions
+- chapter 13, Symmetry groups
+- chapter 14, Calculus on manifolds
+- chapter 15, Fiber bundles and gauge connections
+- chapter 17, Spactime
+- chapter 18, Minkowskian geometry
+- chapter 27, section 11, Cosmology
+
 ### Sir Roger Penrose
 ### Hopf fibration
 ### Paul Dirac
