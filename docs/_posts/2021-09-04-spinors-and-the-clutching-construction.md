@@ -42,6 +42,8 @@ Sir Roger Penrose is the prominent figure at the nexus of physics and geometry. 
 In the standard cosmological models (FLRW,) the universe can be thought of as a 3-surface at each point of cosmological instant of time. Now, if we further assume that the curvature is positive, and we keep out the cosmological constant, then we're going to have a 3-surface as a 3-sphere at each point of time, by keeping time constant. The way that we can visualize a 3-sphere using our visual cortex is to use the Hopf fibration. And also the stereographic projection to bring it down to the Euclidean 3-space that we're familiar with. The picture is inspired by Dror Bar-Natan from the University of Toronto. In the base space, in order to see where you are we've used the geographical map. And at each point of the base space there's a circle. And it's obvious that the circles are linked and this doesn't lead to a trivial bundle. As a 3-surface embedded in a 4-dimensional Euclidean space it has a hole with an interesting topology.
 
 ### Paul Dirac
+Penrose attended one of Dirac's courses on spinors and quantum field theory. It was absolutely necessary for him to understand 2-component spinors. The way that Sir Roger Penrose explains spinors, it's a setting of a pole and a flag. And through 360 degrees of rotation of the pole the flag changes its sign.In order to get to the initial configuration the settings needs to be rotated 720 degrees. These are natural objects that can be found in the real life.
+
 ### The belt trick
 ### Exterior derivative
 ### Determine the clutching construction
