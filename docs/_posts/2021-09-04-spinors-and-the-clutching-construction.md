@@ -7,7 +7,7 @@ title:  "Spinors and the Clutching Construction"
 
 # What's the connection between spinors and the clutching construction?
 
-This post serves as both the transcription of a math video under the same title and also as an update to the [Graph-Wall-Tome](https://theportal.wiki/wiki/Graph,_Wall,_Tome) project. If you like this then you should know that about more than 6 times worth of content is available in [episode 20 of The Portal](https://youtu.be/mg93Dm-vYc8)!
+This post serves as both the transcription of a [math video](https://youtu.be/5R1o2WE_iEQ) under the same title and also as an update to the [Graph-Wall-Tome](https://theportal.wiki/wiki/Graph,_Wall,_Tome) project. If you like this then you should know that about more than 6 times worth of content is available in [episode 20 of The Portal](https://youtu.be/mg93Dm-vYc8)!
 [![cover](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/cover.JPG)](https://youtu.be/5R1o2WE_iEQ)
 
 ### Why should we care?
@@ -82,14 +82,8 @@ A sphere has at least one great circle, such as the equator. Then, passing from 
 The vector bundle over a sphere is non-trivial, becuase passing through a great circle the frames are going to twist. We're going to see how this vector bundle which is non-trivial is properly defined. We follow expositions from section 4.6 The Clutching Construction, Mark J.D. Hamilton (2017.)
 
 We take our 2-manifold, $$ S^2 \in \mathbb{R}^3 $$ given by $$ x^2 + y^2 + z^2 = 1 $$. Next, identify the poles and remove them. $$ N_{+} = (0, 0, 1) \in S^2 $$ and $$ N_{-} = (0, 0, -1) \in S^2 $$. Because we don't want x and y to be zro at the same time, otherwise we wouldn't have something to determine the orientation. So, we have $$ U_{+} = S^2\setminus\{N_{+}\} $$ and $$ U_{-} = S^2\setminus\{N_{-}\} $$ in $$ S^2 $$ excluding the poles. Next, define the clutching function at the equator as a great circle, which maps the circle into the general linear group of real dimension 2, our abstract space, where spinorial vectors transform. $$ f: S^1 \to GL(2,\mathbb{R}) $$. Then, we need a dummy function labeled as p in order to see how we can use any point on the sphere and map it onto the circle, the equator. $$ p: U_{+} \cap U_{-} \to S^1 $$ given by $$ (x, y, z) \mapsto \frac{(x, y)}{\sqrt{x^2+y^2}} $$. That's the magical square root! So, using the dummy function p now we can extend the clutching function as a composition. $$ \bar{f} = f \circ p: U_{+} \cap U_{-} \to GL(2,\mathbb{R}) $$. It takes points from the intersection of $$ U_{+} $$ and $$ U_{-} $$ and takes them to the general linear group of real dimension 2. There's going to be an equivalence class because the intersection is non-empty. And there, using the extended clutching function we can reorient vectors in the tangent space. And so the equivalence class of the vector bundle uses effectively the extended clutching function to resolve the conflict in orientation. $$ \tilde{E} = (U_{-} \times \mathbb{R}^2) \dot{\cup} (U_{+} \times \mathbb{R}^2) $$ by identifying $$ (x, y, z, v) \in (U_{-} \cap U_{+}) \times \mathbb{R}^2 $$ where $$ (U_{-} \cap U_{+}) \times \mathbb{R}^2 \subset U_{-} \times \mathbb{R}^2 $$ with $$ (x, y, z, \bar{f}(x, y, z) \bullet v) \in (U_{-} \cap U_{+}) \times \mathbb{R}^2 $$ where $$ (U_{-} \cap U_{+}) \times \mathbb{R}^2 \subset U_{+} \times \mathbb{R}^2 $$. Then, we have our projection map which essentially removes the extra piece of information, the one component that is the vector in the abstract vector space. It maps the vector bundle onto the sphere. $$ \pi: E_f \to S^2 $$, $$ [x, y, z, v] \mapsto [x, y, z] $$. That gives us an $$ \mathbb{R} $$-vector bundle of rank 2 over $$ S^2 $$. Each vector collapses onto a single point in the base space.
-$$
-\begin{CD}
-\mathbb{R}^2 @>>> E_f\\
-@. @VV{\pi}V\\
-@. S^2
-\end{CD}
-$$
 
+![diagram1](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/diagram1.png)
 
 ### Summary
 ### Building an interstellar engine
