@@ -68,6 +68,7 @@ As an alternative way to visualize spinors would be to turn to the belt trick. S
 ![belttrick1](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/2021-09-04-spinors-and-the-clutching-construction/belttrick1.GIF)
 ![belttrick2](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/2021-09-04-spinors-and-the-clutching-construction/belttrick2.GIF)
 ![belttrick3](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/2021-09-04-spinors-and-the-clutching-construction/belttrick3.GIF)
+![belttrick4](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/2021-09-04-spinors-and-the-clutching-construction/belttrick4.jpg)
 
 ### Exterior derivative
 The total space at each point of a manifold decomposes into two different bundles which can be summed up using the direct sum operator ($$ \oplus $$:) the normal bundle and the tangent bundle. The way that we get vectors in these bundles would be to use the exterior derivative. And at each point of a manifold we can have vectors in both bundles. Referring to the picture, the golden arrow is in the normal bundle, and x-constant and y-constant vectors are respectively the red arrow and the green arrrow, which are in the tangent bundle. This is a 2-manifold embedded in a 3-dimensional space.
