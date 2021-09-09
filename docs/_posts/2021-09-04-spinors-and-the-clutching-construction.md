@@ -115,4 +115,4 @@ So, we saw how fermions are sections of vector bundles in the standard model of 
 The reason why we're all going to these dangerous places is to gather pieces to build an interstellar engine. This has been only a part of the kitchen sink of project Porta. So, probably we're going to need 6 objects and 3 different concept classes. Stay tuned as more will come your way! Please, send us your questions.
 
 ![erick](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/erick.JPG)
-![porta](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/porta.JPG)
+![porta](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/porta.PNG)
