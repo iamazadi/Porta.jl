@@ -28,7 +28,7 @@ If one wants to summarize our knowledge of physics in the briefest possible term
 ### Wall
 We've taken the liberty to undertake [the iconic Wall](http://www.math.stonybrook.edu/~tony/scgp/wall-story/wall-story.html) at the Stony Brook University, and do some graffiti. By adding the cosmological constant to the Einstein equation at the center of the Wall. And closely related to this topic is the Dirac equation which remains the same as before.
 
-![wall](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/2021-09-04-spinors-and-the-clutching-construction/wall.JPG "wall")
+![wall](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/2021-09-04-spinors-and-the-clutching-construction/wall.GIF "wall")
 
 ### Tome
 In this exposition, the main reference would be [the Tome](https://www.amazon.com/Road-Reality-Complete-Guide-Universe/dp/0679776311). The book by Sir Roger Penrose, called: The Road to Reality. It has 34 chapters, but there are about a quarter of them most related to this. Including:
