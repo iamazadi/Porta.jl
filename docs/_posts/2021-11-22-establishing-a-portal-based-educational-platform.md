@@ -20,6 +20,7 @@ The project follows a 6-step path where each step builds on the previous one and
 - Add support for showcasing third-party apps and models
 
 # Establishing a portal-based educational platform
+
 ### How to develop the desire for learning and restart growth
 ## Introduction 
 Ever since the introduction of Andrew Ng’s machine learning online course on Coursera, hundreds of thousands of people have come to believe that they can learn practical skills and begin participating in the new economy of abundance powered by brains and machines. The rise of the power of computers constitutes the second wave of growth after the dotcom era, which was made possible by physicists at CERN. After the 2000s, Moore's law where computers used to get twice as fast every 2.5 years became increasingly irrelevant as designing and manufacturing ever faster chips pushed into the physical realm of quantum computing. Then, the industry attempted at making chips in parallel and cutting out extra wires. However, it seems pretty linear progress and the signs indicate that we need new ideas coming from basic science, particle physics in particular. Young people of this generation have shown the desire to learn and participate in the new economy, but the progress of tools appears to be limited by our understanding of physics at the fundamental level.
