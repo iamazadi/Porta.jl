@@ -3,6 +3,8 @@ layout: post
 title:  "Establishing a portal-based educational platform"
 ---
 
+Inspired by a talk at TEDxYouth@Hillsborough: “[A radical take on education](https://youtu.be/Z3fuOVg2RPc)” by Eric Weinstein.
+
 # Executive Summary
 ## Objective
 Design and engineer a collection of very particular objects in order to spark off a young person’s a semi-curated journey into basic science, in connection to understanding reality at a fundamental level. The objects should stand out as out-of-ordinary and reflect the beauty and uniqueness of the underlying nature that they represent. They also come with a set of corresponding questions, to compare with what subjects ask, so that we know whether the experience has been productive. In particular, it’s visualizations with controls of abstract objects such as connections, curvature forms, spinors and various interactions in the Standard Model of particle physics.
