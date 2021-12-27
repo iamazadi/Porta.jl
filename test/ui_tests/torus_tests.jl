@@ -1,13 +1,13 @@
 import Observables
-import AbstractPlotting
+import Makie
 
 
 q1 = Biquaternion(Quaternion(rand(4)), ℝ³(rand(3)))
-scene = AbstractPlotting.Scene()
+scene = Makie.Scene()
 r = 1 + rand()
 R = 10 + rand()
 segments = rand(5:10)
-color = AbstractPlotting.RGBAf0(rand(4)...)
+color = Makie.RGBAf(rand(4)...)
 transparency = false
 torus = Torus(q1,
               scene,

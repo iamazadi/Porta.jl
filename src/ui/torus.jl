@@ -1,5 +1,5 @@
 import Observables
-import AbstractPlotting
+import Makie
 
 
 export Torus
@@ -16,7 +16,7 @@ mutable struct Torus <: Sprite
     r::Float64
     R::Float64
     segments::Int
-    color::AbstractPlotting.RGBAf0
+    color::Makie.RGBAf
     observable::Tuple{Observables.Observable{Array{Float64,2}},
                       Observables.Observable{Array{Float64,2}},
                       Observables.Observable{Array{Float64,2}}}
@@ -31,11 +31,11 @@ optional arguments: smaller radius `r`, bigger radius `R`, `segments`, `color` a
 `transparency`.
 """
 function Torus(q::Biquaternion,
-               scene::AbstractPlotting.Scene;
+               scene::Makie.Scene;
                r::Float64 = 0.025,
                R::Float64 = 1.0,
                segments::Int = 36,
-               color::AbstractPlotting.RGBAf0 = AbstractPlotting.RGBAf0(0.1, 0.1, 0.1, 0.9),
+               color::Makie.RGBAf = Makie.RGBAf(0.1, 0.1, 0.1, 0.9),
                transparency::Bool = false)
     torus = constructtorus(q, r, R, segments = segments)
     colorarray = fill(color, segments, segments)
