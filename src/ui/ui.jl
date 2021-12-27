@@ -1,6 +1,6 @@
 import GeometryBasics
 import Observables
-import AbstractPlotting
+import Makie
 
 
 export Sprite
@@ -66,14 +66,14 @@ end
 Build a surface with the given `scene`, `value` and `color`. An optional argument is
 `transparency`.
 """
-function buildsurface(scene::AbstractPlotting.Scene,
+function buildsurface(scene::Makie.Scene,
                       value::Array{ℝ³,2},
-                      color::Array{AbstractPlotting.ColorTypes.RGBA{Float32},2};
+                      color::Array{Makie.ColorTypes.RGBA{Float32},2};
                       transparency::Bool = false)
     x = Observables.Observable(map(x -> vec(x)[1] , value))
     y = Observables.Observable(map(x -> vec(x)[2] , value))
     z = Observables.Observable(map(x -> vec(x)[3] , value))
-    AbstractPlotting.surface!(scene, x, y, z, color = color, transparency = transparency)
+    Makie.surface!(scene, x, y, z, color = color, transparency = transparency)
     x, y, z
 end
 
@@ -84,15 +84,15 @@ end
 Build a surface with the given `scene`, `value` and `color`. An optional argument is
 `transparency`.
 """
-function buildsurface(scene::AbstractPlotting.Scene,
+function buildsurface(scene::Makie.Scene,
                       value::Array{ℝ³,2},
-                      color::Observables.Observable{Array{AbstractPlotting.ColorTypes.RGBA{
+                      color::Observables.Observable{Array{Makie.ColorTypes.RGBA{
                                                           Float32},2}};
                       transparency::Bool = false)
     x = Observables.Observable(map(x -> vec(x)[1] , value))
     y = Observables.Observable(map(x -> vec(x)[2] , value))
     z = Observables.Observable(map(x -> vec(x)[3] , value))
-    AbstractPlotting.surface!(scene, x, y, z, color = color, transparency = transparency)
+    Makie.surface!(scene, x, y, z, color = color, transparency = transparency)
     x, y, z
 end
 
@@ -103,14 +103,14 @@ end
 Build a surface with the given `scene`, `value` and `color`. An optional argument is
 `transparency`.
 """
-function buildsurface(scene::AbstractPlotting.Scene,
+function buildsurface(scene::Makie.Scene,
                       value::Array{ℝ³,2},
                       color::Any;
                       transparency::Bool = false)
     x = Observables.Observable(map(x -> vec(x)[1] , value))
     y = Observables.Observable(map(x -> vec(x)[2] , value))
     z = Observables.Observable(map(x -> vec(x)[3] , value))
-    AbstractPlotting.surface!(scene, x, y, z, color = color, transparency = transparency)
+    Makie.surface!(scene, x, y, z, color = color, transparency = transparency)
     x, y, z
 end
 

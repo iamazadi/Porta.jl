@@ -1,17 +1,17 @@
 import FileIO
 import Observables
-import AbstractPlotting
+import Makie
 
 
 ## getsurface and buildsurface
 
 
-scene = AbstractPlotting.Scene()
+scene = Makie.Scene()
 transparency = false
 segments = rand(5:10)
 radius = 1 + rand()
 value1 = constructsphere(q, radius, segments = segments)
-color = fill(AbstractPlotting.RGBAf0(rand(4)...), segments, segments)
+color = fill(Makie.RGBAf(rand(4)...), segments, segments)
 observable = buildsurface(scene, value1, color, transparency = transparency)
 value2 = getsurface(observable, segments)
 
@@ -50,7 +50,7 @@ value1 = constructwhirl(points,
                         config = config,
                         segments = segments)
 
-color = fill(AbstractPlotting.RGBAf0(rand(4)...), segments, number)
+color = fill(Makie.RGBAf(rand(4)...), segments, number)
 transparency = rand(1:2) == 1 ? true : false
 observable = buildsurface(scene, value1, color, transparency = transparency)
 value2 = getsurface(observable, segments, number)
@@ -64,7 +64,7 @@ value2 = getsurface(observable, segments, number)
 ## builsurface with "observable" color array argument
 
 
-observablecolor = Observables.Observable(fill(AbstractPlotting.RGBAf0(rand(4)...),
+observablecolor = Observables.Observable(fill(Makie.RGBAf(rand(4)...),
                                               segments,
                                               segments))
 segments = rand(5:10)
