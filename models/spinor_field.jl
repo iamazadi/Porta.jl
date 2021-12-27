@@ -1,5 +1,5 @@
 # by lazarusA 
-using Legendre, GLMakie
+using AssociatedLegendrePolynomials, GLMakie
 using GeometryBasics, LinearAlgebra, StatsBase
 using Makie: get_dim, surface_normals
 ϵ = 1e-7
@@ -325,18 +325,18 @@ let
         tight_ticklabel_spacing!(cbar)
         display(fig)
         framerate = 30
-        totaltime = 15
+        totaltime = 30
         timestamps = range(0, totaltime, step=1/framerate)
 
-#=         record(fig, joinpath("gallery", "connection1form.mp4"), timestamps;
+        record(fig, joinpath("gallery", "connection1form_a.mp4"), timestamps;
             framerate = framerate) do t
-            p = t / totaltime
-            longitude = sin(p * 2π - π)
-            latitude = cos(p * π - π/2)
-            action = p * 2π
-            set_close_to!(sl3, longitude)
-            set_close_to!(sl4, latitude)
+            step = t / totaltime
+            longitude = π/2
+            latitude = π/4
+            action = step * 2π
+            #set_close_to!(sl3, longitude)
+            #set_close_to!(sl4, latitude)
             set_close_to!(sl5, action)
-        end =#
+        end
     end
 end
