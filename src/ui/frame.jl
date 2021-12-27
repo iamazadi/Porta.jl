@@ -1,5 +1,5 @@
 import Observables
-import AbstractPlotting
+import Makie
 
 
 export Frame
@@ -33,7 +33,7 @@ Construct a Frame with the given `scene`, `circle` in the fiber space, function 
 takes the base space to itself, S³ rotation `s3rotation`, configuration `config`, the number
 of `segments`, `color` and `transparency`.
 """
-function Frame(scene::AbstractPlotting.Scene,
+function Frame(scene::Makie.Scene,
                circle::S¹,
                s2tos3map,
                s2tos2map,

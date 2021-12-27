@@ -1,5 +1,5 @@
 import Observables
-import AbstractPlotting
+import Makie
 import FileIO
 
 
@@ -11,7 +11,7 @@ s2tos2map(b::S²) = begin
 end
 
 
-scene = AbstractPlotting.Scene()
+scene = Makie.Scene()
 circle = U1(rand() * 2pi - pi)
 s3rotation = Quaternion(rand() * 2pi - pi, ℝ³(rand(3)))
 config = Biquaternion(Quaternion(rand() * 2pi - pi, ℝ³(rand(3))), ℝ³(rand(3)))

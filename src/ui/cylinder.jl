@@ -1,5 +1,5 @@
 import Observables
-import AbstractPlotting
+import Makie
 
 
 export Cylinder
@@ -16,7 +16,7 @@ mutable struct Cylinder
     height::Float64
     radius::Float64
     segments::Int
-    color::Observables.Observable{Array{AbstractPlotting.ColorTypes.RGBA{Float32},2}}
+    color::Observables.Observable{Array{Makie.ColorTypes.RGBA{Float32},2}}
     observable::Tuple{Observables.Observable{Array{Float64,2}},
                       Observables.Observable{Array{Float64,2}},
                       Observables.Observable{Array{Float64,2}}}
@@ -30,11 +30,11 @@ Construct a Cylinder with the given configuration `q` and `scene`, and the optio
 arguments: `height`, `radius`, `segments`, `color` and `transparency`.
 """
 function Cylinder(q::Biquaternion,
-                  scene::AbstractPlotting.Scene;
+                  scene::Makie.Scene;
                   height::Float64 = 1.0,
                   radius::Float64 = 0.1,
                   segments::Int = 36,
-                  color::AbstractPlotting.RGBAf0 = AbstractPlotting.RGBAf0(0.7529,
+                  color::Makie.RGBAf = Makie.RGBAf(0.7529,
                                                                            0.7529,
                                                                            0.7529,
                                                                            0.5),
@@ -67,6 +67,6 @@ end
 
 Update a Cylinder by changing its observable with the given `cylinder` and `color`.
 """
-function update(cylinder::Cylinder, color::AbstractPlotting.RGBAf0)
+function update(cylinder::Cylinder, color::Makie.RGBAf)
     cylinder.color[] = fill(color, cylinder.segments, cylinder.segments)
 end
