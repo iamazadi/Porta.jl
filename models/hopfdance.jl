@@ -1,24 +1,25 @@
+import LinearAlgebra
 import FileIO
 import GeometryBasics
 import Observables
-import AbstractPlotting
+import Makie
 import GLMakie
 
 using Porta
 
+
 startframe = 1
 FPS = 24
 resolution = (360, 360)
-segments = 60
+segments = 30
 speed = 1
-#number = 360 * 5
 factor = 0.0025
 scale = 1.0
 basemapradius = 1.025
 basemapsegments = segments
 basepointradius = 0.025
 basepointsegments = 10
-basepointtransparency = true
+basepointtransparency = false
 exportmode = ["gif", "frames", "video"]
 exportmode = exportmode[1]
 modelname = "hopfdance"
@@ -44,9 +45,8 @@ number = totalsamples
 frames = countchunks(signal, chunkspersecond)
 
 # The scene object that contains other visual objects
-AbstractPlotting.reasonable_resolution() = (800, 800)
-AbstractPlotting.primary_resolution() = resolution
-scene = AbstractPlotting.Scene(backgroundcolor = :black,
+#Makie.reasonable_resolution() = (800, 800)
+scene = Makie.Scene(backgroundcolor = :black,
                                show_axis = false,
                                resolution = resolution)
 
@@ -112,8 +112,8 @@ end
 
 
 #basemapconfig = Biquaternion(ℝ³(0, -1.25, 0))
-basemapconfig = Biquaternion(ℝ³(0, 0, 0))
-basemapcolor = AbstractPlotting.RGBAf0(0.75, 0.75, 0.75, 0.25)
+basemapconfig = Biquaternion(Quaternion(1, 0, 0, 0))
+basemapcolor = Makie.RGBAf0(0.75, 0.75, 0.75, 0.25)
 basemaptransparency = true
 basemap = Sphere(basemapconfig,
                  scene,
@@ -123,15 +123,15 @@ basemap = Sphere(basemapconfig,
                  transparency = basemaptransparency)
 
 curvepoints = getbutterflycurve(number)
-solidcolors = Array{AbstractPlotting.RGBAf0,1}(undef, number)
+solidcolors = Array{Makie.RGBAf0,1}(undef, number)
 ghostcolors = similar(solidcolors)
 basepoints = Array{Sphere,1}(undef, number)
 for i in 1:number
     config = Biquaternion(ℝ³(Cartesian(curvepoints[i])) * basemapradius)
     hue = (i - 1) / number * 360
     rgb = hsvtorgb([hue, 1, 1])
-    solidcolors[i] = AbstractPlotting.RGBAf0(rgb..., 0.9)
-    ghostcolors[i] = AbstractPlotting.RGBAf0(rgb..., 0.1)
+    solidcolors[i] = Makie.RGBAf0(rgb..., 0.9)
+    ghostcolors[i] = Makie.RGBAf0(rgb..., 0.1)
     sphere = Sphere(basemapconfig * config,
                     scene,
                     radius = basepointradius,
@@ -157,7 +157,7 @@ for i in 1:number
     transparency = false
     solidwhirl = Whirl(scene,
                        points,
-                       τmap,
+                       σmap,
                        fmap,
                        top = solidtop,
                        bottom = solidbottom,
@@ -171,7 +171,7 @@ for i in 1:number
     transparency = true
     ghostwhirl = Whirl(scene,
                        points,
-                       τmap,
+                       σmap,
                        fmap,
                        top = ghosttop,
                        bottom = ghostbottom,
@@ -184,15 +184,25 @@ for i in 1:number
     ghostwhirls[i] = ghostwhirl
 end
 
-#a, b, c, d = [ComplexLine((float(i) + im)^i) for i in (-5, -2, 3, 7)]
-a, b = ComplexLine(1 + im), ComplexLine(0.5 - 1.5 * im)
-c, d = ComplexLine(-2 + 3 * im), ComplexLine(-1 + 0 * im)
 basespacepoints = Array{ComplexLine,1}(undef, number)
 phases = Array{U1,2}(undef, number, 4)
 s3rotations = Array{Quaternion,1}(undef, number)
 basespacecircles = Array{Any,1}(undef, number)
 
+len = 0.1
+width = 0.01
+transparency = false
+tail, head = ℝ³(rand(3)), ℝ³(rand(3))
+arrows = []
+for i in 1:number
+    hue = (i - 1) / number * 360
+    rgb = hsvtorgb([hue, 1, 1])
+    color = Makie.RGBAf0(rgb..., 0.9)
+    push!(arrows, Arrow(tail, head, scene, width = width, color = color))
+end
 
+a, b = ComplexLine(1 + im), ComplexLine(0.5 - 1.5 * im)
+c, d = ComplexLine(-2 + 3 * im), ComplexLine(-1 + 0 * im)
 f(z, a, b, c, d) = (a * z + b) / (c * z + d)
 
 
@@ -216,6 +226,7 @@ function animate(i::Int)
         point = Geographic(1, 0, π/2)
     end
     point = Cartesian(point)
+    s3rotation = Quaternion(1, 0, 0, 0)
     for (index, item) in enumerate(frequencies)
         z = item
         z = ComplexLine(f(π * z, a′, b′, c′, d′))
@@ -232,18 +243,20 @@ function animate(i::Int)
         α = magnitude * 2π
         s = U1(α)
         g = Quaternion(α, ℝ³(Cartesian(z)))
-        h = S¹action(τmap(point), s) * g
+        h = S¹action(σmap(point), s) * g
         rgb = quaternionicrgb(h, q, 0.1 * abs(realpart) + 0.1 * rand() + 0.8,
                               0.1 * abs(imaginarypart) + 0.1 * rand() + 0.8)
-        solidcolors[index] = AbstractPlotting.RGBAf0(rgb..., abs(realpart))
-        ghostcolors[index] = AbstractPlotting.RGBAf0(rgb..., abs(imaginarypart))
-        solidtop = U1(pi - 2α)
-        ghostbottom = solidtop
+        solidcolors[index] = Makie.RGBAf0(rgb..., abs(realpart))
+        ghostcolors[index] = Makie.RGBAf0(rgb..., abs(imaginarypart))
+        solidtop = U1(0)
+        solidbottom = U1(angle(item))
+        ghosttop = U1(2π - angle(item))
+        ghostbottom = U1(2π)
         phases[index, 1] = solidtop
         phases[index, 2] = solidbottom
         phases[index, 3] = ghosttop
         phases[index, 4] = ghostbottom
-        s3rotations[index] = g
+        #s3rotations[index] = g
     end
     for (index, item) in enumerate(basepoints)
         z = basespacepoints[index]
@@ -255,58 +268,72 @@ function animate(i::Int)
     for (index, item) in enumerate(solidwhirls)
         solidtop = phases[index, 1]
         solidbottom = phases[index, 2]
-        update(item, basespacecircles[index], s3rotations[index], solidtop,
+        update(item, basespacecircles[index], s3rotation, solidtop,
                solidbottom)
         update(item, solidcolors[index])
     end
     for (index, item) in enumerate(ghostwhirls)
         ghosttop = phases[index, 3]
         ghostbottom = phases[index, 4]
-        update(item, basespacecircles[index], s3rotations[index], ghosttop,
+        update(item, basespacecircles[index], s3rotation, ghosttop,
                ghostbottom)
         update(item, ghostcolors[index])
     end
 
-    z = Complex(0 + 0im)
+    # update tangent vectors
+    for (index, item) in enumerate(arrows)
+        w = basespacepoints[index]
+        tail = ℝ³(Cartesian(w)) * basemapradius
+        initial = ℝ³(0, 0, 1) * basemapradius
+        q = getrotation(normalize(tail), normalize(initial))
+        α = phases[index, 2]
+        head = initial + ℝ³(1, 0, 0) * (0.01 + angle(α) / 5)
+        head = rotate(head, q)
+        q = Quaternion(angle(α) / 2, normalize(tail))
+        head = rotate(head, q)
+        update(item, tail, head - tail)
+        update(item, solidcolors[index])
+    end
+
+#=     z = Complex(0 + 0im)
     z = ComplexLine(f(π * z, a′, b′, c′, d′))
     z = ℝ³(Cartesian(z))
 
     z₀ = Complex(0 + im)
     z₀ = ComplexLine(f(π * z₀, a′, b′, c′, d′))
-    z₀ = ℝ³(Cartesian(z₀))
+    z₀ = ℝ³(Cartesian(z₀)) =#
 
-    n = normalize(z₀ - z)
+    #n = normalize(z₀ - z)
     #v = ℝ³(-1, 0, 1) * 2.5
-    v = ℝ³(-1, 0, 1) * 2.1
-    distance = norm(v)
-    v = normalize(z) * distance
+    #v = ℝ³(-1, 0, 1) * 2.1
+    #distance = norm(v)
+    #v = normalize(z) * distance
     # update eye position
     # scene.camera.eyeposition.val
-    upvector = GeometryBasics.Vec3f0(vec(n)...)
-    eyeposition = GeometryBasics.Vec3f0(vec(v)...)
-    lookat = GeometryBasics.Vec3f0(0, 0, 0)
-    AbstractPlotting.update_cam!(scene, eyeposition, lookat, upvector)
-    scene.center = false # prevent scene from recentering on display
+    #upvector = GeometryBasics.Vec3f0(vec(n)...)
+    #eyeposition = GeometryBasics.Vec3f0(vec(v)...)
+    #lookat = GeometryBasics.Vec3f0(0, 0, 0)
+    #Makie.update_cam!(scene, eyeposition, lookat, upvector)
+    #scene.center = false # prevent scene from recentering on display
 end
 
 
 n = ℝ³(0, 0, 1)
-#v = ℝ³(-1, 0, 1) * 2.5
-v = ℝ³(-1, 0, 1) * 2.1
+v = ℝ³(-1, 0, 1) * 2.5
 # update eye position
 # scene.camera.eyeposition.val
 upvector = GeometryBasics.Vec3f0(vec(n)...)
 eyeposition = GeometryBasics.Vec3f0(vec(v)...)
 lookat = GeometryBasics.Vec3f0(0, 0, 0)
-AbstractPlotting.update_cam!(scene, eyeposition, lookat, upvector)
+Makie.update_cam!(scene, eyeposition, lookat, upvector)
 scene.center = false # prevent scene from recentering on display
 if exportmode ∈ ["gif", "video"]
     outputextension = exportmode == "gif" ? "gif" : "mkv"
-    AbstractPlotting.record(scene, "gallery/$modelname.$outputextension",
+    Makie.record(scene, "gallery/$modelname.$outputextension",
                             framerate = FPS) do io
         for i in startframe:frames
             animate(i) # animate the scene
-            AbstractPlotting.recordframe!(io) # record a new frame
+            Makie.recordframe!(io) # record a new frame
             step = (i - 1) / frames
             println("Completed step $(100step).\n")
         end
