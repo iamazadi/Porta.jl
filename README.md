@@ -1,5 +1,4 @@
 # Quantize the Geometry!
-![Group actions](gallery/groupactions.gif "Group actions")
 ![Hopf Dance](gallery/hopfdance.gif "Hopf Dance")
 ![Planet Hopf](gallery/planethopf.gif "Planet Hopf")
 ![the Hopf fibration](gallery/londontsai.gif "The Hopf fibration inspired by London Tsai")
@@ -12,15 +11,17 @@ This project helps with Eric Weinstein's the Graph-Wall-Tome (GWT) project. Watc
 models on the YouTube [channel][1].
 
 ## Requirements
-- AbstractPlotting
+- AssociatedLegendrePolynomials
 - CSV
 - DataFrames
 - FileIO
 - GLMakie
 - GeometryBasics
 - ImageMagick
+- JSServe
 - Makie
 - Observables
+- StatsBase
 - WAV
 - LinearAlgebra
 
