@@ -1,5 +1,5 @@
 import Observables
-import AbstractPlotting
+import Makie
 
 
 export Sphere
@@ -15,7 +15,7 @@ mutable struct Sphere <: Sprite
     q::Biquaternion
     radius::Float64
     segments::Int
-    color::Observables.Observable{Array{AbstractPlotting.ColorTypes.RGBA{Float32},2}}
+    color::Observables.Observable{Array{Makie.ColorTypes.RGBA{Float32},2}}
     observable::Tuple{Observables.Observable{Array{Float64,2}},
                       Observables.Observable{Array{Float64,2}},
                       Observables.Observable{Array{Float64,2}}}
@@ -29,10 +29,10 @@ Construct a sphere with the given configuration `q` and `scene`, and the optiona
 `radius`, `segments`, `color` and `transparency`.
 """
 function Sphere(q::Biquaternion,
-                scene::AbstractPlotting.Scene;
+                scene::Makie.Scene;
                 radius::Float64 = 1.0,
                 segments::Int = 36,
-                color::AbstractPlotting.RGBAf0 = AbstractPlotting.RGBAf0(1.0,
+                color::Makie.RGBAf = Makie.RGBAf(1.0,
                                                                          0.2705,
                                                                          0.0,
                                                                          0.5),
@@ -61,6 +61,6 @@ end
 
 Update a Sphere by changing its observable with the given `sphere` and `color`.
 """
-function update(sphere::Sphere, color::AbstractPlotting.RGBAf0)
+function update(sphere::Sphere, color::Makie.RGBAf)
     sphere.color[] = fill(color, sphere.segments, sphere.segments)
 end
