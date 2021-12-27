@@ -1,11 +1,10 @@
 import Observables
-import AbstractPlotting
+import Makie
 
 
-scene = AbstractPlotting.Scene()
-len = 1 + rand()
-width = 3
-color = :gold
+scene = Makie.Scene()
+width = 1.0
+color = Makie.RGBAf(1.0, 0.0, 0.0, 1.0)
 transparency = false
 tail, head = ℝ³(rand(3)), ℝ³(rand(3))
 arrow = Arrow(tail,

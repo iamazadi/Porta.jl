@@ -1,6 +1,6 @@
 import GeometryBasics
 import Observables
-import AbstractPlotting
+import Makie
 
 
 export Arrow
@@ -13,8 +13,8 @@ export update
 fields: width, color, tail and head.
 """
 mutable struct Arrow <: Sprite
-    width::Int
-    color::Symbol
+    width::Float64
+    color::Any
     tail::Observables.Observable
     head::Observables.Observable
 end
@@ -28,18 +28,20 @@ Construct an Arrow with the given `tail`, `head`, `scene`, and the optional argu
 """
 function Arrow(tail::ℝ³,
                head::ℝ³,
-               scene::AbstractPlotting.Scene;
-               width::Int = 3,
-               color::Symbol = :gold)
-    tailobservable = Observables.Observable([GeometryBasics.Point3f0(vec(tail)...)])
-    headobservable = Observables.Observable([GeometryBasics.Point3f0(vec(head)...)])
-    AbstractPlotting.arrows!(scene,
+               scene::Makie.Scene;
+               width::Float64 = 0.05,
+               color::Makie.RGBAf = Makie.RGBAf(1.0, 0.0, 0.0, 1.0))
+    tailobservable = Observables.Observable([GeometryBasics.Point3f(vec(tail)...)])
+    headobservable = Observables.Observable([GeometryBasics.Point3f(vec(head)...)])
+    colorobservable = Observables.Observable(color)
+    Makie.arrows!(scene,
                              tailobservable,
                              headobservable,
-                             arrowsize = 0.1,
-                             linecolor = color,
+                             arrowsize = Makie.Vec3f(0.075, 0.075, 0.1),
+                             linecolor = colorobservable,
+                             arrowcolor = colorobservable,
                              linewidth = width)
-    Arrow(width, color, tailobservable, headobservable)
+    Arrow(width, colorobservable, tailobservable, headobservable)
 end
 
 
@@ -49,6 +51,16 @@ end
 Update an Arrow by changing its observable with the given `arrow`, `tail` and `head`.
 """
 function update(arrow::Arrow, tail::ℝ³, head::ℝ³)
-    arrow.tail[] = [GeometryBasics.Point3f0(vec(tail)...)]
-    arrow.head[] = [GeometryBasics.Point3f0(vec(head)...)];
+    arrow.tail[] = [GeometryBasics.Point3f(vec(tail)...)]
+    arrow.head[] = [GeometryBasics.Point3f(vec(head)...)];
+end
+
+
+"""
+    update(arrow, color)
+
+Update an Arrow by changing its observable with the given `color`.
+"""
+function update(arrow::Arrow, color::Makie.RGBAf)
+    arrow.color[] = color
 end
