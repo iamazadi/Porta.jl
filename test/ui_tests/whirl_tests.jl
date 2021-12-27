@@ -1,5 +1,5 @@
 import Observables
-import AbstractPlotting
+import Makie
 
 
 # Map from S² into its upper hemisphere
@@ -10,7 +10,7 @@ s2tos2map(b::S²) = begin
 end
 
 
-scene = AbstractPlotting.Scene()
+scene = Makie.Scene()
 number = rand(5:10)
 points = [Geographic(rand(), rand() * 2pi - pi, rand() * pi - pi / 2) for i in 1:number]
 top = U1(rand() * 2pi - pi)
@@ -18,7 +18,7 @@ bottom = U1(rand() * 2pi - pi)
 s3rotation = Quaternion(rand() * 2pi - pi, ℝ³(rand(3)))
 config = Biquaternion(Quaternion(rand() * 2pi - pi, ℝ³(rand(3))), ℝ³(rand(3)))
 segments = rand(5:10)
-color = AbstractPlotting.RGBAf0(rand(4)...)
+color = Makie.RGBAf(rand(4)...)
 transparency = rand(1:2) == 1 ? true : false
 s2tos3map = rand() > 0.5 ? σmap : τmap
 scale = 1.0 + rand()
@@ -82,7 +82,7 @@ value2 = getsurface(whirl.observable, whirl.segments, length(whirl.points))
 @test isapprox(whirl.config, config2)
 @test isapprox(value1, value2) == false
 
-color1 = AbstractPlotting.RGBAf0(rand(4)...)
+color1 = Makie.RGBAf(rand(4)...)
 update(whirl, color1)
 color2 = Observables.to_value(whirl.color)[1] # Select element 1
 
