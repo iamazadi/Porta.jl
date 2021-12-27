@@ -1,11 +1,9 @@
 # by lazarusA 
-using Legendre
+using AssociatedLegendrePolynomials
 using GeometryBasics, LinearAlgebra, StatsBase
 using Makie: get_dim, surface_normals, Slider
 import JSServe
-#JSServe.Page(listen_url="0.0.0.0")
-JSServe.configure_server!(listen_url="0.0.0.0", external_url="http://192.168.0.101:8082", listen_port=8082)
-#JSServe.Page(exportable=true, offline=false, listen_port=8082)
+JSServe.configure_server!(listen_url="0.0.0.0", external_url="http://192.168.0.67:8082", listen_port=8082)
 using WGLMakie
 WGLMakie.activate!()
 
