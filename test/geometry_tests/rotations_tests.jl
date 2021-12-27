@@ -12,7 +12,7 @@ g = getrotation(i, j)
 @test typeof(rotate(p, q)) == typeof(p)
 @test isapprox(rotate(p, q₀), p) # rotations with angle zero
 @test typeof(rotate(points, q)) == typeof(points) # Array input
-@test isapprox(g, Quaternion(pi / 2, k))
+@test isapprox(g, Quaternion(pi / 4, k))
 
 
 q = Biquaternion(Quaternion(rand() * 2pi - pi, ℝ³(rand(3))), ℝ³(rand(3)))

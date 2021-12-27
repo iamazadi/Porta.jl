@@ -11,7 +11,7 @@ getrotation(i::ℝ³, n::ℝ³) = begin
         return Quaternion(0, normalize(i))
     end
     u = normalize(cross(i, n))
-    θ = acos(dot(normalize(i), normalize(n)))
+    θ = acos(dot(normalize(i), normalize(n))) / 2
     Quaternion(θ, u)
 end
 
