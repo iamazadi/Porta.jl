@@ -1,9 +1,9 @@
 import Observables
-import AbstractPlotting
+import Makie
 
 
 q1 = Biquaternion(Quaternion(rand(4)), ℝ³(rand(3)))
-scene = AbstractPlotting.Scene()
+scene = Makie.Scene()
 len = 1 + rand()
 width = 5
 color = [:red, :green, :blue]

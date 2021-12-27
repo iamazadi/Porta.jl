@@ -1,6 +1,6 @@
 import GeometryBasics
 import Observables
-import AbstractPlotting
+import Makie
 
 
 export Triad
@@ -28,17 +28,17 @@ Construct a Triad with the given configuration `q`, `scene`, and the optional ar
 `length`, `width` and `color`.
 """
 function Triad(q::Biquaternion,
-               scene::AbstractPlotting.Scene;
+               scene::Makie.Scene;
                length::Float64 = 1.0,
                width::Int = 5,
                color::Array{Symbol} = [:red, :green, :blue])
     triad = constructtriad(q, length = length)
     observable = Observables.Observable(triad)
-    array = AbstractPlotting.@lift begin
-        s = map(x -> GeometryBasics.Point3f0(vec(x)), $observable)
+    array = Makie.@lift begin
+        s = map(x -> GeometryBasics.Point3f(vec(x)), $observable)
         [s[1] => s[2], s[3] => s[4], s[5] => s[6]]
     end
-    AbstractPlotting.linesegments!(scene,
+    Makie.linesegments!(scene,
                                    array,
                                    color = color,
                                    linewidth = width)
