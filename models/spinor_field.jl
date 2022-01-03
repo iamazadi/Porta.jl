@@ -1,19 +1,10 @@
 # by lazarusA 
-using AssociatedLegendrePolynomials, GLMakie
+using GLMakie
 using GeometryBasics, LinearAlgebra, StatsBase
 using Makie: get_dim, surface_normals
 ϵ = 1e-7
 # thanks to @jkrumbiegel for the lift
 let
-    function Y(θ, ϕ, l, m)
-        if m < 0
-            return (-1)^m * √2 * Nlm(l, abs(m)) * Plm(l, abs(m), cos(θ)) * sin(abs(m)*ϕ)
-        elseif m == 0
-            return sqrt((2*l+1)/4π)*Plm(l, m, cos(θ))
-        else
-            return (-1)^m * √2 * Nlm(l, m) * Plm(l, m, cos(θ)) * cos(m*ϕ)
-        end
-    end
     function getMesh(x,y,z)
         positions = vec(map(CartesianIndices(z)) do i
         GeometryBasics.Point{3, Float32}(
@@ -108,8 +99,64 @@ let
         √(1 - (i[1])^2 - (i[2])^2)
     end
     f₂(i) = -f₁(i)
+    gets1action(start, stop, segments, point) = begin
+        getp(point, α) = begin
+            ϕ, θ = point
+            z₀ = getz₀(ϕ, θ, α)
+            z₁ = getz₁(ϕ, θ, α)
+            q₁, q₂ = real(z₀), imag(z₀)
+            q₃, q₄ = real(z₁), imag(z₁)
+            q = [q₁; q₂; q₃; q₄]
+            p = q[1:3] ./ (1 - q₄)
+            magnitude = norm(p)
+            normalize(p) * tanh(magnitude)
+        end
+        getsegmentslengths(point, linearspace) = begin
+            lengths = []
+            for i in 1:length(linearspace)-1
+                α₁ = linearspace[i]
+                α₂ = linearspace[i + 1]
+                p₁ = getp(point, α₁)
+                p₂ = getp(point, α₂)
+                distance = norm(p₁ - p₂)
+                push!(lengths, distance)
+            end
+            lengths
+        end
+        getloss(point, start, stop, p, v) = begin
+            q = p + v
+            X = getsegmentslengths(point, q)
+            N = length(X)
+            μ = sum(X) / N
+            #σ² = sum(exp.((X .- μ).^2) .- 1) / N
+            σ² = sum(exp.((X .- μ).^2) .- 1) / N
+            error1 = (q[begin] - start)^2 * 0.1
+            error2 = (q[end] - stop)^2 * 0.1
+            σ² + error1 + error2
+        end
+        linearspace = zeros(segments)
+        v = collect(range(start, stop = stop, length = segments))
+        getloss1(v, w) = getloss(point, start, stop, v, w)
+        loss = getloss1(linearspace, v)
+        threshold = 1e-2
+        η = 1e-1
+        iterations = 100
+        α = 0.9
+        i = 1
+        while loss > threshold && i < iterations
+            g = directional(getloss1, linearspace, v)
+            new = v - (η .* g)
+            v = α .* v + (1 - α) .* new
+            loss = getloss1(linearspace, v)
+            i += 1
+        end
+        #indices = convert(Array{Int64}, floor.(range(1, stop = segments2, length = segments)))
+        #v[indices]
+        v
+    end
 
-    segments = 200
+    segments = 30
+    segments2 = 3
     radius = 0.05
     # Grids of polar and azimuthal angles
     θ = LinRange(0, π, segments)
@@ -122,7 +169,7 @@ let
     m = Node(1)
 
     lon = Node(1.0)
-    lat = Node(1.0)
+    lat = Node(1.5)
     ang = Node(1.0)
     vector = Node([1.0; 0.0; 0.0])
 
@@ -136,11 +183,16 @@ let
         a₁ / (1 - a₃) + im * a₂ / (1 - a₃)
     end
     fiber = lift(lon, lat, ang) do lon, lat, ang
-        points = [[lon; lat] + [cos(i); sin(i)] .* radius for i in range(0, stop = 2π, length = segments)]
-        ψ = range(0, stop = ang, length = segments)
-        xyz(ψ, point) = begin
-            v₀ = getz₀(point[1], point[2], ψ)
-            v₁ = getz₁(point[1], point[2], ψ)
+        points = [[lon; lat] + [cos(i); sin(i)] .* radius for i in range(0, stop = 2π, length = segments2)]
+        start = 0
+        stop = ang
+        #ψ = range(0, stop = ang, length = segments)
+        actions = [gets1action(start, stop, segments, point) for point in points]
+        xyz(i, j) = begin
+            point = points[j]
+            action = actions[j][i]
+            v₀ = getz₀(point[1], point[2], action)
+            v₁ = getz₁(point[1], point[2], action)
             q₁, q₂ = real(v₀), imag(v₀)
             q₃, q₄ = real(v₁), imag(v₁)
             q = [q₁; q₂; q₃; q₄]
@@ -148,7 +200,7 @@ let
             magnitude = norm(p)
             normalize(p) * tanh(magnitude)
         end
-        a = [xyz(i, j) for i in ψ, j in points]
+        a = [xyz(i, j) for i in 1:segments, j in 1:length(points)]
         a₁ = map(i -> i[1], a)
         a₂ = map(i -> i[2], a)
         a₃ = map(i -> i[3], a)
@@ -159,11 +211,16 @@ let
     fiber₃ = @lift($fiber[3])
 
     fiber2 = lift(lon, lat, ang) do lon, lat, ang
-        points = [[lon; lat] + [cos(i); sin(i)] .* radius for i in range(0, stop = 2π, length = segments)]
-        ψ = range(ang, stop = 2π, length = segments)
-        xyz(ψ, point) = begin
-            v₀ = getz₀(point[1], point[2], ψ)
-            v₁ = getz₁(point[1], point[2], ψ)
+        points = [[lon; lat] + [cos(i); sin(i)] .* radius for i in range(0, stop = 2π, length = segments2)]
+        start = ang
+        stop = 2π
+        #ψ = range(start, stop = stop, length = segments)
+        actions = [gets1action(start, stop, segments, point) for point in points]
+        xyz(i, j) = begin
+            point = points[j]
+            action = actions[j][i]
+            v₀ = getz₀(point[1], point[2], action)
+            v₁ = getz₁(point[1], point[2], action)
             q₁, q₂ = real(v₀), imag(v₀)
             q₃, q₄ = real(v₁), imag(v₁)
             q = [q₁; q₂; q₃; q₄]
@@ -171,7 +228,7 @@ let
             magnitude = norm(p)
             normalize(p) * tanh(magnitude)
         end
-        a = [xyz(i, j) for i in ψ, j in points]
+        a = [xyz(i, j) for i in 1:segments, j in 1:length(points)]
         a₁ = map(i -> i[1], a)
         a₂ = map(i -> i[2], a)
         a₃ = map(i -> i[3], a)
@@ -277,57 +334,36 @@ let
     z₁ = @lift(zz .* 0.1 .+ $tail[3])
 
     ambient =  Vec3f0(0.75, 0.75, 0.75)
-    cmap = (:dodgerblue, :white) # how to include this into menu options?
     with_theme(theme_black()) do
         fig = Figure(resolution = (1400, 800))
-        menu = Menu(fig, options = ["Spectral_11", "viridis", "heat", "plasma", "magma", "inferno"])
-        Ygrid = lift(l, m) do l, m
-            [Y(θ, ϕ, l, m) for θ in θ, ϕ in ϕ]
-        end
-        Ylm = @lift(abs.($Ygrid))
-        Ygrid2 = @lift(vec($Ygrid))
 
         ax1 = Axis3(fig, aspect = :data, perspectiveness = 0.5, elevation = π/8, azimuth = 2.225π)
         ax2 = Axis3(fig, aspect = :data, perspectiveness = 0.5, elevation = π/8, azimuth = 2.225π)
-        pltobj1 = mesh!(ax1, getMesh(xx, yy, zz), color = Ygrid2, colormap = cmap, ambient = ambient)
-        pltobj3 = mesh!(ax1, @lift(getMesh($x₁, $y₁, $z₁)), color = :gold, colormap = cmap, ambient = ambient)
+        pltobj1 = mesh!(ax1, getMesh(xx, yy, zz), color = :blue, ambient = ambient)
+        pltobj3 = mesh!(ax1, @lift(getMesh($x₁, $y₁, $z₁)), color = :gold, ambient = ambient)
         pltobj4 = arrows!(ax1, tails₁, tails₂, tails₃, heads₁, heads₂, heads₃, color = [:red, :silver, :gray], lengthscale = 0.3f0)
-        pltobj5 = mesh!(ax2, @lift(getMesh($fiber₁, $fiber₂, $fiber₃)), color = :red, colormap = cmap, ambient = ambient)
-        pltobj6 = mesh!(ax2, @lift(getMesh($fiber2₁, $fiber2₂, $fiber2₃)), color = Ygrid2, colormap = cmap, ambient = ambient)
+        pltobj5 = mesh!(ax2, @lift(getMesh($fiber₁, $fiber₂, $fiber₃)), color = :red, ambient = ambient)
+        pltobj6 = mesh!(ax2, @lift(getMesh($fiber2₁, $fiber2₂, $fiber2₃)), color = :blue, ambient = ambient)
         pltobj7 = arrows!(ax2, conn_tail₁, conn_tail₂, conn_tail₃, conn_head₁, conn_head₂, conn_head₃, color = [:gold], lengthscale = 1.0f0)
-        cbar = Colorbar(fig, pltobj1, label = "Yₗₘ(θ,ϕ)", width = 11, tickalign = 1, tickwidth = 1)
         fig[1,1] = ax1
         fig[1,2] = ax2
-        fig[1,3] = cbar
         round3(n) = round(n, sigdigits = 3)
         degree(n) = round3(180(n / π))
         fig[0,1:2] = Label(fig, @lift("Hopf fiber: longitude = $(degree($lon)), latitude = $(degree($lat)), S¹action = $(degree($ang))."), textsize = 20)
-        fig[2, 0] = vgrid!(
-            Label(fig, "Colormap", width = nothing),
-            menu; tellheight = false, width = 100)
-        on(menu.selection) do s
-            pltobj1.colormap = s
-            pltobj3.colormap = s
-            pltobj4.colormap = s
-            pltobj5.colormap = s
-            pltobj6.colormap = s
-            pltobj7.colormap = s
-        end
-        sl3 = Slider(fig[end+1, 2:3], range = range(-π, stop = π, length = 100))
-        sl4 = Slider(fig[end+1, 2:3], range = range(-π/2, stop = 0.99 * π/2, length = 100))
-        sl5 = Slider(fig[end+1, 2:3], range = range(0, stop = 2π, length = 100))
+        sl3 = Slider(fig[end+1, 1:2], range = range(-π, stop = π, length = 100))
+        sl4 = Slider(fig[end+1, 1:2], range = range(-π/2, stop = 0.99 * π/2, length = 100))
+        sl5 = Slider(fig[end+1, 1:2], range = range(0, stop = 2π, length = 100))
         set_close_to!(sl3, to_value(lon))
         set_close_to!(sl4, to_value(lat))
         set_close_to!(sl5, to_value(ang))
         connect!(lon, sl3.value)
         connect!(lat, sl4.value)
         connect!(ang, sl5.value)
-        tight_ticklabel_spacing!(cbar)
         display(fig)
         framerate = 30
         totaltime = 30
         timestamps = range(0, totaltime, step=1/framerate)
-
+#= 
         record(fig, joinpath("gallery", "connection1form_a.mp4"), timestamps;
             framerate = framerate) do t
             step = t / totaltime
@@ -337,6 +373,6 @@ let
             #set_close_to!(sl3, longitude)
             #set_close_to!(sl4, latitude)
             set_close_to!(sl5, action)
-        end
+        end =#
     end
 end
