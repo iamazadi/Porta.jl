@@ -2,6 +2,8 @@ export Bundle
 export Clifford
 export σmap
 export τmap
+export πmap
+export λ⁻¹map
 export S¹action
 
 
@@ -73,6 +75,35 @@ end
 
 
 """
+    πmap(q)
+
+Sends a point on a unit 3-sphere to a point on a unit 2-sphere with the given
+point. S³ ↦ S²
+"""
+function πmap(q::Quaternion)
+    z₁, z₂ = vec(ComplexPlane(q))
+    ComplexLine(z₂ / z₁)
+end
+
+
+"""
+λ⁻¹map(p)
+Sends a point on the plane back to a point on a unit sphere with the given
+point. This is the inverse stereographic projection of a 3-sphere.
+"""
+function λ⁻¹map(p::S²)
+    r3 = ℝ³(Cartesian(p))
+    p₁, p₂, p₃ = vec(r3)
+    mgnitude² = norm(r3)^2
+    x₁ = 2p₁ / (1 + mgnitude²)
+    x₂ = 2p₂ / (1 + mgnitude²)
+    x₃ = 2p₃ / (1 + mgnitude²)
+    x₄ = (-1 + mgnitude²) / (1 + mgnitude²)
+    Quaternion(x₁, x₂, x₃, x₄)
+end
+
+
+"""
     S¹action(z, s)
 
 Aply the S¹ action on the S³ with the given point in the total space, `z`, and the circle
@@ -81,3 +112,5 @@ Aply the S¹ action on the S³ with the given point in the total space, `z`, and
 S¹action(z::S³, s::S¹) = begin
     Quaternion(ComplexPlane(exp(im * angle(s)) .* vec(ComplexPlane(z))))
 end
+
+S¹action(z::ComplexPlane, s::U1) = ComplexPlane(exp(im * angle(s)) .* vec(z))
