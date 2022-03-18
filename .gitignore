@@ -25,11 +25,15 @@ Manifest.toml
 
 # data files
 test/data/
-data/natural_earth_vector/temp1-nodes.csv
-data/natural_earth_vector/temp2-attributes.csv
+data/ne_50m_admin_0_countries
 
 # interaction videos
 /gallery/interactions
 /gallery/planethopf
 /gallery/hopfdance
 /gallery/videos
+/gallery/latitudinaltori
+/gallery/latitudinaltori2
+/gallery/penrosestairs
+/gallery/paralleltransport
+/gallery/gdp
