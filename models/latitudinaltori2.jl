@@ -9,44 +9,43 @@ using Porta
 
 
 startframe = 1
-FPS = 24
-resolution = (360, 360)
-segments = 30
+FPS = 60
+resolution = (3840, 2160)
+segments = 36
 speed = 1
 factor = 0.0025
 scale = 1.0
-radius = 0.02
+radius = 0.01
+number = 360
+frames = 3600
 basemapradius = 1.025
-basemapsegments = segments
-basepointradius = 0.025
-basepointsegments = 30
+basemapsegments = 2segments
+basepointradius = 0.02
+basepointsegments = 10
 basepointtransparency = false
 exportmode = ["gif", "frames", "video"]
-exportmode = exportmode[1]
-modelname = "hopfdance"
+exportmode = exportmode[2]
+modelname = "latitudinaltori2"
 
 
-# Loping Sting by Kevin MacLeod is licensed under a Creative Commons Attribution
-# 4.0 license. https://creativecommons.org/licenses/by/4.0/
+frequencies = begin
+    array = []
+    N = 6
+    n = Int(number ÷ N)
+    for i in 1:N
+        θ = (i / N) * π - (π / 2)
+        θ = 0.99 * θ
+        points = [Geographic(1, ϕ, θ) for ϕ in range(0, stop = 2π * 8 / 10, length = n)]
+        points = ComplexLine.(points)
+        points = [p.z for p in points]
+        append!(array, points)
+    end
+    convert(Array{Complex,1}, array)
+end
 
-# Source: http://incompetech.com/music/royalty-free/index.html?isrc=USUAN1200014
-
-# Artist: http://incompetech.com/
-
-audioname = "audio"
-extension = ".wav"
-audiopath = joinpath("data", audioname * extension)
-signal = Signal(audiopath)
-chunkspersecond = FPS
-#totalsamples = Integer(getframerate(signal) ÷ chunkspersecond) - 1
-totalsamples = length(getdata(getfftchunk(signal,1, chunkspersecond, 3)))
-number = totalsamples
-#indices = convert(Array{Int64},
-#                  floor.(range(2, stop = totalsamples-1, length = number)))
-frames = countchunks(signal, chunkspersecond)
+number = length(frequencies)
 
 # The scene object that contains other visual objects
-#Makie.reasonable_resolution() = (800, 800)
 scene = Makie.Scene(backgroundcolor = :black,
                                show_axis = false,
                                resolution = resolution)
@@ -113,9 +112,10 @@ end
 
 
 #basemapconfig = Biquaternion(ℝ³(0, -1.25, 0))
-basemapconfig = Biquaternion(Quaternion(1, 0, 0, 0))
-basemapcolor = Makie.RGBAf0(0.75, 0.75, 0.75, 0.25)
-basemaptransparency = true
+basemapconfig = Biquaternion(Quaternion(1, 0, 0, 0), ℝ³(0, 1.05, 0))
+#basemapcolor = Makie.RGBAf(0.8, 0.8, 0.8, 0.2)
+basemapcolor = load("gallery/mars_1k_color.jpg")
+basemaptransparency = false
 basemap = Sphere(basemapconfig,
                  scene,
                  radius = basemapradius,
@@ -143,7 +143,7 @@ for i in 1:number
 end
 
 #bundleconfig = Biquaternion(ℝ³(0, 1.25, 0))
-bundleconfig = Biquaternion(ℝ³(0, 0, 0))
+bundleconfig = Biquaternion(ℝ³(0, -1.05, 0))
 s3rotation = Quaternion(1, 0, 0, 0)
 solidfibers = Array{Fiber,1}(undef, number)
 ghostfibers = Array{Fiber,1}(undef, number)
@@ -189,7 +189,6 @@ end
 basespacepoints = Array{ComplexLine,1}(undef, number)
 phases = Array{U1,2}(undef, number, 4)
 s3rotations = Array{Quaternion,1}(undef, number)
-basespacecircles = Array{Any,1}(undef, number)
 
 len = 0.1
 width = 0.01
@@ -204,7 +203,7 @@ for i in 1:number
 end
 
 a, b = ComplexLine(1 + im), ComplexLine(0.5 - 1.5 * im)
-c, d = ComplexLine(-2 + 3 * im), ComplexLine(-1 + 0 * im)
+c, d = ComplexLine(-0.5 + 1 * im), ComplexLine(-1 + 0.3 * im)
 f(z, a, b, c, d) = (a * z + b) / (c * z + d)
 
 
@@ -214,50 +213,44 @@ f(z, a, b, c, d) = (a * z + b) / (c * z + d)
 Update the state of observables with the given frame number `i`.
 """
 function animate(i::Int)
-    frequencies = getdata(getfftchunk(signal, i, chunkspersecond, 3))#[indices]
     step = (i - 1) / frames
-    τ = -step * speed * 4pi
-    u = ℝ³(0, 1, 0)
-    q = Quaternion(τ, u)
-    a′, b′, c′, d′ = [ComplexLine(Cartesian(rotate(ℝ³(Cartesian(point)), q))).z
-                      for point in (a, b, c, d)]
-    point = getpointonpath(step)
-    #println("ComplexLine(f(point.z, a′, b′, c′, d′)) = ", ComplexLine(f(point.z, a′, b′, c′, d′)))
-    point = ComplexLine(f(point.z, a′, b′, c′, d′))
-    if isnan(vec(point)[1]) || isnan(vec(point)[2])
-        point = Geographic(1, 0, π/2)
+    u = getpointonpath(step)
+    if isnan(vec(u)[1]) || isnan(vec(u)[2])
+        u = Geographic(1, 0, π/2)
     end
-    point = Cartesian(point)
+    τ = step * speed * 2pi
+    u = ℝ³(Cartesian(u))
+    q = Quaternion(τ, u)
+    a′, b′, c′, d′ = [ComplexLine(Cartesian(rotate(ℝ³(Cartesian(point)), q))).z for point in (a, b, c, d)]
     s3rotation = Quaternion(1, 0, 0, 0)
     for (index, item) in enumerate(frequencies)
         z = item
-        z = ComplexLine(f(π * z, a′, b′, c′, d′))
-        basespacepoints[index] = z
-        #println("z = ", z)
-        z′ = z
+        z = ComplexLine(f(2π * z, a′, b′, c′, d′))
         if isnan(vec(z)[1]) || isnan(vec(z)[2])
-            z′ = Geographic(1, 0, π/2)
+            z = ComplexLine(Geographic(1, 0, -π / 2))
         end
-        #basespacecircles[index] = getpoints(z′, segments = basepointsegments)
-        realpart = real(item)
-        imaginarypart = imag(item)
-        magnitude = abs(item)
-        α = magnitude * 2π
-        s = U1(α)
-        g = Quaternion(α, ℝ³(Cartesian(z)))
-        h = S¹action(σmap(point), s) * g
-        rgb = quaternionicrgb(h, q, 0.1 * abs(realpart) + 0.1 * rand() + 0.8,
-                              0.1 * abs(imaginarypart) + 0.1 * rand() + 0.8)
-        solidcolors[index] = Makie.RGBAf0(rgb..., abs(realpart))
-        ghostcolors[index] = Makie.RGBAf0(rgb..., abs(imaginarypart))
+        r, ϕ, θ = vec(Geographic(z))
+        if isnan(r)
+            z = ComplexLine(Geographic(1, ϕ, θ * 0.99))
+        end
+        
+        basespacepoints[index] = z
+        α = angle(z) + π
+        fraction = α / 2π
+        complement = 1 - fraction
+        g = Quaternion(τ, ℝ³(Cartesian(z)))
+        q = Quaternion(1, 0, 0, 0)
+        rgb = quaternionicrgb(g, q, 0.2 * fraction + 0.2 * rand() + 0.6, 0.2 * complement + 0.2 * rand() + 0.6)
+        solidcolors[index] = Makie.RGBAf(rgb..., fraction)
+        ghostcolors[index] = Makie.RGBAf(rgb..., complement)
         solidtop = U1(0)
-        solidbottom = U1(angle(item))
-        ghosttop = U1(2π - angle(item))
+        solidbottom = U1(α)
+        ghosttop = solidbottom
         ghostbottom = U1(2π)
         phases[index, 1] = solidtop
         phases[index, 2] = solidbottom
-        phases[index, 3] = ghostbottom
-        phases[index, 4] = ghosttop
+        phases[index, 3] = ghosttop
+        phases[index, 4] = ghostbottom
         #s3rotations[index] = g
     end
     for (index, item) in enumerate(basepoints)
@@ -293,6 +286,7 @@ function animate(i::Int)
         head = rotate(head, q)
         q = Quaternion(angle(α) / 2, normalize(tail))
         head = rotate(head, q)
+        tail, head = applyconfig([tail; head], basemapconfig)
         update(item, tail, head - tail)
         update(item, solidcolors[index])
     end
@@ -343,7 +337,7 @@ if exportmode ∈ ["gif", "video"]
 elseif exportmode == "frames"
     directory = joinpath("gallery", modelname)
     !isdir(directory) && mkdir(directory)
-    directory = joinpath("gallery", modelname, audioname)
+    directory = joinpath("gallery", modelname)
     !isdir(directory) && mkdir(directory)
     for i in startframe:frames
         start = time()
@@ -355,7 +349,7 @@ elseif exportmode == "frames"
 
         paddingnumber = length(digits(frames))
         imageid = lpad(i, paddingnumber, "0")
-        imagename = "$(audioname)_$(resolution[2])p_$(FPS)fps_$imageid.jpeg"
+        imagename = "$(modelname)_$(resolution[2])p_$(FPS)fps_$imageid.jpeg"
         filepath = joinpath(directory, imagename)
         FileIO.save(filepath,
                     scene;
@@ -373,20 +367,16 @@ elseif exportmode == "frames"
             part = i ÷ (frames / 10)
             exportdir = joinpath(directory, "export")
             !isdir(exportdir) && mkdir(exportdir)
-            #WxH = "$(resolution[1])x$(resolution[2])"
-            WxH = "1920x1080"
-            commonpart = "$(audioname)_$(resolution[2])p_$(FPS)fps"
+            WxH = "$(resolution[1])x$(resolution[2])"
+            #WxH = "1920x1080"
+            commonpart = "$(modelname)_$(resolution[2])p_$(FPS)fps"
             inputname = "$(commonpart)_%0$(paddingnumber)d.jpeg"
             inputpath = joinpath(directory, inputname)
             outputname = "$(commonpart)_$(part).mp4"
             outputpath = joinpath(exportdir, outputname)
-            outputwithaudioname = "$(commonpart)_withaudio_$(part).mp4"
-            outputwithaudiopath = joinpath(exportdir, outputwithaudioname)
             command1 = `ffmpeg -y -f image2 -framerate $FPS -i $inputpath -s $WxH -pix_fmt yuvj420p $outputpath`
             run(command1)
             sleep(1)
-            command2 = `ffmpeg -y -i $outputpath -i $audiopath -c:v copy -map 0:v:0 -map 1:a:0 -c:a aac -b:a 192k -shortest $(outputwithaudiopath)`
-            run(command2)
         end
 
         if isapprox(i % (frames / 10), 0)

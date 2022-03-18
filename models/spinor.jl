@@ -9,44 +9,26 @@ using Porta
 
 
 startframe = 1
-FPS = 24
-resolution = (360, 360)
-segments = 30
+FPS = 60
+resolution = (3840, 2160)
+segments = 48
 speed = 1
 factor = 0.0025
 scale = 1.0
-radius = 0.02
-basemapradius = 1.025
-basemapsegments = segments
-basepointradius = 0.025
-basepointsegments = 30
-basepointtransparency = false
+radius = 0.005
+number = 720
+frames = 3600
+basemapradius = 0.325
+basemapsegments = 2segments
+basepointradius = 0.01
+basepointsegments = 10
+basepointtransparency = true
 exportmode = ["gif", "frames", "video"]
-exportmode = exportmode[1]
-modelname = "hopfdance"
+exportmode = exportmode[2]
+modelname = "spinor2"
 
-
-# Loping Sting by Kevin MacLeod is licensed under a Creative Commons Attribution
-# 4.0 license. https://creativecommons.org/licenses/by/4.0/
-
-# Source: http://incompetech.com/music/royalty-free/index.html?isrc=USUAN1200014
-
-# Artist: http://incompetech.com/
-
-audioname = "audio"
-extension = ".wav"
-audiopath = joinpath("data", audioname * extension)
-signal = Signal(audiopath)
-chunkspersecond = FPS
-#totalsamples = Integer(getframerate(signal) ÷ chunkspersecond) - 1
-totalsamples = length(getdata(getfftchunk(signal,1, chunkspersecond, 3)))
-number = totalsamples
-#indices = convert(Array{Int64},
-#                  floor.(range(2, stop = totalsamples-1, length = number)))
-frames = countchunks(signal, chunkspersecond)
 
 # The scene object that contains other visual objects
-#Makie.reasonable_resolution() = (800, 800)
 scene = Makie.Scene(backgroundcolor = :black,
                                show_axis = false,
                                resolution = resolution)
@@ -112,9 +94,48 @@ function getpoints(z::S²; segments::Int = 30)
 end
 
 
+A(s, p::S²) = begin
+    z = s(p)
+    z₀, z₁ = vec(ComplexPlane(z))
+    r = vec(z) # radial
+    f = [-r[2]; r[1]; -r[4]; r[3]] # fiber tangent
+    X₀, X₁ = vec(ComplexPlane(Quaternion(f)))
+    1/2 * (conj(z₀) * X₀ - z₀ * conj(X₀) + conj(z₁) * X₁ - z₁ * conj(X₁))
+end
+
+
+"""
+    getflower(;N=4, A=.5, B=-pi/7, P=pi/2, Q=0, number=300)
+
+Calculates the x, y and z points of a flower in the base space.
+with the given number of petals N, the fattness of the petals A,
+the height of the petals B, the latitude of the flower P,
+the rotation of the flower Q, and the total number of points in the grid.
+"""
+function getflower(;N=4, A=.5, B=-pi/7, P=pi/2, Q=0, number=300)
+    N = 6
+    A = .5
+    B = -pi/7
+    P = π / 2 - π / 4
+    Q = 0
+    t = range(0, stop = 2pi, length = number)
+    az = 2pi .* t + A .* cos.(N .* 2pi .* t) .+ Q
+    po = B .* sin.(N .* 2pi .* t) .+ P
+    x = cos.(az).*sin.(po)
+    y = sin.(az).*sin.(po)
+    z = cos.(po)
+    points = Array{Geographic}(undef, number)
+    for i in 1:number
+        points[i] = Geographic(Cartesian(x[i], y[i], z[i]))
+    end
+    points
+end
+
+
 #basemapconfig = Biquaternion(ℝ³(0, -1.25, 0))
-basemapconfig = Biquaternion(Quaternion(1, 0, 0, 0))
-basemapcolor = Makie.RGBAf0(0.75, 0.75, 0.75, 0.25)
+basemapconfig = Biquaternion(Quaternion(1, 0, 0, 0), ℝ³(-0.9 + basemapradius / 2, -√2 - basemapradius / 2, 0))
+basemapcolor = Makie.RGBAf(0.8, 0.8, 0.8, 0.2)
+#basemapcolor = load("gallery/mars_1k_color.jpg")
 basemaptransparency = true
 basemap = Sphere(basemapconfig,
                  scene,
@@ -123,16 +144,19 @@ basemap = Sphere(basemapconfig,
                  color = basemapcolor,
                  transparency = basemaptransparency)
 
-curvepoints = getbutterflycurve(number)
-solidcolors = Array{Makie.RGBAf0,1}(undef, number)
+curvepoints = getflower(number = number)
+solidcolors = Array{Makie.RGBAf,1}(undef, number)
 ghostcolors = similar(solidcolors)
 basepoints = Array{Sphere,1}(undef, number)
 for i in 1:number
     config = Biquaternion(ℝ³(Cartesian(curvepoints[i])) * basemapradius)
-    hue = (i - 1) / number * 360
-    rgb = hsvtorgb([hue, 1, 1])
-    solidcolors[i] = Makie.RGBAf0(rgb..., 0.9)
-    ghostcolors[i] = Makie.RGBAf0(rgb..., 0.1)
+    q₁ = λ⁻¹map(curvepoints[i])
+    q₂ = Quaternion(1, 0, 0, 0)
+    rgb = quaternionicrgb(q₁, q₂, 1, 1)
+    # hue = (i - 1) / number * 360
+    # rgb = hsvtorgb([hue, 1, 1])
+    solidcolors[i] = Makie.RGBAf(rgb..., 0.7)
+    ghostcolors[i] = Makie.RGBAf(rgb..., 0.1)
     sphere = Sphere(basemapconfig * config,
                     scene,
                     radius = basepointradius,
@@ -147,17 +171,16 @@ bundleconfig = Biquaternion(ℝ³(0, 0, 0))
 s3rotation = Quaternion(1, 0, 0, 0)
 solidfibers = Array{Fiber,1}(undef, number)
 ghostfibers = Array{Fiber,1}(undef, number)
-α = 40 / 180 * pi
-solidtop = U1(pi - 2α)
-solidbottom = U1(-pi)
-ghosttop = U1(pi)
-ghostbottom = solidtop
+solidtop = U1(0)
+solidbottom = U1(2π)
+ghosttop = U1(0)
+ghostbottom = U1(2π)
 for i in 1:number
     point = curvepoints[i]
     transparency = false
     solidfiber = Fiber(scene,
                        point,
-                       σmap,
+                       λ⁻¹map,
                        fmap,
                        radius = radius,
                        top = solidtop,
@@ -172,7 +195,7 @@ for i in 1:number
     transparency = true
     ghostfiber = Fiber(scene,
                        point,
-                       σmap,
+                       λ⁻¹map,
                        fmap,
                        radius = radius,
                        top = ghosttop,
@@ -187,9 +210,8 @@ for i in 1:number
 end
 
 basespacepoints = Array{ComplexLine,1}(undef, number)
-phases = Array{U1,2}(undef, number, 4)
+phases = Array{U1,2}(undef, number, 2)
 s3rotations = Array{Quaternion,1}(undef, number)
-basespacecircles = Array{Any,1}(undef, number)
 
 len = 0.1
 width = 0.01
@@ -197,15 +219,64 @@ transparency = false
 tail, head = ℝ³(rand(3)), ℝ³(rand(3))
 arrows = []
 for i in 1:number
-    hue = (i - 1) / number * 360
-    rgb = hsvtorgb([hue, 1, 1])
-    color = Makie.RGBAf0(rgb..., 0.9)
-    push!(arrows, Arrow(tail, head, scene, width = width, color = color))
+    push!(arrows, Arrow(tail, head, scene, width = width, color = solidcolors[i]))
 end
 
-a, b = ComplexLine(1 + im), ComplexLine(0.5 - 1.5 * im)
-c, d = ComplexLine(-2 + 3 * im), ComplexLine(-1 + 0 * im)
-f(z, a, b, c, d) = (a * z + b) / (c * z + d)
+
+group2algebra(A::SU2, r::Float64) = begin
+    τ₃ = -0.5 .* [im 0; 0 -im]
+    (-2 * r) .* (A.a * τ₃ * LinearAlgebra.inv(A.a))
+end
+
+
+exponentiate(M::Array{<:Complex,2}, t::Float64) = begin
+    eigenvalues = LinearAlgebra.eigvals(M)
+    eigenvectors = LinearAlgebra.eigvecs(M)
+    S = eigenvectors
+    S⁻¹ = LinearAlgebra.inv(S)
+    e = LinearAlgebra.Diagonal(eigenvalues) .* t
+    S = convert.(Complex{BigFloat}, S)
+    S⁻¹ = convert.(Complex{BigFloat}, S⁻¹)
+    e = convert.(Complex{BigFloat}, e)
+    G = S * ℯ.^e * S⁻¹
+    z₁, z₂ = G[1,1], G[1,2]
+    v = LinearAlgebra.normalize([real(z₁); imag(z₁); real(z₂); imag(z₂)])
+    z₁, z₂ = Complex{Float64}(v[1] + im * v[2]), Complex{Float64}(v[3] + im * v[4])
+    G = [z₁ -conj(z₂); z₂ conj(z₁)]
+    SU2(G)
+end
+
+B = SU2(Quaternion(π / 8, ℝ³(Cartesian(Geographic(1, π / 3, π / 4)))))
+# ComplexPlane(0.9238795325112867 + 0.13529902503654928im, 0.2343447855778369 + 0.27059805007309845im)
+
+L₁ = [Complex(0) Complex(1); Complex(1) Complex(0)]
+L₂ = [Complex(0) Complex(-im); Complex(im) Complex(0)]
+L₃ = [Complex(1) Complex(0); Complex(0) Complex(-1)]
+rotation = 2π
+frames = 360
+ϵ = rotation / frames
+g = L₃ # group2algebra(B, ϵ)
+q₂ = g
+
+for i in 1:frames
+    h = group2algebra(exponentiate(g, i * ϵ - π), 1.0)
+    q = rotate(h, ComplexPlane(B))
+    q₂ = q
+    println(q)
+    if i % (frames / 4) == 0.0
+        println("")
+    end
+end
+
+# ComplexPlane(-0.010686830141843868 + 0.7131691405919512im, -0.612279177876824 + 0.34115945964803246im)
+# ComplexPlane(-0.6123681646060238 + 0.356191878306672im, -0.0022871329322613106 - 0.7057813725427761im)
+# ComplexPlane(-0.35355339059327384 - 0.6123724356957946im, -0.7071067811865475 + 4.336808689942018e-19im)
+# ComplexPlane(0.6123680128847738 - 0.3562382883042756im, 0.002327401029800577 + 0.7057579485532132im)
+# ComplexPlane(0.35355339059327384 + 0.6123724356957946im, 0.7071067811865475 - 8.673617379884035e-19im)
+# ComplexPlane(-0.6123680128847738 + 0.3562382883042756im, -0.0023274010298005776 - 0.7057579485532132im)
+
+println(q₀)
+println(Quaternion(q))
 
 
 """
@@ -214,51 +285,22 @@ f(z, a, b, c, d) = (a * z + b) / (c * z + d)
 Update the state of observables with the given frame number `i`.
 """
 function animate(i::Int)
-    frequencies = getdata(getfftchunk(signal, i, chunkspersecond, 3))#[indices]
     step = (i - 1) / frames
-    τ = -step * speed * 4pi
-    u = ℝ³(0, 1, 0)
-    q = Quaternion(τ, u)
-    a′, b′, c′, d′ = [ComplexLine(Cartesian(rotate(ℝ³(Cartesian(point)), q))).z
-                      for point in (a, b, c, d)]
-    point = getpointonpath(step)
-    #println("ComplexLine(f(point.z, a′, b′, c′, d′)) = ", ComplexLine(f(point.z, a′, b′, c′, d′)))
-    point = ComplexLine(f(point.z, a′, b′, c′, d′))
-    if isnan(vec(point)[1]) || isnan(vec(point)[2])
-        point = Geographic(1, 0, π/2)
-    end
-    point = Cartesian(point)
-    s3rotation = Quaternion(1, 0, 0, 0)
-    for (index, item) in enumerate(frequencies)
+    τ = step * rotation
+    global q = rotate(q, e)
+    
+    for (index, item) in enumerate(curvepoints)
         z = item
-        z = ComplexLine(f(π * z, a′, b′, c′, d′))
+        h = rotate(λ⁻¹map(z), q)
+        z = πmap(h)
+        q₂ = Quaternion(1, 0, 0, 0)
+        rgb = quaternionicrgb(h, q₂, 0.8 + 0.2 * rand(), 0.8 + 0.2 * rand())
+        solidcolors[index] = Makie.RGBAf(rgb..., 0.5 + 0.3 * rand())
+        ghostcolors[index] = Makie.RGBAf(rgb..., 0.1 + 0.1 * rand())
+
         basespacepoints[index] = z
-        #println("z = ", z)
-        z′ = z
-        if isnan(vec(z)[1]) || isnan(vec(z)[2])
-            z′ = Geographic(1, 0, π/2)
-        end
-        #basespacecircles[index] = getpoints(z′, segments = basepointsegments)
-        realpart = real(item)
-        imaginarypart = imag(item)
-        magnitude = abs(item)
-        α = magnitude * 2π
-        s = U1(α)
-        g = Quaternion(α, ℝ³(Cartesian(z)))
-        h = S¹action(σmap(point), s) * g
-        rgb = quaternionicrgb(h, q, 0.1 * abs(realpart) + 0.1 * rand() + 0.8,
-                              0.1 * abs(imaginarypart) + 0.1 * rand() + 0.8)
-        solidcolors[index] = Makie.RGBAf0(rgb..., abs(realpart))
-        ghostcolors[index] = Makie.RGBAf0(rgb..., abs(imaginarypart))
-        solidtop = U1(0)
-        solidbottom = U1(angle(item))
-        ghosttop = U1(2π - angle(item))
-        ghostbottom = U1(2π)
-        phases[index, 1] = solidtop
-        phases[index, 2] = solidbottom
-        phases[index, 3] = ghostbottom
-        phases[index, 4] = ghosttop
-        #s3rotations[index] = g
+        phases[index, 1] = U1(0)
+        phases[index, 2] = U1(τ - 2π)
     end
     for (index, item) in enumerate(basepoints)
         z = basespacepoints[index]
@@ -268,17 +310,15 @@ function animate(i::Int)
         update(item, solidcolors[index])
     end
     for (index, item) in enumerate(solidfibers)
-        solidtop = phases[index, 1]
-        solidbottom = phases[index, 2]
-        update(item, basespacepoints[index], s3rotation, radius, solidtop,
-               solidbottom)
+        top = phases[index, 1]
+        bottom = phases[index, 2]
+        update(item, curvepoints[index], q, radius, top, bottom)
         update(item, solidcolors[index])
     end
     for (index, item) in enumerate(ghostfibers)
-        ghosttop = phases[index, 3]
-        ghostbottom = phases[index, 4]
-        update(item, basespacepoints[index], s3rotation, radius, ghosttop,
-               ghostbottom)
+        top = U1(0)
+        bottom = U1(2π)
+        update(item, curvepoints[index], q, radius, top, bottom)
         update(item, ghostcolors[index])
     end
 
@@ -289,39 +329,19 @@ function animate(i::Int)
         initial = ℝ³(0, 0, 1) * basemapradius
         q = getrotation(normalize(tail), normalize(initial))
         α = phases[index, 2]
-        head = initial + ℝ³(1, 0, 0) * (0.01 + angle(α) / 5)
+        head = initial + ℝ³(1, 0, 0) * (1 / 10)
         head = rotate(head, q)
-        q = Quaternion(angle(α) / 2, normalize(tail))
+        q = Quaternion(angle(α), normalize(tail))
         head = rotate(head, q)
+        tail, head = applyconfig([tail; head], basemapconfig)
         update(item, tail, head - tail)
-        update(item, solidcolors[index])
+        update(item, ghostcolors[index])
     end
-
-#=     z = Complex(0 + 0im)
-    z = ComplexLine(f(π * z, a′, b′, c′, d′))
-    z = ℝ³(Cartesian(z))
-
-    z₀ = Complex(0 + im)
-    z₀ = ComplexLine(f(π * z₀, a′, b′, c′, d′))
-    z₀ = ℝ³(Cartesian(z₀)) =#
-
-    #n = normalize(z₀ - z)
-    #v = ℝ³(-1, 0, 1) * 2.5
-    #v = ℝ³(-1, 0, 1) * 2.1
-    #distance = norm(v)
-    #v = normalize(z) * distance
-    # update eye position
-    # scene.camera.eyeposition.val
-    #upvector = GeometryBasics.Vec3f0(vec(n)...)
-    #eyeposition = GeometryBasics.Vec3f0(vec(v)...)
-    #lookat = GeometryBasics.Vec3f0(0, 0, 0)
-    #Makie.update_cam!(scene, eyeposition, lookat, upvector)
-    #scene.center = false # prevent scene from recentering on display
 end
 
 
-n = ℝ³(0, 0, 1)
-v = ℝ³(-1, 0, 1) * 2.5
+n = ℝ³(1, 0, 0)
+v = ℝ³(0, 0, 2) * √2
 # update eye position
 # scene.camera.eyeposition.val
 upvector = GeometryBasics.Vec3f0(vec(n)...)
@@ -343,19 +363,20 @@ if exportmode ∈ ["gif", "video"]
 elseif exportmode == "frames"
     directory = joinpath("gallery", modelname)
     !isdir(directory) && mkdir(directory)
-    directory = joinpath("gallery", modelname, audioname)
+    directory = joinpath("gallery", modelname)
     !isdir(directory) && mkdir(directory)
     for i in startframe:frames
         start = time()
         animate(i) # animate the scene
         elapsed = time() - start
+        sleep(0.1)
         println("Generating frame $i took $elapsed (s).")
 
         start = time()
 
         paddingnumber = length(digits(frames))
         imageid = lpad(i, paddingnumber, "0")
-        imagename = "$(audioname)_$(resolution[2])p_$(FPS)fps_$imageid.jpeg"
+        imagename = "$(modelname)_$(resolution[2])p_$(FPS)fps_$imageid.jpeg"
         filepath = joinpath(directory, imagename)
         FileIO.save(filepath,
                     scene;
@@ -363,33 +384,27 @@ elseif exportmode == "frames"
                     pt_per_unit = 400.0,
                     px_per_unit = 400.0)
         elapsed = time() - start
+        sleep(0.1)
         println("Saving file $filepath took $elapsed (s).")
-
         step = (i - 1) / frames
         println("Completed step $(100step).\n")
-        sleep(1)
 
         stitch() = begin
-            part = i ÷ (frames / 10)
+            part = i ÷ (frames / 3)
             exportdir = joinpath(directory, "export")
             !isdir(exportdir) && mkdir(exportdir)
-            #WxH = "$(resolution[1])x$(resolution[2])"
-            WxH = "1920x1080"
-            commonpart = "$(audioname)_$(resolution[2])p_$(FPS)fps"
+            WxH = "$(resolution[1])x$(resolution[2])"
+            #WxH = "1920x1080"
+            commonpart = "$(modelname)_$(resolution[2])p_$(FPS)fps"
             inputname = "$(commonpart)_%0$(paddingnumber)d.jpeg"
             inputpath = joinpath(directory, inputname)
             outputname = "$(commonpart)_$(part).mp4"
             outputpath = joinpath(exportdir, outputname)
-            outputwithaudioname = "$(commonpart)_withaudio_$(part).mp4"
-            outputwithaudiopath = joinpath(exportdir, outputwithaudioname)
             command1 = `ffmpeg -y -f image2 -framerate $FPS -i $inputpath -s $WxH -pix_fmt yuvj420p $outputpath`
             run(command1)
-            sleep(1)
-            command2 = `ffmpeg -y -i $outputpath -i $audiopath -c:v copy -map 0:v:0 -map 1:a:0 -c:a aac -b:a 192k -shortest $(outputwithaudiopath)`
-            run(command2)
         end
 
-        if isapprox(i % (frames / 10), 0)
+        if isapprox(i % (frames / 3), 0)
             stitch()
             sleep(1)
         end

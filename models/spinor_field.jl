@@ -99,11 +99,11 @@ let
         √(1 - (i[1])^2 - (i[2])^2)
     end
     f₂(i) = -f₁(i)
-    gets1action(start, stop, segments, point) = begin
-        getp(point, α) = begin
-            ϕ, θ = point
-            z₀ = getz₀(ϕ, θ, α)
-            z₁ = getz₁(ϕ, θ, α)
+    getpoints(start, stop, segments1, segments2, point, radius) = begin
+        getp(point) = begin
+            ψ, ϕ, θ = point
+            z₀ = getz₀(ϕ, θ, ψ)
+            z₁ = getz₁(ϕ, θ, ψ)
             q₁, q₂ = real(z₀), imag(z₀)
             q₃, q₄ = real(z₁), imag(z₁)
             q = [q₁; q₂; q₃; q₄]
@@ -111,52 +111,130 @@ let
             magnitude = norm(p)
             normalize(p) * tanh(magnitude)
         end
-        getsegmentslengths(point, linearspace) = begin
+        getlengths(points) = begin
             lengths = []
-            for i in 1:length(linearspace)-1
-                α₁ = linearspace[i]
-                α₂ = linearspace[i + 1]
-                p₁ = getp(point, α₁)
-                p₂ = getp(point, α₂)
+            segments = length(points)
+            for i in 1:segments-1
+                p₁ = getp(points[i])
+                p₂ = getp(points[i + 1])
                 distance = norm(p₁ - p₂)
                 push!(lengths, distance)
             end
             lengths
         end
-        getloss(point, start, stop, p, v) = begin
-            q = p + v
-            X = getsegmentslengths(point, q)
+        getcircumference(points) = begin
+            circumference = 0
+            segments = length(points)
+            for i in 1:segments-1
+                p₁ = getp(points[i])
+                p₂ = getp(points[i + 1])
+                distance = norm(p₁ - p₂)
+                circumference += distance
+            end
+            circumference
+        end
+        getdistances(points, base) = begin
+            distances = []
+            segments1, segments2 = size(points)
+            for i in 1:segments1
+                for j in 1:segments2
+                    p₁ = getp(points[i, j])
+                    p₂ = getp([points[i, j][1]; base])
+                    distance = norm(p₁ - p₂)
+                    push!(distances, distance)
+                end
+            end
+            distances
+        end
+        inputs = Array{Array{Float64,1},2}(undef, segments1, segments2)
+        #ϕ, θ = point
+        ϕ, θ = [point[1], -π/2]
+        linearspace1 = collect(range(start, stop = stop, length = segments1))
+        linearspace2 = collect(range(0, stop = 2π, length = segments2))
+        for i in 1:segments1
+            for j in 1:segments2
+                ψ = linearspace1[i]
+                ϕ = point[1] + cos(linearspace2[j]) * radius
+                θ = point[2] + sin(linearspace2[j]) * radius
+                inputs[i, j] = [ψ; ϕ; θ]
+            end
+        end
+        getvariance(X) = begin
             N = length(X)
             μ = sum(X) / N
-            #σ² = sum(exp.((X .- μ).^2) .- 1) / N
-            σ² = sum(exp.((X .- μ).^2) .- 1) / N
-            error1 = (q[begin] - start)^2 * 0.1
-            error2 = (q[end] - stop)^2 * 0.1
-            σ² + error1 + error2
+            σ² = sum((X .- μ).^2) / N
+            σ²
         end
-        linearspace = zeros(segments)
-        v = collect(range(start, stop = stop, length = segments))
-        getloss1(v, w) = getloss(point, start, stop, v, w)
-        loss = getloss1(linearspace, v)
-        threshold = 1e-2
-        η = 1e-1
-        iterations = 100
+        getvariance1(X) = begin
+            N = length(X)
+            μ = sum(X) / N
+            σ² = sum(exp.((X .- μ).^2) .- 1) / N
+            σ²
+        end
+        converttovector(points) = begin
+            vector = []
+            segments1, segments2 = size(points)
+            for i in 1:segments1
+                for j in 1:segments2
+                    vector = [vector; points[i, j]]
+                end
+            end
+            vector
+        end
+        converttomatrix(vector, shape) = begin
+            matrix = Array{Array{Float64,1},2}(undef, shape...)
+            index = 1
+            for i in 1:shape[1]
+                for j in 1:shape[2]
+                    matrix[i, j] = vector[index: index + 2]
+                    index += 3
+                end
+            end
+            matrix
+        end
+        getloss(points, base) = begin
+            segments1, segments2 = size(points)
+            loss = 0
+            # get the length of segments along a fiber
+            lengths = [getlengths(points[:, i]) for i in 1:segments2]
+            loss += sum(getvariance.(lengths)) / segments2
+            # get the length of segments along the sectional cut of a fiber
+            lengths = [getlengths(points[i, :]) for i in 1:segments1]
+            loss += sum(getvariance.(lengths)) / segments1
+            # get the circumference of the sectional cut of a fiber
+            circumferences = [getcircumference(points[i, :]) for i in 1:segments1]
+            loss += getvariance(circumferences) / segments1
+            # get the the distance between the central point of a sectional cut of a fiber and the surrounding star-shaped points
+            distances = getdistances(points, base)
+            loss += sum(getvariance.(distances)) / (segments1 * segments2)
+            error1 = sum((points[begin, :][begin] .- start).^2) / segments2
+            error2 = sum((points[end, :][begin] .- stop).^2) / segments2
+            loss + error1 + error2
+        end
+        getloss1(v₁, v₂) = getloss(converttomatrix(v₁ + v₂, size(inputs)), point)
+        v₂ = converttovector(inputs)
+        v₁ = zeros(size(v₂))
+        loss = getloss1(v₁, v₂)
+        threshold = 1e-3
+        η = 1e-3
+        iterations = 300
         α = 0.9
         i = 1
         while loss > threshold && i < iterations
-            g = directional(getloss1, linearspace, v)
-            new = v - (η .* g)
-            v = α .* v + (1 - α) .* new
-            loss = getloss1(linearspace, v)
+            heat = rand(size(v₂)...)
+            v₂ = v₂ + (0.001 .* heat)
+            g = directional(getloss1, v₁, v₂)
+            new = v₂ - (η .* g)
+            v₂ = α .* v₂ + (1 - α) .* new
+            loss = getloss1(v₁, v₂)
             i += 1
         end
-        #indices = convert(Array{Int64}, floor.(range(1, stop = segments2, length = segments)))
-        #v[indices]
-        v
+        outputs = converttomatrix(v₂, size(inputs))
+        [getp(outputs[i, j]) for i in 1:segments1, j in 1:segments2]
     end
 
     segments = 30
-    segments2 = 3
+    segments2 = 30
     radius = 0.05
     # Grids of polar and azimuthal angles
     θ = LinRange(0, π, segments)
@@ -183,11 +261,11 @@ let
         a₁ / (1 - a₃) + im * a₂ / (1 - a₃)
     end
     fiber = lift(lon, lat, ang) do lon, lat, ang
-        points = [[lon; lat] + [cos(i); sin(i)] .* radius for i in range(0, stop = 2π, length = segments2)]
+        #points = [[lon; lat] + [cos(i); sin(i)] .* radius for i in range(0, stop = 2π, length = segments2)]
         start = 0
         stop = ang
         #ψ = range(0, stop = ang, length = segments)
-        actions = [gets1action(start, stop, segments, point) for point in points]
+        #actions = [gets1action(start, stop, segments, point) for point in points]
         xyz(i, j) = begin
             point = points[j]
             action = actions[j][i]
@@ -200,7 +278,9 @@ let
             magnitude = norm(p)
             normalize(p) * tanh(magnitude)
         end
-        a = [xyz(i, j) for i in 1:segments, j in 1:length(points)]
+        #a = [xyz(i, j) for i in 1:segments, j in 1:length(points)]
+        point = [lon; lat]
+        a = getpoints(start, stop, segments, segments2, point, radius)
         a₁ = map(i -> i[1], a)
         a₂ = map(i -> i[2], a)
         a₃ = map(i -> i[3], a)
@@ -211,11 +291,11 @@ let
     fiber₃ = @lift($fiber[3])
 
     fiber2 = lift(lon, lat, ang) do lon, lat, ang
-        points = [[lon; lat] + [cos(i); sin(i)] .* radius for i in range(0, stop = 2π, length = segments2)]
+        #points = [[lon; lat] + [cos(i); sin(i)] .* radius for i in range(0, stop = 2π, length = segments2)]
         start = ang
         stop = 2π
         #ψ = range(start, stop = stop, length = segments)
-        actions = [gets1action(start, stop, segments, point) for point in points]
+        #actions = [gets1action(start, stop, segments, point) for point in points]
         xyz(i, j) = begin
             point = points[j]
             action = actions[j][i]
@@ -228,7 +308,9 @@ let
             magnitude = norm(p)
             normalize(p) * tanh(magnitude)
         end
-        a = [xyz(i, j) for i in 1:segments, j in 1:length(points)]
+        #a = [xyz(i, j) for i in 1:segments, j in 1:length(points)]
+        point = [lon; lat]
+        a = getpoints(start, stop, segments, segments2, point, radius)
         a₁ = map(i -> i[1], a)
         a₂ = map(i -> i[2], a)
         a₃ = map(i -> i[3], a)
