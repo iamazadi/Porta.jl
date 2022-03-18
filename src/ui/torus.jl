@@ -16,7 +16,7 @@ mutable struct Torus <: Sprite
     r::Float64
     R::Float64
     segments::Int
-    color::Makie.RGBAf
+    color::Observables.Observable{Array{Makie.ColorTypes.RGBA{Float32},2}}
     observable::Tuple{Observables.Observable{Array{Float64,2}},
                       Observables.Observable{Array{Float64,2}},
                       Observables.Observable{Array{Float64,2}}}
@@ -38,9 +38,9 @@ function Torus(q::Biquaternion,
                color::Makie.RGBAf = Makie.RGBAf(0.1, 0.1, 0.1, 0.9),
                transparency::Bool = false)
     torus = constructtorus(q, r, R, segments = segments)
-    colorarray = fill(color, segments, segments)
+    colorarray = Observables.Observable(fill(color, segments, segments))
     observable = buildsurface(scene, torus, colorarray, transparency = transparency)
-    Torus(q, r, R, segments, color, observable)
+    Torus(q, r, R, segments, colorarray, observable)
 end
 
 
@@ -53,4 +53,14 @@ function update(torus::Torus, q::Biquaternion)
     torus.q = q
     value = constructtorus(torus.q, torus.r, torus.R, segments = torus.segments)
     updatesurface(value, torus.observable)
+end
+
+
+"""
+    update(torus, color)
+
+Update a Torus by changing its observable with the given `torus` and `color`.
+"""
+function update(torus::Torus, color::Makie.RGBAf)
+    torus.color[] = fill(color, torus.segments, torus.segments)
 end
