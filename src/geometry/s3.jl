@@ -54,6 +54,15 @@ struct SU2 <: S³
 end
 
 
+"""
+    show(b)
+
+Print a string representation of the given SU2 `b`.
+"""
+Base.show(io::IO, q::SU2) = print(io, "$(round.(q.a, digits = 2)) ∈ SU(2)")
+Base.show(io::IO, q::ComplexPlane) = print(io, "($(round(q.z₁, digits = 2)),$(round(q.z₂, digits = 2))) ∈ ℂ²")
+Base.show(io::IO, q::Quaternion) = print(io, "$(round.(vec(q.r), digits = 2)) ∈ ℝ⁴")
+
 Base.vec(q::Quaternion) = vec(q.r)
 Base.vec(cp::ComplexPlane) = [cp.z₁; cp.z₂]
 
