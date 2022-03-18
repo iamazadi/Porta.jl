@@ -3,6 +3,7 @@ import Makie
 
 
 export Sphere
+export RGBSphere
 export update
 
 
@@ -22,6 +23,17 @@ mutable struct Sphere <: Sprite
 end
 
 
+mutable struct RGBSphere <: Sprite
+    q::Biquaternion
+    radius::Float64
+    segments::Int
+    color::Any
+    observable::Tuple{Observables.Observable{Array{Float64,2}},
+                      Observables.Observable{Array{Float64,2}},
+                      Observables.Observable{Array{Float64,2}}}
+end
+
+
 """
     Sphere(q, scene)
 
@@ -32,15 +44,24 @@ function Sphere(q::Biquaternion,
                 scene::Makie.Scene;
                 radius::Float64 = 1.0,
                 segments::Int = 36,
-                color::Makie.RGBAf = Makie.RGBAf(1.0,
-                                                                         0.2705,
-                                                                         0.0,
-                                                                         0.5),
+                color::Makie.RGBAf = Makie.RGBAf(1.0, 0.2705, 0.0, 0.5),
                 transparency::Bool = false)
     sphere = constructsphere(q, radius, segments = segments)
     colorarray = Observables.Observable(fill(color, segments, segments))
     observable = buildsurface(scene, sphere, colorarray, transparency = transparency)
     Sphere(q, radius, segments, colorarray, observable)
+end
+
+
+function RGBSphere(q::Biquaternion,
+                scene::Makie.Scene,
+                color::Any;
+                radius::Float64 = 1.0,
+                segments::Int = 36,
+                transparency::Bool = false)
+    sphere = constructsphere(q, radius, segments = segments)
+    observable = buildsurface(scene, sphere, color, transparency = transparency)
+    RGBSphere(q, radius, segments, color, observable)
 end
 
 
@@ -50,6 +71,17 @@ end
 Update a Sphere by changing its observable with the given `sphere` and configuration `q`.
 """
 function update(sphere::Sphere, q::Biquaternion)
+    sphere.q = q
+    value = constructsphere(sphere.q, sphere.radius, segments = sphere.segments)
+    updatesurface(value, sphere.observable)
+end
+
+"""
+    update(sphere, q)
+
+Update a Sphere by changing its observable with the given `sphere` and configuration `q`.
+"""
+function update(sphere::RGBSphere, q::Biquaternion)
     sphere.q = q
     value = constructsphere(sphere.q, sphere.radius, segments = sphere.segments)
     updatesurface(value, sphere.observable)
