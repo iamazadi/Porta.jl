@@ -30,17 +30,19 @@ function Arrow(tail::ℝ³,
                head::ℝ³,
                scene::Makie.Scene;
                width::Float64 = 0.05,
-               color::Makie.RGBAf = Makie.RGBAf(1.0, 0.0, 0.0, 1.0))
+               color::Makie.RGBAf = Makie.RGBAf(1.0, 0.0, 0.0, 1.0),
+               transparency::Bool = false)
     tailobservable = Observables.Observable([GeometryBasics.Point3f(vec(tail)...)])
     headobservable = Observables.Observable([GeometryBasics.Point3f(vec(head)...)])
     colorobservable = Observables.Observable(color)
     Makie.arrows!(scene,
-                             tailobservable,
-                             headobservable,
-                             arrowsize = Makie.Vec3f(0.075, 0.075, 0.1),
-                             linecolor = colorobservable,
-                             arrowcolor = colorobservable,
-                             linewidth = width)
+                  tailobservable,
+                  headobservable,
+                  arrowsize = Makie.Vec3f(width / 2, width / 2, 2width),
+                  linecolor = colorobservable,
+                  arrowcolor = colorobservable,
+                  linewidth = width,
+                  transparency = transparency)
     Arrow(width, colorobservable, tailobservable, headobservable)
 end
 
