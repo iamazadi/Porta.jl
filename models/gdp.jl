@@ -156,7 +156,7 @@ color = FileIO.load("data/gdp/map_transparent2.png")
 # Free vector and raster map data @ naturalearthdata.com.
 
 # 1. Download cultural data admin 0 from natural earth data
-# 2. Install this desktop
+# 2. Install qgis desktop
 # 3. Install mmqgis plugin for exporting to CSV
 
 # The path to the dataset
