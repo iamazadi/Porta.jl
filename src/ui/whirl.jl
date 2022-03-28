@@ -9,173 +9,107 @@ export update
 """
     Represents a whirl.
 
-fields: points, s2tos2map, s2tos3map, top, bottom, s3rotation, config, segments, color,
-observable and scale.
+fields: points, gauge1, gauge2, configuration, segments, color and observable.
 """
 mutable struct Whirl <: Sprite
-    points::Array{<:S²,1}
-    s2tos3map::Any
-    s2tos2map::Any
-    top::S¹
-    bottom::S¹
-    s3rotation::S³
-    config::Biquaternion
+    points::Array{ComplexPlane,1}
+    gauge1::Array{U1,1}
+    gauge2::Array{U1,1}
+    configuration::Biquaternion
     segments::Int
     color::Observables.Observable{Array{Makie.ColorTypes.RGBA{Float32},2}}
     observable::Tuple{Observables.Observable{Array{Float64,2}},
                       Observables.Observable{Array{Float64,2}},
                       Observables.Observable{Array{Float64,2}}}
-    scale::Real
 end
 
 
 """
     Whirl(scene,
           points,
-          s2tos3map,
-          s2tos2map,
-          [top, [bottom, [s3rotation, [config, [segments, [color, [transparency
-           [,scale]]]]]]]])
+          [gauge1, [gauge2, [configuration, [segments, [color, [transparency]]]]]])
 
-Construct a whirl with the given `scene`, `points` in the base space, `s2tos3map`,
-`s2tos2map`, `top`, `bottom`, S³ rotation `s3rotation`, configuration `config`, the number
-of `segments`, `color`, `transparency` and `scale`.
+Construct a whirl with the given `scene`, `points`, `section`, `gauge1`, `gauge2`,
+`configuration`, `segments`, `color` and `transparency`.
 """
 function Whirl(scene::Makie.Scene,
-               points::Array{<:S²,1},
-               s2tos3map,
-               s2tos2map;
-               top::S¹ = U1(-pi),
-               bottom::S¹ = U1(pi),
-               s3rotation::S³ = Quaternion(1, 0, 0, 0),
-               config::Biquaternion = Biquaternion(ℝ³(0, 0, 0)),
+               points::Array{ComplexPlane,1},
+               gauge1::Array{U1,1},
+               gauge2::Array{U1,1};
+               configuration::Biquaternion = Biquaternion(ℝ³(0, 0, 0)),
                segments::Int = 36,
-               color::Makie.RGBAf = Makie.RGBAf(1.0,
-                                                                        0.2705,
-                                                                        0.0,
-                                                                        0.5),
-               transparency::Bool = false,
-               scale::Real = 1.0)
-    whirl = constructwhirl(points,
-                           s2tos3map,
-                           s2tos2map,
-                           top = top,
-                           bottom = bottom,
-                           s3rotation = s3rotation,
-                           config = config,
-                           segments = segments,
-                           scale = scale)
+               color::Makie.RGBAf = Makie.RGBAf(1.0, 0.2705, 0.0, 0.5),
+               transparency::Bool = false)
+    whirl = constructwhirl(points, gauge1, gauge2, configuration, segments)
     colorarray = Observables.Observable(fill(color, size(whirl)...))
     observable = buildsurface(scene, whirl, colorarray, transparency = transparency)
-    Whirl(points, s2tos3map, s2tos2map, top, bottom, s3rotation, config, segments,
-          colorarray, observable, scale)
+    Whirl(points, gauge1, gauge2, configuration, segments, colorarray, observable)
 end
 
 
 """
     update(whirl, points)
 
-Update a Whirl by changing its observable with the given `whirl` and `points` in the base
-space.
+Update a Whirl by changing its observable with the given `whirl` and `points`.
 """
-function update(whirl::Whirl, points::Array{<:S²,1})
-    @assert(length(points) == length(whirl.points),
-            "The number of the given points must be equal to what it was before.")
+function update(whirl::Whirl, points::Array{ComplexPlane,1})
     whirl.points = points
     value = constructwhirl(whirl.points,
-                           whirl.s2tos3map,
-                           whirl.s2tos2map,
-                           top = whirl.top,
-                           bottom = whirl.bottom,
-                           s3rotation = whirl.s3rotation,
-                           config = whirl.config,
-                           segments = whirl.segments,
-                           scale = whirl.scale)
+                           whirl.gauge1,
+                           whirl.gauge2,
+                           whirl.configuration,
+                           whirl.segments)
     updatesurface(value, whirl.observable)
 end
 
 
 """
-    update(whirl, s2tos3map, s2tos2map)
+    update(whirl, gauge1, gauge2)
 
-Update a Whirl by changing its observable with the given `whirl` and map `s2tos3map` from
-the base space into the total space, f: S² → S³, and also the map `s2tos2map` from the base
-space into itself, f: S² → S².
+Update a Whirl by changing its observable with the given `whirl`, `gauge1` and `gauge2`.
 """
-function update(whirl::Whirl, s2tos3map::Any, s2tos2map::Any)
-    whirl.s2tos3map = s2tos3map
-    whirl.s2tos2map = s2tos2map
+function update(whirl::Whirl, gauge1::Array{U1,1}, gauge2::Array{U1,1})
+    whirl.gauge1 = gauge1
+    whirl.gauge2 = gauge2
     value = constructwhirl(whirl.points,
-                           whirl.s2tos3map,
-                           whirl.s2tos2map,
-                           top = whirl.top,
-                           bottom = whirl.bottom,
-                           s3rotation = whirl.s3rotation,
-                           config = whirl.config,
-                           segments = whirl.segments,
-                           scale = whirl.scale)
+                           whirl.gauge1,
+                           whirl.gauge2,
+                           whirl.configuration,
+                           whirl.segments)
     updatesurface(value, whirl.observable)
 end
 
 
 """
-    update(whirl, top, bottom)
+    update(whirl, points, gauge1, gauge2)
 
-Update a Whirl by changing its observable with the given `whirl`, `top` and `bottom`.
+Update a Whirl by changing its observable with the given `whirl`, `points`, `gauge1` and `gauge2`.
 """
-function update(whirl::Whirl, top::S¹, bottom::S¹)
-    whirl.top = top
-    whirl.bottom = bottom
+function update(whirl::Whirl, points::Array{ComplexPlane,1}, gauge1::Array{U1,1}, gauge2::Array{U1,1})
+    whirl.points = points
+    whirl.gauge1 = gauge1
+    whirl.gauge2 = gauge2
     value = constructwhirl(whirl.points,
-                           whirl.s2tos3map,
-                           whirl.s2tos2map,
-                           top = whirl.top,
-                           bottom = whirl.bottom,
-                           s3rotation = whirl.s3rotation,
-                           config = whirl.config,
-                           segments = whirl.segments,
-                           scale = whirl.scale)
+                           whirl.gauge1,
+                           whirl.gauge2,
+                           whirl.configuration,
+                           whirl.segments)
     updatesurface(value, whirl.observable)
 end
 
 
 """
-    update(whirl, s3rotation)
+    update(whirl, configuration)
 
-Update a Whirl by changing its observable with the given `whirl` and S³ rotation
-`s3rotation`.
+Update a Whirl by changing its observable with the given `whirl` and `configuration`.
 """
-function update(whirl::Whirl, s3rotation::S³)
-    whirl.s3rotation = s3rotation
+function update(whirl::Whirl, configuration::Biquaternion)
+    whirl.configuration = configuration
     value = constructwhirl(whirl.points,
-                           whirl.s2tos3map,
-                           whirl.s2tos2map,
-                           top = whirl.top,
-                           bottom = whirl.bottom,
-                           s3rotation = whirl.s3rotation,
-                           config = whirl.config,
-                           segments = whirl.segments,
-                           scale = whirl.scale)
-    updatesurface(value, whirl.observable)
-end
-
-
-"""
-    update(whirl, config)
-
-Update a Whirl by changing its observable with the given `whirl` and configuration `config`.
-"""
-function update(whirl::Whirl, config::Biquaternion)
-    whirl.config = config
-    value = constructwhirl(whirl.points,
-                           whirl.s2tos3map,
-                           whirl.s2tos2map,
-                           top = whirl.top,
-                           bottom = whirl.bottom,
-                           s3rotation = whirl.s3rotation,
-                           config = whirl.config,
-                           segments = whirl.segments,
-                           scale = whirl.scale)
+                           whirl.gauge1,
+                           whirl.gauge2,
+                           whirl.configuration,
+                           whirl.segments)
     updatesurface(value, whirl.observable)
 end
 
@@ -187,30 +121,4 @@ Update a Whirl by changing its observable with the given `whirl` and `color`.
 """
 function update(whirl::Whirl, color::Makie.RGBAf)
     whirl.color[] = fill(color, whirl.segments, length(whirl.points))
-end
-
-
-"""
-    update(whirl, points, s3rotation, top, bottom)
-
-Update a Whirl by constructing it from scratch with the given base space `points`, S³
-rotation `s3rotation`, beginning U(1) action `top` and ending U(1) action `bottom`.
-"""
-function update(whirl::Whirl, points::Array{<:S²,1}, s3rotation::S³, top::S¹, bottom::S¹)
-    @assert(length(points) == length(whirl.points),
-            "The number of the given points must be equal to what it was before.")
-    whirl.points = points
-    whirl.s3rotation = s3rotation
-    whirl.top = top
-    whirl.bottom = bottom
-    value = constructwhirl(whirl.points,
-                           whirl.s2tos3map,
-                           whirl.s2tos2map,
-                           top = whirl.top,
-                           bottom = whirl.bottom,
-                           s3rotation = whirl.s3rotation,
-                           config = whirl.config,
-                           segments = whirl.segments,
-                           scale = whirl.scale)
-    updatesurface(value, whirl.observable)
 end
