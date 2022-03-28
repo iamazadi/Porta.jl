@@ -8,7 +8,7 @@ export constructframe
 export getplane
 export constructfiber
 export constructtwospinor
-export getactions
+export transformg
 
 
 """
@@ -168,81 +168,6 @@ end
 
 
 """
-    constructwhirl(points,
-                   s2tos3map,
-                   s2tos2map;
-                   [top, [bottom, [s3rotation, [config, [segments [, scale]]]]]])
-
-Construct a whirl with the given `points` in the base space, , a map from the base space to
-the total space `s2tos3map`, a conformal map that takes the base space to itself `s2tos2map`
-, `top` and `bottom` U(1) actions, S³ rotation `s3rotation`, configuration `config`, the
-number of `segments` and `scale`.
-"""
-function constructwhirl(points::Array{<:S²,1},
-                        s2tos3map,
-                        s2tos2map;
-                        top::S¹ = U1(-pi),
-                        bottom::S¹ = U1(pi),
-                        s3rotation::S³ = Quaternion(1, 0, 0, 0),
-                        config::Biquaternion = Biquaternion(ℝ³(0, 0, 0)),
-                        segments::Int = 36,
-                        scale::Real = 1.0)
-    array = Array{ℝ³,2}(undef, segments, length(points))
-    α₁ = min(angle(top), angle(bottom))
-    α₂ = max(angle(top), angle(bottom))
-    actions = range(α₁, stop = α₂, length = segments)
-    for (j, p) in enumerate(points)
-        # actions = getactions(p, s2tos3map, s2tos2map, top = top, bottom = bottom,
-        #                      s3rotation = s3rotation, segments = segments, scale = scale)
-        for (i, α) in enumerate(actions)
-            array[i, j] = compressedλmap(rotate(S¹action(s2tos3map(s2tos2map(p)), U1(α)), s3rotation)) * scale
-        end
-    end
-    applyconfig(array, config)
-end
-
-
-"""
-    constructfiber(point,
-                   s2tos3map,
-                   s2tos2map;
-                   [radius, [top, [bottom, [s3rotation, [config, [segments [, scale]]]]]]])
-
-Construct a Hopf fiber with the given `point` in the base space, , a map from the base space to
-the total space `s2tos3map`, a conformal map that takes the base space to itself `s2tos2map`,
-fiber sectional `radius`, `top` and `bottom` U(1) actions, S³ rotation `s3rotation`,
-configuration `config`, the number of `segments` and `scale`.
-"""
-function constructfiber(point::S²,
-                        s2tos3map,
-                        s2tos2map;
-                        radius::Float64 = 0.02,
-                        top::S¹ = U1(-pi),
-                        bottom::S¹ = U1(pi),
-                        s3rotation::S³ = Quaternion(1, 0, 0, 0),
-                        config::Biquaternion = Biquaternion(ℝ³(0, 0, 0)),
-                        segments::Int = 30,
-                        scale::Real = 1.0)
-    segments2 = 10
-    α₁ = U1(min(angle(top), angle(bottom)))
-    α₂ = U1(max(angle(top), angle(bottom)))
-    circle = [ℝ³(cos(α), sin(α), 0) for α in range(0, stop = 2π, length = segments2)] .* radius
-    actions = getactions(point, s2tos3map, s2tos2map, top = α₁, bottom = α₂, s3rotation = s3rotation, segments = segments, scale = scale)
-    getp(point, α, rotation, scale) = compressedλmap(rotate(S¹action(s2tos3map(s2tos2map(point)), U1(α)), rotation)) * scale
-    array = Array{ℝ³,2}(undef, segments, segments2)
-    n = ℝ³(0, 0, 1)
-    for (i, α) in enumerate(actions)
-        p₁ = getp(point, α, s3rotation, scale)
-        p₂ = getp(point, α + α * 1e-2, s3rotation, scale)
-        w = normalize(p₂ - p₁)
-        q = Biquaternion(getrotation(n, w), p₁)
-        array[i, :] = applyconfig(circle, q)
-    end
-    applyconfig(array, config)
-end
-
-
-"""
     transformg(p, g₁, g₂, segments)
 
 Transform G-acions by finding and applying affine parameters with the given point `p`
@@ -289,6 +214,69 @@ end
 
 
 """
+    constructwhirl(points, gauge1, gauge2, configuration, segments)
+
+Construct a whirl with the given `points`, `gauge1`, `gauge2`, `configuration` and `segments`.
+"""
+function constructwhirl(points::Array{ComplexPlane,1},
+                        gauge1::Array{U1,1},
+                        gauge2::Array{U1,1},
+                        configuration::Biquaternion,
+                        segments::Int)
+    array = Array{ℝ³,2}(undef, segments, length(points))
+    for (j, p) in enumerate(points)
+        g₁ = gauge1[j]
+        g₂ = gauge2[j]
+        g = transformg(p, g₁, g₂, segments)
+        for (i, α) in enumerate(g)
+            array[i, j] = compressedλmap(S¹action(p, α))
+        end
+    end
+    applyconfig(array, configuration)
+end
+
+
+"""
+    constructfiber(point,
+                   s2tos3map,
+                   s2tos2map;
+                   [radius, [top, [bottom, [s3rotation, [config, [segments [, scale]]]]]]])
+
+Construct a Hopf fiber with the given `point` in the base space, , a map from the base space to
+the total space `s2tos3map`, a conformal map that takes the base space to itself `s2tos2map`,
+fiber sectional `radius`, `top` and `bottom` U(1) actions, S³ rotation `s3rotation`,
+configuration `config`, the number of `segments` and `scale`.
+"""
+function constructfiber(point::S²,
+                        s2tos3map,
+                        s2tos2map;
+                        radius::Float64 = 0.02,
+                        top::S¹ = U1(-pi),
+                        bottom::S¹ = U1(pi),
+                        s3rotation::S³ = Quaternion(1, 0, 0, 0),
+                        config::Biquaternion = Biquaternion(ℝ³(0, 0, 0)),
+                        segments::Int = 30,
+                        scale::Real = 1.0)
+    segments2 = 10
+    α₁ = U1(min(angle(top), angle(bottom)))
+    α₂ = U1(max(angle(top), angle(bottom)))
+    circle = [ℝ³(cos(α), sin(α), 0) for α in range(0, stop = 2π, length = segments2)] .* radius
+    actions = getactions(point, s2tos3map, s2tos2map, top = α₁, bottom = α₂, s3rotation = s3rotation, segments = segments, scale = scale)
+    getp(point, α, rotation, scale) = compressedλmap(rotate(S¹action(s2tos3map(s2tos2map(point)), U1(α)), rotation)) * scale
+    array = Array{ℝ³,2}(undef, segments, segments2)
+    n = ℝ³(0, 0, 1)
+    for (i, α) in enumerate(actions)
+        p₁ = getp(point, α, s3rotation, scale)
+        p₂ = getp(point, α + α * 1e-2, s3rotation, scale)
+        w = normalize(p₂ - p₁)
+        q = Biquaternion(getrotation(n, w), p₁)
+        array[i, :] = applyconfig(circle, q)
+    end
+    applyconfig(array, config)
+end
+
+
+"""
     constructtwospinor(point, gauge1, gauge2, configuration, radius, segments1, segments2)
 
 Construct a 2-spinor with the given `point` in the principal bundle, `gauge1`, `gauge2`,
@@ -316,35 +304,24 @@ end
 
 
 """
-    constructframe(circle, s2tos3map, s2tos2map; [s3rotation, [config, [segments]]])
+    constructframe(section, configuration, segments)
 
 Construct a frame that is like an S³ cross-section under stereographic projection with the
-given `circle` that determines the phase angle in the fiber space, a map from the base space
-to the total space `s2tos3map`, a conformal map that takes the base space to itself
-`s2tos2map`, S³ rotation `s3rotation`, configuration `config` and the number of `segments`.
+given `section`, `configuration` and `segments`.
 """
-function constructframe(circle::S¹,
-                        s2tos3map,
-                        s2tos2map;
-                        s3rotation::S³ = Quaternion(1, 0, 0, 0),
-                        config::Biquaternion = Biquaternion(ℝ³(0, 0, 0)),
+function constructframe(section::Any,
+                        configuration::Biquaternion = Biquaternion(ℝ³(0, 0, 0)),
                         segments::Int = 36)
-    scale = 1.0
     array = Array{ℝ³,2}(undef, segments, segments)
     lspaceϕ = collect(range(float(-pi), stop = float(pi), length = segments))
     lspaceθ = collect(range(float(pi / 2), stop = float(-pi / 2), length = segments))
     for (i, θ) in enumerate(lspaceθ)
         for (j, ϕ) in enumerate(lspaceϕ)
             p = Geographic(1, ϕ, θ)
-            # actions = getactions(p, s2tos3map, s2tos2map, top = U1(0), bottom = U1(2π),
-            #                      s3rotation = s3rotation, segments = 1000, scale = scale)
-            # index = max(1, Int(floor((angle(circle) / 2π) * length(actions))))
-            # action = U1(actions[index])
-            # action = circle
-            array[i, j] = compressedλmap(rotate(S¹action(s2tos3map(s2tos2map(p)), circle), s3rotation)) * scale
+            array[i, j] = compressedλmap(section(p))
         end
     end
-    applyconfig(array, config)
+    applyconfig(array, configuration)
 end
 
 
