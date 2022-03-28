@@ -59,7 +59,7 @@ function σmap(b::S²)
     p = Geographic(b)
     z₀ = exp(im * 0) * sqrt((1 + sin(p.θ)) / 2)
     z₁ = exp(im * p.ϕ) * sqrt((1 - sin(p.θ)) / 2)
-    Quaternion(ComplexPlane(z₀, z₁))
+    ComplexPlane(z₀, z₁)
 end
 
 
@@ -70,7 +70,7 @@ A map that takes the base space to the total space. σ: S² → S³, τ ⊂ [z�
 """
 function τmap(b::S²)
     z₀, z₁ = vec(ComplexPlane(σmap(b)))
-    Quaternion(ComplexPlane(z₁, z₀))
+    ComplexPlane(z₁, z₀)
 end
 
 
