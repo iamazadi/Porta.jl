@@ -6,10 +6,10 @@ const TOLERANCE = 1e-7
 
 
 logicdir = "logic_tests"
-linearalgebradir = "linearalgebra_tests"
+linearalgebradir = "topology_tests/linearalgebra"
 geometrydir = "geometry_tests"
 bundlesdir = "bundles_tests"
-uidir = "ui_tests"
+computergraphicsdir = "computergraphics_tests"
 datadir = "data_tests"
 
 
@@ -42,16 +42,17 @@ end
 
 
 @time @testset "The UI Tests" begin
-    include(joinpath(uidir, "body_tests.jl"))
-    include(joinpath(uidir, "ui_tests.jl"))
-    include(joinpath(uidir, "arrow_tests.jl"))
-    include(joinpath(uidir, "cylinder_tests.jl"))
-    include(joinpath(uidir, "sphere_tests.jl"))
-    include(joinpath(uidir, "torus_tests.jl"))
-    include(joinpath(uidir, "triad_tests.jl"))
-    include(joinpath(uidir, "whirl_tests.jl"))
-    include(joinpath(uidir, "frame_tests.jl"))
-    include(joinpath(uidir, "coloring_tests.jl"))
+    include(joinpath(computergraphicsdir, "body_tests.jl"))
+    include(joinpath(computergraphicsdir, "ui_tests.jl"))
+    include(joinpath(computergraphicsdir, "arrow_tests.jl"))
+    include(joinpath(computergraphicsdir, "cylinder_tests.jl"))
+    include(joinpath(computergraphicsdir, "sphere_tests.jl"))
+    include(joinpath(computergraphicsdir, "hemisphere_tests.jl"))
+    include(joinpath(computergraphicsdir, "torus_tests.jl"))
+    include(joinpath(computergraphicsdir, "triad_tests.jl"))
+    include(joinpath(computergraphicsdir, "whirl_tests.jl"))
+    include(joinpath(computergraphicsdir, "frame_tests.jl"))
+    include(joinpath(computergraphicsdir, "coloring_tests.jl"))
 end
 
 
