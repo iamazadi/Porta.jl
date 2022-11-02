@@ -32,7 +32,7 @@ function Arrow(tail::ℝ³,
                head::ℝ³,
                scene::Makie.Scene;
                width::Float64 = 0.05,
-               color::Makie.RGBAf = Makie.RGBAf(1.0, 0.0, 0.0, 1.0),
+               color::Makie.RGBA = Makie.RGBA(1.0, 0.0, 0.0, 1.0),
                transparency::Bool = false)
     tailobservable = Observables.Observable([GeometryBasics.Point3f(vec(tail)...)])
     headobservable = Observables.Observable([GeometryBasics.Point3f(vec(head)...)])
@@ -67,6 +67,6 @@ end
 
 Update an Arrow by changing its observable with the given `color`.
 """
-function update(arrow::Arrow, color::Makie.RGBAf)
+function update(arrow::Arrow, color::Makie.RGBA)
     arrow.color[] = color
 end
