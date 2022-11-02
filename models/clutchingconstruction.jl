@@ -84,27 +84,27 @@ z_arrow = Arrow(tail,
                 width = width,
                 color = color)
 
-# color = GLMakie.RGBA(255.0, 0.0, 0.0, 0.5)
-# tail, head = ℝ³(0, 0, 1), ℝ³(0, 0, 0.3)
-# a_arrow = Arrow(tail,
-#                 head,
-#                 lscene.scene,
-#                 width = width,
-#                 color = color)
-# color = GLMakie.RGBA(0.0, 255.0, 0.0, 0.5)
-# tail, head = ℝ³(0, 0, 1), ℝ³(0, 0, 0.3)
-# b_arrow = Arrow(tail,
-#                 head,
-#                 lscene.scene,
-#                 width = width,
-#                 color = color)
-# color = GLMakie.RGBA(0.0, 0.0, 255.0, 0.5)
-# tail, head = ℝ³(0, 0, 1), ℝ³(0, 0, 0.3)
-# c_arrow = Arrow(tail,
-#                 head,
-#                 lscene.scene,
-#                 width = width,
-#                 color = color)
+color = GLMakie.RGBA(255.0, 0.0, 0.0, 0.5)
+tail, head = ℝ³(0, 0, 1), ℝ³(0, 0, 0.3)
+a_arrow = Arrow(tail,
+                head,
+                lscene.scene,
+                width = width,
+                color = color)
+color = GLMakie.RGBA(0.0, 255.0, 0.0, 0.5)
+tail, head = ℝ³(0, 0, 1), ℝ³(0, 0, 0.3)
+b_arrow = Arrow(tail,
+                head,
+                lscene.scene,
+                width = width,
+                color = color)
+color = GLMakie.RGBA(0.0, 0.0, 255.0, 0.5)
+tail, head = ℝ³(0, 0, 1), ℝ³(0, 0, 0.3)
+c_arrow = Arrow(tail,
+                head,
+                lscene.scene,
+                width = width,
+                color = color)
 
 textbox = GLMakie.Textbox(fig, placeholder = "Enter a name", width = 115)
 textbox.stored_string = "I"
@@ -114,35 +114,48 @@ toggle = GLMakie.Toggle(fig, active = false)
 label = GLMakie.Label(fig, GLMakie.lift(x -> x ? "Disk S" : "Disk N", toggle.active))
 fig[4, 3] = GLMakie.grid!(GLMakie.hcat(textbox, markbutton, resetbutton, toggle, label), tellheight = false)
 
-rotation = GLMakie.lift(eyeposition) do _eyeposition
-    _lookat = GLMakie.to_value(lookat)
-    v = _eyeposition - _lookat
-    if GLMakie.to_value(toggle.active) 
-        v = -v
-        n = ℝ³(0, 0, 1)
-        h = Quaternion(π / 2, ℝ³(0, 1, 0)) * getrotation(n, v)
-    else
-        n = ℝ³(0, 0, 1)
-        h = getrotation(n, v)
-    end
+rotation = GLMakie.Observable(Quaternion(1, 0, 0, 0))
+
+# rotation = GLMakie.lift(eyeposition) do _eyeposition
+#     _lookat = GLMakie.to_value(lookat)
+#     v = _eyeposition - _lookat
+#     # v = _lookat
+#     n = ℝ³(0, 0, 1)
     
-    
+#     if GLMakie.to_value(toggle.active) 
+#         v = -v
+#         #h = Quaternion(π / 2, ℝ³(0, 1, 0)) * getrotation(n, v)
+#     end
 
-    pᵢ = ℝ³(0, 0, 1)
-    pᵢ₊₁ = normalize(v)
-    qᵢ = getrotation(n, pᵢ)
-    qᵢ₊₁ = getrotation(n, pᵢ₊₁)
+#     pᵢ = ℝ³(0, 0, 1)
+#     pᵢ₊₁ = normalize(v)
+#     qᵢ = getrotation(n, pᵢ)
+#     qᵢ₊₁ = getrotation(n, pᵢ₊₁)
 
-    p = Quaternion([0; vec(pᵢ₊₁)]) * conj(Quaternion([0; vec(pᵢ)]))
+#     p = Quaternion([0; vec(pᵢ₊₁)]) * conj(Quaternion([0; vec(pᵢ)]))
 
-    p′ = Quaternion([vec(p)[1] + 1; vec(p)[2:4]])
-    Δᵢ = normalize(p′)
+#     p′ = Quaternion([vec(p)[1] + 1; vec(p)[2:4]])
+#     Δᵢ = normalize(p′)
 
-    r = conj(qᵢ) * conj(Δᵢ) * qᵢ₊₁
+#     r = conj(qᵢ) * conj(Δᵢ) * qᵢ₊₁
 
-    θ = 2atan(vec(r)[4] / vec(r)[1])
-    h * Quaternion(-θ / 2, normalize(v))
-end
+#     θ = 2atan(vec(r)[2] / vec(r)[1])
+
+#     r1 = normalize(_eyeposition - (dot(_eyeposition, v) / norm(v)) * v)
+
+#     update(a_arrow, _lookat, normalize(ℝ³(vec(Δᵢ)[2:4]...)))
+#     update(b_arrow, _lookat, normalize(ℝ³(vec(r)[2:4]...)))
+#     update(c_arrow, _lookat, r1)
+
+#     #θ = acos(dot(r1, normalize(ℝ³(vec(Δᵢ)[2:4]...))))
+#     println(θ)
+#     if GLMakie.to_value(toggle.active) 
+#         h = Quaternion(π / 2, ℝ³(0, 1, 0)) * getrotation(n, v)
+#     else
+#         h = getrotation(n, v)
+#     end
+#     h #* Quaternion(θ / 2, normalize(v))
+# end
 
 textotation = GLMakie.@lift(GLMakie.Quaternion(vec($rotation)[2], vec($rotation)[3], vec($rotation)[4], vec($rotation)[1]))
 
@@ -309,6 +322,41 @@ updatep(p) = begin
     path = GLMakie.to_value(pathobservable)
     path = [point; path[1:end-1]]
     pathobservable[] = path
+
+    v = point
+    ẑ = ℝ³(0, 0, 1)
+    
+    if GLMakie.to_value(toggle.active) 
+        v = -v
+    end
+
+    pᵢ = ℝ³(point₀[1], point₀[2], Φ(point₀))
+    pᵢ₊₁ = normalize(v)
+    qᵢ = getrotation(ẑ, pᵢ)
+    qᵢ₊₁ = getrotation(ẑ, pᵢ₊₁)
+
+    p = Quaternion([0; vec(pᵢ₊₁)]) * conj(Quaternion([0; vec(pᵢ)]))
+
+    p′ = Quaternion([vec(p)[1] + 1; vec(p)[2:4]])
+    Δᵢ = normalize(p′)
+
+    r = conj(qᵢ) * conj(Δᵢ) * qᵢ₊₁
+
+    θ = 2atan(vec(r)[2] / vec(r)[1])
+
+
+    update(a_arrow, ℝ³(0, 0, 0), pᵢ₊₁)
+    update(b_arrow, pᵢ₊₁, normalize(ℝ³(vec(Δᵢ)[2:4]...)))
+    update(c_arrow, pᵢ₊₁, normalize(ℝ³(vec(r)[2:4]...)))
+
+    println(θ)
+    if GLMakie.to_value(toggle.active) 
+        h = Quaternion(π / 2, ℝ³(0, 1, 0)) * getrotation(ẑ, v)
+    else
+        h = getrotation(ẑ, v)
+    end
+    
+    rotation[] = h * Quaternion(θ / 2, normalize(v))
 end
 
 GLMakie.on(sl_nx.value) do nx
