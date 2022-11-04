@@ -5,6 +5,7 @@ using Porta
 
 
 controlstatus = GLMakie.Observable(true)
+cumulativetwist = GLMakie.Observable(0.0)
 
 Φ(p) = begin
     chart = GLMakie.to_value(toggle.active)
@@ -84,21 +85,21 @@ z_arrow = Arrow(tail,
                 width = width,
                 color = color)
 
-color = GLMakie.RGBA(255.0, 0.0, 0.0, 0.5)
+color = GLMakie.RGBA(10.0, 1.0, 1.0, 0.5)
 tail, head = ℝ³(0, 0, 1), ℝ³(0, 0, 0.3)
 a_arrow = Arrow(tail,
                 head,
                 lscene.scene,
                 width = width,
                 color = color)
-color = GLMakie.RGBA(0.0, 255.0, 0.0, 0.5)
+color = GLMakie.RGBA(1.0, 10.0, 1.0, 0.5)
 tail, head = ℝ³(0, 0, 1), ℝ³(0, 0, 0.3)
 b_arrow = Arrow(tail,
                 head,
                 lscene.scene,
                 width = width,
                 color = color)
-color = GLMakie.RGBA(0.0, 0.0, 255.0, 0.5)
+color = GLMakie.RGBA(1.0, 1.0, 10.0, 0.5)
 tail, head = ℝ³(0, 0, 1), ℝ³(0, 0, 0.3)
 c_arrow = Arrow(tail,
                 head,
@@ -164,8 +165,6 @@ GLMakie.text!(GLMakie.Point3f(0, 1, 0), text = "b", color = :black, align = (:le
 GLMakie.text!(GLMakie.Point3f(-1, 0, 0), text = "c", color = :black, align = (:left, :baseline), rotation = textotation, textsize = textsize1, markerspace = :data)
 GLMakie.text!(GLMakie.Point3f(0, -1, 0), text = "d", color = :black, align = (:left, :baseline), rotation = textotation, textsize = textsize1, markerspace = :data)
 
-yrotation = GLMakie.@lift(getrotation(ℝ³(0, 0, 1), ℝ³($(y_arrow.tailobservable)[1].data...) + ℝ³($(y_arrow.headobservable)[1].data...)))
-zrotation = GLMakie.@lift(normalize(getrotation(ℝ³(0, 0, 1), ℝ³($(z_arrow.tailobservable)[1].data...) + ℝ³($(z_arrow.headobservable)[1].data...))))
 GLMakie.text!(lscene,
               GLMakie.@lift(GLMakie.Point3f(vec(ℝ³($(x_arrow.tailobservable)[1].data...) + ℝ³($(x_arrow.headobservable)[1].data...)))),
               text = "1",
@@ -247,8 +246,8 @@ n_xs = GLMakie.Observable([0.0; 0.0])
 n_ys = GLMakie.Observable([0.0; 0.0])
 n_us = GLMakie.Observable([0.3; 0.0])
 n_vs = GLMakie.Observable([0.0; 0.3])
-s_xs = GLMakie.Observable([0.0; 0.0])
-s_ys = GLMakie.Observable([0.0; 0.0])
+s_xs = GLMakie.Observable([10.0; 10.0])
+s_ys = GLMakie.Observable([10.0; 10.0])
 s_us = GLMakie.Observable([0.3; 0.0])
 s_vs = GLMakie.Observable([0.0; 0.3])
 n_colors = GLMakie.Observable([:red; :green])
@@ -260,18 +259,22 @@ GLMakie.text!(n_ax.scene, GLMakie.@lift(($n_xs)[2] + ($n_us)[2] + 0.1 * sign(($n
 GLMakie.text!(s_ax.scene, GLMakie.@lift(($s_xs)[1] + ($s_us)[1] + 0.1 * sign(($s_xs)[1] + ($s_us)[1])), GLMakie.@lift(($s_ys)[1] + ($s_vs)[1] + 0.1 * sign(($s_ys)[1] + ($s_vs)[1])), text = "1", color = :red, align = (:center, :center), textsize = textsize)
 GLMakie.text!(s_ax.scene, GLMakie.@lift(($s_xs)[2] + ($s_us)[2] + 0.1 * sign(($s_xs)[2] + ($s_us)[2])), GLMakie.@lift(($s_ys)[2] + ($s_vs)[2] + 0.1 * sign(($s_ys)[2] + ($s_vs)[2])), text = "2", color = :green, align = (:center, :center), textsize = textsize)
 
-chartpathxs = GLMakie.@lift([vec(($pathobservable)[i])[1] for i in 1:pathpoints])
-chartpathys = GLMakie.@lift([vec(($pathobservable)[i])[2] for i in 1:pathpoints])
-GLMakie.linesegments!(n_ax, chartpathxs, chartpathys, linewidth = 10, linestyle = :dot, color = pathcolor)
-GLMakie.linesegments!(s_ax, chartpathxs, chartpathys, linewidth = 10, linestyle = :dot, color = pathcolor)
+n_pathobservable = GLMakie.Observable([ℝ³(0, 0, 1) for i in 1:pathpoints])
+s_pathobservable = GLMakie.Observable([ℝ³(0, 0, 1) for i in 1:pathpoints])
+n_chartpathxs = GLMakie.@lift([vec(($n_pathobservable)[i])[1] for i in 1:pathpoints])
+n_chartpathys = GLMakie.@lift([vec(($n_pathobservable)[i])[2] for i in 1:pathpoints])
+s_chartpathxs = GLMakie.@lift([vec(($s_pathobservable)[i])[1] for i in 1:pathpoints])
+s_chartpathys = GLMakie.@lift([vec(($s_pathobservable)[i])[2] for i in 1:pathpoints])
+GLMakie.linesegments!(n_ax, n_chartpathxs, n_chartpathys, linewidth = 10, linestyle = :dot, color = pathcolor)
+GLMakie.linesegments!(s_ax, s_chartpathxs, s_chartpathys, linewidth = 10, linestyle = :dot, color = pathcolor)
 
 p₀ = GLMakie.Observable([0.0; 0.0])
 p₁ = GLMakie.Observable([0.0; 0.0])
-sl_nx = GLMakie.Slider(fig[3, 3], range = -1:0.0001:1, startvalue = 0)
-sl_ny = GLMakie.Slider(fig[1:2, 4], range = -1:0.0001:1, horizontal = false, startvalue = 0)
+sl_nx = GLMakie.Slider(fig[3, 3], range = -1:0.00001:1, startvalue = 0)
+sl_ny = GLMakie.Slider(fig[1:2, 4], range = -1:0.00001:1, horizontal = false, startvalue = 0)
 
-sl_sx = GLMakie.Slider(fig[7, 3], range = -1:0.0001:1, startvalue = 0)
-sl_sy = GLMakie.Slider(fig[5:6, 4], range = -1:0.0001:1, horizontal = false, startvalue = 0)
+sl_sx = GLMakie.Slider(fig[7, 3], range = -1:0.00001:1, startvalue = 0)
+sl_sy = GLMakie.Slider(fig[5:6, 4], range = -1:0.00001:1, horizontal = false, startvalue = 0)
 
 # ϕ₀ = GLMakie.Observable(0.0)
 # θ₀ = GLMakie.Observable(0.0)
@@ -306,12 +309,12 @@ torus = Torus(q1,
               transparency = transparency)
 
 
-snapthreshold = 0.03
+snapthreshold = 0.02
 
 updatep(p) = begin
     point₀ = GLMakie.to_value(p₁)
     point₁ = p
-    threshold = 1e-6
+    threshold = 1e-8
     if isapprox(point₀[1], point₁[1], atol = threshold) && isapprox(point₀[2], point₁[2], atol = threshold)
         return
     end
@@ -319,19 +322,38 @@ updatep(p) = begin
     p₁[] = point₁
     x, y = point₁
     point = ℝ³(x, y, Φ(point₁))
-    path = GLMakie.to_value(pathobservable)
-    path = [point; path[1:end-1]]
-    pathobservable[] = path
 
-    v = point
-    ẑ = ℝ³(0, 0, 1)
-    
-    if GLMakie.to_value(toggle.active) 
-        v = -v
+    if GLMakie.to_value(toggle.active)
+        path = GLMakie.to_value(pathobservable)
+        path = [point; path[1:end-1]]
+        pathobservable[] = path
+
+        s_path = GLMakie.to_value(s_pathobservable)
+        s_path = [point; s_path[1:end-1]]
+        s_pathobservable[] = s_path
+
+        n_path = GLMakie.to_value(n_pathobservable)
+        n_path = [n_path[1]; n_path[1:end-1]]
+        n_pathobservable[] = n_path
+    else
+        path = GLMakie.to_value(pathobservable)
+        path = [point; path[1:end-1]]
+        pathobservable[] = path
+
+        n_path = GLMakie.to_value(n_pathobservable)
+        n_path = [point; n_path[1:end-1]]
+        n_pathobservable[] = n_path
+
+        s_path = GLMakie.to_value(s_pathobservable)
+        s_path = [s_path[1]; s_path[1:end-1]]
+        s_pathobservable[] = s_path
     end
 
+    ẑ = ℝ³(0, 0, 1)
+
     pᵢ = ℝ³(point₀[1], point₀[2], Φ(point₀))
-    pᵢ₊₁ = normalize(v)
+    pᵢ₊₁ = ℝ³(point₁[1], point₁[2], Φ(point₁))
+
     qᵢ = getrotation(ẑ, pᵢ)
     qᵢ₊₁ = getrotation(ẑ, pᵢ₊₁)
 
@@ -342,21 +364,38 @@ updatep(p) = begin
 
     r = conj(qᵢ) * conj(Δᵢ) * qᵢ₊₁
 
-    θ = 2atan(vec(r)[2] / vec(r)[1])
+    θ = 2atan(vec(r)[4] / vec(r)[1])
+    θ = θ / 4
 
-
-    update(a_arrow, ℝ³(0, 0, 0), pᵢ₊₁)
-    update(b_arrow, pᵢ₊₁, normalize(ℝ³(vec(Δᵢ)[2:4]...)))
-    update(c_arrow, pᵢ₊₁, normalize(ℝ³(vec(r)[2:4]...)))
+    θ = GLMakie.to_value(cumulativetwist) + θ
+    cumulativetwist[] = θ
 
     println(θ)
     if GLMakie.to_value(toggle.active) 
-        h = Quaternion(π / 2, ℝ³(0, 1, 0)) * getrotation(ẑ, v)
+        h = Quaternion(π / 2, ℝ³(0, 1, 0)) * getrotation(ẑ, -pᵢ₊₁)
+        r′ = -Quaternion(-θ / 2, pᵢ₊₁)
     else
-        h = getrotation(ẑ, v)
+        h = getrotation(ẑ, pᵢ₊₁)
+        r′ = Quaternion(θ / 2, pᵢ₊₁)
     end
     
-    rotation[] = h * Quaternion(θ / 2, normalize(v))
+    
+    h′ = h * r′
+    rotation[] = h′
+
+    update(a_arrow, pᵢ₊₁, rotate(ℝ³(1, 0, 0), conj(h′)))
+    update(b_arrow, pᵢ₊₁, rotate(ℝ³(0, 1, 0), conj(h′)))
+    update(c_arrow, pᵢ₊₁, rotate(ℝ³(0, 0, 1), conj(h′)))
+
+    # if GLMakie.to_value(toggle.active) 
+    #     update(a_arrow, -v, rotate(ℝ³(1, 0, 0), conj(h′)))
+    #     update(b_arrow, -v, rotate(ℝ³(0, 1, 0), conj(h′)))
+    #     update(c_arrow, -v, rotate(ℝ³(0, 0, 1), conj(h′)))
+    # else
+    #     update(a_arrow, v, rotate(ℝ³(1, 0, 0), conj(h′)))
+    #     update(b_arrow, v, rotate(ℝ³(0, 1, 0), conj(h′)))
+    #     update(c_arrow, v, rotate(ℝ³(0, 0, 1), conj(h′)))
+    # end
 end
 
 GLMakie.on(sl_nx.value) do nx
@@ -480,28 +519,42 @@ GLMakie.on(p₁) do p
 
     n = ℝ³(0, 0, 1)
 
-    u = xhead - (dot(xhead, tail) / norm(n)) * n
-    v = yhead - (dot(yhead, tail) / norm(n)) * n
-    u.a[3] = 0.0
-    v.a[3] = 0.0
-    u = 0.3 * normalize(u)
-    v = 0.3 * normalize(v)
+    if GLMakie.to_value(toggle.active)
+        u = xhead - (dot(xhead, tail) / norm(n)) * n
+        v = yhead - (dot(yhead, tail) / norm(n)) * n
+        u.a[3] = 0.0
+        v.a[3] = 0.0
+        u = 0.3 * normalize(u)
+        v = 0.3 * normalize(v)
+        s_xs[] = [x; x]
+        s_ys[] = [y; y]
+        s_us[] = [u.a[1]; v.a[1]]
+        s_vs[] = [u.a[2]; v.a[2]]
 
-    n_xs[] = [x; x]
-    n_ys[] = [y; y]
-    n_us[] = [u.a[1]; v.a[1]]
-    n_vs[] = [u.a[2]; v.a[2]]
+        # send the deactive frame to out of axis limits
+        n_xs[] = [10.0; 10.0]
+        n_ys[] = [10.0; 10.0]
+        n_us[] = [11.0; 11.0]
+        n_vs[] = [11.0; 11.0]
+    else
+        u = xhead - (dot(xhead, tail) / norm(n)) * n
+        v = yhead - (dot(yhead, tail) / norm(n)) * n
+        u.a[3] = 0.0
+        v.a[3] = 0.0
+        u = 0.3 * normalize(u)
+        v = 0.3 * normalize(v)
 
-    u = xhead - (dot(xhead, tail) / norm(n)) * n
-    v = yhead - (dot(yhead, tail) / norm(n)) * n
-    u.a[3] = 0.0
-    v.a[3] = 0.0
-    u = 0.3 * normalize(u)
-    v = 0.3 * normalize(v)
-    s_xs[] = [x; x]
-    s_ys[] = [y; y]
-    s_us[] = [u.a[1]; v.a[1]]
-    s_vs[] = [u.a[2]; v.a[2]]
+        n_xs[] = [x; x]
+        n_ys[] = [y; y]
+        n_us[] = [u.a[1]; v.a[1]]
+        n_vs[] = [u.a[2]; v.a[2]]
+
+        # send the deactive frame to out of axis limits
+        s_xs[] = [10.0; 10.0]
+        s_ys[] = [10.0; 10.0]
+        s_us[] = [11.0; 11.0]
+        s_vs[] = [11.0; 11.0]
+    end
 
     _eyeposition = 2 * tail + 2 * xhead + 2 * yhead + 4 * zhead
     _lookat = tail
@@ -515,10 +568,17 @@ end
 GLMakie.on(toggle.active) do chart
     p = GLMakie.to_value(p₁)
     x, y = p
-    s_xs[] = [x; x]
-    s_ys[] = [y; y]
-    n_xs[] = [x; x]
-    n_ys[] = [y; y]
+    if chart
+        s_xs[] = [x; x]
+        s_ys[] = [y; y]
+        n_xs[] = [10.0; 10.0]
+        n_ys[] = [10.0; 10.0]
+    else
+        s_xs[] = [11.0; 11.0]
+        s_ys[] = [11.0; 11.0]
+        n_xs[] = [x; x]
+        n_ys[] = [y; y]
+    end
     controlstatus[] = false
     if !isapprox(GLMakie.to_value(sl_sx.value), x)
         GLMakie.set_close_to!(sl_sx, x)
@@ -533,6 +593,7 @@ GLMakie.on(toggle.active) do chart
         GLMakie.set_close_to!(sl_ny, y)
     end
     controlstatus[] = true
+    p₁[] = GLMakie.to_value(p₁)
 end
 
 dummyarrows = []
@@ -567,16 +628,13 @@ GLMakie.on(markbutton.clicks) do n
     Arrow(tail, head, lscene.scene, width = width, color = color[2])
     head = z_arrow.head
     Arrow(tail, head, lscene.scene, width = width, color = color[3])
-    _xrotation = getrotation(ℝ³(0, 0, 1), ℝ³(GLMakie.to_value(x_arrow.tailobservable)[1].data...) + ℝ³(GLMakie.to_value(x_arrow.headobservable)[1].data...))
-    _yrotation = getrotation(ℝ³(0, 0, 1), ℝ³(GLMakie.to_value(y_arrow.tailobservable)[1].data...) + ℝ³(GLMakie.to_value(y_arrow.headobservable)[1].data...))
-    _zrotation = normalize(getrotation(ℝ³(0, 0, 1), ℝ³(GLMakie.to_value(z_arrow.tailobservable)[1].data...) + ℝ³(GLMakie.to_value(z_arrow.headobservable)[1].data...)))
     GLMakie.text!(lscene,
                   GLMakie.Point3f(vec(ℝ³(GLMakie.to_value(x_arrow.tailobservable)[1].data...) + ℝ³(GLMakie.to_value(x_arrow.headobservable)[1].data...))),
                   text = "$(name)₁",
                   color = color[1],
                   align = (:left, :baseline),
                   textsize = textsize1,
-                  rotation = GLMakie.Quaternion(vec(_xrotation)[2], vec(_xrotation)[3], vec(_xrotation)[4], vec(_xrotation)[1]),
+                  rotation = textotation,
                   markerspace = :data)
     GLMakie.text!(lscene,
                   GLMakie.Point3f(vec(ℝ³(GLMakie.to_value(y_arrow.tailobservable)[1].data...) + ℝ³(GLMakie.to_value(y_arrow.headobservable)[1].data...))),
@@ -584,7 +642,7 @@ GLMakie.on(markbutton.clicks) do n
                   color = color[2],
                   align = (:left, :baseline),
                   textsize = textsize1,
-                  rotation = GLMakie.Quaternion(vec(_yrotation)[2], vec(_yrotation)[3], vec(_yrotation)[4], vec(_yrotation)[1]),
+                  rotation = textotation,
                   markerspace = :data)
     GLMakie.text!(lscene,
                   GLMakie.Point3f(vec(ℝ³(GLMakie.to_value(z_arrow.tailobservable)[1].data...) + ℝ³(GLMakie.to_value(z_arrow.headobservable)[1].data...))),
@@ -592,8 +650,9 @@ GLMakie.on(markbutton.clicks) do n
                   color = color[3],
                   align = (:left, :baseline),
                   textsize = textsize1,
-                  rotation = GLMakie.Quaternion(vec(_zrotation)[2], vec(_zrotation)[3], vec(_zrotation)[4], vec(_zrotation)[1]),
+                  rotation = textotation,
                   markerspace = :data)
+    p₁[] = GLMakie.to_value(p₁)
 end
 
 GLMakie.on(resetbutton.clicks) do n
@@ -617,6 +676,7 @@ GLMakie.on(resetbutton.clicks) do n
     update(y_arrow, tail, ℝ³(0, 0.3, 0))
     update(z_arrow, tail, ℝ³(0, 0, 0.3))
     pathobservable[] = [ℝ³(0, 0, 1) for i in 1:pathpoints]
+    p₁[] = GLMakie.to_value(p₁)
 end
 
 # GLMakie.on(sl_θ.value) do θ
