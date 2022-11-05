@@ -677,6 +677,10 @@ GLMakie.on(resetbutton.clicks) do n
     update(z_arrow, tail, ℝ³(0, 0, 0.3))
     pathobservable[] = [ℝ³(0, 0, 1) for i in 1:pathpoints]
     p₁[] = GLMakie.to_value(p₁)
+    cumulativetwist[] = 0.0
+    update(a_arrow, tail, ℝ³(1, 0, 0))
+    update(b_arrow, tail, ℝ³(0, 1, 0))
+    update(c_arrow, tail, ℝ³(0, 0, 1))
 end
 
 # GLMakie.on(sl_θ.value) do θ
