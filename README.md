@@ -1,4 +1,4 @@
-# Quantize the Geometry!
+# Geometrize the quantum!
 ![Hopf Dance](gallery/hopfdance.gif "Hopf Dance")
 ![Planet Hopf](gallery/planethopf.gif "Planet Hopf")
 ![the Hopf fibration](gallery/londontsai.gif "The Hopf fibration inspired by London Tsai")
