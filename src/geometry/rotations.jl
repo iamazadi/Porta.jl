@@ -11,7 +11,7 @@ getrotation(i::ℝ³, n::ℝ³) = begin
     if isapprox(normalize(i), normalize(n))
         return Quaternion(0, normalize(i))
     end
-    u = normalize(cross(i, n))
+    u = normalize(cross(n, i))
     θ = acos(dot(normalize(i), normalize(n))) / 2
     Quaternion(θ, u)
 end
