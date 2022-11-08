@@ -158,7 +158,7 @@ rotation = GLMakie.Observable(Quaternion(1, 0, 0, 0))
 #     h #* Quaternion(θ / 2, normalize(v))
 # end
 
-textotation = GLMakie.@lift(GLMakie.Quaternion(vec($rotation)[2], vec($rotation)[3], vec($rotation)[4], vec($rotation)[1]))
+textotation = GLMakie.@lift(GLMakie.Quaternion(-vec($rotation)[2], -vec($rotation)[3], -vec($rotation)[4], vec($rotation)[1]))
 
 GLMakie.text!(GLMakie.Point3f(1, 0, 0), text = "a", color = :black, align = (:left, :baseline), textsize = textsize1, rotation = textotation, markerspace = :data)
 GLMakie.text!(GLMakie.Point3f(0, 1, 0), text = "b", color = :black, align = (:left, :baseline), textsize = textsize1, rotation = textotation, markerspace = :data)
@@ -356,8 +356,11 @@ updatep(p) = begin
 
     qᵢ = getrotation(ẑ, pᵢ)
     qᵢ₊₁ = getrotation(ẑ, pᵢ₊₁)
+    # qᵢ = Quaternion([0; vec(ẑ)]) * conj(Quaternion([0; vec(pᵢ)]))
+    # qᵢ₊₁ = Quaternion([0; vec(ẑ)]) * conj(Quaternion([0; vec(pᵢ₊₁)]))
 
-    p = Quaternion([0; vec(pᵢ₊₁)]) * conj(Quaternion([0; vec(pᵢ)]))
+    # p = Quaternion([0; vec(pᵢ)]) * conj(Quaternion([0; vec(pᵢ₊₁)]))
+    p = getrotation(pᵢ, pᵢ₊₁)
 
     p′ = Quaternion([vec(p)[1] + 1; vec(p)[2:4]])
     Δᵢ = normalize(p′)
@@ -365,27 +368,27 @@ updatep(p) = begin
     r = conj(qᵢ) * conj(Δᵢ) * qᵢ₊₁
 
     θ = 2atan(vec(r)[4] / vec(r)[1])
-    θ = θ / 4
+    θ = θ / 2
 
     θ = GLMakie.to_value(cumulativetwist) + θ
-    cumulativetwist[] = θ
-
+    cumulativetwist[] = θ % 2π
     println(θ)
+    
     if GLMakie.to_value(toggle.active) 
-        h = Quaternion(π / 2, ℝ³(0, 1, 0)) * getrotation(ẑ, -pᵢ₊₁)
-        r′ = -Quaternion(-θ / 2, pᵢ₊₁)
+        h = Quaternion(π, ℝ³(0, 1, 0)) * conj(getrotation(ẑ, pᵢ₊₁))
+        r′ = Quaternion(θ, pᵢ₊₁)
+        h′ = conj(h * r′)
+        rotation[] = h′
     else
-        h = getrotation(ẑ, pᵢ₊₁)
-        r′ = Quaternion(θ / 2, pᵢ₊₁)
+        h = conj(getrotation(ẑ, pᵢ₊₁))
+        r′ = Quaternion(θ, pᵢ₊₁)
+        h′ = conj(h * r′)
+        rotation[] = h′
     end
-    
-    
-    h′ = h * r′
-    rotation[] = h′
 
-    update(a_arrow, pᵢ₊₁, rotate(ℝ³(1, 0, 0), conj(h′)))
-    update(b_arrow, pᵢ₊₁, rotate(ℝ³(0, 1, 0), conj(h′)))
-    update(c_arrow, pᵢ₊₁, rotate(ℝ³(0, 0, 1), conj(h′)))
+    update(a_arrow, pᵢ₊₁, rotate(ℝ³(1, 0, 0), h′))
+    update(b_arrow, pᵢ₊₁, rotate(ℝ³(0, 1, 0), h′))
+    update(c_arrow, pᵢ₊₁, rotate(ℝ³(0, 0, 1), h′))
 
     # if GLMakie.to_value(toggle.active) 
     #     update(a_arrow, -v, rotate(ℝ³(1, 0, 0), conj(h′)))
