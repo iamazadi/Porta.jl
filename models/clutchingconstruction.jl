@@ -356,8 +356,6 @@ updatep(p) = begin
 
     qᵢ = getrotation(ẑ, pᵢ)
     qᵢ₊₁ = getrotation(ẑ, pᵢ₊₁)
-    # qᵢ = Quaternion([0; vec(ẑ)]) * conj(Quaternion([0; vec(pᵢ)]))
-    # qᵢ₊₁ = Quaternion([0; vec(ẑ)]) * conj(Quaternion([0; vec(pᵢ₊₁)]))
 
     # p = Quaternion([0; vec(pᵢ)]) * conj(Quaternion([0; vec(pᵢ₊₁)]))
     p = getrotation(pᵢ, pᵢ₊₁)
@@ -368,7 +366,6 @@ updatep(p) = begin
     r = conj(qᵢ) * conj(Δᵢ) * qᵢ₊₁
 
     θ = 2atan(vec(r)[4] / vec(r)[1])
-    θ = θ / 2
 
     θ = GLMakie.to_value(cumulativetwist) + θ
     cumulativetwist[] = θ % 2π
@@ -376,16 +373,12 @@ updatep(p) = begin
     
     if GLMakie.to_value(toggle.active) 
         h = Quaternion(π, ℝ³(0, 1, 0)) * conj(getrotation(ẑ, pᵢ₊₁))
-        r′ = Quaternion(θ, pᵢ₊₁)
-        h′ = conj(h * r′)
-        rotation[] = h′
     else
         h = conj(getrotation(ẑ, pᵢ₊₁))
-        r′ = Quaternion(θ, pᵢ₊₁)
-        h′ = conj(h * r′)
-        rotation[] = h′
     end
-
+    r′ = Quaternion(θ / 2, pᵢ₊₁)
+    h′ = conj(h * r′)
+    rotation[] = h′
     update(a_arrow, pᵢ₊₁, rotate(ℝ³(1, 0, 0), h′))
     update(b_arrow, pᵢ₊₁, rotate(ℝ³(0, 1, 0), h′))
     update(c_arrow, pᵢ₊₁, rotate(ℝ³(0, 0, 1), h′))
