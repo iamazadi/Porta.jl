@@ -354,44 +354,26 @@ updatep(p) = begin
     pᵢ = ℝ³(point₀[1], point₀[2], Φ(point₀))
     pᵢ₊₁ = ℝ³(point₁[1], point₁[2], Φ(point₁))
 
-    qᵢ = getrotation(ẑ, pᵢ)
-    qᵢ₊₁ = getrotation(ẑ, pᵢ₊₁)
+    qᵢ = getrotation(Quaternion(ẑ), Quaternion(pᵢ))
+    qᵢ₊₁ = getrotation(Quaternion(ẑ), Quaternion(pᵢ₊₁))
 
-    # p = Quaternion([0; vec(pᵢ)]) * conj(Quaternion([0; vec(pᵢ₊₁)]))
-    p = getrotation(pᵢ, pᵢ₊₁)
-
+    p = getrotation(Quaternion(pᵢ), Quaternion(pᵢ₊₁))
     p′ = Quaternion([vec(p)[1] + 1; vec(p)[2:4]])
     Δᵢ = normalize(p′)
 
     r = conj(qᵢ) * conj(Δᵢ) * qᵢ₊₁
-
     θ = 2atan(vec(r)[4] / vec(r)[1])
-
     θ = GLMakie.to_value(cumulativetwist) + θ
     cumulativetwist[] = θ % 2π
     println(θ)
     
-    if GLMakie.to_value(toggle.active) 
-        h = Quaternion(π, ℝ³(0, 1, 0)) * conj(getrotation(ẑ, pᵢ₊₁))
-    else
-        h = conj(getrotation(ẑ, pᵢ₊₁))
-    end
-    r′ = Quaternion(θ / 2, pᵢ₊₁)
-    h′ = conj(h * r′)
+    h = getrotation(Quaternion(ẑ), Quaternion(pᵢ₊₁))
+    r′ = Quaternion(-θ / 2, ẑ)
+    h′ = h * r′
     rotation[] = h′
     update(a_arrow, pᵢ₊₁, rotate(ℝ³(1, 0, 0), h′))
     update(b_arrow, pᵢ₊₁, rotate(ℝ³(0, 1, 0), h′))
     update(c_arrow, pᵢ₊₁, rotate(ℝ³(0, 0, 1), h′))
-
-    # if GLMakie.to_value(toggle.active) 
-    #     update(a_arrow, -v, rotate(ℝ³(1, 0, 0), conj(h′)))
-    #     update(b_arrow, -v, rotate(ℝ³(0, 1, 0), conj(h′)))
-    #     update(c_arrow, -v, rotate(ℝ³(0, 0, 1), conj(h′)))
-    # else
-    #     update(a_arrow, v, rotate(ℝ³(1, 0, 0), conj(h′)))
-    #     update(b_arrow, v, rotate(ℝ³(0, 1, 0), conj(h′)))
-    #     update(c_arrow, v, rotate(ℝ³(0, 0, 1), conj(h′)))
-    # end
 end
 
 GLMakie.on(sl_nx.value) do nx
