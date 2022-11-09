@@ -82,6 +82,7 @@ Quaternion(cp::ComplexPlane) = Quaternion(real(cp.z₁),
                                           real(cp.z₂),
                                           imag(cp.z₂))
 Quaternion(s::SU2) = Quaternion(ComplexPlane(s))
+Quaternion(r::ℝ³) = Quaternion([0; vec(r)])
 normalize(q::Quaternion) = Quaternion(normalize(q.r))
 norm(q::Quaternion) = norm(q.r)
 dot(q1::Quaternion, q2::Quaternion) = dot(q1.r, q2.r)
