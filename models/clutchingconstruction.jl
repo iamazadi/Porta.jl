@@ -370,10 +370,14 @@ updatep(p) = begin
     h = getrotation(Quaternion(ẑ), Quaternion(pᵢ₊₁))
     r′ = Quaternion(-θ / 2, ẑ)
     h′ = h * r′
-    rotation[] = h′
     update(a_arrow, pᵢ₊₁, rotate(ℝ³(1, 0, 0), h′))
     update(b_arrow, pᵢ₊₁, rotate(ℝ³(0, 1, 0), h′))
     update(c_arrow, pᵢ₊₁, rotate(ℝ³(0, 0, 1), h′))
+
+    θ₀ = π / 2 + π / 4
+    r′ = Quaternion(-(θ + θ₀) / 2, ẑ)
+    h′ = h * r′
+    rotation[] = h′
 end
 
 GLMakie.on(sl_nx.value) do nx
