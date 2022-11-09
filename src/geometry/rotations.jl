@@ -11,9 +11,18 @@ getrotation(i::ℝ³, n::ℝ³) = begin
     if isapprox(normalize(i), normalize(n))
         return Quaternion(0, normalize(i))
     end
-    u = normalize(cross(n, i))
+    u = normalize(cross(i, n))
     θ = acos(dot(normalize(i), normalize(n))) / 2
-    Quaternion(θ, u)
+    Quaternion(-θ, u)
+end
+getrotation(q::Quaternion, h::Quaternion) = begin
+    @assert(isapprox(norm(q), 1), "The first point must be in S². $q")
+    @assert(isapprox(norm(h), 1), "The second point also must be in S². $h")
+    if isapprox(q, h)
+        return Quaternion(1, 0, 0, 0)
+    end
+    s = conj(q) * h
+    Quaternion(-acos(vec(s)[1]) / 2, normalize(ℝ³(vec(s)[2:4])))
 end
 
 
