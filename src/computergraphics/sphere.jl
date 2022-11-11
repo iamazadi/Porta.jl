@@ -54,11 +54,11 @@ end
 
 
 function RGBSphere(q::Biquaternion,
-                scene::Makie.LScene,
-                color::Any;
-                radius::Float64 = 1.0,
-                segments::Int = 36,
-                transparency::Bool = false)
+                   scene::Makie.LScene,
+                   color::Any;
+                   radius::Float64 = 1.0,
+                   segments::Int = 36,
+                   transparency::Bool = false)
     sphere = constructsphere(q, radius, segments = segments)
     observable = buildsurface(scene, sphere, color, transparency = transparency)
     RGBSphere(q, radius, segments, color, observable)
