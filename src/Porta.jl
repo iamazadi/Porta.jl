@@ -32,6 +32,7 @@ include(joinpath(geometrydir, "stereographicprojection.jl"))
 include(joinpath(geometrydir, "rotations.jl"))
 
 include(joinpath(bundlesdir, "clifford.jl"))
+include(joinpath(bundlesdir, "planethopf.jl"))
 
 include(joinpath(computergraphicsdir, "body.jl"))
 include(joinpath(computergraphicsdir, "ui.jl"))
