@@ -1,11 +1,18 @@
+import ColorTypes
+import FixedPointNumbers
 import GeometryBasics
 import GLMakie
+import FileIO
 
 using Porta
 
-
+segments = 30
+segments1 = 15
+p₀ = GLMakie.Observable([0.0; 0.0])
+p₁ = GLMakie.Observable([0.0; 0.0])
 controlstatus = GLMakie.Observable(true)
 cumulativetwist = GLMakie.Observable(0.0)
+gauges = GLMakie.Observable([U1(0.0) for i in 1:segments1])
 
 Φ(p) = begin
     chart = GLMakie.to_value(toggle.active)
@@ -29,14 +36,14 @@ textsize = 30
 textsize1 = 0.25
 
 fig = GLMakie.Figure()
-
+toggle = GLMakie.Toggle(fig, active = false)
 pl = GLMakie.PointLight(GLMakie.Point3f(0), GLMakie.RGBf(20, 20, 20))
-al = GLMakie.AmbientLight(GLMakie.RGBf(0.2, 0.2, 0.2))
+#pl = GLMakie.PointLight(GLMakie.@lift(GLMakie.Point3f([$(p₁)[1], $(p₁)[2], Φ($(p₁))]...)), GLMakie.RGBf(20, 20, 20))
+al = GLMakie.AmbientLight(GLMakie.RGBf(1.0, 1.0, 1.0))
 lscene = GLMakie.LScene(fig[1:7, 1:2], show_axis=true, scenekw = (lights = [pl, al], backgroundcolor=:white, clear=true))
 
 q1 = Biquaternion(ℝ³(0, 0, 0))
 radius = 1.0
-segments = 30
 color = GLMakie.RGBAf(255, 0, 255, 0.25)
 transparency = true
 n_hemisphere = Hemisphere(q1,
@@ -54,6 +61,9 @@ s_hemisphere = Hemisphere(q1,
                           segments = segments,
                           color = color,
                           transparency = transparency)
+
+q1 = Biquaternion(ℝ³(0, 0, 0))
+sphere = RGBSphere(q1, lscene, FileIO.load("data/basemap_mask.png"), radius = 1.01, segments = segments, transparency = false)
 
 cam = GLMakie.camera(lscene.scene) # this is how to access the scenes camera
 eyeposition = GLMakie.Observable(ℝ³(1, 1, 1))
@@ -111,7 +121,6 @@ textbox = GLMakie.Textbox(fig, placeholder = "Enter a name", width = 115)
 textbox.stored_string = "I"
 markbutton = GLMakie.Button(fig, label = "Mark the frame")
 resetbutton = GLMakie.Button(fig, label = "Reset frame")
-toggle = GLMakie.Toggle(fig, active = false)
 label = GLMakie.Label(fig, GLMakie.lift(x -> x ? "Disk S" : "Disk N", toggle.active))
 fig[4, 3] = GLMakie.grid!(GLMakie.hcat(textbox, markbutton, resetbutton, toggle, label), tellheight = false)
 
@@ -211,6 +220,63 @@ end
 surfacepoints = GLMakie.@lift(surf(ℝ³($(x_arrow.tailobservable)[1].data...), ℝ³($(x_arrow.headobservable)[1].data...), ℝ³($(y_arrow.headobservable)[1].data...)))
 GLMakie.surface!(lscene, GLMakie.@lift(map(x -> x.a[1], $surfacepoints)), GLMakie.@lift(map(x -> x.a[2], $surfacepoints)), GLMakie.@lift(map(x -> x.a[3], $surfacepoints)), color = image, transparency = true)
 
+
+##### construct the Hopf fibration
+
+point = GLMakie.to_value(p₁)
+point = Geographic(ℝ³(point[1], point[2], Φ(point)))
+radius = 0.1
+points = [Geographic(1, radius * cos(α) + point.ϕ, radius * sin(α) + point.θ) for α in range(0, stop = 2π, length = segments1)]
+points1 = map(x -> σmap(x), points)
+configuration = Biquaternion(GLMakie.to_value(rotation), 2 * ℝ³(GLMakie.to_value(p₁)..., Φ(GLMakie.to_value(p₁))))
+colorref = FileIO.load("data/basemap_color.png")
+solidcolor = getcolor(points, colorref, 1.0)
+ghostcolor = getcolor(points, colorref, 0.1)
+solidtop = U1(0)
+solidbottom = U1(GLMakie.to_value(cumulativetwist))
+ghosttop = solidbottom
+ghostbottom = U1(2π)
+solidgauge1 = [solidtop for i in 1:segments1]
+solidgauge2 = [solidbottom for i in 1:segments1]
+ghostgauge1 = [ghosttop for i in 1:segments1]
+ghostgauge2 = [ghostbottom for i in 1:segments1]
+scale = 1.0
+solidwhirl = Whirl(lscene,
+                   points1,
+                   solidgauge1,
+                   solidgauge2,
+                   configuration = configuration,
+                   segments = segments,
+                   color = solidcolor,
+                   transparency = false,
+                   scale = scale)
+ghostwhirl = Whirl(lscene,
+                   points1,
+                   ghostgauge1,
+                   ghostgauge2,
+                   configuration = configuration,
+                   segments = segments,
+                   color = ghostcolor,
+                   transparency = false,
+                   scale = scale)
+colortransparent = FileIO.load("data/basemap_mask1.png")
+# framesprite1 = Frame(lscene,
+#                      σmap,
+#                      colortransparent,
+#                      configuration = configuration,
+#                      segments = 3segments,
+#                      transparency = false,
+#                      scale = scale)
+framesprite2 = Frame(lscene,
+                     σmap,
+                     colortransparent,
+                     configuration = configuration,
+                     segments = 5segments,
+                     transparency = false,
+                     scale = scale)
+
+#####
+
 # sl_ϕ = GLMakie.Slider(fig[1:end, 2], range = float(-π):0.01:float(π), startvalue = 0)
 # sl_θ = GLMakie.Slider(fig[1:end, 3], range = float(-π / 2):0.01:float(π / 2), startvalue = 0)
 # sl_α = GLMakie.Slider(fig[1:end, 4], range = 0:0.01:float(2π), startvalue = 0)
@@ -268,13 +334,11 @@ s_chartpathys = GLMakie.@lift([vec(($s_pathobservable)[i])[2] for i in 1:pathpoi
 GLMakie.linesegments!(n_ax, n_chartpathxs, n_chartpathys, linewidth = 10, linestyle = :dot, color = pathcolor)
 GLMakie.linesegments!(s_ax, s_chartpathxs, s_chartpathys, linewidth = 10, linestyle = :dot, color = pathcolor)
 
-p₀ = GLMakie.Observable([0.0; 0.0])
-p₁ = GLMakie.Observable([0.0; 0.0])
-sl_nx = GLMakie.Slider(fig[3, 3], range = -1:0.00001:1, startvalue = 0)
-sl_ny = GLMakie.Slider(fig[1:2, 4], range = -1:0.00001:1, horizontal = false, startvalue = 0)
+sl_nx = GLMakie.Slider(fig[3, 3], range = -1:0.01:1, startvalue = 0)
+sl_ny = GLMakie.Slider(fig[1:2, 4], range = -1:0.01:1, horizontal = false, startvalue = 0)
 
-sl_sx = GLMakie.Slider(fig[7, 3], range = -1:0.00001:1, startvalue = 0)
-sl_sy = GLMakie.Slider(fig[5:6, 4], range = -1:0.00001:1, horizontal = false, startvalue = 0)
+sl_sx = GLMakie.Slider(fig[7, 3], range = -1:0.01:1, startvalue = 0)
+sl_sy = GLMakie.Slider(fig[5:6, 4], range = -1:0.01:1, horizontal = false, startvalue = 0)
 
 # ϕ₀ = GLMakie.Observable(0.0)
 # θ₀ = GLMakie.Observable(0.0)
@@ -283,7 +347,6 @@ sl_sy = GLMakie.Slider(fig[5:6, 4], range = -1:0.00001:1, horizontal = false, st
 
 q1 = Biquaternion(ℝ³(0, 0, 1))
 radius = 0.05
-segments = 30
 color = GLMakie.RGBAf(0, 0, 0, 1.0)
 transparency = false
 markersphere = Sphere(q1,
@@ -297,7 +360,6 @@ markersphere = Sphere(q1,
 q1 = Biquaternion(ℝ³(0, 0, 0))
 r = 0.02
 R = 1.0
-segments = 30
 color = GLMakie.RGBAf(0, 0, 0, 1.0)
 transparency = true
 torus = Torus(q1,
@@ -364,7 +426,8 @@ updatep(p) = begin
     r = conj(qᵢ) * conj(Δᵢ) * qᵢ₊₁
     θ = 2atan(vec(r)[4] / vec(r)[1])
     θ = GLMakie.to_value(cumulativetwist) + θ
-    cumulativetwist[] = θ % 2π
+    θ = θ % 4π
+    cumulativetwist[] = θ
     println(θ)
     
     h = getrotation(Quaternion(ẑ), Quaternion(pᵢ₊₁))
@@ -378,6 +441,40 @@ updatep(p) = begin
     r′ = Quaternion(-(θ + θ₀) / 2, ẑ)
     h′ = h * r′
     rotation[] = h′
+
+    configuration = Biquaternion(h′, 2 * pᵢ₊₁)
+
+    point = Geographic(Cartesian(pᵢ₊₁))
+    points = [Geographic(1, radius * cos(α) + point.ϕ, radius * sin(α) + point.θ) for α in range(0, stop = 2π, length = segments1)]
+    points1 = map(x -> σmap(x), points)
+
+    g = transformg(σmap(point), U1(0), U1(2π), segments)
+    index = max(1, Int(floor(abs(θ / 4π * segments))))
+    gauge = [g[index] for i in 1:segments1]
+
+    if θ ≥ 0
+        update(solidwhirl, points1, solidgauge1, gauge, configuration)
+        update(ghostwhirl, points1, gauge, ghostgauge2, configuration)
+    else
+        index = segments + 1 - index
+        gauge = [g[index] for i in 1:segments1]
+
+        update(solidwhirl, points1, gauge, ghostgauge2, configuration)
+        update(ghostwhirl, points1, solidgauge1, gauge, configuration)
+    end
+
+    gauges[] = gauge
+
+    solidcolor = getcolor(points, colorref, 1.0)
+    ghostcolor = getcolor(points, colorref, 0.5)
+    update(solidwhirl, solidcolor)
+    update(ghostwhirl, ghostcolor)
+    # update(framesprite1, σmap, configuration)
+    section(x::S²) = begin
+        q = σmap(x)
+        S¹action(q, g[index])
+    end
+    update(framesprite2, section, configuration)
 end
 
 GLMakie.on(sl_nx.value) do nx
@@ -538,7 +635,7 @@ GLMakie.on(p₁) do p
         s_vs[] = [11.0; 11.0]
     end
 
-    _eyeposition = 2 * tail + 2 * xhead + 2 * yhead + 4 * zhead
+    _eyeposition = 2 * tail + 2 * xhead + 2 * yhead + 6 * zhead
     _lookat = tail
     _up = tail
     eyeposition[] = _eyeposition
@@ -679,5 +776,13 @@ end
 # scatter!(point, color = :red, markersize = 20)
 
 # limits!(ax, -5, 5, -5, 5)
+
+# fps = 10
+# GLMakie.record(lscene.scene, "test.mp4"; framerate = fps) do io
+#     for i = 1:1000
+#         sleep(1/fps)
+#         GLMakie.recordframe!(io)
+#     end
+# end
 
 fig
