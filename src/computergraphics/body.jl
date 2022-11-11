@@ -58,13 +58,13 @@ function constructsphere(q::Biquaternion,
                          radius::Real;
                          segments::Int = 36)
     array = Array{ℝ³,2}(undef, segments, segments)
-    lspace = collect(range(float(pi), stop = float(-pi), length = segments))
-    lspace1 = collect(range(float(-π / 2), stop = float(π / 2), length = segments))
+    lspace = collect(range(float(-pi), stop = float(pi), length = segments))
+    lspace1 = collect(range(float(π / 2), stop = float(-π / 2), length = segments))
     for i in 1:segments
         for j in 1:segments
             ϕ = lspace[i]
             θ = lspace1[j]
-            array[i, j] = ℝ³(Cartesian(Geographic(radius, ϕ, θ)))
+            array[j, i] = ℝ³(Cartesian(Geographic(radius, ϕ, θ)))
         end
     end
     map(x -> x + gettranslation(q), rotate(array, getrotation(q)))
@@ -237,22 +237,46 @@ end
 
 
 """
-    constructwhirl(points, gauge1, gauge2, configuration, segments)
+    constructwhirl(points, gauge1, gauge2, configuration, segments, scale)
 
-Construct a whirl with the given `points`, `gauge1`, `gauge2`, `configuration` and `segments`.
+Construct a whirl with the given `points`, `gauge1`, `gauge2`, `configuration`, `segments` and `scale`.
 """
 function constructwhirl(points::Array{ComplexPlane,1},
                         gauge1::Array{U1,1},
                         gauge2::Array{U1,1},
                         configuration::Biquaternion,
-                        segments::Int)
-    array = Array{ℝ³,2}(undef, segments, length(points))
+                        segments::Int,
+                        scale::Float64)
+    array = Array{ℝ³,2}(undef, length(points), segments)
     for (j, p) in enumerate(points)
         g₁ = gauge1[j]
         g₂ = gauge2[j]
         g = transformg(p, g₁, g₂, segments)
         for (i, α) in enumerate(g)
-            array[i, j] = compressedλmap(S¹action(p, α))
+            array[j, i] = compressedλmap(S¹action(p, α)) * scale
+        end
+    end
+    applyconfig(array, configuration)
+end
+
+
+"""
+    constructframe(section, configuration, segments, scale)
+
+Construct a frame that is like an S³ cross-section under stereographic projection with the
+given `section`, `configuration`, `segments` and `scale`.
+"""
+function constructframe(section::Any,
+                        configuration::Biquaternion,
+                        segments::Int,
+                        scale::Float64)
+    array = Array{ℝ³,2}(undef, segments, segments)
+    lspaceϕ = collect(range(float(-pi), stop = float(pi), length = segments))
+    lspaceθ = collect(range(float(pi / 2), stop = float(-pi / 2), length = segments))
+    for (i, θ) in enumerate(lspaceθ)
+        for (j, ϕ) in enumerate(lspaceϕ)
+            p = Geographic(1, ϕ, θ)
+            array[i, j] = compressedλmap(section(p)) * scale
         end
     end
     applyconfig(array, configuration)
@@ -321,28 +345,6 @@ function constructtwospinor(point::ComplexPlane, gauge1::U1, gauge2::U1, configu
         w = normalize(p₂ - p₁)
         q = Biquaternion(getrotation(n, w), p₁)
         array[i, :] = applyconfig(circle, q)
-    end
-    applyconfig(array, configuration)
-end
-
-
-"""
-    constructframe(section, configuration, segments)
-
-Construct a frame that is like an S³ cross-section under stereographic projection with the
-given `section`, `configuration` and `segments`.
-"""
-function constructframe(section::Any,
-                        configuration::Biquaternion = Biquaternion(ℝ³(0, 0, 0)),
-                        segments::Int = 36)
-    array = Array{ℝ³,2}(undef, segments, segments)
-    lspaceϕ = collect(range(float(-pi), stop = float(pi), length = segments))
-    lspaceθ = collect(range(float(pi / 2), stop = float(-pi / 2), length = segments))
-    for (i, θ) in enumerate(lspaceθ)
-        for (j, ϕ) in enumerate(lspaceϕ)
-            p = Geographic(1, ϕ, θ)
-            array[i, j] = compressedλmap(section(p))
-        end
     end
     applyconfig(array, configuration)
 end
