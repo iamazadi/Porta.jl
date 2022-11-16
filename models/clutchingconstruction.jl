@@ -2,17 +2,85 @@ import ColorTypes
 import FixedPointNumbers
 import GeometryBasics
 import GLMakie
+import Makie
 import FileIO
+import DataFrames
+import CSV
 
 using Porta
 
+
 segments = 30
-segments1 = 15
+segments1 = 30
+resolution = (1920, 1080)
+
+# The path to the dataset
+attributespath = "data/gdp/geometry-attributes.csv"
+attributes = DataFrames.DataFrame(CSV.File(attributespath))
+attributes = DataFrames.sort(attributes, :shapeid, rev = true)
+nodespath = "data/gdp/geometry-nodes.csv"
+nodes = DataFrames.DataFrame(CSV.File(nodespath))
+
+attributesgroup = DataFrames.groupby(attributes, :NAME)
+nodesgroup = DataFrames.groupby(nodes, :shapeid)
+number = length(attributesgroup)
+ϵ = 1e-3
+countries = Dict("shapeid" => [], "name" => [], "gdpmd" => [],
+                 "gdpyear" => [], "economy" => [], "partid" => [], "nodes" => [])
+for i in 1:number
+    shapeid = attributesgroup[i][!, :shapeid][1]
+    name = attributesgroup[i][!, :NAME][1]
+    gdpmd = attributesgroup[i][!, :GDP_MD][1]
+    gdpyear = attributesgroup[i][!, :GDP_YEAR][1]
+    economy = attributesgroup[i][!, :ECONOMY][1]
+    subdataframe = nodes[nodes.shapeid .== shapeid, :]
+    uniquepartid = unique(subdataframe[!, :partid])
+
+    histogram = Dict()
+    for id in uniquepartid
+        sub = subdataframe[subdataframe.partid .== id, :]
+        ϕ = sub.x ./ 180 .* π
+        θ = sub.y ./ 180 .* π
+        coordinates = map(x -> Geographic(1, x[1], x[2]), eachrow([ϕ θ]))[begin:end-1]
+        coordinates = decimate(coordinates, ϵ)
+        histogram[id] = length(coordinates)
+    end
+    partsnumber = max(values(histogram)...)
+    index = findfirst(x -> histogram[x] == partsnumber, uniquepartid)
+    partid = uniquepartid[index]
+    subdataframe = subdataframe[subdataframe.partid .== partid, :]
+    ϕ = subdataframe.x ./ 180 .* π
+    θ = subdataframe.y ./ 180 .* π
+    coordinates = map(x -> Geographic(1, x[1], x[2]), eachrow([ϕ θ]))[begin:end-1]
+    println("Length of points: $name : $(length(coordinates))")
+    coordinates = decimate(coordinates, ϵ)
+    if length(coordinates) < segments1
+        continue
+    end
+    println("Length of points: $name : $(length(coordinates))")
+    push!(countries["shapeid"], shapeid)
+    push!(countries["name"], name)
+    push!(countries["gdpmd"], gdpmd)
+    push!(countries["gdpyear"], gdpyear)
+    push!(countries["economy"], economy)
+    push!(countries["partid"], partid)
+    push!(countries["nodes"], coordinates)
+end
+
+for i in 1:length(countries["nodes"])
+    println(length(countries["nodes"][i]))
+end
+
+
 p₀ = GLMakie.Observable([0.0; 0.0])
 p₁ = GLMakie.Observable([0.0; 0.0])
 controlstatus = GLMakie.Observable(true)
 cumulativetwist = GLMakie.Observable(0.0)
 gauges = GLMakie.Observable([U1(0.0) for i in 1:segments1])
+pathinitialized = false
+uppathinitialized = false
+ghostsnumber = 6
+groupactions = GLMakie.Observable([U1(0) for i in 1:ghostsnumber])
 
 Φ(p) = begin
     chart = GLMakie.to_value(toggle.active)
@@ -34,17 +102,18 @@ end
 
 textsize = 30
 textsize1 = 0.25
-
-fig = GLMakie.Figure()
+fig = GLMakie.Figure(resolution = resolution)
 toggle = GLMakie.Toggle(fig, active = false)
 pl = GLMakie.PointLight(GLMakie.Point3f(0), GLMakie.RGBf(20, 20, 20))
 #pl = GLMakie.PointLight(GLMakie.@lift(GLMakie.Point3f([$(p₁)[1], $(p₁)[2], Φ($(p₁))]...)), GLMakie.RGBf(20, 20, 20))
-al = GLMakie.AmbientLight(GLMakie.RGBf(1.0, 1.0, 1.0))
-lscene = GLMakie.LScene(fig[1:7, 1:2], show_axis=true, scenekw = (lights = [pl, al], backgroundcolor=:white, clear=true))
+al = GLMakie.AmbientLight(GLMakie.RGBf(0.9, 0.9, 0.9))
+# GLMakie.set_window_config!(pause_renderloop=true)
+screen = GLMakie.display(fig, resolution = resolution)
+lscene = GLMakie.LScene(fig[1:7, 1:2], show_axis=true, scenekw = (resolution = resolution, lights = [pl, al], backgroundcolor=:white, clear=true))
 
 q1 = Biquaternion(ℝ³(0, 0, 0))
 radius = 1.0
-color = GLMakie.RGBAf(255, 0, 255, 0.25)
+color = GLMakie.RGBAf(255, 0, 255, 0.2)
 transparency = true
 n_hemisphere = Hemisphere(q1,
                           lscene,
@@ -54,7 +123,7 @@ n_hemisphere = Hemisphere(q1,
                           transparency = transparency)
 
 q1 = Biquaternion(Quaternion(π / 2, ℝ³(1, 0, 0)), ℝ³(0, 0, 0))
-color = GLMakie.RGBAf(255, 255, 0, 0.25)
+color = GLMakie.RGBAf(255, 255, 0, 0.2)
 s_hemisphere = Hemisphere(q1,
                           lscene,
                           radius = radius,
@@ -72,22 +141,22 @@ up = GLMakie.Observable(ℝ³(0, 0, 1))
 GLMakie.update_cam!(lscene.scene, GLMakie.Vec3f(vec(GLMakie.to_value(eyeposition))...), GLMakie.Vec3f(vec(GLMakie.to_value(lookat))...), GLMakie.Vec3f(vec(GLMakie.to_value(up))...))
 
 width = 0.05
-transparency = false
-color = GLMakie.RGBA(255.0, 0.0, 0.0, 1.0)
+transparency = true
+color = GLMakie.RGBA(255.0, 0.0, 0.0, 0.25)
 tail, head = ℝ³(0, 0, 1), ℝ³(0.3, 0, 0)
 x_arrow = Arrow(tail,
                 head,
                 lscene.scene,
                 width = width,
                 color = color)
-color = GLMakie.RGBA(0.0, 255.0, 0.0, 1.0)
+color = GLMakie.RGBA(0.0, 255.0, 0.0, 0.25)
 tail, head = ℝ³(0, 0, 1), ℝ³(0, 0.3, 0)
 y_arrow = Arrow(tail,
                 head,
                 lscene.scene,
                 width = width,
                 color = color)
-color = GLMakie.RGBA(0.0, 0.0, 255.0, 1.0)
+color = GLMakie.RGBA(0.0, 0.0, 255.0, 0.25)
 tail, head = ℝ³(0, 0, 1), ℝ³(0, 0, 0.3)
 z_arrow = Arrow(tail,
                 head,
@@ -95,21 +164,21 @@ z_arrow = Arrow(tail,
                 width = width,
                 color = color)
 
-color = GLMakie.RGBA(10.0, 1.0, 1.0, 0.5)
+color = GLMakie.RGBA(1.0, 0.1, 0.1, 0.5)
 tail, head = ℝ³(0, 0, 1), ℝ³(0, 0, 0.3)
 a_arrow = Arrow(tail,
                 head,
                 lscene.scene,
                 width = width,
                 color = color)
-color = GLMakie.RGBA(1.0, 10.0, 1.0, 0.5)
+color = GLMakie.RGBA(0.1, 1.0, 0.1, 0.5)
 tail, head = ℝ³(0, 0, 1), ℝ³(0, 0, 0.3)
 b_arrow = Arrow(tail,
                 head,
                 lscene.scene,
                 width = width,
                 color = color)
-color = GLMakie.RGBA(1.0, 1.0, 10.0, 0.5)
+color = GLMakie.RGBA(0.1, 0.1, 1.0, 0.5)
 tail, head = ℝ³(0, 0, 1), ℝ³(0, 0, 0.3)
 c_arrow = Arrow(tail,
                 head,
@@ -199,13 +268,20 @@ GLMakie.text!(lscene,
               rotation = textotation,
               markerspace = :data)
 
-pathpoints = 180
+pathpoints = 720
+uppathpoints = 720
 pathobservable = GLMakie.Observable([ℝ³(0, 0, 1) for i in 1:pathpoints])
+uppath = GLMakie.Observable([ℝ³(0, 0, 1.5) for i in 1:uppathpoints])
 xs = GLMakie.@lift([vec(($pathobservable)[i])[1] for i in 1:pathpoints])
 ys = GLMakie.@lift([vec(($pathobservable)[i])[2] for i in 1:pathpoints])
 zs = GLMakie.@lift([vec(($pathobservable)[i])[3] for i in 1:pathpoints])
 pathcolor = [GLMakie.RGBAf(hsvtorgb([(i - 1) / pathpoints * 360, 1.0, 1.0])..., 1.0) for i in 1:pathpoints]
+uppathcolor = [GLMakie.RGBAf(hsvtorgb([(i - 1) / uppathpoints * 360, 1.0, 1.0])..., 1.0) for i in 1:uppathpoints]
 GLMakie.linesegments!(lscene, xs, ys, zs, linewidth = 10, linestyle = :dot, color = pathcolor)
+upxs = GLMakie.@lift([vec(i)[1] for i in $uppath])
+upys = GLMakie.@lift([vec(i)[2] for i in $uppath])
+upzs = GLMakie.@lift([vec(i)[3] for i in $uppath])
+GLMakie.linesegments!(lscene, upxs, upys, upzs, linewidth = 10, linestyle = :dot, color = uppathcolor)
 
 image = GLMakie.load("gallery/plane.png")
 surf(tail, xhead, yhead) = begin
@@ -225,7 +301,7 @@ GLMakie.surface!(lscene, GLMakie.@lift(map(x -> x.a[1], $surfacepoints)), GLMaki
 
 point = GLMakie.to_value(p₁)
 point = Geographic(ℝ³(point[1], point[2], Φ(point)))
-radius = 0.1
+radius = 0.2
 points = [Geographic(1, radius * cos(α) + point.ϕ, radius * sin(α) + point.θ) for α in range(0, stop = 2π, length = segments1)]
 points1 = map(x -> σmap(x), points)
 configuration = Biquaternion(GLMakie.to_value(rotation), 2 * ℝ³(GLMakie.to_value(p₁)..., Φ(GLMakie.to_value(p₁))))
@@ -241,39 +317,10 @@ solidgauge2 = [solidbottom for i in 1:segments1]
 ghostgauge1 = [ghosttop for i in 1:segments1]
 ghostgauge2 = [ghostbottom for i in 1:segments1]
 scale = 1.0
-solidwhirl = Whirl(lscene,
-                   points1,
-                   solidgauge1,
-                   solidgauge2,
-                   configuration = configuration,
-                   segments = segments,
-                   color = solidcolor,
-                   transparency = false,
-                   scale = scale)
-ghostwhirl = Whirl(lscene,
-                   points1,
-                   ghostgauge1,
-                   ghostgauge2,
-                   configuration = configuration,
-                   segments = segments,
-                   color = ghostcolor,
-                   transparency = false,
-                   scale = scale)
+solidwhirlsprites = [Whirl(lscene, points1, solidgauge1, solidgauge2, configuration = configuration, segments = segments, color = solidcolor, transparency = false, scale = scale) for i in 1:ghostsnumber]
+ghostwhirlsprites = [Whirl(lscene, points1, ghostgauge1, ghostgauge2, configuration = configuration, segments = segments, color = ghostcolor, transparency = true, scale = scale) for i in 1:ghostsnumber]
 colortransparent = FileIO.load("data/basemap_mask1.png")
-# framesprite1 = Frame(lscene,
-#                      σmap,
-#                      colortransparent,
-#                      configuration = configuration,
-#                      segments = 3segments,
-#                      transparency = false,
-#                      scale = scale)
-framesprite2 = Frame(lscene,
-                     σmap,
-                     colortransparent,
-                     configuration = configuration,
-                     segments = 5segments,
-                     transparency = false,
-                     scale = scale)
+framesprites = [Frame(lscene, σmap, colortransparent, configuration = configuration, segments = 4segments, transparency = true, scale = scale) for i in 1:ghostsnumber]
 
 #####
 
@@ -334,11 +381,11 @@ s_chartpathys = GLMakie.@lift([vec(($s_pathobservable)[i])[2] for i in 1:pathpoi
 GLMakie.linesegments!(n_ax, n_chartpathxs, n_chartpathys, linewidth = 10, linestyle = :dot, color = pathcolor)
 GLMakie.linesegments!(s_ax, s_chartpathxs, s_chartpathys, linewidth = 10, linestyle = :dot, color = pathcolor)
 
-sl_nx = GLMakie.Slider(fig[3, 3], range = -1:0.01:1, startvalue = 0)
-sl_ny = GLMakie.Slider(fig[1:2, 4], range = -1:0.01:1, horizontal = false, startvalue = 0)
+sl_nx = GLMakie.Slider(fig[3, 3], range = -1:0.0001:1, startvalue = 0)
+sl_ny = GLMakie.Slider(fig[1:2, 4], range = -1:0.0001:1, horizontal = false, startvalue = 0)
 
-sl_sx = GLMakie.Slider(fig[7, 3], range = -1:0.01:1, startvalue = 0)
-sl_sy = GLMakie.Slider(fig[5:6, 4], range = -1:0.01:1, horizontal = false, startvalue = 0)
+sl_sx = GLMakie.Slider(fig[7, 3], range = -1:0.0001:1, startvalue = 0)
+sl_sy = GLMakie.Slider(fig[5:6, 4], range = -1:0.0001:1, horizontal = false, startvalue = 0)
 
 # ϕ₀ = GLMakie.Observable(0.0)
 # θ₀ = GLMakie.Observable(0.0)
@@ -371,7 +418,8 @@ torus = Torus(q1,
               transparency = transparency)
 
 
-snapthreshold = 0.02
+#snapthreshold = 0.02
+snapthreshold = 0.0
 
 updatep(p) = begin
     point₀ = GLMakie.to_value(p₁)
@@ -380,15 +428,25 @@ updatep(p) = begin
     if isapprox(point₀[1], point₁[1], atol = threshold) && isapprox(point₀[2], point₁[2], atol = threshold)
         return
     end
+    point = ℝ³(point₁[1], point₁[2], Φ(point₁))
+    dummy = Geographic(Cartesian(point))
+    if isapprox(dummy.θ, -π / 2)
+        point = ℝ³(Cartesian(Geographic(dummy.r, dummy.ϕ, dummy.θ * 0.99)))
+    end
+    point₁ = vec(point)[1:2]
     p₀[] = point₀
     p₁[] = point₁
-    x, y = point₁
-    point = ℝ³(x, y, Φ(point₁))
-
+    
+    path = GLMakie.to_value(pathobservable)
+    if pathinitialized
+        path = [point * 1.02; path[1:end-1]]
+    else
+        path = [point * 1.02 for i in 1:pathpoints]
+        global pathinitialized = true
+    end
+    pathobservable[] = path
+    
     if GLMakie.to_value(toggle.active)
-        path = GLMakie.to_value(pathobservable)
-        path = [point; path[1:end-1]]
-        pathobservable[] = path
 
         s_path = GLMakie.to_value(s_pathobservable)
         s_path = [point; s_path[1:end-1]]
@@ -398,9 +456,6 @@ updatep(p) = begin
         n_path = [n_path[1]; n_path[1:end-1]]
         n_pathobservable[] = n_path
     else
-        path = GLMakie.to_value(pathobservable)
-        path = [point; path[1:end-1]]
-        pathobservable[] = path
 
         n_path = GLMakie.to_value(n_pathobservable)
         n_path = [point; n_path[1:end-1]]
@@ -426,7 +481,7 @@ updatep(p) = begin
     r = conj(qᵢ) * conj(Δᵢ) * qᵢ₊₁
     θ = 2atan(vec(r)[4] / vec(r)[1])
     θ = GLMakie.to_value(cumulativetwist) + θ
-    θ = θ % 4π
+    θ = θ % 2π
     cumulativetwist[] = θ
     println(θ)
     
@@ -445,36 +500,151 @@ updatep(p) = begin
     configuration = Biquaternion(h′, 2 * pᵢ₊₁)
 
     point = Geographic(Cartesian(pᵢ₊₁))
-    points = [Geographic(1, radius * cos(α) + point.ϕ, radius * sin(α) + point.θ) for α in range(0, stop = 2π, length = segments1)]
-    points1 = map(x -> σmap(x), points)
+    inside = false
+    index = 1
+    for (i, boundary) in enumerate(countries["nodes"])
+        index = i
+        ϕ = sum(map(x -> x.ϕ, boundary)) / length(boundary)
+        θ = sum(map(x -> x.θ, boundary))  / length(boundary)
+        isnear = abs(ϕ - point.ϕ) < π / 6 && abs(θ - point.θ) < π / 6
+        inside = isinside(point, boundary)
+        if inside && isnear
+            break
+        end
+    end
+    if inside
+        points = countries["nodes"][index]
+        indices = Int.(floor.(collect(range(1, stop = segments1, length = segments1))))
+        points = points[indices]
+    else
+        points = [Geographic(1, radius * cos(α) + point.ϕ, radius * sin(α) + point.θ) for α in range(0, stop = 2π, length = segments1)]
+    end
 
-    g = transformg(σmap(point), U1(0), U1(2π), segments)
-    index = max(1, Int(floor(abs(θ / 4π * segments))))
+    # modify points in order to avoid the South Pole
+    _points = []
+    for item in points
+        if isapprox(item.θ, -π / 2)
+            _item = deepcopy(item)
+            _points = [Geographic(_item.r, _item.ϕ, 0.99 * _item.θ); _points]
+        else
+            _item = deepcopy(item)
+            _points = [_item; _points]
+        end
+    end
+    points = deepcopy(_points)
+    points = convert(Array{Geographic,1}, points)
+
+    points1 = map(w -> σmap(w), points)
+    points1 = convert(Array{ComplexPlane,1}, points1)
+
+    g = transformg(σmap(point), U1(0), U1(2π), segments1)
+    θ = GLMakie.to_value(cumulativetwist)
+    index = min(segments1, Int(floor(abs(θ / 2π * segments1))) + 1)
     gauge = [g[index] for i in 1:segments1]
 
+    # shidt the animation for one sprite to the past before updating the current sprite
+    # but only properties related to the internal dimensions (i.e. not configuration)
+    for i in 2:ghostsnumber
+        update(solidwhirlsprites[i], solidwhirlsprites[i - 1].points, solidwhirlsprites[i - 1].gauge1, solidwhirlsprites[i - 1].gauge2, configuration)
+        update(ghostwhirlsprites[i], ghostwhirlsprites[i - 1].points, ghostwhirlsprites[i - 1].gauge1, ghostwhirlsprites[i - 1].gauge2, configuration)
+    end
+
     if θ ≥ 0
-        update(solidwhirl, points1, solidgauge1, gauge, configuration)
-        update(ghostwhirl, points1, gauge, ghostgauge2, configuration)
+        update(solidwhirlsprites[1], points1, solidgauge1, gauge, configuration)
+        update(ghostwhirlsprites[1], points1, gauge, ghostgauge2, configuration)
     else
-        index = segments + 1 - index
+        index = segments1 + 1 - index
         gauge = [g[index] for i in 1:segments1]
 
-        update(solidwhirl, points1, gauge, ghostgauge2, configuration)
-        update(ghostwhirl, points1, solidgauge1, gauge, configuration)
+        update(solidwhirlsprites[1], points1, gauge, ghostgauge2, configuration)
+        update(ghostwhirlsprites[1], points1, solidgauge1, gauge, configuration)
     end
 
     gauges[] = gauge
+    # keep track of previous group actions for animating a trail of frames
+    _groupactions = GLMakie.to_value(groupactions)
+    _groupactions = [gauge[1]; _groupactions[1:end-1]]
+    groupactions[] = _groupactions
 
     solidcolor = getcolor(points, colorref, 1.0)
-    ghostcolor = getcolor(points, colorref, 0.5)
-    update(solidwhirl, solidcolor)
-    update(ghostwhirl, ghostcolor)
-    # update(framesprite1, σmap, configuration)
-    section(x::S²) = begin
-        q = σmap(x)
-        S¹action(q, g[index])
+    ghostcolor = getcolor(points, colorref, 0.25)
+    if isapprox(solidcolor.r, 1) && isapprox(solidcolor.g, 1) && isapprox(solidcolor.b, 1) && isapprox(solidcolor.alpha, 1)
+        if GLMakie.to_value(toggle.active)
+            solidcolor = GLMakie.RGBA{FixedPointNumbers.Normed{UInt8, 8}}(1.0, 1.0, 0.0, 1.0)
+            ghostcolor = GLMakie.RGBA{FixedPointNumbers.Normed{UInt8, 8}}(1.0, 1.0, 0.0, 0.5)
+        else
+            solidcolor = GLMakie.RGBA{FixedPointNumbers.Normed{UInt8, 8}}(1.0, 0.0, 1.0, 1.0)
+            ghostcolor = GLMakie.RGBA{FixedPointNumbers.Normed{UInt8, 8}}(1.0, 0.0, 1.0, 0.5)
+        end
     end
-    update(framesprite2, section, configuration)
+    for i in 2:ghostsnumber
+        update(solidwhirlsprites[i], GLMakie.to_value(solidwhirlsprites[i - 1].color)[1])
+        update(ghostwhirlsprites[i], GLMakie.to_value(ghostwhirlsprites[i - 1].color)[1])
+    end
+    update(solidwhirlsprites[1], solidcolor)
+    update(ghostwhirlsprites[1], ghostcolor)
+    for i in 1:ghostsnumber
+        update(framesprites[i], x -> S¹action(σmap(x), _groupactions[i]), configuration)
+    end
+    
+    path = GLMakie.to_value(pathobservable)
+    liftedpath = map(x -> compressedλmap(S¹action(σmap(Geographic(Cartesian(x))), gauge[1])), path)
+    # if uppathinitialized
+    #     _uppath = [point1; _uppath[1:end-1]]
+    # else
+    #     _uppath = [point1 for i in 1:uppathpoints]
+    #     global uppathinitialized = true
+    # end
+    uppath[] = applyconfig(liftedpath, configuration)
+
+    # chart controls
+    n = ℝ³(0, 0, 1)
+    x, y, z = vec(ℝ³(Cartesian(point)))
+    if GLMakie.to_value(toggle.active)
+        u = a_arrow.head - (dot(a_arrow.head, a_arrow.tail) / norm(n)) * n
+        v = b_arrow.head - (dot(b_arrow.head, b_arrow.tail) / norm(n)) * n
+        u.a[3] = 0.0
+        v.a[3] = 0.0
+        u = 0.3 * normalize(u)
+        v = 0.3 * normalize(v)
+        s_xs[] = [x; x]
+        s_ys[] = [y; y]
+        s_us[] = [u.a[1]; v.a[1]]
+        s_vs[] = [u.a[2]; v.a[2]]
+
+        # send the deactive frame to out of axis limits
+        n_xs[] = [10.0; 10.0]
+        n_ys[] = [10.0; 10.0]
+        n_us[] = [11.0; 11.0]
+        n_vs[] = [11.0; 11.0]
+    else
+        u = a_arrow.head - (dot(a_arrow.head, a_arrow.tail) / norm(n)) * n
+        v = b_arrow.head - (dot(b_arrow.head, b_arrow.tail) / norm(n)) * n
+        u.a[3] = 0.0
+        v.a[3] = 0.0
+        u = 0.3 * normalize(u)
+        v = 0.3 * normalize(v)
+
+        n_xs[] = [x; x]
+        n_ys[] = [y; y]
+        n_us[] = [u.a[1]; v.a[1]]
+        n_vs[] = [u.a[2]; v.a[2]]
+
+        # send the deactive frame to out of axis limits
+        s_xs[] = [10.0; 10.0]
+        s_ys[] = [10.0; 10.0]
+        s_us[] = [11.0; 11.0]
+        s_vs[] = [11.0; 11.0]
+    end
+
+    # camera controls
+    _eyeposition = 2.0 * a_arrow.tail + 2.0 * a_arrow.head + 2.0 * b_arrow.head + c_arrow.head
+    _lookat = a_arrow.tail
+    _up = a_arrow.tail
+    eyeposition[] = 0.95 * GLMakie.to_value(eyeposition) + 0.05 * _eyeposition
+    lookat[] = 0.95 * GLMakie.to_value(lookat) + 0.05 * _lookat
+    up[] = 0.95 * GLMakie.to_value(up) + 0.05 * _up
+    GLMakie.update_cam!(lscene.scene, GLMakie.Vec3f(vec(_eyeposition)...), GLMakie.Vec3f(vec(_lookat)...), GLMakie.Vec3f(vec(_up)...))
 end
 
 GLMakie.on(sl_nx.value) do nx
@@ -596,52 +766,7 @@ GLMakie.on(p₁) do p
     xhead = normalize(xhead)
     yhead = normalize(yhead)
 
-    n = ℝ³(0, 0, 1)
-
-    if GLMakie.to_value(toggle.active)
-        u = xhead - (dot(xhead, tail) / norm(n)) * n
-        v = yhead - (dot(yhead, tail) / norm(n)) * n
-        u.a[3] = 0.0
-        v.a[3] = 0.0
-        u = 0.3 * normalize(u)
-        v = 0.3 * normalize(v)
-        s_xs[] = [x; x]
-        s_ys[] = [y; y]
-        s_us[] = [u.a[1]; v.a[1]]
-        s_vs[] = [u.a[2]; v.a[2]]
-
-        # send the deactive frame to out of axis limits
-        n_xs[] = [10.0; 10.0]
-        n_ys[] = [10.0; 10.0]
-        n_us[] = [11.0; 11.0]
-        n_vs[] = [11.0; 11.0]
-    else
-        u = xhead - (dot(xhead, tail) / norm(n)) * n
-        v = yhead - (dot(yhead, tail) / norm(n)) * n
-        u.a[3] = 0.0
-        v.a[3] = 0.0
-        u = 0.3 * normalize(u)
-        v = 0.3 * normalize(v)
-
-        n_xs[] = [x; x]
-        n_ys[] = [y; y]
-        n_us[] = [u.a[1]; v.a[1]]
-        n_vs[] = [u.a[2]; v.a[2]]
-
-        # send the deactive frame to out of axis limits
-        s_xs[] = [10.0; 10.0]
-        s_ys[] = [10.0; 10.0]
-        s_us[] = [11.0; 11.0]
-        s_vs[] = [11.0; 11.0]
-    end
-
-    _eyeposition = 2 * tail + 2 * xhead + 2 * yhead + 6 * zhead
-    _lookat = tail
-    _up = tail
-    eyeposition[] = _eyeposition
-    lookat[] = _lookat
-    up[] = _up
-    GLMakie.update_cam!(lscene.scene, GLMakie.Vec3f(vec(_eyeposition)...), GLMakie.Vec3f(vec(_lookat)...), GLMakie.Vec3f(vec(_up)...))
+    # _eyeposition = 2 * tail + 2 * xhead + 2 * yhead + 6 * zhead
 end
 
 GLMakie.on(toggle.active) do chart
@@ -755,6 +880,9 @@ GLMakie.on(resetbutton.clicks) do n
     update(y_arrow, tail, ℝ³(0, 0.3, 0))
     update(z_arrow, tail, ℝ³(0, 0, 0.3))
     pathobservable[] = [ℝ³(0, 0, 1) for i in 1:pathpoints]
+    uppath[] = [ℝ³(0, 0, 1.5) for i in 1:uppathpoints]
+    global pathinitialized = false
+    global uppathinitialized = false
     p₁[] = GLMakie.to_value(p₁)
     cumulativetwist[] = 0.0
     update(a_arrow, tail, ℝ³(1, 0, 0))
@@ -786,3 +914,133 @@ end
 # end
 
 fig
+
+frames = 7200
+totalpath = getbutterflycurve(frames)
+firstpoint = totalpath[1]
+firstpoint = Geographic(firstpoint)
+initialpoint = Geographic(Cartesian(ℝ³(0, 0, 1)))
+N = 45
+for i in 1:N
+    r, ϕ, θ = vec(firstpoint)
+    r₀, ϕ₀, θ₀ = vec(initialpoint)
+    η = i / N
+    ϕ′ = η * ϕ + (1 - η) * ϕ₀
+    θ′ = η * θ + (1 - η) * θ₀
+    point′ = Geographic(1, ϕ′, θ′)
+    x, y, z = vec(ℝ³(Cartesian(point′)))
+    chart = GLMakie.to_value(toggle.active)
+    if point′.θ < 0 && !chart
+        toggle.active[] = true
+    end
+    if point′.θ ≥ 0 && chart
+        toggle.active[] = false
+    end
+    if chart
+        GLMakie.set_close_to!(sl_sx, x)
+        GLMakie.set_close_to!(sl_sy, y)
+    else
+        GLMakie.set_close_to!(sl_nx, x)
+        GLMakie.set_close_to!(sl_ny, y)
+    end
+end
+
+
+FPS = 60
+startframe = 1
+modelname = "holonomy5"
+
+animate(i) = begin
+    point = Geographic(totalpath[i])
+    chart = GLMakie.to_value(toggle.active)
+    if point.θ < 0 && !chart
+        toggle.active[] = true
+    end
+    if point.θ ≥ 0 && chart
+        toggle.active[] = false
+    end
+
+    x, y, z = vec(ℝ³(Cartesian(point)))
+    if chart
+        GLMakie.set_close_to!(sl_sx, x)
+        GLMakie.set_close_to!(sl_sy, y)
+    else
+        GLMakie.set_close_to!(sl_nx, x)
+        GLMakie.set_close_to!(sl_ny, y)
+    end
+end
+
+
+exportmode = ["gif", "frames", "video"]
+exportmode = exportmode[2]
+
+
+if exportmode ∈ ["gif", "video"]
+    outputextension = exportmode == "gif" ? "gif" : "mkv"
+    Makie.record(scene, "gallery/$modelname.$outputextension",
+                            framerate = FPS) do io
+        for i in startframe:frames
+            animate(i) # animate the scene
+            Makie.recordframe!(io) # record a new frame
+            step = (i - 1) / frames
+            println("Completed step $(100step).\n")
+        end
+    end
+elseif exportmode == "frames"
+    directory = joinpath("gallery", modelname)
+    !isdir(directory) && mkdir(directory)
+    for i in startframe:frames
+        start = time()
+        animate(i) # animate the scene
+        elapsed = round(time() - start, digits = 4)
+        sleep(0.1)
+        println("Generating frame $i took $elapsed (s).")
+        sleep(0.1)
+
+        start = time()
+
+        paddingnumber = length(digits(frames))
+        imageid = lpad(i, paddingnumber, "0")
+        imagename = "$(modelname)_$(resolution[2])p_$(FPS)fps_$imageid.jpeg"
+        filepath = joinpath(directory, imagename)
+        GLMakie.set_window_config!(pause_renderloop=true)
+        # FileIO.save(filepath, Makie.colorbuffer(screen), resolution = resolution, pt_per_unit = 400.0, px_per_unit = 400.0)
+        FileIO.save(filepath, Makie.colorbuffer(screen))
+        GLMakie.set_window_config!(pause_renderloop=false)
+        # GLMakie.save(joinpath(diskndir, "diskn_$(resolution[2])p_$(FPS)fps_$imageid.jpeg"), n_ax.scene; resolution = (2160, 2160), pt_per_unit = 400.0, px_per_unit = 400.0, Makie.colorbuffer(screen))
+        # GLMakie.save(joinpath(disksdir, "disks_$(resolution[2])p_$(FPS)fps_$imageid.jpeg"), s_ax.scene; resolution = (2160, 2160), pt_per_unit = 400.0, px_per_unit = 400.0, Makie.colorbuffer(screen))
+        # GLMakie.set_window_config!(pause_rendering=false)
+
+        elapsed = round(time() - start, digits = 4)
+        sleep(0.1)
+        println("Saving file $filepath took $elapsed (s).")
+        sleep(0.1)
+
+        step = round((i - 1) / frames, digits = 4)
+        sleep(0.1)
+        println("Completed step $(100step).\n")
+        sleep(0.1)
+
+        stitch() = begin
+            part = i
+            exportdir = joinpath(directory, "export")
+            !isdir(exportdir) && mkdir(exportdir)
+            WxH = "$(resolution[1])x$(resolution[2])"
+            WxH = "1920x1080"
+            commonpart = "$(modelname)_$(resolution[2])p_$(FPS)fps"
+            inputname = "$(commonpart)_%0$(paddingnumber)d.jpeg"
+            inputpath = joinpath(directory, inputname)
+            outputname = "$(commonpart)_$(part).mp4"
+            outputpath = joinpath(exportdir, outputname)
+            command1 = `ffmpeg -y -f image2 -framerate $FPS -i $inputpath -s $WxH -pix_fmt yuvj420p $outputpath`
+            run(command1)
+        end
+
+        if i == frames
+            sleep(1)
+            stitch()
+            sleep(1)
+        end
+        # break
+    end
+end
