@@ -16,8 +16,9 @@ computergraphicsdir = "computergraphics"
 datadir = "data"
 
 
-include(joinpath(logicdir, "propositionallogic.jl"))
-include(joinpath(logicdir, "predicatelogic.jl"))
+# commented out because it exports T
+# include(joinpath(logicdir, "propositionallogic.jl"))
+# include(joinpath(logicdir, "predicatelogic.jl"))
 
 include(joinpath(linearalgebradir, "abstractvectorspace.jl"))
 include(joinpath(linearalgebradir, "determinant.jl"))
