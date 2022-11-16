@@ -256,7 +256,8 @@ function constructwhirl(points::Array{ComplexPlane,1},
             array[j, i] = compressedλmap(S¹action(p, α)) * scale
         end
     end
-    applyconfig(array, configuration)
+    array = applyconfig(array, configuration)
+    convert(Matrix{ℝ³}, array)
 end
 
 
