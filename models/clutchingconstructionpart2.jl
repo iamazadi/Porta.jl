@@ -70,29 +70,47 @@ objectives[42] = "parallel transport the frame to the origin of chart N  (backtr
 # verify that the frame coincides with the default frame (coinciding with a triad made of x̂, ŷ and ẑ)
 
 objectives[43] = "locate the midpoint along the great circle between 'a' and 'b' and label it 'g'"
-objectives[44] = "locate the midpoint along the great circle between 'a' and 'e' and label it 'h'"
+objectives[44] = "locate the midpoint along the great circle between 'a' and 'd' and label it 'h'"
+objectives[45] = "locate the midpoint along the great circle between 'a' and 'e' and label it 'i'"
+objectives[46] = "locate the midpoint along the great circle between 'a' and 'f' and label it 'j'"
 
-objectives[45] = "parallel transport the frame to 'g'"
-objectives[46] = "mark the frame using the identifier I"
-objectives[47] = "parallel transport the frame back to the origin of chart N (backtrack)"
+objectives[47] = "parallel transport the frame to 'g'"
+objectives[48] = "mark the frame using the identifier I"
+objectives[49] = "parallel transport the frame back to the origin of chart N (backtrack)"
 
-objectives[48] = "parallel transport the frame to 'h'"
-objectives[49] = "mark the frame using the identifier I"
-objectives[50] = "parallel transport the frame back to the origin of chart N (backtrack)"
+objectives[50] = "parallel transport the frame to 'h'"
+objectives[51] = "mark the frame using the identifier I"
+objectives[52] = "parallel transport the frame back to the origin of chart N (backtrack)"
 
-objectives[51] = "parallel transport the frame to 'a'"
-objectives[52] = "jump over the boundary from chart N into S" # verify that the frame coincides with the marked frame I at 'a'
-objectives[53] = "parallel transport the frame to the origin of chart S"
+objectives[53] = "parallel transport the frame to 'i'"
+objectives[54] = "mark the frame using the identifier I"
+objectives[55] = "parallel transport the frame back to the origin of chart N (backtrack)"
 
-objectives[54] = "parallel transport the frame to 'g'"
-objectives[55] = "mark the frame using the identifier II"
-objectives[56] = "parallel transport the frame back to the origin of chart S (backtrack)"
+objectives[56] = "parallel transport the frame to 'j'"
+objectives[57] = "mark the frame using the identifier I"
+objectives[58] = "parallel transport the frame back to the origin of chart N (backtrack)"
 
-objectives[57] = "parallel transport the frame to 'h'"
-objectives[58] = "mark the frame using the identifier II"
-objectives[59] = "parallel transport the frame back to the origin of chart S (backtrack)"
+objectives[59] = "parallel transport the frame to 'a'"
+objectives[60] = "jump over the boundary from chart N into S" # verify that the frame coincides with the marked frame I at 'a'
+objectives[61] = "parallel transport the frame to the origin of chart S"
 
-objectives[60] = "rotate the camera about ẑ for 2π"
+objectives[62] = "parallel transport the frame to 'g'"
+objectives[63] = "mark the frame using the identifier II"
+objectives[64] = "parallel transport the frame back to the origin of chart S (backtrack)"
+
+objectives[65] = "parallel transport the frame to 'h'"
+objectives[66] = "mark the frame using the identifier II"
+objectives[67] = "parallel transport the frame back to the origin of chart S (backtrack)"
+
+objectives[68] = "parallel transport the frame to 'i'"
+objectives[69] = "mark the frame using the identifier II"
+objectives[70] = "parallel transport the frame back to the origin of chart S (backtrack)"
+
+objectives[71] = "parallel transport the frame to 'j'"
+objectives[72] = "mark the frame using the identifier II"
+objectives[73] = "parallel transport the frame back to the origin of chart S (backtrack)"
+
+objectives[74] = "rotate the camera about ẑ for 2π"
 
 # The marker's position in a chart
 p₀ = GLMakie.Observable([0.0; 0.0; 0.0])
@@ -110,6 +128,8 @@ islabeled["Ie"] = false
 islabeled["If"] = false
 islabeled["Ig"] = false
 islabeled["Ih"] = false
+islabeled["Ii"] = false
+islabeled["Ij"] = false
 islabeled["IIb"] = false
 islabeled["IIc"] = false
 islabeled["IId"] = false
@@ -117,8 +137,12 @@ islabeled["IIe"] = false
 islabeled["IIf"] = false
 islabeled["IIg"] = false
 islabeled["IIh"] = false
+islabeled["IIi"] = false
+islabeled["IIj"] = false
 islabeled["g"] = false
 islabeled["h"] = false
+islabeled["i"] = false
+islabeled["j"] = false
 
 x̂ = ℝ³(1, 0, 0)
 ŷ = ℝ³(0, 1, 0)
@@ -140,9 +164,11 @@ lscene_s = GLMakie.LScene(fig[3:4, 3], show_axis=true,
                           scenekw = (resolution = resolution1, lights = [pl, al], backgroundcolor=:black, clear=true))
 
 cam = GLMakie.camera(lscene.scene) # this is how to access the scenes camera
-eyeposition₀ = ℝ³((cam.eyeposition[])...)
-lookat₀ = ℝ³(0, 0, 0)
-up₀ = ℝ³(0, 0, 1)
+cam_n = GLMakie.camera(lscene_n.scene) # this is how to access the scenes camera
+cam_s = GLMakie.camera(lscene_s.scene) # this is how to access the scenes camera
+eyeposition = ℝ³(cam.eyeposition[]...)
+eyeposition_n = ℝ³(cam_n.eyeposition[]...)
+eyeposition_s = ℝ³(cam_s.eyeposition[]...)
 
 sliderx¹ = GLMakie.Slider(fig[5, 3], range = -1:0.00001:1, startvalue = 0)
 sliderx² = GLMakie.Slider(fig[6, 3], range = -1:0.00001:1, startvalue = 0)
@@ -174,48 +200,53 @@ pointd = ℝ³(0, -1, 0)
 pointe = ℝ³(0, 0, 1)
 pointf = ℝ³(0, 0, -1)
 pointg = ℝ³(√2 / 2, √2 / 2, 0)
-pointh = ℝ³(√2 / 2, 0, √2 / 2)
+pointh = ℝ³(√2 / 2, -√2 / 2, 0)
+pointi = ℝ³(√2 / 2, 0, √2 / 2)
+pointj = ℝ³(√2 / 2, 0, -√2 / 2)
 
 # Text labels for specifying landmarks
 textsize = 0.5
 GLMakie.text!(lscene.scene, GLMakie.Point3f(vec(pointa)), text = "a", color = :white,
-              align = (:left, :baseline), textsize = textsize, markerspace = :data)
+              align = (:left, :baseline), rotation = 90, textsize = textsize, markerspace = :data)
 GLMakie.text!(lscene.scene, GLMakie.Point3f(vec(pointb)), text = "b", color = :white,
-              align = (:left, :baseline), textsize = textsize, markerspace = :data)
+              align = (:left, :baseline), rotation = 90, textsize = textsize, markerspace = :data)
 GLMakie.text!(lscene.scene, GLMakie.Point3f(vec(pointc)), text = "c", color = :white,
-              align = (:left, :baseline), textsize = textsize, markerspace = :data)
+              align = (:left, :baseline), rotation = 90, textsize = textsize, markerspace = :data)
 GLMakie.text!(lscene.scene, GLMakie.Point3f(vec(pointd)), text = "d", color = :white,
-              align = (:left, :baseline), textsize = textsize, markerspace = :data)
+              align = (:left, :baseline), rotation = 90, textsize = textsize, markerspace = :data)
 GLMakie.text!(lscene.scene, GLMakie.Point3f(vec(pointe)), text = "e", color = :white,
-              align = (:left, :baseline), textsize = textsize, markerspace = :data)
+              align = (:left, :baseline), rotation = 90, textsize = textsize, markerspace = :data)
 GLMakie.text!(lscene.scene, GLMakie.Point3f(vec(pointf)), text = "f", color = :white,
-              align = (:left, :baseline), textsize = textsize, markerspace = :data)
+              align = (:left, :baseline), rotation = 90, textsize = textsize, markerspace = :data)
 
 GLMakie.text!(lscene_n.scene, GLMakie.Point3f(vec(pointa)), text = "a", color = :white,
-              align = (:left, :baseline), textsize = textsize, markerspace = :data)
+              align = (:left, :baseline), rotation = 90, textsize = textsize, markerspace = :data)
 GLMakie.text!(lscene_n.scene, GLMakie.Point3f(vec(pointb)), text = "b", color = :white,
-              align = (:left, :baseline), textsize = textsize, markerspace = :data)
+              align = (:left, :baseline), rotation = 90, textsize = textsize, markerspace = :data)
 GLMakie.text!(lscene_n.scene, GLMakie.Point3f(vec(pointc)), text = "c", color = :white,
-              align = (:left, :baseline), textsize = textsize, markerspace = :data)
+              align = (:left, :baseline), rotation = 90, textsize = textsize, markerspace = :data)
 GLMakie.text!(lscene_n.scene, GLMakie.Point3f(vec(pointd)), text = "d", color = :white,
-              align = (:left, :baseline), textsize = textsize, markerspace = :data)
+              align = (:left, :baseline), rotation = 90, textsize = textsize, markerspace = :data)
 GLMakie.text!(lscene_n.scene, GLMakie.Point3f(vec(pointe)), text = "e", color = :white,
-              align = (:left, :baseline), textsize = textsize, markerspace = :data)
+              align = (:left, :baseline), rotation = 90, textsize = textsize, markerspace = :data)
 GLMakie.text!(lscene_n.scene, GLMakie.Point3f(vec(pointf)), text = "f", color = :white,
-              align = (:left, :baseline), textsize = textsize, markerspace = :data)
+              align = (:left, :baseline), rotation = 90, textsize = textsize, markerspace = :data)
 
 GLMakie.text!(lscene_s.scene, GLMakie.Point3f(vec(pointa)), text = "a", color = :white,
-              align = (:left, :baseline), textsize = textsize, markerspace = :data)
+              align = (:left, :baseline), rotation = 90, textsize = textsize, markerspace = :data)
 GLMakie.text!(lscene_s.scene, GLMakie.Point3f(vec(pointb)), text = "b", color = :white,
-              align = (:left, :baseline), textsize = textsize, markerspace = :data)
+              align = (:left, :baseline), rotation = 90, textsize = textsize, markerspace = :data)
 GLMakie.text!(lscene_s.scene, GLMakie.Point3f(vec(pointc)), text = "c", color = :white,
-              align = (:left, :baseline), textsize = textsize, markerspace = :data)
+              align = (:left, :baseline), rotation = 90, textsize = textsize, markerspace = :data)
 GLMakie.text!(lscene_s.scene, GLMakie.Point3f(vec(pointd)), text = "d", color = :white,
-              align = (:left, :baseline), textsize = textsize, markerspace = :data)
+              align = (:left, :baseline), rotation = 90, textsize = textsize, markerspace = :data)
 GLMakie.text!(lscene_s.scene, GLMakie.Point3f(vec(pointe)), text = "e", color = :white,
-              align = (:left, :baseline), textsize = textsize, markerspace = :data)
+              align = (:left, :baseline), rotation = 90, textsize = textsize, markerspace = :data)
 GLMakie.text!(lscene_s.scene, GLMakie.Point3f(vec(pointf)), text = "f", color = :white,
-              align = (:left, :baseline), textsize = textsize, markerspace = :data)
+              align = (:left, :baseline), rotation = 90, textsize = textsize, markerspace = :data)
+
+lookat = ℝ³(0, 0, 0)
+up = ℝ³(0, 0, 1)
 
 # The arrows pointing to the current location of the frame
 
@@ -267,7 +298,12 @@ end
 Calculate a point along the connecting path from the starting point `r₀` to the destination `r₁` with the given time `t`.
 """
 function getpoint(r₀::ℝ³, r₁::ℝ³, t::Float64)
-    r₁ * t + (1 - t) * r₀
+    p = r₁ * t + (1 - t) * r₀
+    if norm(p) > 1
+        return normalize(p)
+    else
+        return p
+    end
 end
 
 
@@ -304,6 +340,7 @@ function mark(name::String)
                   color = colors[1],
                   align = (:left, :baseline),
                   textsize = textsize / 2,
+                  rotation = 90,
                   markerspace = :data)
     GLMakie.text!(lscene,
                   GLMakie.Point3f(vec(tail + headx²)),
@@ -311,6 +348,7 @@ function mark(name::String)
                   color = colors[2],
                   align = (:left, :baseline),
                   textsize = textsize / 2,
+                  rotation = 90,
                   markerspace = :data)
     GLMakie.text!(lscene,
                   GLMakie.Point3f(vec(tail + headx³)),
@@ -318,8 +356,9 @@ function mark(name::String)
                   color = colors[3],
                   align = (:left, :baseline),
                   textsize = textsize / 2,
+                  rotation = 90,
                   markerspace = :data)
-    GLMakie.update_cam!(lscene.scene, GLMakie.Vec3f(vec(eyeposition₀)...), GLMakie.Vec3f(vec(lookat₀)...), GLMakie.Vec3f(vec(up₀)...))
+    resetcam()
 end
 
 
@@ -419,6 +458,35 @@ function updateui()
     update(arrowx¹, tail, headx¹)
     update(arrowx², tail, headx²)
     update(arrowx³, tail, headx³)
+end
+
+
+"""
+    resetcam()
+
+Resets the eyeposition, look at and up vactors of cameras caused by creating objects in the scene.
+"""
+function resetcam()
+    GLMakie.update_cam!(lscene.scene, GLMakie.Vec3f(vec(eyeposition)...), GLMakie.Vec3f(vec(lookat)...), GLMakie.Vec3f(vec(up)...))
+    GLMakie.update_cam!(lscene_n.scene, GLMakie.Vec3f(vec(eyeposition_n)...), GLMakie.Vec3f(vec(lookat)...), GLMakie.Vec3f(vec(up)...))
+    GLMakie.update_cam!(lscene_s.scene, GLMakie.Vec3f(vec(eyeposition_s)...), GLMakie.Vec3f(vec(lookat)...), GLMakie.Vec3f(vec(up)...))
+end
+
+
+"""
+    rotatecam(step)
+
+Resets the eyeposition, look at and up vactors of cameras caused by creating objects in the scene,
+with the given `step` which determines the rotation degree.
+"""
+function rotatecam(step::Float64)
+    q = Quaternion(step * π, ẑ)
+    _eyeposition = rotate(eyeposition, q)
+    _eyeposition_n = rotate(eyeposition_n, q)
+    _eyeposition_s = rotate(eyeposition_s, q)
+    GLMakie.update_cam!(lscene.scene, GLMakie.Vec3f(vec(_eyeposition)...), GLMakie.Vec3f(vec(lookat)...), GLMakie.Vec3f(vec(up)...))
+    GLMakie.update_cam!(lscene_n.scene, GLMakie.Vec3f(vec(_eyeposition_n)...), GLMakie.Vec3f(vec(lookat)...), GLMakie.Vec3f(vec(up)...))
+    GLMakie.update_cam!(lscene_s.scene, GLMakie.Vec3f(vec(_eyeposition_s)...), GLMakie.Vec3f(vec(lookat)...), GLMakie.Vec3f(vec(up)...))
 end
 
 
@@ -535,24 +603,24 @@ end
 
 # animate a path
 framerate = 60
-timestamps = range(0, 118, step = 1 / framerate)
+f = 3
+N = f * length(objectives)
+timestamps = range(0, N, step = 1 / framerate)
 GLMakie.record(fig, "gallery/time_animation.mp4", timestamps; framerate = framerate) do t
-    τ = t / 2 + 1
-    index = Int(floor(τ))
+    τ = t / f + 1
+    index = isapprox(τ, length(objectives) + 1) ? Int(floor(τ) - 1) : Int(floor(τ))
     objective = objectives[index]
     currentobjective[] = "($index) $objective"
-    step = τ % floor(τ)
+    step = isapprox(t, N) ? τ % floor(τ) : τ % floor(τ) + 1 / framerate
     progress = round(100step)
     println("($index) $objective . $progress")
 
     if index == 1 # transport the frame to the origin of chart N
-        eyeposition = rotate(eyeposition₀, Quaternion(step * π, ẑ))
-        GLMakie.update_cam!(lscene.scene, GLMakie.Vec3f(vec(eyeposition)...), GLMakie.Vec3f(vec(lookat₀)...), GLMakie.Vec3f(vec(up₀)...))
+        rotatecam(step)
     end
 
     if index == 2 # reset the orientation of the frame such that it coincides with a triad made of x̂, ŷ and ẑ
-        eyeposition = rotate(eyeposition₀, Quaternion(-step * π, ẑ))
-        GLMakie.update_cam!(lscene.scene, GLMakie.Vec3f(vec(eyeposition)...), GLMakie.Vec3f(vec(lookat₀)...), GLMakie.Vec3f(vec(up₀)...))
+        resetcam()
     end
 
     if index == 3 # parallel transport the frame to 'a' 
@@ -759,8 +827,7 @@ GLMakie.record(fig, "gallery/time_animation.mp4", timestamps; framerate = framer
     end
 
     if index == 39 # rotate the camera about ẑ for 2π
-        eyeposition = rotate(eyeposition₀, Quaternion(step * π, ẑ))
-        GLMakie.update_cam!(lscene.scene, GLMakie.Vec3f(vec(eyeposition)...), GLMakie.Vec3f(vec(lookat₀)...), GLMakie.Vec3f(vec(up₀)...))
+        rotatecam(step)
     end
 
     if index == 40 # parallel transport the frame to 'a' (backtrack)
@@ -787,110 +854,203 @@ GLMakie.record(fig, "gallery/time_animation.mp4", timestamps; framerate = framer
                           align = (:left, :baseline), textsize = textsize, markerspace = :data)
             GLMakie.text!(lscene_s.scene, GLMakie.Point3f(vec(pointg)), text = "g", color = :white,
                           align = (:left, :baseline), textsize = textsize, markerspace = :data)
-            GLMakie.update_cam!(lscene.scene, GLMakie.Vec3f(vec(eyeposition₀)...), GLMakie.Vec3f(vec(lookat₀)...), GLMakie.Vec3f(vec(up₀)...))
+            resetcam()
             islabeled["g"] = true
         end
     end
 
-    if index == 44 # locate the midpoint along the great circle between 'a' and 'e' and label it 'h'
+    if index == 44 # locate the midpoint along the great circle between 'a' and 'd' and label it 'h'
         if !islabeled["h"]
             GLMakie.text!(lscene.scene, GLMakie.Point3f(vec(pointh)), text = "h", color = :white,
-                          align = (:left, :baseline), textsize = textsize, markerspace = :data)
+                          align = (:left, :baseline), rotation = 90, textsize = textsize, markerspace = :data)
             GLMakie.text!(lscene_n.scene, GLMakie.Point3f(vec(pointh)), text = "h", color = :white,
-                          align = (:left, :baseline), textsize = textsize, markerspace = :data)
+                          align = (:left, :baseline), rotation = 90, textsize = textsize, markerspace = :data)
             GLMakie.text!(lscene_s.scene, GLMakie.Point3f(vec(pointh)), text = "h", color = :white,
-                          align = (:left, :baseline), textsize = textsize, markerspace = :data)
-            GLMakie.update_cam!(lscene.scene, GLMakie.Vec3f(vec(eyeposition₀)...), GLMakie.Vec3f(vec(lookat₀)...), GLMakie.Vec3f(vec(up₀)...))
+                          align = (:left, :baseline), rotation = 90, textsize = textsize, markerspace = :data)
+            resetcam()
             islabeled["h"] = true
         end
     end
 
-    if index == 45 # parallel transport the frame to 'g'
+    if index == 45 # locate the midpoint along the great circle between 'a' and 'b' and label it 'i'
+        if !islabeled["i"]
+            GLMakie.text!(lscene.scene, GLMakie.Point3f(vec(pointi)), text = "i", color = :white,
+                          align = (:left, :baseline), rotation = 90, textsize = textsize, markerspace = :data)
+            GLMakie.text!(lscene_n.scene, GLMakie.Point3f(vec(pointi)), text = "i", color = :white,
+                          align = (:left, :baseline), rotation = 90, textsize = textsize, markerspace = :data)
+            GLMakie.text!(lscene_s.scene, GLMakie.Point3f(vec(pointi)), text = "i", color = :white,
+                          align = (:left, :baseline), rotation = 90, textsize = textsize, markerspace = :data)
+            resetcam()
+            islabeled["i"] = true
+        end
+    end
+
+    if index == 46 # locate the midpoint along the great circle between 'a' and 'd' and label it 'j'
+        if !islabeled["j"]
+            GLMakie.text!(lscene.scene, GLMakie.Point3f(vec(pointj)), text = "j", color = :white,
+                          align = (:left, :baseline), textsize = textsize, markerspace = :data)
+            GLMakie.text!(lscene_n.scene, GLMakie.Point3f(vec(pointj)), text = "j", color = :white,
+                          align = (:left, :baseline), textsize = textsize, markerspace = :data)
+            GLMakie.text!(lscene_s.scene, GLMakie.Point3f(vec(pointj)), text = "j", color = :white,
+                          align = (:left, :baseline), textsize = textsize, markerspace = :data)
+            resetcam()
+            islabeled["j"] = true
+        end
+    end
+
+    if index == 47 # parallel transport the frame to 'g'
         point = getpoint(ℝ³(0, 0, 0), pointg, step)
         paralleltransport(point)
     end
 
-    if index == 46 # mark the frame using the identifier I
+    if index == 48 # mark the frame using the identifier I
         if !islabeled["Ig"]
             mark("I")
             islabeled["Ig"] = true
         end
     end
 
-    if index == 47 # parallel transport the frame back to the origin of chart N (backtrack)
+    if index == 49 # parallel transport the frame back to the origin of chart N (backtrack)
         point = getpoint(pointg, ℝ³(0, 0, 0), step)
         paralleltransport(point)
     end
 
-    if index == 48 # parallel transport the frame to 'h'
+    if index == 50 # parallel transport the frame to 'h'
         point = getpoint(ℝ³(0, 0, 0), pointh, step)
         paralleltransport(point)
     end
 
-    if index == 49 # mark the frame using the identifier I
+    if index == 51 # mark the frame using the identifier I
         if !islabeled["Ih"]
             mark("I")
             islabeled["Ih"] = true
         end
     end
 
-    if index == 50 # parallel transport the frame back to the origin of chart N (backtrack)
+    if index == 52 # parallel transport the frame back to the origin of chart N (backtrack)
         point = getpoint(pointh, ℝ³(0, 0, 0), step)
         paralleltransport(point)
     end
 
-    if index == 51 # parallel transport the frame to 'a'
+    if index == 53 # parallel transport the frame to 'i'
+        point = getpoint(ℝ³(0, 0, 0), pointi, step)
+        paralleltransport(point)
+    end
+
+    if index == 54 # mark the frame using the identifier I
+        if !islabeled["Ii"]
+            mark("I")
+            islabeled["Ii"] = true
+        end
+    end
+
+    if index == 55 # parallel transport the frame back to the origin of chart N (backtrack)
+        point = getpoint(pointi, ℝ³(0, 0, 0), step)
+        paralleltransport(point)
+    end
+
+    if index == 56 # parallel transport the frame to 'j'
+        point = getpoint(ℝ³(0, 0, 0), pointj, step)
+        paralleltransport(point)
+    end
+
+    if index == 57 # mark the frame using the identifier I
+        if !islabeled["Ij"]
+            mark("I")
+            islabeled["Ij"] = true
+        end
+    end
+
+    if index == 58 # parallel transport the frame back to the origin of chart N (backtrack)
+        point = getpoint(pointj, ℝ³(0, 0, 0), step)
+        paralleltransport(point)
+    end
+
+    if index == 59 # parallel transport the frame to 'a'
         point = getpoint(ℝ³(0, 0, 0), pointa, step)
         paralleltransport(point)
     end
 
-    if index == 52 # jump over the boundary from chart N into S
+    if index == 60 # jump over the boundary from chart N into S
         if !(toggle.active[])
             toggle.active = true
         end
     end
 
-    if index == 53 # parallel transport the frame to the origin of chart S
+    if index == 61 # parallel transport the frame to the origin of chart S
         point = getpoint(pointa, ℝ³(0, 0, 0), step)
         paralleltransport(point)
     end
 
-    if index == 54 # parallel transport the frame to 'g'
+    if index == 62 # parallel transport the frame to 'g'
         point = getpoint(ℝ³(0, 0, 0), pointg, step)
         paralleltransport(point)
     end
 
-    if index == 55 # mark the frame using the identifier II
+    if index == 63 # mark the frame using the identifier II
         if !islabeled["IIg"]
             mark("II")
             islabeled["IIg"] = true
         end
     end
 
-    if index == 56 # parallel transport the frame back to the origin of chart S (backtrack)
+    if index == 64 # parallel transport the frame back to the origin of chart S (backtrack)
         point = getpoint(pointg, ℝ³(0, 0, 0), step)
         paralleltransport(point)
     end
 
-    if index == 57 # parallel transport the frame to 'h'
+    if index == 65 # parallel transport the frame to 'h'
         point = getpoint(ℝ³(0, 0, 0), pointh, step)
         paralleltransport(point)
     end
 
-    if index == 58 # mark the frame using the identifier II
+    if index == 66 # mark the frame using the identifier II
         if !islabeled["IIh"]
             mark("II")
             islabeled["IIh"] = true
         end
     end
 
-    if index == 59 # parallel transport the frame back to the origin of chart S (backtrack)
+    if index == 67 # parallel transport the frame back to the origin of chart S (backtrack)
         point = getpoint(pointh, ℝ³(0, 0, 0), step)
         paralleltransport(point)
     end
 
-    if index == 60 # rotate the camera about ẑ for 2π
-        eyeposition = rotate(eyeposition₀, Quaternion(step * π, ẑ))
-        GLMakie.update_cam!(lscene.scene, GLMakie.Vec3f(vec(eyeposition)...), GLMakie.Vec3f(vec(lookat₀)...), GLMakie.Vec3f(vec(up₀)...))
+    if index == 68 # parallel transport the frame to 'i'
+        point = getpoint(ℝ³(0, 0, 0), pointi, step)
+        paralleltransport(point)
+    end
+
+    if index == 69 # mark the frame using the identifier II
+        if !islabeled["IIi"]
+            mark("II")
+            islabeled["IIi"] = true
+        end
+    end
+
+    if index == 70 # parallel transport the frame back to the origin of chart S (backtrack)
+        point = getpoint(pointi, ℝ³(0, 0, 0), step)
+        paralleltransport(point)
+    end
+
+    if index == 71 # parallel transport the frame to 'j'
+        point = getpoint(ℝ³(0, 0, 0), pointj, step)
+        paralleltransport(point)
+    end
+
+    if index == 72 # mark the frame using the identifier II
+        if !islabeled["IIj"]
+            mark("II")
+            islabeled["IIj"] = true
+        end
+    end
+
+    if index == 73 # parallel transport the frame back to the origin of chart S (backtrack)
+        point = getpoint(pointj, ℝ³(0, 0, 0), step)
+        paralleltransport(point)
+    end
+
+    if index == 74 # rotate the camera about ẑ for 2π
+        rotatecam(step)
     end
 end
