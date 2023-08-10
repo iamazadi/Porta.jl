@@ -1,8 +1,8 @@
-import LinearAlgebra
+using LinearAlgebra
 
 
 # v ∈ S³
-v = LinearAlgebra.normalize(Quaternion(rand(4)))
+v = normalize(Quaternion(rand(4)))
 # constants c₁, c₂, c₃ ∈ ℝ
 c₁, c₂, c₃ = rand(3)
 # a ∈ TᵥS³ in terms of the basis {K₁v, K₂v, K₃v} for TᵥS³
