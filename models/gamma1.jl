@@ -221,7 +221,6 @@ whirl6 = Whirl(lscene, w6, [0.0 for i in 1:length(w6)], [2π for i in 1:length(w
 frame1 = Frame(lscene, x -> G(0, τmap(x)), segments, basemap_color, transparency = true)
 frame2 = Frame(lscene, x -> G(0, τmap(x)), segments, basemap_color, transparency = true)
 
-
 samples = length(sol[v])
 γ₁ = Vector{Quaternion}(undef, samples)
 phases = Vector{Float64}(undef, samples)
