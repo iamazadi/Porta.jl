@@ -1,28 +1,16 @@
 # Geometrize the quantum!
-![Hopf Dance](gallery/hopfdance.gif "Hopf Dance")
-![Planet Hopf](gallery/planethopf.gif "Planet Hopf")
-![the Hopf fibration](gallery/londontsai.gif "The Hopf fibration inspired by London Tsai")
-![the Hopf flower](gallery/flower.gif "The Hopf flower")
-![24-cell](gallery/24-cell.gif "24-cell")
-![600-cell](gallery/600-cell.gif "600-cell")
-![surfaces](gallery/surfaces.gif "surfaces")
 
 This project helps with Eric Weinstein's the Graph-Wall-Tome (GWT) project. Watch visual
 models on the YouTube [channel][1].
 
 ## Requirements
-- AssociatedLegendrePolynomials
-- CSV
-- DataFrames
-- FileIO
-- GLMakie
-- GeometryBasics
-- ImageMagick
-- JSServe
-- Makie
-- Observables
-- StatsBase
-- WAV
+- CSV v0.8.5
+- DataFrames v1.4.4
+- DifferentialEquations v7.8.0
+- FileIO v1.16.1
+- GLMakie v0.8.7
+- Latexify v0.16.1
+- ModelingToolkit v8.63.0
 - LinearAlgebra
 
 
@@ -43,7 +31,7 @@ or get the latest experimental code.
 
 ## Usage
 For client-side code read the tests, and for examples on how to build please check out the
-models directory. See [Planet Hopf](../master/models/drorbarnatan2010.jl) as an example!
+models directory. See [alternativeview.jl](../master/models/alternativeview.jl) as an example!
 
 ## Status
 - Logic [Doing]
@@ -62,6 +50,7 @@ models directory. See [Planet Hopf](../master/models/drorbarnatan2010.jl) as an 
 - [The Road to Reality][4], Sir Roger Penrose (2004)
 - A [Portal][5] Special Presentation- Geometric Unity: A First Look
 - [Planet Hopf][6], Dror Bar-Natan (2010)
+- Rupert Way, [Dynamics in the Hopf bundle][7], the geometric phase and implications for dynamical systems (2008)
 
 [1]: https://www.youtube.com/channel/UCY8FW_kvEfGDj5i5j_rkaqA
 [2]: https://cds.cern.ch/record/181783/files/cer-000093203.pdf
@@ -69,3 +58,4 @@ models directory. See [Planet Hopf](../master/models/drorbarnatan2010.jl) as an 
 [4]: https://www.amazon.com/Road-Reality-Complete-Guide-Universe/dp/0679776311
 [5]: https://youtu.be/Z7rd04KzLcg
 [6]: http://drorbn.net/AcademicPensieve/Projects/PlanetHopf/
+[7]: https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&cad=rja&uact=8&ved=2ahUKEwiCm-SnytGAAxUK2qQKHUB9CjoQFnoECBUQAQ&url=http%3A%2F%2Fpersonal.maths.surrey.ac.uk%2Fst%2FT.Bridges%2FGEOMETRIC-PHASE%2FRW_Finalformthesis.pdf&usg=AOvVaw2Fx2-wD95a3deuUiUaRef3&opi=89978449
