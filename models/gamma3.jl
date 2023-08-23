@@ -8,7 +8,7 @@ using Porta
 
 
 resolution = (1920, 1080)
-segments = 60
+segments = 180
 frames_number = 360
 
 r₁ = 0.8 # experiments: 1-6
@@ -35,9 +35,9 @@ modelname = "gamma3_$version"
 L = 10.0
 L′ = -L
 ẑ = [0.0; 0.0; 1.0]
-α = 0.1
+α = 0.05
 markersize = 0.01
-linewidth = 5.0
+linewidth = 6.0
 arrowsize = GLMakie.Vec3f(0.02, 0.02, 0.04)
 
 getλ(s) = λ₀ + r₀ * exp(im * (s + ϕ₀))
@@ -297,7 +297,7 @@ pl = GLMakie.PointLight(GLMakie.Point3f(0), GLMakie.RGBf(20, 20, 20))
 al = GLMakie.AmbientLight(GLMakie.RGBf(0.9, 0.9, 0.9))
 lscene = GLMakie.LScene(fig[1, 1], show_axis=true, scenekw = (resolution = resolution, lights = [pl, al], backgroundcolor=:black, clear=true))
 
-starman = FileIO.load("data/SpaceX_s_Starman_desk_toy_2804270/files/Starman_3.stl")
+starman = FileIO.load("data/Starman_3.stl")
 starman_sprite = GLMakie.mesh!(
     lscene,
     starman,
@@ -341,17 +341,18 @@ end
 Whirl(lscene, γ₁, [0.0 for _ in eachindex(γ₁)], [2π for _ in eachindex(γ₁)], segments, getcolor(πmap.(γ₁), colorref, α), transparency = true)
 whirls = []
 for i in 1:steps_number
-    whirl = Whirl(lscene, γ₂[i], [0.0 for _ in eachindex(γ₂[i])], [0.0001 for _ in eachindex(γ₂[i])], segments, getcolor(πmap.(γ₂[i]), colorref, α), transparency = true)
+    c = GLMakie.RGBAf(convert_hsvtorgb([i / steps_number * 360; 1; 1])..., α)
+    whirl = Whirl(lscene, γ₂[i], [0.0 for _ in eachindex(γ₂[i])], [0.0001 for _ in eachindex(γ₂[i])], segments, c, transparency = true)
     push!(whirls, whirl)
 end
 basemap1 = Basemap(lscene, x -> G(0, τmap(x)), segments, basemap_color, transparency = true)
 basemap2 = Basemap(lscene, x -> G(0, τmap(x)), segments, basemap_color, transparency = true)
 points1 = GLMakie.Observable(GLMakie.Point3f[]) # Signal that can be used to update plots efficiently
 colors1 = GLMakie.Observable(Int[])
-lines1 = GLMakie.lines!(lscene, points1, linewidth = linewidth, color = colors1, colormap = :jet, transparency = true)
+lines1 = GLMakie.lines!(lscene, points1, linewidth = linewidth, color = colors1, colormap = :jet, transparency = false)
 points2 = [GLMakie.Observable(GLMakie.Point3f[]) for _ in 1:steps_number]
 colors2 = [GLMakie.Observable(Int[]) for _ in 1:steps_number]
-lines2 = [GLMakie.lines!(lscene, points2[i], linewidth = linewidth, color = colors2[i], colormap = :jet, transparency = true) for i in 1:steps_number]
+lines2 = [GLMakie.lines!(lscene, points2[i], linewidth = linewidth, color = colors2[i], colormap = :jet, transparency = false) for i in 1:steps_number]
 points3 = GLMakie.Observable(GLMakie.Point3f[]) # Signal that can be used to update plots efficiently
 colors3 = GLMakie.Observable(Int[])
 lines3 = GLMakie.lines!(lscene, points3, linewidth = 3linewidth, color = colors3, colormap = :plasma, transparency = false)
@@ -422,12 +423,18 @@ function step2(progress)
         notify(points2[i]); notify(colors2[i]) # tell points and colors that their value has been updated
         update!(whirls[i], γ₂[i], [0.0 for _ in 1:_samples] ,[θ₂[i][j] for _ in 1:_samples])
     end
-    phase = phase / N
-    update!(basemap1, x -> G(phase, τmap(x)))
+    update!(basemap1, x -> G(θ₂[begin][end], τmap(x)))
+    i = max(1, Int(floor(progress * length(γ₂[begin]))))
+    GLMakie.rotate!(starman_sprite, GLMakie.Vec3f(ẑ), -2(θ₂[begin][i]))
+    axis = Float64.(normalize(project(K(3) * γ₂[begin][i])))
+    rotation_angle, rotation_axis = getrotation(ẑ, axis)
+    GLMakie.rotate!(starman_sprite, GLMakie.Vec3f(rotation_axis), rotation_angle)
+    GLMakie.translate!(starman_sprite, GLMakie.Point3f(project(γ₂[begin][i])))
     p ./ N
 end
 
 function step3(progress)
+    α = 0.9
     i = max(1, Int(floor(progress * steps_number)))
     p = project(γ₂[i][end])
     if i ∈ memo3
@@ -441,6 +448,20 @@ function step3(progress)
     lines3.colorrange = (0, frame) # update plot attribute directly
     notify(points3); notify(colors3) # tell points and colors that their value has been updated
     update!(basemap1, x -> G(θ₂[i][end], τmap(x)))
+    color1 = GLMakie.RGBAf(convert_hsvtorgb([progress * 360; 1; 1])..., α)
+    color2 = GLMakie.RGBAf(convert_hsvtorgb([progress * 360; 0.5; 0.5])..., α)
+    color3 = GLMakie.RGBAf(convert_hsvtorgb([progress * 360; 0.25; 0.25])..., α)
+    linecolor = [color1, color2, color3]
+    arrowcolor = [color1, color2, color3]
+    tail = [GLMakie.Point3f(p...) for _ in 1:3]
+    head = [GLMakie.Point3f(p + project(K(3) * γ₂[i][end])), GLMakie.Point3f(p + project(K(1) * γ₂[i][end])) * 0.5, GLMakie.Point3f(p + project(K(2) * γ₂[i][end])) * 0.5]
+    GLMakie.arrows!(lscene, tail, head, fxaa=true, linecolor = linecolor, arrowcolor = arrowcolor, linewidth = 0.01, arrowsize = arrowsize, transparency = false)
+    GLMakie.meshscatter!([p[1]], [p[2]], [p[3]], markersize = markersize, color = color1, transparency = false)
+    GLMakie.rotate!(starman_sprite, GLMakie.Vec3f(ẑ), -2(θ₂[i][end]))
+    axis = Float64.(normalize(project(K(3) * γ₂[i][end])))
+    rotation_angle, rotation_axis = getrotation(ẑ, axis)
+    GLMakie.rotate!(starman_sprite, GLMakie.Vec3f(rotation_axis), rotation_angle)
+    GLMakie.translate!(starman_sprite, GLMakie.Point3f(project(γ₂[i][end])))
     p
 end
 
