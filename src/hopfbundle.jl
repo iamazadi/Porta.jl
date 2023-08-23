@@ -8,6 +8,7 @@ export π✳
 export ver
 export σmap
 export τmap
+export πmap
 
 
 """
@@ -82,9 +83,9 @@ Take a point from S² into S³ as a section of the Hopf bundle.
 function σmap(p::Vector{Float64})
     g = convert_to_geographic(p)
     r, ϕ, θ = g
-    z₁ = ℯ^(im * 0) * √((1 + sin(θ)) / 2)
-    z₂ = ℯ^(im * ϕ) * √((1 - sin(θ)) / 2)
-    Quaternion([z₁; z₂])
+    z₂ = ℯ^(im * 0) * √((1 + sin(θ)) / 2)
+    z₁ = ℯ^(im * ϕ) * √((1 - sin(θ)) / 2)
+    -Quaternion([z₁; z₂])
 end
 
 
@@ -97,7 +98,22 @@ Take a point from S² into S³ as a section of the Hopf bundle.
 function τmap(p::Vector{Float64})
     g = convert_to_geographic(p)
     r, ϕ, θ = g
-    z₁ = ℯ^(im * 0) * √((1 + sin(θ)) / 2)
-    z₂ = ℯ^(im * ϕ) * √((1 - sin(θ)) / 2)
-    Quaternion([z₂; z₁])
+    z₂ = ℯ^(im * 0) * √((1 + sin(θ)) / 2)
+    z₁ = ℯ^(im * ϕ) * √((1 - sin(θ)) / 2)
+    -Quaternion([z₂; z₁])
+end
+
+
+"""
+    πmap(q)
+
+Apply the Hopf map to the given point `q`.
+π: S³ → S²
+"""
+πmap(v::Quaternion) = begin
+    z₁, z₂ = v.a + v.c * im, v.b + v.d * im
+    w₃ = conj(z₁) * z₂ + z₁ * conj(z₂)
+    w₂ = im * (conj(z₁) * z₂ - z₁ * conj(z₂))
+    w₁ = abs(z₁)^2 - abs(z₂)^2
+    real.([w₁; w₂; w₃])
 end
