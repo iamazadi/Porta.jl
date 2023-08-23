@@ -18,8 +18,9 @@ end
 @time @testset "The Graphics Tests" begin
     include("surface_tests.jl")
     include("whirl_tests.jl")
-    include("frame_tests.jl")
+    include("basemap_tests.jl")
     include("earth_tests.jl")
+    include("rotation_tests.jl")
 end
 
 elapsed = time() - start

@@ -11,7 +11,8 @@ include("dualquaternions.jl")
 include("hopfbundle.jl")
 include("surface.jl")
 include("whirl.jl")
-include("frame.jl")
+include("basemap.jl")
 include("earth.jl")
+include("rotation.jl")
 
 end # module
