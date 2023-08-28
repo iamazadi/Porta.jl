@@ -8,7 +8,7 @@ using Porta
 
 
 resolution = (1920, 1080)
-segments = 180
+segments = 360
 frames_number = 360
 
 r₁ = 0.8 # experiments: 1-6
@@ -25,19 +25,19 @@ r₇ = 0.5 # experiment 7
 r₈ = 0.8 # experiment 8
 λ₈ = 2 - im # experiment 8
 
-r₀ = r₁
-λ₀ = λ₂
+r₀ = 2.5 # radius of lambda path circle
+λ₀ = 2 - im # centre of lambda path circle
 ϕ₀ = 0.0
 
 operator = imag(λ₀) ≥ 0 ? "+" : "-"
 version = "r₀=$(r₀)_λ₀=$(float(real(λ₀)))_$(operator)_𝑖$(abs(float(imag(λ₀))))"
 modelname = "gamma3_$version"
-L = 10.0
+L = 10.0 # max x range
 L′ = -L
 ẑ = [0.0; 0.0; 1.0]
-α = 0.05
-markersize = 0.01
-linewidth = 6.0
+α = 0.2
+markersize = 0.03
+linewidth = 7.0
 arrowsize = GLMakie.Vec3f(0.02, 0.02, 0.04)
 
 getλ(s) = λ₀ + r₀ * exp(im * (s + ϕ₀))
@@ -187,68 +187,65 @@ function getγ₂(L::Float64, L′::Float64, s₀::Float64)
     sol = solve(prob)
     samples = length(sol[v])
     γ₂ = Vector{Quaternion}(undef, samples)
+    u₂ = Vector{Quaternion}(undef, samples)
     phases = Vector{Float64}(undef, samples)
     s = Vector{Float64}(undef, samples)
     path_s2 = Vector{Vector{Float64}}(undef, samples)
     for i in 1:samples
         γ₂[i] = Quaternion(sol[v][i])
+        u₂[i] = Quaternion(sol[u][i])
         phases[i] = sol[θ][i]
         s[i] = sol[t][i]
         path_s2[i] = sol[w][i]
     end
     λ = convert_to_cartesian(sol[λᵣ] + im * sol[λᵢ])
-    γ₂, phases, λ, path_s2, s, latex
+    γ₂, u₂, phases, λ, path_s2, s, latex
 end
+
+
+get_u(L::Float64, L′::Float64, s::Float64) = vec(getγ₂(L, L′, s)[2][end])
+get_u(L::Float64, L′::Float64, s::Num) = get_u(L, L′, s)
+get_u(L::Float64, L′::Float64, s::SymbolicUtils.BasicSymbolic{Real}) = get_u(L, L′, s)
+@register_symbolic get_u(L::Float64, L′::Float64, s::Num)::Vector{Float64}
+@register_symbolic get_u(L::Float64, L′::Float64, s::SymbolicUtils.BasicSymbolic{Real})::Vector{Float64}
 
 
 """
     getγ₃(L, L′)
 
-Get path γ₃ with the given integration interval [`L`,`L′`], which defaults to (0, 2π].
+Get path γ₃ with the given integration interval [`L`,`L′`] along paths of type γ₂.
 Rupert Way (2008)
 """
-function getγ₃(L::Float64 = 0.0, L′::Float64 = 2π)
-    u₀ = get_u_L′_λ_s(L, L′, L)
-    v₀ = vec(u₀)
+function getγ₃(L::Float64, L′::Float64)
+    u₀ = get_u(L, L′, L)
+    v₀ = vec(normalize(u₀))
+    w₀ = πmap(Quaternion(v₀))
+    m₀ = norm(u₀)
+    # Define our parameters
+    @parameters K₃[1:4,1:4]=K(3) δ=(2π / 10000)
     # Define our state variables: state(t) = initial condition
     @variables t
-    @variables u1(t)=v₀[1] u2(t)=v₀[2] u3(t)=v₀[3] u4(t)=v₀[4]
-    @variables w1(t)=v₀[1] w2(t)=v₀[2] w3(t)=v₀[3] w4(t)=v₀[4]
+    @variables u(t)[1:4]=u₀
+    @variables uₛ(t)[1:4]=u₀
     @variables v(t)[1:4]=v₀
+    @variables w(t)[1:3]=w₀
+    @variables m(t)=m₀
     @variables θ(t)=0
-    @variables vhat(t)[1:4]=v₀
-    @variables vdot(t)[1:4]=vec(Quaternion(im .* [u₀.a + im * u₀.c; u₀.b + im * u₀.d]))
-
-    # Define our parameters
-    @parameters K₃[1:4,1:4]=K(3) δ=(2π / 100000000)
 
     # Define our differential: takes the derivative with respect to `t`
     D = Differential(t)
 
     # Define the differential equations
-    eqs = [u1 ~ get_u_L′_λ_s1(L, L′, t + δ)
-           u2 ~ get_u_L′_λ_s2(L, L′, t + δ)
-           u3 ~ get_u_L′_λ_s3(L, L′, t + δ)
-           u4 ~ get_u_L′_λ_s4(L, L′, t + δ)
-           w1 ~ get_u_L′_λ_s1(L, L′, t - δ)
-           w2 ~ get_u_L′_λ_s2(L, L′, t - δ)
-           w3 ~ get_u_L′_λ_s3(L, L′, t - δ)
-           w4 ~ get_u_L′_λ_s4(L, L′, t - δ)
-           D(v[1]) ~ (u1 - w1) / 2δ
-           D(v[2]) ~ (u2 - w2) / 2δ
-           D(v[3]) ~ (u3 - w3) / 2δ
-           D(v[4]) ~ (u4 - w4) / 2δ
-           vhat[1] ~ normalize1(v...)
-           vhat[2] ~ normalize2(v...)
-           vhat[3] ~ normalize3(v...)
-           vhat[4] ~ normalize4(v...)
-           vdot[1] ~ normalize1(D(v[1]), D(v[2]), D(v[3]), D(v[4])) 
-           vdot[2] ~ normalize2(D(v[1]), D(v[2]), D(v[3]), D(v[4])) 
-           vdot[3] ~ normalize3(D(v[1]), D(v[2]), D(v[3]), D(v[4])) 
-           vdot[4] ~ normalize4(D(v[1]), D(v[2]), D(v[3]), D(v[4])) 
-           D(θ) ~ -dot(K₃ * vhat, vdot)]
+    eqs = [u .~ get_u(L, L′, t)[1:4]
+           uₛ .~ (get_u(L, L′, t + δ)[1:4] - get_u(L, L′, t - δ)[1:4]) ./ 2δ
+           D(θ) ~ imag([u[1] + u[3] * im; u[2] + u[4] * im]' * [uₛ[1] + uₛ[3] * im; uₛ[2] + uₛ[4] * im]) / (u' * u)
+           m ~ sqrtᵣ(sum(abs.([u[1] + u[3] * im; u[2] + u[4] * im]).^2), 0)
+           v ~ u ./ m
+           w[3] ~ real(conj(v[1] + v[3] * im) * (v[2] + v[4] * im) + (v[1] + v[3] * im) * conj(v[2]) + v[4] * im)
+           w[2] ~ real(im * (conj(v[1] + v[3] * im) * (v[2] + v[4] * im) - (v[1] + v[3] * im) * conj(v[2] + v[4] * im)))
+           w[1] ~ real(abs(v[1] + v[3] * im)^2 - abs(v[2] + v[4] * im)^2)]
 
-    # latexify(eqs)
+    latex = latexify(eqs)
 
     # Bring these pieces together into an ODESystem with independent variable t
     @named sys = ODESystem(eqs, t)
@@ -256,7 +253,7 @@ function getγ₃(L::Float64 = 0.0, L′::Float64 = 2π)
     # Symbolically Simplify the System
     simpsys = structural_simplify(sys)
 
-    latexify(simpsys)
+   # latexify(simpsys)
 
     # Convert from a symbolic to a numerical problem to simulate
     tspan = (0, 2π)
@@ -268,28 +265,29 @@ function getγ₃(L::Float64 = 0.0, L′::Float64 = 2π)
     γ₃ = Vector{Quaternion}(undef, samples)
     phases = Vector{Float64}(undef, samples)
     s = Vector{Float64}(undef, samples)
+    s2_path = Vector{Vector{Float64}}(undef, samples)
     for i in 1:samples
         γ₃[i] = Quaternion(sol[v][i])
         phases[i] = sol[θ][i]
         s[i] = sol[t][i]
+        s2_path = sol[w][i]
     end
-    γ₃, phases, s
+    γ₃, phases, s2_path, s, latex
 end
 
 
 γ₁, θ₁, λ₁, w₁, t₁, latex1 = getγ₁(0.0, 2π)
-samples1 = length(t₁)
-steps_number = samples1
+steps_number = length(t₁)
 γ₂ = Vector{Vector{Quaternion}}(undef, steps_number)
 θ₂ = Vector{Vector{Float64}}(undef, steps_number)
 λ_array = []
 for i in 1:steps_number
-    s₀ = t₁[i]
-    _γ, _θ, _λ, _w, _t, _latex = getγ₂(L, L′, s₀)
+    _γ, _u, _θ, _λ, _w, _t, _latex2 = getγ₂(L, L′, t₁[i])
     push!(λ_array, _λ)
     γ₂[i] = _γ
     θ₂[i] = _θ
 end
+γ₃, θ₃, s2_path₃, t₃, latex3 = getγ₃(L, L′)
 
 makefigure() = GLMakie.Figure(resolution = resolution)
 fig = GLMakie.with_theme(makefigure, GLMakie.theme_black())
@@ -297,15 +295,15 @@ pl = GLMakie.PointLight(GLMakie.Point3f(0), GLMakie.RGBf(20, 20, 20))
 al = GLMakie.AmbientLight(GLMakie.RGBf(0.9, 0.9, 0.9))
 lscene = GLMakie.LScene(fig[1, 1], show_axis=true, scenekw = (resolution = resolution, lights = [pl, al], backgroundcolor=:black, clear=true))
 
-starman = FileIO.load("data/Starman_3.stl")
-starman_sprite = GLMakie.mesh!(
-    lscene,
-    starman,
-    color = [tri[1][2] for tri in starman for i in 1:3],
-    colormap = GLMakie.Reverse(:Spectral)
-)
-scale = 1 / 600
-GLMakie.scale!(starman_sprite, scale, scale, scale)
+# starman = FileIO.load("data/Starman_3.stl")
+# starman_sprite = GLMakie.mesh!(
+#     lscene,
+#     starman,
+#     color = [tri[1][2] for tri in starman for i in 1:3],
+#     colormap = GLMakie.Reverse(:Spectral)
+# )
+# scale = 1 / 400
+# GLMakie.scale!(starman_sprite, scale, scale, scale)
 
 cam = GLMakie.camera(lscene.scene) # this is how to access the scenes camera
 # eyeposition = GLMakie.Vec3f(cam.eyeposition[]...)
@@ -336,17 +334,21 @@ for i in eachindex(boundary_nodes)
     push!(boundary_colors, color)
     w = [τmap(boundary_nodes[i][j]) for j in eachindex(boundary_nodes[i])]
     push!(boundary_w, w)
-    whirl1 = Whirl(lscene, w, [0.0 for _ in 1:length(w)], [2π for _ in 1:length(w)], segments, color, transparency = true)
+    whirl1 = Whirl(lscene, w, [float(π) for _ in 1:length(w)], [0.0 for _ in 1:length(w)], segments, color, transparency = true)
 end
-Whirl(lscene, γ₁, [0.0 for _ in eachindex(γ₁)], [2π for _ in eachindex(γ₁)], segments, getcolor(πmap.(γ₁), colorref, α), transparency = true)
-whirls = []
-for i in 1:steps_number
-    c = GLMakie.RGBAf(convert_hsvtorgb([i / steps_number * 360; 1; 1])..., α)
-    whirl = Whirl(lscene, γ₂[i], [0.0 for _ in eachindex(γ₂[i])], [0.0001 for _ in eachindex(γ₂[i])], segments, c, transparency = true)
-    push!(whirls, whirl)
-end
+Whirl(lscene, γ₁, [0.0 for _ in γ₁], [2π for _ in γ₁], segments, getcolor(πmap.(γ₁), colorref, α), transparency = true)
+whirl = Whirl(lscene, γ₃, [0.0 for i in γ₃], [2π for _ in γ₃], segments, getcolor(πmap.(γ₃), colorref, α), transparency = true)
+# whirls = []
+# for i in 1:steps_number
+#     c = GLMakie.RGBAf(convert_hsvtorgb([i / steps_number * 360; 1; 1])..., α)
+#     whirl = Whirl(lscene, γ₂[i], [0.0 for i in γ₂[i]], [θ₂[i][begin] for _ in γ₂[i]], segments, c, transparency = true)
+#     push!(whirls, whirl)
+# end
+# w = map(x -> x[end], γ₂)
+# Whirl(lscene, w, [0.0 for _ in w], [2π for _ in w], segments, getcolor(πmap.(w), colorref, 0.1), transparency = true)
 basemap1 = Basemap(lscene, x -> G(0, τmap(x)), segments, basemap_color, transparency = true)
 basemap2 = Basemap(lscene, x -> G(0, τmap(x)), segments, basemap_color, transparency = true)
+basemap3 = Basemap(lscene, x -> G(π, τmap(x)), segments, basemap_color, transparency = true)
 points1 = GLMakie.Observable(GLMakie.Point3f[]) # Signal that can be used to update plots efficiently
 colors1 = GLMakie.Observable(Int[])
 lines1 = GLMakie.lines!(lscene, points1, linewidth = linewidth, color = colors1, colormap = :jet, transparency = false)
@@ -361,19 +363,18 @@ memo2 = [[] for _ in 1:steps_number]
 memo3 = []
 
 function step1(progress)
-    i = max(1, Int(floor(progress * samples1)))
+    i = max(1, Int(floor(progress * steps_number)))
     p = project(γ₁[i])
     if i ∈ memo1
         return p
     else
         push!(memo1, i)
     end
-    rainbowcolors = [GLMakie.RGBAf(convert_hsvtorgb([i / samples1 * 360; 1; 1])..., α) for i in 1:samples1]
-    color1 = GLMakie.RGBAf(convert_hsvtorgb([progress * 360; 1; 1])..., α)
-    color2 = GLMakie.RGBAf(convert_hsvtorgb([progress * 360; 0.5; 0.5])..., α)
-    color3 = GLMakie.RGBAf(convert_hsvtorgb([progress * 360; 0.25; 0.25])..., α)
-    linecolor = [color1, color2, color3]
-    arrowcolor = [color1, color2, color3]
+    rainbowcolors = [GLMakie.RGBAf(convert_hsvtorgb([i / steps_number * 360; 1; 1])..., α) for i in 1:steps_number]
+    color1 = GLMakie.RGBAf(convert_hsvtorgb([progress * 360; 1; 1])..., 0.9)
+    red, green, blue = GLMakie.RGBAf(1, 0, 0, 1), GLMakie.RGBAf(0, 1, 0, 1), GLMakie.RGBAf(0, 0, 1, 1)
+    linecolor = [red, green, blue]
+    arrowcolor = [red, green, blue]
     w = πmap(γ₁[i])
     GLMakie.meshscatter!([w[1]], [w[2]], [w[3]], markersize = 2markersize, color = rainbowcolors[i], transparency = true)
     basepoints = map(x -> project(x), γ₁)
@@ -382,7 +383,7 @@ function step1(progress)
     pz = [basepoints[j][3] for j in 1:i]
     GLMakie.meshscatter!(px, py, pz, markersize = markersize, color = rainbowcolors[1:i], transparency = true)
     tail = [GLMakie.Point3f(p...) for _ in 1:3]
-    head = [GLMakie.Point3f(p + project(K(3) * γ₁[i])), GLMakie.Point3f(p + project(K(1) * γ₁[i])) * 0.5, GLMakie.Point3f(p + project(K(2) * γ₁[i])) * 0.5]
+    head = [GLMakie.Point3f(project(K(3) * γ₁[i])) * 0.2, GLMakie.Point3f(project(K(1) * γ₁[i])) * 0.2, GLMakie.Point3f(project(K(2) * γ₁[i])) * 0.2]
     GLMakie.arrows!(lscene, tail, head, fxaa=true, linecolor = linecolor, arrowcolor = arrowcolor, linewidth = 0.01, arrowsize = arrowsize, transparency = true)
     GLMakie.meshscatter!([p[1]], [p[2]], [p[3]], markersize = markersize, color = color1, transparency = true)
     update!(basemap1, x -> G(θ₁[i], τmap(x)))
@@ -391,11 +392,12 @@ function step1(progress)
     push!(colors1[], frame)
     lines1.colorrange = (0, frame) # update plot attribute directly
     notify(points1); notify(colors1) # tell points and colors that their value has been updated
-    GLMakie.rotate!(starman_sprite, GLMakie.Vec3f(ẑ), -2(θ₁[i]))
-    axis = Float64.(normalize(project(K(3) * γ₁[i])))
-    rotation_angle, rotation_axis = getrotation(ẑ, axis)
-    GLMakie.rotate!(starman_sprite, GLMakie.Vec3f(rotation_axis), rotation_angle)
-    GLMakie.translate!(starman_sprite, GLMakie.Point3f(p))
+    # GLMakie.rotate!(starman_sprite, GLMakie.Vec3f(ẑ), -2(θ₁[i]))
+    # axis = Float64.(normalize(project(K(3) * γ₁[i])))
+    # rotation_angle, rotation_axis = getrotation(ẑ, axis)
+    # GLMakie.rotate!(starman_sprite, GLMakie.Vec3f(rotation_axis), rotation_angle)
+    # GLMakie.translate!(starman_sprite, GLMakie.Point3f(p))
+    update!(whirl, color1)
     p
 end
 
@@ -421,47 +423,52 @@ function step2(progress)
         push!(colors2[i][], frame)
         lines2[i].colorrange = (0, frame) # update plot attribute directly
         notify(points2[i]); notify(colors2[i]) # tell points and colors that their value has been updated
-        update!(whirls[i], γ₂[i], [0.0 for _ in 1:_samples] ,[θ₂[i][j] for _ in 1:_samples])
+        # update!(whirls[i], γ₂[i], [0.0 for _ in 1:_samples] ,[-θ₂[i][j] for _ in 1:_samples])
+        # c = GLMakie.RGBAf(convert_hsvtorgb([i * steps_number * 360; 1; 1])..., α / 2)
+        # update!(whirls[i], c)
     end
-    update!(basemap1, x -> G(θ₂[begin][end], τmap(x)))
-    i = max(1, Int(floor(progress * length(γ₂[begin]))))
-    GLMakie.rotate!(starman_sprite, GLMakie.Vec3f(ẑ), -2(θ₂[begin][i]))
-    axis = Float64.(normalize(project(K(3) * γ₂[begin][i])))
-    rotation_angle, rotation_axis = getrotation(ẑ, axis)
-    GLMakie.rotate!(starman_sprite, GLMakie.Vec3f(rotation_axis), rotation_angle)
-    GLMakie.translate!(starman_sprite, GLMakie.Point3f(project(γ₂[begin][i])))
+    update!(basemap1, x -> G(-θ₂[end][end], τmap(x)))
+    # i = max(1, Int(floor(progress * length(γ₂[end]))))
+    # GLMakie.rotate!(starman_sprite, GLMakie.Vec3f(ẑ), -2(θ₂[end][i]))
+    # axis = Float64.(normalize(project(K(3) * γ₂[end][i])))
+    # rotation_angle, rotation_axis = getrotation(ẑ, axis)
+    # GLMakie.rotate!(starman_sprite, GLMakie.Vec3f(rotation_axis), rotation_angle)
+    # GLMakie.translate!(starman_sprite, GLMakie.Point3f(project(γ₂[end][i])))
     p ./ N
 end
 
+
 function step3(progress)
     α = 0.9
-    i = max(1, Int(floor(progress * steps_number)))
-    p = project(γ₂[i][end])
+    i = max(1, Int(floor(progress * length(γ₃))))
+    p = project(γ₃[i])
     if i ∈ memo3
         return p
     else
         push!(memo3, i)
     end
+    w = πmap(γ₃[i])
+    rainbowcolors = [GLMakie.RGBAf(convert_hsvtorgb([i / length(γ₃) * 360; 1; 1])..., α) for i in 1:length(γ₃)]
+    GLMakie.meshscatter!([w[1]], [w[2]], [w[3]], markersize = 2markersize, color = rainbowcolors[i], transparency = true)
     push!(points3[], p)
     frame = max(1, Int(floor(progress * frames_number)))
     push!(colors3[], frame)
     lines3.colorrange = (0, frame) # update plot attribute directly
     notify(points3); notify(colors3) # tell points and colors that their value has been updated
-    update!(basemap1, x -> G(θ₂[i][end], τmap(x)))
     color1 = GLMakie.RGBAf(convert_hsvtorgb([progress * 360; 1; 1])..., α)
-    color2 = GLMakie.RGBAf(convert_hsvtorgb([progress * 360; 0.5; 0.5])..., α)
-    color3 = GLMakie.RGBAf(convert_hsvtorgb([progress * 360; 0.25; 0.25])..., α)
-    linecolor = [color1, color2, color3]
-    arrowcolor = [color1, color2, color3]
+    red, green, blue = GLMakie.RGBAf(1, 0, 0, 1), GLMakie.RGBAf(0, 1, 0, 1), GLMakie.RGBAf(0, 0, 1, 1)
+    linecolor = [red, green, blue]
+    arrowcolor = [red, green, blue]
     tail = [GLMakie.Point3f(p...) for _ in 1:3]
-    head = [GLMakie.Point3f(p + project(K(3) * γ₂[i][end])), GLMakie.Point3f(p + project(K(1) * γ₂[i][end])) * 0.5, GLMakie.Point3f(p + project(K(2) * γ₂[i][end])) * 0.5]
+    head = [GLMakie.Point3f(project(K(3) * γ₃[i])), GLMakie.Point3f(project(K(1) * γ₃[i])), GLMakie.Point3f(project(K(2) * γ₃[i]))]
     GLMakie.arrows!(lscene, tail, head, fxaa=true, linecolor = linecolor, arrowcolor = arrowcolor, linewidth = 0.01, arrowsize = arrowsize, transparency = false)
     GLMakie.meshscatter!([p[1]], [p[2]], [p[3]], markersize = markersize, color = color1, transparency = false)
-    GLMakie.rotate!(starman_sprite, GLMakie.Vec3f(ẑ), -2(θ₂[i][end]))
-    axis = Float64.(normalize(project(K(3) * γ₂[i][end])))
-    rotation_angle, rotation_axis = getrotation(ẑ, axis)
-    GLMakie.rotate!(starman_sprite, GLMakie.Vec3f(rotation_axis), rotation_angle)
-    GLMakie.translate!(starman_sprite, GLMakie.Point3f(project(γ₂[i][end])))
+    # GLMakie.rotate!(starman_sprite, GLMakie.Vec3f(ẑ), -2(θ₃[i]))
+    # axis = Float64.(normalize(project(K(3) * γ₃[i])))
+    # rotation_angle, rotation_axis = getrotation(ẑ, axis)
+    # GLMakie.rotate!(starman_sprite, GLMakie.Vec3f(rotation_axis), rotation_angle)
+    # GLMakie.translate!(starman_sprite, GLMakie.Point3f(project(γ₃[i])))
+    update!(basemap1, x -> G(θ₃[i], τmap(x)))
     p
 end
 
@@ -469,12 +476,12 @@ end
 GLMakie.record(fig, joinpath("gallery", "$modelname.mp4"), 1:frames_number) do frame
     println("Frame: $frame")
     progress = frame / frames_number
-    distance = π / 2
+    distance = π
     _segments = 4
     if progress ≤ 1 / _segments
         _progress = _segments * progress
         p = step1(_progress)
-    end
+    endgit
     if 1 / _segments < progress ≤ 2 / _segments
         _progress = _segments * (progress - 1 / _segments)
         p = step2(_progress)
@@ -486,13 +493,13 @@ GLMakie.record(fig, joinpath("gallery", "$modelname.mp4"), 1:frames_number) do f
     if 3 / _segments < progress ≤ 4 / _segments
         _progress = _segments * (progress - 3 / _segments)
         i = max(1, Int(floor(_progress * steps_number)))
-        p = project(γ₂[i][end])
+        p = project(γ₃[end])
         distance += 1e-2
     end
     
     global lookat = 0.9 * lookat + 0.1 * GLMakie.Vec3f(p...)
     up = GLMakie.Vec3f(0, 0, 1)
-    azimuth = -π / 2 + 0.3 * sin(2π * progress) # set the view angle of the axis
-    eyeposition = GLMakie.Vec3f(distance .* convert_to_cartesian([1; azimuth; π / 7])...)
+    azimuth = π + π / 4 + 0.4 * sin(2π * progress) # set the view angle of the axis
+    eyeposition = GLMakie.Vec3f(distance .* convert_to_cartesian([1; azimuth; π / 6])...)
     GLMakie.update_cam!(lscene.scene, eyeposition, lookat, up)
 end
