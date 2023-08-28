@@ -25,7 +25,7 @@ r₇ = 0.5 # experiment 7
 r₈ = 0.8 # experiment 8
 λ₈ = 2 - im # experiment 8
 
-r₀ = 2.5 # radius of lambda path circle
+r₀ = 2.0 # radius of lambda path circle
 λ₀ = 2 - im # centre of lambda path circle
 ϕ₀ = 0.0
 
