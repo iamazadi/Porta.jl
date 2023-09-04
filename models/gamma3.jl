@@ -8,7 +8,7 @@ using Porta
 
 
 resolution = (1920, 1080)
-segments = 360
+segments = 180
 frames_number = 360
 
 r₁ = 0.8 # experiments: 1-6
@@ -25,8 +25,8 @@ r₇ = 0.5 # experiment 7
 r₈ = 0.8 # experiment 8
 λ₈ = 2 - im # experiment 8
 
-r₀ = 2.0 # radius of lambda path circle
-λ₀ = 2 - im # centre of lambda path circle
+r₀ = 0.8 # radius of lambda path circle
+λ₀ = 1.0 + 0.2 * im # center of lambda path circle
 ϕ₀ = 0.0
 
 operator = imag(λ₀) ≥ 0 ? "+" : "-"
@@ -35,9 +35,9 @@ modelname = "gamma3_$version"
 L = 10.0 # max x range
 L′ = -L
 ẑ = [0.0; 0.0; 1.0]
-α = 0.2
-markersize = 0.03
-linewidth = 7.0
+α = 0.05
+markersize = 0.04
+linewidth = 8.0
 arrowsize = GLMakie.Vec3f(0.02, 0.02, 0.04)
 
 getλ(s) = λ₀ + r₀ * exp(im * (s + ϕ₀))
@@ -295,15 +295,15 @@ pl = GLMakie.PointLight(GLMakie.Point3f(0), GLMakie.RGBf(20, 20, 20))
 al = GLMakie.AmbientLight(GLMakie.RGBf(0.9, 0.9, 0.9))
 lscene = GLMakie.LScene(fig[1, 1], show_axis=true, scenekw = (resolution = resolution, lights = [pl, al], backgroundcolor=:black, clear=true))
 
-# starman = FileIO.load("data/Starman_3.stl")
-# starman_sprite = GLMakie.mesh!(
-#     lscene,
-#     starman,
-#     color = [tri[1][2] for tri in starman for i in 1:3],
-#     colormap = GLMakie.Reverse(:Spectral)
-# )
-# scale = 1 / 400
-# GLMakie.scale!(starman_sprite, scale, scale, scale)
+starman = FileIO.load("data/Starman_3.stl")
+starman_sprite = GLMakie.mesh!(
+    lscene,
+    starman,
+    color = [tri[1][2] for tri in starman for i in 1:3],
+    colormap = GLMakie.Reverse(:Spectral)
+)
+scale = 1 / 400
+GLMakie.scale!(starman_sprite, scale, scale, scale)
 
 cam = GLMakie.camera(lscene.scene) # this is how to access the scenes camera
 # eyeposition = GLMakie.Vec3f(cam.eyeposition[]...)
@@ -336,8 +336,8 @@ for i in eachindex(boundary_nodes)
     push!(boundary_w, w)
     whirl1 = Whirl(lscene, w, [float(π) for _ in 1:length(w)], [0.0 for _ in 1:length(w)], segments, color, transparency = true)
 end
-Whirl(lscene, γ₁, [0.0 for _ in γ₁], [2π for _ in γ₁], segments, getcolor(πmap.(γ₁), colorref, α), transparency = true)
-whirl = Whirl(lscene, γ₃, [0.0 for i in γ₃], [2π for _ in γ₃], segments, getcolor(πmap.(γ₃), colorref, α), transparency = true)
+# Whirl(lscene, γ₁, [0.0 for _ in γ₁], [2π for _ in γ₁], segments, getcolor(πmap.(γ₁), colorref, α), transparency = true)
+# whirl = Whirl(lscene, γ₃, [0.0 for i in γ₃], [2π for _ in γ₃], segments, getcolor(πmap.(γ₃), colorref, α), transparency = true)
 # whirls = []
 # for i in 1:steps_number
 #     c = GLMakie.RGBAf(convert_hsvtorgb([i / steps_number * 360; 1; 1])..., α)
@@ -392,12 +392,12 @@ function step1(progress)
     push!(colors1[], frame)
     lines1.colorrange = (0, frame) # update plot attribute directly
     notify(points1); notify(colors1) # tell points and colors that their value has been updated
-    # GLMakie.rotate!(starman_sprite, GLMakie.Vec3f(ẑ), -2(θ₁[i]))
-    # axis = Float64.(normalize(project(K(3) * γ₁[i])))
-    # rotation_angle, rotation_axis = getrotation(ẑ, axis)
-    # GLMakie.rotate!(starman_sprite, GLMakie.Vec3f(rotation_axis), rotation_angle)
-    # GLMakie.translate!(starman_sprite, GLMakie.Point3f(p))
-    update!(whirl, color1)
+    GLMakie.rotate!(starman_sprite, GLMakie.Vec3f(ẑ), θ₁[i])
+    axis = Float64.(normalize(project(K(3) * γ₁[i])))
+    rotation_angle, rotation_axis = getrotation(ẑ, axis)
+    GLMakie.rotate!(starman_sprite, GLMakie.Vec3f(rotation_axis), rotation_angle)
+    GLMakie.translate!(starman_sprite, GLMakie.Point3f(p))
+    # update!(whirl, color1)
     p
 end
 
@@ -427,13 +427,13 @@ function step2(progress)
         # c = GLMakie.RGBAf(convert_hsvtorgb([i * steps_number * 360; 1; 1])..., α / 2)
         # update!(whirls[i], c)
     end
-    update!(basemap1, x -> G(-θ₂[end][end], τmap(x)))
-    # i = max(1, Int(floor(progress * length(γ₂[end]))))
-    # GLMakie.rotate!(starman_sprite, GLMakie.Vec3f(ẑ), -2(θ₂[end][i]))
-    # axis = Float64.(normalize(project(K(3) * γ₂[end][i])))
-    # rotation_angle, rotation_axis = getrotation(ẑ, axis)
-    # GLMakie.rotate!(starman_sprite, GLMakie.Vec3f(rotation_axis), rotation_angle)
-    # GLMakie.translate!(starman_sprite, GLMakie.Point3f(project(γ₂[end][i])))
+    update!(basemap1, x -> G(θ₂[end][end], τmap(x)))
+    i = max(1, Int(floor(progress * length(γ₂[end]))))
+    GLMakie.rotate!(starman_sprite, GLMakie.Vec3f(ẑ), θ₂[end][i])
+    axis = Float64.(normalize(project(K(3) * γ₂[end][i])))
+    rotation_angle, rotation_axis = getrotation(ẑ, axis)
+    GLMakie.rotate!(starman_sprite, GLMakie.Vec3f(rotation_axis), rotation_angle)
+    GLMakie.translate!(starman_sprite, GLMakie.Point3f(project(γ₂[end][i])))
     p ./ N
 end
 
@@ -463,11 +463,11 @@ function step3(progress)
     head = [GLMakie.Point3f(project(K(3) * γ₃[i])), GLMakie.Point3f(project(K(1) * γ₃[i])), GLMakie.Point3f(project(K(2) * γ₃[i]))]
     GLMakie.arrows!(lscene, tail, head, fxaa=true, linecolor = linecolor, arrowcolor = arrowcolor, linewidth = 0.01, arrowsize = arrowsize, transparency = false)
     GLMakie.meshscatter!([p[1]], [p[2]], [p[3]], markersize = markersize, color = color1, transparency = false)
-    # GLMakie.rotate!(starman_sprite, GLMakie.Vec3f(ẑ), -2(θ₃[i]))
-    # axis = Float64.(normalize(project(K(3) * γ₃[i])))
-    # rotation_angle, rotation_axis = getrotation(ẑ, axis)
-    # GLMakie.rotate!(starman_sprite, GLMakie.Vec3f(rotation_axis), rotation_angle)
-    # GLMakie.translate!(starman_sprite, GLMakie.Point3f(project(γ₃[i])))
+    GLMakie.rotate!(starman_sprite, GLMakie.Vec3f(ẑ), θ₃[i])
+    axis = Float64.(normalize(project(K(3) * γ₃[i])))
+    rotation_angle, rotation_axis = getrotation(ẑ, axis)
+    GLMakie.rotate!(starman_sprite, GLMakie.Vec3f(rotation_axis), rotation_angle)
+    GLMakie.translate!(starman_sprite, GLMakie.Point3f(project(γ₃[i])))
     update!(basemap1, x -> G(θ₃[i], τmap(x)))
     p
 end
@@ -476,12 +476,12 @@ end
 GLMakie.record(fig, joinpath("gallery", "$modelname.mp4"), 1:frames_number) do frame
     println("Frame: $frame")
     progress = frame / frames_number
-    distance = π
+    distance = 2π / 3
     _segments = 4
     if progress ≤ 1 / _segments
         _progress = _segments * progress
         p = step1(_progress)
-    endgit
+    end
     if 1 / _segments < progress ≤ 2 / _segments
         _progress = _segments * (progress - 1 / _segments)
         p = step2(_progress)
@@ -499,7 +499,7 @@ GLMakie.record(fig, joinpath("gallery", "$modelname.mp4"), 1:frames_number) do f
     
     global lookat = 0.9 * lookat + 0.1 * GLMakie.Vec3f(p...)
     up = GLMakie.Vec3f(0, 0, 1)
-    azimuth = π + π / 4 + 0.4 * sin(2π * progress) # set the view angle of the axis
+    azimuth = π + π / 4 + 0.3 * sin(2π * progress) # set the view angle of the axis
     eyeposition = GLMakie.Vec3f(distance .* convert_to_cartesian([1; azimuth; π / 6])...)
     GLMakie.update_cam!(lscene.scene, eyeposition, lookat, up)
 end
