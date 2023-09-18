@@ -1,5 +1,7 @@
 # Geometrize the quantum!
 
+![Gallery](https://github.com/iamazadi/Porta.jl/blob/master/docs/_posts_images/IMG_5621.gif)
+
 This project helps with Eric Weinstein's the Graph-Wall-Tome (GWT) project. Watch visual
 models on the YouTube [channel][1].
 
