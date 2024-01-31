@@ -27,6 +27,7 @@ When the robot is turned off, try to manually balance it. Show that it has a sin
 The mono-wheel computes the angular velocity of its body with respect to the ground using a gyroscope. The sensor works based on the Micro-ElectroMechanical Systems (MEMS) technology. There are micron-scale moving parts (weights on springs) inside a very tiny chip for measuring inertial forces acted on the microchip from the outside environment. The Inertial Measurement Unit (IMU) that we use for this project is depicted in the figure below.
 
 ![mpu](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/2024-01-31-how-does-a-self-balancing-robot-work-mathematically/mpu.JPG)
+![pcb](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/2024-01-31-how-does-a-self-balancing-robot-work-mathematically/pcb.JPG)
 
 ### How hard is the task?
 
@@ -194,6 +195,8 @@ Here, we extracted two different mathematical models for the motion of the robot
 
 ### Monitoring the controller in action.
 
+![stateController](stateController.png)
+
 Poke the robot from two different directions gently while the controller is active. Show that it recovers from small pushes exerted on the robot’s columns via finger tip. It can recover its orientation from small dynamic accelerations. Unlike the static acceleration of the Earth’s gravity, pushing the robot counts as a dynamic acceleration. And the robot is robust to dynamic accelerations, within the saturation limits of the reaction wheel.
 
 ![ugn3503](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/2024-01-31-how-does-a-self-balancing-robot-work-mathematically/ugn3503.JPG)
@@ -234,6 +237,7 @@ Talking about the limits of the reaction wheel system, one of the problems occur
 
 Using either a motor with higher Revolutions Per Minute (RPM) with a reaction wheel that has a lower rotational inertia, or a lower RPM motor with a reaction wheel that has a higher rotational inertia should alleviate the saturation problem. The second solution is preferable because any kind of manufacturing inaccuracies in building the symmetrical reaction wheel causes the robot to become unstable at high speeds, due to unwanted high-frequency wobbling.
 
+![reactionWheel](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/2024-01-31-how-does-a-self-balancing-robot-work-mathematically/reactionWheel.PNG)
 ![solution](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/2024-01-31-how-does-a-self-balancing-robot-work-mathematically/solution.PNG)
 
 ## Takeaway
