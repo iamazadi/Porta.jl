@@ -27,7 +27,7 @@ When the robot is turned off, try to manually balance it. Show that it has a sin
 The mono-wheel computes the angular velocity of its body with respect to the ground using a gyroscope. The sensor works based on the Micro-ElectroMechanical Systems (MEMS) technology. There are micron-scale moving parts (weights on springs) inside a very tiny chip for measuring inertial forces acted on the microchip from the outside environment. The Inertial Measurement Unit (IMU) that we use for this project is depicted in the figure below.
 
 ![mpu](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/2024-01-31-how-does-a-self-balancing-robot-work-mathematically/mpu.JPG)
-![pcb](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/2024-01-31-how-does-a-self-balancing-robot-work-mathematically/pcb.JPG)
+![pcb](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/2024-01-31-how-does-a-self-balancing-robot-work-mathematically/pcb.PNG)
 
 ### How hard is the task?
 
