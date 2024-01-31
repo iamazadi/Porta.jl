@@ -195,7 +195,7 @@ Here, we extracted two different mathematical models for the motion of the robot
 
 ### Monitoring the controller in action.
 
-![stateController](stateController.png)
+![stateController](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/2024-01-31-how-does-a-self-balancing-robot-work-mathematically/stateController.png)
 
 Poke the robot from two different directions gently while the controller is active. Show that it recovers from small pushes exerted on the robot’s columns via finger tip. It can recover its orientation from small dynamic accelerations. Unlike the static acceleration of the Earth’s gravity, pushing the robot counts as a dynamic acceleration. And the robot is robust to dynamic accelerations, within the saturation limits of the reaction wheel.
 
