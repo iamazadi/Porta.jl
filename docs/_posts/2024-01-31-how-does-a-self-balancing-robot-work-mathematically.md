@@ -234,7 +234,7 @@ Talking about the limits of the reaction wheel system, one of the problems occur
 
 Using either a motor with higher Revolutions Per Minute (RPM) with a reaction wheel that has a lower rotational inertia, or a lower RPM motor with a reaction wheel that has a higher rotational inertia should alleviate the saturation problem. The second solution is preferable because any kind of manufacturing inaccuracies in building the symmetrical reaction wheel causes the robot to become unstable at high speeds, due to unwanted high-frequency wobbling.
 
-![solution](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/2024-01-31-how-does-a-self-balancing-robot-work-mathematically/problem.PNG)
+![solution](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/2024-01-31-how-does-a-self-balancing-robot-work-mathematically/solution.PNG)
 
 ## Takeaway
 ### Why is the robot relevant today?
