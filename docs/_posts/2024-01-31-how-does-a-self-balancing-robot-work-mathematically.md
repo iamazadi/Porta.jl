@@ -275,5 +275,3 @@ Training a Reinforcement learning (RL) policy for balancing, by expanding the sy
 Please click on the image below to watch the statement video!
 
 [![statement video](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/2024-01-31-how-does-a-self-balancing-robot-work-mathematically/cover.PNG)](https://youtu.be/rBjlrpOvGok)
-
-docs/_posts/2024-01-31-how-does-a-self-balancing-robot-work-mathematically.md
