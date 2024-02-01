@@ -133,11 +133,11 @@ Therefore the following equation can take its final form.
 
 After a rearrangement.
 
-![computation13](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/2024-01-31-how-does-a-self-balancing-robot-work-mathematically/computation13.PNG)
+![computation13](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/2024-01-31-how-does-a-self-balancing-robot-work-mathematically/computation13.jpg)
 
 The final form of the main wheel system’s second state equation looks like this:
 
-![equation8](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/2024-01-31-how-does-a-self-balancing-robot-work-mathematically/equation8.PNG)
+![equation8](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/2024-01-31-how-does-a-self-balancing-robot-work-mathematically/equation8.jpg)
 
 Equations 7 and 8 determine the robot's behavior in the direction of the X-axis and its deviation in rotating about the Y-axis (angle theta) in terms of the main motor's supply voltage. Next, we derive the mathematical model of the robot rotating around the X-axis (angle phi) and the effect of the reaction wheel.
 
