@@ -80,7 +80,7 @@ The parameter I_r shows the rotational moment of inertia of all of the robot's p
 
 ![figure7](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/2024-01-31-how-does-a-self-balancing-robot-work-mathematically/figure7.JPG)
 
-The letters H, V and H stand for Horizontal, Vertical and Friction, respectively. They represent the horizontal, vertical and friction forces.
+The letters H, V and F stand for Horizontal, Vertical and Friction, respectively. They represent the horizontal, vertical and friction forces.
 
 ![equation4](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/2024-01-31-how-does-a-self-balancing-robot-work-mathematically/equation4.PNG)
 ![equation5](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/2024-01-31-how-does-a-self-balancing-robot-work-mathematically/equation5.PNG)
