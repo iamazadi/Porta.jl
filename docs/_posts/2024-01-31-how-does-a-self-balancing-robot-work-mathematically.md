@@ -205,7 +205,7 @@ The Hall effect sensors are located inside the servo motor’s housing, for meas
 
 ![graph](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/2024-01-31-how-does-a-self-balancing-robot-work-mathematically/graph.png)
 
-The sensor reading is analog and the time-series is a periodic function at constant revolutions per minute (angular velocity).
+The sensor reading is analog and the time-series is a periodic function at constant Revolutions Per Minute (RPM or angular velocity).
 
 ## Other Views
 ### Comparing with other unicycles.
@@ -229,7 +229,7 @@ We studied the mathematical equations of the robot’s motion. The interesting t
 
 ### The issue of the saturation of the reaction wheel.
 
-Talking about the limits of the reaction wheel system, one of the problems occurs whenever the reaction wheel goes into the saturation mode. The wheel saturates when it reaches max speed in terms of RPM and can no longer provide additional torque beyond current supply. As soon as the system goes into regions of the state space where the supplied toque by the reaction wheel is insufficient the robot becomes unstable and falls over its sides.
+Talking about the limits of the reaction wheel system, one of the problems occurs whenever the reaction wheel goes into the saturation mode. The wheel saturates when it reaches max speed in terms of RPM and can no longer provide additional torque beyond current supply. As soon as the system goes into regions of the state space where the supplied toque by the reaction wheel is insufficient the robot becomes unstable and falls over on its sides.
 
 ![problem](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/2024-01-31-how-does-a-self-balancing-robot-work-mathematically/problem.PNG)
 
