@@ -3,10 +3,6 @@ layout: post
 title:  "How Does A Self-Balancing Robot Work Mathematically?"
 ---
 
-Inspired by [The Portal, episode 20,](https://youtu.be/mg93Dm-vYc8) with the host Eric Weinstein and the guest Sir Roger Penrose.
-
-How Does A Self-Balancing Robot Work Mathematically?
-
 # Introduction
 ### Introducing the self-balance robot.
 Today, we are going to talk about the way that a mono-wheel works. It is a self-balancing robot with only one wheel. But, it can keep its balance along two axes. Therefore, it is like a two-wheel balance robot when it is balancing forwards and backwards. And it is different from a two-wheel balance robot because it uses a reaction wheel in order to balance in the left and right direction.
