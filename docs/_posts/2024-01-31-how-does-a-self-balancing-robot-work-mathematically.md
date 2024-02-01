@@ -176,7 +176,7 @@ In the equations above the parameters m_r and I_r are written for the whole robo
 
 ![equation13](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/2024-01-31-how-does-a-self-balancing-robot-work-mathematically/equation13.PNG)
 
-Equation 13 without the force of the spring takes a different form, which makes sense because the rubber piece on the main wheel should affect the acceleration of angle phi.
+Equation 13 without the force of the spring takes a different form, which makes sense because the rubber piece on the main wheel should depend on the angle phi.
 
 ![computation16](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/2024-01-31-how-does-a-self-balancing-robot-work-mathematically/computation16.PNG)
 
