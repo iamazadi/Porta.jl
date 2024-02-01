@@ -139,7 +139,7 @@ The final form of the main wheel system’s second state equation looks like thi
 
 ![equation8](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/2024-01-31-how-does-a-self-balancing-robot-work-mathematically/equation8.PNG)
 
-Equations 7 and 8 determine the robot's behavior in the direction of the X-axis and its deviation in rotating about the Y-axis (angle theta) in terms of the main motor's supply voltage. Next, we derive the mathematical model of the robot in deviation around the X-axis (angle phi) and the effect of the reaction wheel.
+Equations 7 and 8 determine the robot's behavior in the direction of the X-axis and its deviation in rotating about the Y-axis (angle theta) in terms of the main motor's supply voltage. Next, we derive the mathematical model of the robot rotating around the X-axis (angle phi) and the effect of the reaction wheel.
 
 ### Modeling the reaction wheel’s behavior.
 
