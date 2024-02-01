@@ -129,7 +129,7 @@ Looks like we need to replace the value of V. But, from using equation 7 we can 
 
 Therefore the following equation can take its final form.
 
-![computation12](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/2024-01-31-how-does-a-self-balancing-robot-work-mathematically/computation12.PNG)
+![computation12](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/2024-01-31-how-does-a-self-balancing-robot-work-mathematically/Computation12.jpg)
 
 After a rearrangement.
 
