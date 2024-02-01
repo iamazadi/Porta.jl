@@ -155,7 +155,7 @@ In addition to gravity, we have a thin flexible band over the circumference of t
 
 ![equation9](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/2024-01-31-how-does-a-self-balancing-robot-work-mathematically/equation9.PNG)
 
-In equation 9, k_s denotes the spring constant constant and l denotes the length between the center of mass of the robot's body and the contact point on axis 2. The equations that govern the reaction wheel’s driver are similar to those of the main motor, as equation 10 suggests.
+In equation 9, k_s denotes the spring constant and l denotes the length between the center of mass of the robot's body and the contact point on axis 2. The equations that govern the reaction wheel’s driver are similar to those of the main motor, as equation 10 suggests.
 
 ![equation10](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/2024-01-31-how-does-a-self-balancing-robot-work-mathematically/equation10.PNG)
 ![figure10](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/2024-01-31-how-does-a-self-balancing-robot-work-mathematically/figure10.JPG)
