@@ -188,9 +188,9 @@ Also, equation 13 defines the first state equation of the reaction wheel’s con
 
 The answer appears as equation 14 after simplification, completing the second half of the system’s state equations.
 
-Here, we extracted two different mathematical models for the motion of the robot around two perpendicular axes. Using the equations that describe these motions (equations 7 and 8 or equations 13 and 14) we can extract the system's transform matrix in that motion, or find its state space. The system's state at time-step n equals the transform of the system's state at time-step n minus one. Finally, keeping balance in two different directions is going to require two separate controllers. The controller that controls angle theta and motion along axis X commands The main motor, whereas the controller that controls angle phi commands the motor of the reaction wheel.
-
 ![equation14](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/2024-01-31-how-does-a-self-balancing-robot-work-mathematically/equation14.PNG)
+
+Here, we extracted two different mathematical models for the motion of the robot around two perpendicular axes. Using the equations that describe these motions (equations 7 and 8 or equations 13 and 14) we can extract the system's transform matrix in that motion, or find its state space. The system's state at time-step n equals the transform of the system's state at time-step n minus one. Finally, keeping balance in two different directions is going to require two separate controllers. The controller that controls angle theta and motion along axis X commands The main motor, whereas the controller that controls angle phi commands the motor of the reaction wheel.
 
 
 ### Monitoring the controller in action.
