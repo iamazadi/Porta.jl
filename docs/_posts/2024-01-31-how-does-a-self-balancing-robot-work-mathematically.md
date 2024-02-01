@@ -171,7 +171,7 @@ The equation ruling the rotational motion of the entire robot about axis 2 at th
 In the equations above the parameters m_r and I_r are written for the whole robot, including the reaction wheel since gravity applies to every part. The parameters m_w and I_w are specifically related to the reaction wheel. Note that the rotational inertia I_r and I_w are calculated about two different axes. By solving equations 9 through 12 simultaneously, and assuming the linear approximation that sin(phi) is approximately equal to phi for small angles, the equations describing the system's state are extracted.
 
 ![computation14](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/2024-01-31-how-does-a-self-balancing-robot-work-mathematically/computation14.PNG)
-![computation15](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/2024-01-31-how-does-a-self-balancing-robot-work-mathematically/computation15.PNG)
+![computation15](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/2024-01-31-how-does-a-self-balancing-robot-work-mathematically/Computation15.jpg)
 
 
 ![equation13](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/2024-01-31-how-does-a-self-balancing-robot-work-mathematically/equation13.PNG)
