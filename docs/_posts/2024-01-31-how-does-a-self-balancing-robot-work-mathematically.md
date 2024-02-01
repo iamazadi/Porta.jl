@@ -105,7 +105,7 @@ Then, substitute equation 4:
 
 Then, divide both sides of the equation by minus r times R:
 
-![equation7](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/2024-01-31-how-does-a-self-balancing-robot-work-mathematically/equation7.PNG)
+![equation7](https://github.com/iamazadi/Porta.jl/raw/master/docs/_posts_images/2024-01-31-how-does-a-self-balancing-robot-work-mathematically/equation7.jpg)
 
 That is one of the state equations. Now, begin with equation 6 again, for finding the other equation.
 
