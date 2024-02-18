@@ -26,6 +26,7 @@ Manifest.toml
 # data files
 test/data/
 data/ne_50m_admin_0_countries
+data/solutions
 
 # interaction videos
 /gallery/
