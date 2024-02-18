@@ -3,6 +3,7 @@ import GLMakie
 
 export Basemap
 export update!
+export make
 
 
 """
@@ -26,7 +27,7 @@ Make the shape of a frame as a 2-surface in ℝ³.
 """
 function make(σ::Any, segments::Integer)
     matrix = Matrix{Vector{Float64}}(undef, segments, segments)
-    factor = 0.99 # use a limiting factor to avoid the poles
+    factor = 0.999 # use a limiting factor to avoid the poles
     lspace_ϕ = collect(range(-π, stop = float(π), length = segments))
     lspace_θ = collect(range(π / 2 * factor, stop = -π / 2 * factor, length = segments))
     for (i, θ) in enumerate(lspace_θ)
