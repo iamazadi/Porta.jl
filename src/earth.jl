@@ -131,11 +131,14 @@ Get the color of the given `basemap` at the center of the boundary specified by 
 Use QGIS to design a geo map.
 """
 function getcolor(points::Vector{Vector{Float64}}, basemap::Any, α::Float64)
+    number = length(points)
+    if (number == 0)
+        return GLMakie.RGBA(1.0, 1.0, 1.0, α)
+    end
     height, width = size(basemap)
     margin = 20
     ϕ = map(x -> convert_to_geographic(x)[2], points)
     θ = map(x -> π / 2 - (π / 2 + convert_to_geographic(x)[3]), points)
-    number = length(points)
     ϕ = sum(ϕ) / number
     θ = sum(θ) / number
     ϕ, θ = (ϕ + π) / 2π, (θ + π / 2) / π
@@ -289,7 +292,8 @@ function loadcountries(attributes_path::String, nodes_path::String)
         economy = attributesgroup[i][!, :ECONOMY][1]
         subdataframe = nodes[nodes.shapeid .== shapeid, :]
         uniquepartid = unique(subdataframe[!, :partid])
-        ϵ = name == "Antarctica" ? 1e-3 : 5e-3
+        # ϵ = name == "Antarctica" ? 5e-3 : 1e-3
+        ϵ = 1e-3
         histogram = Dict()
         for id in uniquepartid
             sub = subdataframe[subdataframe.partid .== id, :]
