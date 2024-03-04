@@ -2,29 +2,19 @@ import GLMakie
 import FileIO
 
 
-σ(p::Vector{Float64}) = begin
-    g = convert_to_geographic(p)
-    r, ϕ, θ = g
-    z₁ = ℯ^(im * 0) * √((1 + sin(θ)) / 2)
-    z₂ = ℯ^(im * ϕ) * √((1 - sin(θ)) / 2)
-    Quaternion([z₁; z₂])
-end
-
-
 fig = GLMakie.Figure()
 lscene = GLMakie.LScene(fig[1, 1])
 
 segments = rand(5:10)
 color = FileIO.load("../data/basemap_color.png")
 transparency = rand(1:2) == 1 ? true : false
-
-basemap = Basemap(lscene, σ, segments, color, transparency = transparency)
+q = Quaternion(1, 0, 0, 0)
+basemap = Basemap(lscene, q, segments, color, transparency = transparency)
 
 matrix = getsurface(basemap.observable, segments, segments)
 
-_σ(g) = G(rand() * 2π, σ(g))
-
-update!(basemap, _σ)
+q = Quaternion(rand(4))
+update!(basemap, q)
 
 _matrix = getsurface(basemap.observable, segments, segments)
 

@@ -12,7 +12,7 @@ export make
 Convert a point `g` from geographic coordinates into cartesian coordinates.
 """
 function convert_to_cartesian(g::Vector{<:Real})
-    r, ϕ, θ = vec(g)
+    r, ϕ, θ = g
     x = r * cos(θ) * cos(ϕ)
     y = r * cos(θ) * sin(ϕ)
     z = r * sin(θ)
@@ -20,19 +20,14 @@ function convert_to_cartesian(g::Vector{<:Real})
 end
 
 
-"""
-    make(σ, sgments)
-
-Make the shape of a frame as a 2-surface in ℝ³.
-"""
-function make(σ::Any, segments::Integer)
+function make(q::Quaternion, segments::Integer)
     matrix = Matrix{Vector{Float64}}(undef, segments, segments)
-    factor = 0.999 # use a limiting factor to avoid the poles
-    lspace_ϕ = collect(range(-π, stop = float(π), length = segments))
-    lspace_θ = collect(range(π / 2 * factor, stop = -π / 2 * factor, length = segments))
-    for (i, θ) in enumerate(lspace_θ)
-        for (j, ϕ) in enumerate(lspace_ϕ)
-            matrix[i, j] = project(σ(convert_to_cartesian([1; ϕ; θ])))
+    lspaceϕ = collect(range(-π / 4, stop = π / 4, length = segments))
+    lspaceθ = collect(range(-π / 4, stop = π / 4, length = segments))
+    f = 0.9
+    for (i, ϕ) in enumerate(lspaceϕ)
+        for (j, θ) in enumerate(lspaceθ)
+            matrix[i, j] = project(exp(f * θ * K(1) + f * -ϕ * K(2)) * q)
         end
     end
     matrix
@@ -40,31 +35,30 @@ end
 
 
 """
-    Represents a base map.
+    Represents a horizontal subspace.
 
-fields: σ, segments, color and observable.
-σ: S² → S³
+fields: q, segments, color and observable.
 """
 mutable struct Basemap <: Sprite
-    σ::Any
+    q::Quaternion
     segments::Integer
     color::Any
     observable::Tuple{GLMakie.Observable{Matrix{Float64}}, GLMakie.Observable{Matrix{Float64}}, GLMakie.Observable{Matrix{Float64}}}
-    Basemap(scene::GLMakie.LScene, σ::Any, segments::Integer, color::Any; transparency::Bool = false) = begin
-        matrix = make(σ, segments)
+    Basemap(scene::GLMakie.LScene, q::Quaternion, segments::Integer, color::Any; transparency::Bool = false) = begin
+        matrix = make(q, segments)
         observable = buildsurface(scene, matrix, color, transparency = transparency)
-        new(σ, segments, color, observable)
+        new(q, segments, color, observable)
     end
 end
 
 
 """
-    update!(basemap, σ)
+    update!(basemap, q)
 
-Update a Basemap's section `σ`.
+Switch to the right horizontal subsapce with the given point `q`.
 """
-function update!(basemap::Basemap, σ::Any)
-    basemap.σ = σ
-    matrix = make(σ, basemap.segments)
+function update!(basemap::Basemap, q::Quaternion)
+    basemap.q = q
+    matrix = make(q, basemap.segments)
     updatesurface!(matrix, basemap.observable)
 end
