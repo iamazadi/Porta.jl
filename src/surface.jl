@@ -29,9 +29,9 @@ end
 
 
 """
-    buildsurface(scene, value, color)
+    buildsurface(scene, value, color, transparency)
 
-Build a surface with the given `scene`, `value` and `color`.
+Build a surface with the given `scene`, `value`, `color` and `transparency`.
 """
 function buildsurface(scene::GLMakie.LScene,
                       value::Matrix{<:Vector{<:Real}},
@@ -41,6 +41,24 @@ function buildsurface(scene::GLMakie.LScene,
     y = GLMakie.Observable(map(x -> x[2] , value))
     z = GLMakie.Observable(map(x -> x[3] , value))
     GLMakie.surface!(scene, x, y, z, color = color, transparency = transparency)
+    x, y, z
+end
+
+
+"""
+    buildsurface(scene, value, color, visible, transparency)
+
+Build a surface with the given `scene`, `value`, `color`, `visible` and `transparency`.
+"""
+function buildsurface(scene::GLMakie.LScene,
+                      value::Matrix{<:Vector{<:Real}},
+                      color::Any,
+                      visible::GLMakie.Observable{Bool};
+                      transparency::Bool = false)
+    x = GLMakie.Observable(map(x -> x[1] , value))
+    y = GLMakie.Observable(map(x -> x[2] , value))
+    z = GLMakie.Observable(map(x -> x[3] , value))
+    GLMakie.surface!(scene, x, y, z, color = color, transparency = transparency, visible = visible)
     x, y, z
 end
 
