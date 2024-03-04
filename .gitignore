@@ -30,7 +30,10 @@ data/solutions
 
 # interaction videos
 /gallery/
+# assets
 data/Starman_3.stl
+data/basemap_mask2.png
+data/basemap_mask11.png
 
 
 # VS Code settings
