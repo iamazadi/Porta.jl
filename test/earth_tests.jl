@@ -58,9 +58,8 @@ curve = getbutterflycurve(N)
 
 @test length(curve) == N
 
-
-attributes_path = "../data/gdp/geometry-attributes.csv"
-nodes_path = "../data/gdp/geometry-nodes.csv"
+attributes_path = "../data/naturalearth/geometry-attributes.csv"
+nodes_path = "../data/naturalearth/geometry-nodes.csv"
 
 countries = loadcountries(attributes_path, nodes_path)
 i = rand(1:length(countries["nodes"]))

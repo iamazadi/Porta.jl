@@ -274,7 +274,8 @@ Free vector and raster map data @ naturalearthdata.com.
 3. Install mmqgis plugin for exporting to CSV
 """
 function loadcountries(attributes_path::String, nodes_path::String)
-    attributes = DataFrames.DataFrame(CSV.File(attributes_path))
+    file = CSV.File(attributes_path)
+    attributes = DataFrames.DataFrame(file)
     attributes = DataFrames.sort(attributes, :shapeid, rev = true)
     nodes = DataFrames.DataFrame(CSV.File(nodes_path))
 
