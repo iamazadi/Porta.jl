@@ -3,31 +3,31 @@ using LinearAlgebra
 
 
 N = rand(5:10)
-v = [normalize(Quaternion(rand(4)...)) for i in 1:N]
-θ1 = rand(N)
-θ2 = rand(N)
+q = [normalize(Quaternion(rand(4)...)) for i in 1:N]
+θ1 = rand()
+θ2 = rand()
 segments = rand(5:10)
 
-@test norm(Porta.project(v[1])) ≤ 1
+@test norm(Porta.project(q[1])) ≤ 1
 
-matrix = Porta.make(v, θ1, θ2, segments)
+matrix = Porta.make(q, θ1, θ2, segments)
 @test size(matrix) == (N, segments)
 @test length(matrix[1,1]) == 3
 
 fig = GLMakie.Figure()
 lscene = GLMakie.LScene(fig[1, 1])
 color = GLMakie.RGBAf(rand(4)...)
-whirl = Whirl(lscene, v, θ1, θ2, segments, color, transparency = false)
+whirl = Whirl(lscene, q, θ1, θ2, segments, color, transparency = false)
 
-_v = [normalize(Quaternion(rand(4)...)) for i in 1:N]
-_θ1 = rand(N)
-_θ2 = rand(N)
+_q = [normalize(Quaternion(rand(4)...)) for i in 1:N]
+_θ1 = rand()
+_θ2 = rand()
 
-update!(whirl, _v, _θ1, _θ2)
+update!(whirl, _q, _θ1, _θ2)
 
-@test all([isapprox(whirl.v[i], _v[i]) for i in 1:N])
-@test all([isapprox(whirl.θ1[i], _θ1[i]) for i in 1:N])
-@test all([isapprox(whirl.θ2[i], _θ2[i]) for i in 1:N])
+@test all([isapprox(whirl.q[i], _q[i]) for i in 1:N])
+@test all([isapprox(whirl.θ1, _θ1) for i in 1:N])
+@test all([isapprox(whirl.θ2, _θ2) for i in 1:N])
 
 _color = GLMakie.RGBAf(rand(4)...)
 update!(whirl, _color)
