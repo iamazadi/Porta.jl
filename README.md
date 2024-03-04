@@ -6,13 +6,14 @@ This project helps with Eric Weinstein's the Graph-Wall-Tome (GWT) project. Watc
 models on the YouTube [channel][1].
 
 ## Requirements
-- CSV v0.8.5
-- DataFrames v1.4.4
-- DifferentialEquations v7.8.0
-- FileIO v1.16.1
-- GLMakie v0.8.7
+CSV v0.10.12
+- DataFrames v1.6.1
+- DifferentialEquations v7.12.0
+- FileIO v1.16.2
+- GLMakie v0.9.9
+- GeometryBasics v0.4.10
 - Latexify v0.16.1
-- ModelingToolkit v8.63.0
+- ModelingToolkit v9.1.0
 - LinearAlgebra
 
 
