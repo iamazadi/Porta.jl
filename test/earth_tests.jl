@@ -1,25 +1,24 @@
 import FileIO
 import GLMakie
-using LinearAlgebra
 
 
-point = rand(3)
-line = Line(rand(3), rand(3))
+point = ℝ³(rand(3))
+line = Line(ℝ³(rand(3)), ℝ³(rand(3)))
 distance = getdistance(point, line)
 
 @test distance < 2
 
 N = rand(5:10)
-points = [rand(3) for i in 1:N]
+points = [ℝ³(rand(3)) for i in 1:N]
 ϵ = rand() * 1e-3
 _points = decimate(points, ϵ)
 
 @test length(points) ≤ length(_points)
 
-point = normalize(rand(3))
+point = normalize(ℝ³(rand(3)))
 _point = convert_to_geographic(point)
 
-@test isapprox(_point[1], 1)
+@test isapprox(_point[1], 1.0)
 @test -π ≤ _point[2] ≤ π
 @test -π / 2 ≤ _point[3] ≤ π / 2
 
@@ -48,11 +47,11 @@ result = isinside(poly, p)
 
 @test typeof(result) <: Bool
 
-geographic = [1; rand() * 2π - π; rand() * π - π / 2]
+geographic = [1.0; rand() * 2π - π; rand() * π - π / 2]
 
 cartesian = convert_to_cartesian(geographic)
 
-@test isapprox(norm(cartesian), 1)
+@test isapprox(norm(cartesian), 1.0)
 
 curve = getbutterflycurve(N)
 
@@ -67,4 +66,4 @@ j = rand(1:length(countries["nodes"][i]))
 
 @test length(countries["nodes"]) > 100
 @test length(countries["nodes"]) == length(countries["name"])
-@test isapprox(1, norm(countries["nodes"][i][j]))
+@test isapprox(1.0, norm(countries["nodes"][i][j]))

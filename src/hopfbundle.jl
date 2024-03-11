@@ -1,6 +1,3 @@
-import LinearAlgebra
-
-
 export Φ
 export G
 export hopfmap
@@ -18,8 +15,8 @@ Perform the standard S¹ free group action in complex coordinates z ∈ S³ ⊂ 
 Φ: S¹ × S³ → S³
 (ℯⁱᶿ,z) ↦ ℯⁱᶿz
 """
-Φ(θ::Real, v::Vector{<:Real}) = Quaternion(exp(im * θ) .* [v[1] + im * v[3]; v[2] + im * v[4]])
-Φ(θ::Real, q::Quaternion) = Quaternion(exp(im * θ) .* [q.a + im * q.c; q.b + im * q.d])
+Φ(θ::Real, v::ℝ⁴) = Quaternion(exp(im * θ) .* [vec(v)[1] + im * vec(v)[3]; vec(v)[2] + im * vec(v)[4]])
+Φ(θ::Real, q::Quaternion) = Quaternion(exp(im * θ) .* [vec(q)[1] + im * vec(q)[3]; vec(q)[2] + im * vec(q)[4]])
 
 
 """
@@ -28,10 +25,10 @@ Perform the standard S¹ free group action in complex coordinates z ∈ S³ ⊂ 
 The S¹ group action in real coordinates.
 G_θ: S¹ × S³ → S³
 """
-G(θ::Real, v::Vector{<:Real}) = Quaternion([LinearAlgebra.I(2) .* cos(θ) LinearAlgebra.I(2) .* -sin(θ);
-                                            LinearAlgebra.I(2) .* sin(θ) LinearAlgebra.I(2) .* cos(θ)] * v)
-G(θ::Real, q::Quaternion) = Quaternion([LinearAlgebra.I(2) .* cos(θ) LinearAlgebra.I(2) .* -sin(θ);
-                                        LinearAlgebra.I(2) .* sin(θ) LinearAlgebra.I(2) .* cos(θ)] * vec(q))
+G(θ::Real, v::ℝ⁴) = Quaternion([I(2) .* cos(θ) I(2) .* -sin(θ);
+                                I(2) .* sin(θ) I(2) .* cos(θ)] * vec(v))
+G(θ::Real, q::Quaternion) = Quaternion([I(2) .* cos(θ) I(2) .* -sin(θ);
+                                        I(2) .* sin(θ) I(2) .* cos(θ)] * vec(q))
 
 
 """
@@ -42,8 +39,8 @@ Apply the Hopf map as a projection.
 (x₁, x₂, x₃, x₄) ↦ (2(x₁x₂ + y₁y₂), 2(x₂y₁ + x₁y₂), x₁² + y₁² - x₂² - y₂²)
 z = (z₁, z₂) ↦ (2Re(z₁z̅₂), 2Im(z₁z̅₂), |z₁|² - |z₂|²) = (z̅₁z₂ + z₁z̅₂, i(z̅₁z₂ + z₁z̅₂), |z₁|² - |z₂|²)
 """
-hopfmap(v::Vector{<:Real}) = [2(v[1] * v[2] + v[3] * v[4]); 2(v[2] * v[3] - v[1] * v[4]); v[1]^2 + v[3]^2 - v[2]^2 - v[4]^2]
-hopfmap(q::Quaternion) = [2(q.a * q.b + q.c * q.d); 2(q.b * q.c - q.a * q.d); q.a^2 + q.c^2 - q.b^2 - q.d^2]
+hopfmap(v::ℝ⁴) = [2(vec(v)[1] * vec(v)[2] + vec(v)[3] * vec(v)[4]); 2(vec(v)[2] * vec(v)[3] - vec(v)[1] * vec(v)[4]); vec(v)[1]^2 + vec(v)[3]^2 - vec(v)[2]^2 - vec(v)[4]^2]
+hopfmap(q::Quaternion) = [2(vec(q)[1] * vec(q)[2] + vec(q)[3] * vec(q)[4]); 2(vec(q)[2] * vec(q)[3] - vec(q)[1] * vec(q)[4]); vec(q)[1]^2 + vec(q)[3]^2 - vec(q)[2]^2 - vec(q)[4]^2]
 
 
 """
@@ -59,9 +56,10 @@ v = (x₁, x₂, y₁, y₂) = (Re(z₁), Re(z₂), Im(z₁), Im(z₂)) ∈ S³ 
 """
 π✳(q::Dualquaternion) = begin
     g = real(q)
-    M = 2 .* [g.b g.a g.d g.c;
-              -g.d g.c g.b -g.a;
-              g.a -g.b g.c -g.d]
+    a, b, c, d = vec(g)
+    M = 2 .* [b a d c;
+              -d c b -a;
+              a -b c -d]
     M * vec(imag(q))
 end
 
@@ -80,7 +78,7 @@ ver(v::Quaternion, α::Real) = α * (K(3) * v)
 Take a point from S² into S³ as a section of the Hopf bundle.
 σ: S² → S³
 """
-function σmap(p::Vector{Float64})
+function σmap(p::ℝ³)
     g = convert_to_geographic(p)
     r, ϕ, θ = g
     z₂ = ℯ^(im * 0) * √((1 + sin(θ)) / 2)
@@ -95,7 +93,7 @@ end
 Take a point from S² into S³ as a section of the Hopf bundle.
 τ: S² → S³
 """
-function τmap(p::Vector{Float64})
+function τmap(p::ℝ³)
     g = convert_to_geographic(p)
     r, ϕ, θ = g
     z₂ = ℯ^(im * 0) * √((1 + sin(θ)) / 2)
@@ -111,9 +109,9 @@ Apply the Hopf map to the given point `q`.
 π: S³ → S²
 """
 πmap(v::Quaternion) = begin
-    z₁, z₂ = v.a + v.c * im, v.b + v.d * im
+    z₁, z₂ = vec(v)[1] + vec(v)[3] * im, vec(v)[2] + vec(v)[4] * im
     w₃ = conj(z₁) * z₂ + z₁ * conj(z₂)
     w₂ = im * (conj(z₁) * z₂ - z₁ * conj(z₂))
     w₁ = abs(z₁)^2 - abs(z₂)^2
-    real.([w₁; w₂; w₃])
+    ℝ³(real.([w₁; w₂; w₃]))
 end

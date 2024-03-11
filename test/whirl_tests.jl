@@ -1,5 +1,4 @@
 import GLMakie
-using LinearAlgebra
 
 
 N = rand(5:10)
@@ -8,11 +7,11 @@ q = [normalize(Quaternion(rand(4)...)) for i in 1:N]
 θ2 = rand()
 segments = rand(5:10)
 
-@test norm(Porta.project(q[1])) ≤ 1
+@test norm(project(q[1])) ≤ 1
 
-matrix = Porta.make(q, θ1, θ2, segments)
+matrix = make(q, θ1, θ2, segments)
 @test size(matrix) == (N, segments)
-@test length(matrix[1,1]) == 3
+@test typeof(matrix[1, 1]) <: ℝ³
 
 fig = GLMakie.Figure()
 lscene = GLMakie.LScene(fig[1, 1])

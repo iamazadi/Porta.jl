@@ -6,22 +6,8 @@ export update!
 export make
 
 
-"""
-    convert_to_cartesian(g)
-
-Convert a point `g` from geographic coordinates into cartesian coordinates.
-"""
-function convert_to_cartesian(g::Vector{<:Real})
-    r, ϕ, θ = g
-    x = r * cos(θ) * cos(ϕ)
-    y = r * cos(θ) * sin(ϕ)
-    z = r * sin(θ)
-    [x; y; z]
-end
-
-
 function make(q::Quaternion, segments::Integer)
-    matrix = Matrix{Vector{Float64}}(undef, segments, segments)
+    matrix = Matrix{ℝ³}(undef, segments, segments)
     lspaceϕ = collect(range(-π / 4, stop = π / 4, length = segments))
     lspaceθ = collect(range(-π / 4, stop = π / 4, length = segments))
     f = 0.9

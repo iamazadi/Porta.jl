@@ -1,10 +1,7 @@
-import LinearAlgebra
-
-
-e = Quaternion(1, 0, 0, 0)
-i = Quaternion(0, 1, 0, 0)
-j = Quaternion(0, 0, 1, 0)
-k = Quaternion(0, 0, 0, 1)
+e = Quaternion(ℝ⁴(1.0, 0.0, 0.0, 0.0))
+i = Quaternion(0.0, 1.0, 0.0, 0.0)
+j = Quaternion(0.0, 0.0, 1.0, 0.0)
+k = Quaternion(0.0, 0.0, 0.0, 1.0)
 
 # i² = -1
 @test isapprox(i * i, -e)
@@ -18,30 +15,30 @@ k = Quaternion(0, 0, 0, 1)
 @test isapprox((i * j) * (i * j), -((i * i) * (j * j)))
 
 θ = rand() * 2π
-u = LinearAlgebra.normalize(rand(3))
+u = normalize(ℝ³(rand(3)))
 q = Quaternion(θ, u)
 
 @test isapprox(conj(conj(q)), q)
 
 # |q| = 1
-@test isapprox(LinearAlgebra.norm(q), 1)
+@test isapprox(norm(q), 1)
 
 # K₁ = RᵀJ₃R
-@test isapprox(K(1), LinearAlgebra.transpose(R) * J(3) * R, atol = TOLERANCE)
+@test isapprox(K(1), transpose(R) * J(3) * R, atol = TOLERANCE)
 # K₂ = RᵀJ₁R
-@test isapprox(K(2), LinearAlgebra.transpose(R) * J(1) * R, atol = TOLERANCE)
+@test isapprox(K(2), transpose(R) * J(1) * R, atol = TOLERANCE)
 # K₃ = RᵀJ₂R
-@test isapprox(K(3), LinearAlgebra.transpose(R) * J(2) * R, atol = TOLERANCE)
+@test isapprox(K(3), transpose(R) * J(2) * R, atol = TOLERANCE)
 
 # Check to see if the following vectors form a basis for ℝ⁴
 ξ = Quaternion(rand(4)...)
 
 # <ξ, K₁ξ> = 0
-@test isapprox(0, LinearAlgebra.dot(ξ, K(1) * ξ), atol = TOLERANCE)
+@test isapprox(0, dot(ξ, K(1) * ξ), atol = TOLERANCE)
 # <ξ, K₂ξ> = 0
-@test isapprox(0, LinearAlgebra.dot(ξ, K(2) * ξ), atol = TOLERANCE)
+@test isapprox(0, dot(ξ, K(2) * ξ), atol = TOLERANCE)
 # <ξ, K₃ξ> = 0
-@test isapprox(0, LinearAlgebra.dot(ξ, K(3) * ξ), atol = TOLERANCE)
+@test isapprox(0, dot(ξ, K(3) * ξ), atol = TOLERANCE)
 
 for i in 1:3
     for j = 1:3
@@ -49,11 +46,11 @@ for i in 1:3
             continue
         end
         # <Kᵢξ, Kⱼξ> = 0
-        @test isapprox(0, LinearAlgebra.dot(K(i) * ξ, K(j) * ξ), atol = TOLERANCE)
+        @test isapprox(0, dot(K(i) * ξ, K(j) * ξ), atol = TOLERANCE)
         # <ξ, KᵢᵀKⱼξ> = 0
-        @test isapprox(0, LinearAlgebra.dot(ξ, LinearAlgebra.transpose(K(i)) * K(j) * ξ), atol = TOLERANCE)
+        @test isapprox(0, dot(ξ, transpose(K(i)) * K(j) * ξ), atol = TOLERANCE)
         # <ξ, -KᵢKⱼξ> = 0
-        @test isapprox(0, LinearAlgebra.dot(ξ, -K(i) * K(j) * ξ), atol = TOLERANCE)
+        @test isapprox(0, dot(ξ, -K(i) * K(j) * ξ), atol = TOLERANCE)
         for k in 1:3
             if k == i || k == j
                 continue
@@ -83,7 +80,7 @@ for i in 1:3
                 end
             end
             # <ξ, ϵᵢⱼₖKₖξ> = 0
-            @test isapprox(0, LinearAlgebra.dot(ξ, ϵ(i, j) .* K(k) * ξ), atol = TOLERANCE)
+            @test isapprox(0, dot(ξ, ϵ(i, j) .* K(k) * ξ), atol = TOLERANCE)
         end
     end
 end

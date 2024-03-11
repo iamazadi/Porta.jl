@@ -5,6 +5,7 @@ export Whirl
 export update!
 export project
 export convert_hsvtorgb
+export make
 
 
 """
@@ -49,8 +50,8 @@ end
 Take the given point `q` ∈ S³ ⊂ ℂ² into the Euclidean space ℝ³ using stereographic projection.
 """
 function project(q::Quaternion)
-    v = [q.a; q.b; q.c] ./ (1 - q.d)
-    normalize(v) .* tanh(norm(v))
+    v = ℝ³(vec(q)[1], vec(q)[2], vec(q)[3]) * (1.0 / (1.0 - vec(q)[4]))
+    normalize(v) * tanh(norm(v))
 end
 
 
@@ -60,7 +61,7 @@ end
 Make the vertical subspace of the boundary `q`, with the given heights `θ1` and `θ2`, and the number of `segments`.
 """
 function make(q::Vector{Quaternion}, θ1::Float64, θ2::Float64, segments::Integer)
-    matrix = Matrix{Vector{Float64}}(undef, length(q), segments)
+    matrix = Matrix{ℝ³}(undef, length(q), segments)
     lspaceθ = collect(range(θ1, stop = θ2, length = segments))
     for (j, p) in enumerate(q)
         for (i, θ) in enumerate(lspaceθ)

@@ -9,10 +9,10 @@ lscene = GLMakie.LScene(fig[1, 1])
 
 segments = rand(5:10)
 
-matrix = Matrix{Vector{Float64}}(undef, segments, segments)
+matrix = Matrix{ℝ³}(undef, segments, segments)
 for i in 1:segments
     for j in 1:segments
-        matrix[j, i] = rand(3)
+        matrix[j, i] = ℝ³(rand(3))
     end
 end
 
@@ -43,7 +43,7 @@ _matrix = getsurface(observable, segments, segments)
 
 ## updatesurfce
 
-matrix = map(x -> 2 .* x, matrix)
+matrix = map(x -> 2 * x, matrix)
 updatesurface!(matrix, observable)
 _matrix = getsurface(observable, segments, segments)
 

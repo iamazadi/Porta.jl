@@ -1,7 +1,6 @@
 import CSV
 import DataFrames
 import GLMakie
-using LinearAlgebra
 
 export Point
 export Line
@@ -56,8 +55,8 @@ Base.show(io::IO, e::Edge) = print(io, "$(e[1]) ∘−∘ $(e[2])")
 fields: p₁ and p₂.
 """
 struct Line
-    p₁::Vector{Float64}
-    p₂::Vector{Float64}
+    p₁::ℝ³
+    p₂::ℝ³
 end
 
 
@@ -66,7 +65,7 @@ end
 
 Calculate the length of a line segment perpendicular to `line` and passing through the given `point`.
 """
-function getdistance(point::Vector{Float64}, line::Line)
+function getdistance(point::ℝ³, line::Line)
     p₀ = point
     p₁, p₂ = line.p₁, line.p₂
     norm(cross(p₂ - p₁, p₁ - p₀)) / norm(p₂ - p₁)
@@ -78,7 +77,7 @@ end
 
 Decimate a curve containing a sequence of `points` by adding points to the curve that are farther ferom each other than the given threshold `ϵ`.
 """
-function decimate(points::Vector{Vector{Float64}}, ϵ::Float64)
+function decimate(points::Vector{ℝ³}, ϵ::Float64)
     # Find the point with the maximum distance
     dmax = 0
     index = 1
@@ -116,8 +115,8 @@ end
 
 Convert a point from cartesian coordinate to geographic coordinates.
 """
-convert_to_geographic(p::Vector{Float64}) = begin
-    x, y, z = p
+convert_to_geographic(p::ℝ³) = begin
+    x, y, z = vec(p)
     r = norm(p)
     [r; atan(y, x); asin(z / r)]
 end
@@ -130,7 +129,7 @@ Get the color of the given `basemap` at the center of the boundary specified by 
 
 Use QGIS to design a geo map.
 """
-function getcolor(points::Vector{Vector{Float64}}, basemap::Any, α::Float64)
+function getcolor(points::Vector{ℝ³}, basemap::Any, α::Float64)
     number = length(points)
     if (number == 0)
         return GLMakie.RGBA(1.0, 1.0, 1.0, α)
@@ -214,7 +213,7 @@ isinside(poly::Vector{Tuple{Point{T}, Point{T}}}, p::Point{T}) where T = isodd(c
 
 Determine whether the given `point` is inside the `boundary`.
 """
-function isinside(point::Vector{Float64}, boundary::Vector{<:Vector{<:Real}})
+function isinside(point::ℝ³, boundary::Vector{ℝ³})
     _point = convert_to_geographic(point)
     p = Point(_point[2], _point[3])
     N = length(boundary)
@@ -239,7 +238,21 @@ Convert the given point `z` in the Riemann sphere to cartesian coordinates.
 convert_to_cartesian(z::Complex) = begin
     x, y = real(z), imag(z)
     d = x^2 + y^2 + 1
-    [2x / d; 2y / d; (d - 2) / d]
+    ℝ³(2x / d, 2y / d, (d - 2) / d)
+end
+
+
+"""
+    convert_to_cartesian(g)
+
+Convert a point `g` from geographic coordinates into cartesian coordinates.
+"""
+function convert_to_cartesian(g::Vector{<:Real})
+    r, ϕ, θ = g
+    x = r * cos(θ) * cos(ϕ)
+    y = r * cos(θ) * sin(ϕ)
+    z = r * sin(θ)
+    ℝ³(x, y, z)
 end
 
 
