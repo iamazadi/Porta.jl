@@ -11,10 +11,8 @@ CSV v0.10.12
 - DifferentialEquations v7.12.0
 - FileIO v1.16.2
 - GLMakie v0.9.9
-- GeometryBasics v0.4.10
 - Latexify v0.16.1
 - ModelingToolkit v9.1.0
-- LinearAlgebra
 
 
 ## Installation
