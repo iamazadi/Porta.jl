@@ -24,14 +24,11 @@ docs/site/
 Manifest.toml
 
 # data files
-test/data/
-data/ne_50m_admin_0_countries
 data/solutions
 
 # interaction videos
 /gallery/
 # assets
-data/Starman_3.stl
 data/basemap_mask2.png
 data/basemap_mask11.png
 
