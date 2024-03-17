@@ -5,12 +5,12 @@ import GLMakie
 using Porta
 
 
-figuresize = (1920, 1080)
+figuresize = (1080, 1920)
 segments = 30
 basemapsegments = 30
-modelname = "structureequation"
-boundary_names = ["Australia", "Japan", "United States of America", "United Kingdom", "Antarctica", "Iran"]
-frames_number = 360 * length(boundary_names)
+modelname = "planethopf"
+boundary_names = ["Australia", "Japan", "United States of America", "United Kingdom", "Antarctica", "Iran", "Chile", "France", "South Africa", "Turkey", "Pakistan", "India", "Russia", "Canada", "Mexico"]
+frames_number = 720 # 360 * length(boundary_names)
 samplename = "United States of America"
 indices = Dict()
 ratio = 0.99
@@ -19,10 +19,10 @@ ŷ = ℝ³(0.0, 1.0, 0.0)
 ẑ = ℝ³(0.0, 0.0, 1.0)
 linewidth = 10.0
 arrowsize = GLMakie.Vec3f(0.02, 0.02, 0.04)
-eyeposition = normalize(ℝ³(1.0, 1.0, 0.0)) * 1.9
+eyeposition = normalize(ℝ³(1.0, 1.0, 1.0)) * π
 lookat = ℝ³(0.0, 0.0, 0.0)
-up = normalize(ℝ³(0.0, 1.0, 1.0))
-totalstages = length(boundary_names)
+up = normalize(ℝ³(1.0, 0.0, 0.0))
+totalstages = 1 # length(boundary_names)
 initialized = [false for _ in 1:totalstages]
 
 
@@ -32,18 +32,19 @@ initialized = [false for _ in 1:totalstages]
 Parallel transport the basis frame at point `q` in the direction angle `α` with distance `θ`,
 and smoothness `segments`.
 """
-function paralleltransport(q::Quaternion, α::Float64, θ::Float64, segments::Int)
-    x¹ = K(1) * q
-    x² = K(2) * q
-    x³ = K(3) * q
+function paralleltransport(q::SpinVector, α::Float64, θ::Float64, segments::Int)
+    h = Quaternion(q)
+    x¹ = K(1) * h
+    x² = K(2) * h
+    x³ = K(3) * h
     v = sin(α) * K(1) + cos(α) * K(2)
     θ₀ = θ / segments
-    track = [q]
+    track = [h]
     track1 = [x¹]
     track2 = [x²]
     track3 = [x³]
     for i in 1:segments
-        n = exp(v * i * θ₀) * q
+        n = exp(v * i * θ₀) * h
         x¹ = normalize(x¹ - dot(x¹, n) * n)
         x² = normalize(x² - dot(x², n) * n)
         x³ = normalize(x³ - dot(x³, n) * n)
@@ -79,16 +80,19 @@ for i in eachindex(countries["name"])
 end
 
 θ1 = float(π)
-q = τmap(ℝ³(1.0, 0.0, 0.0))
-basemap1 = Basemap(lscene, q, basemapsegments, basemap_color, transparency = true)
-basemap2 = Basemap(lscene, G(float(π), q), basemapsegments, basemap_color, transparency = true)
+timesign = 1
+q = SpinVector(ℝ³(0.0, 1.0, 0.0), timesign)
+chart = (π / 2, -π / 2, π / 2, -π / 2)
+basemap1 = Basemap(lscene, q, chart, basemapsegments, basemap_color, transparency = true)
+basemap2 = Basemap(lscene, q, chart, basemapsegments, basemap_color, transparency = true)
 
 whirls = []
 _whirls = []
 for i in eachindex(boundary_nodes)
-    color = getcolor(boundary_nodes[i], colorref, 0.5)
-    _color = getcolor(boundary_nodes[i], colorref, 0.1)
-    w = [τmap(boundary_nodes[i][j]) for j in eachindex(boundary_nodes[i])]
+    hue = i / length(boundary_names) * 360
+    color = GLMakie.HSVA(hue, 100, 100, 0.25) # getcolor(boundary_nodes[i], colorref, 0.5)
+    _color = GLMakie.HSVA(hue, 100, 100, 0.05) # getcolor(boundary_nodes[i], colorref, 0.1)
+    w = [SpinVector(boundary_nodes[i][j], timesign) for j in eachindex(boundary_nodes[i])]
     whirl = Whirl(lscene, w, 0.0, θ1, segments, color, transparency = true)
     _whirl = Whirl(lscene, w, θ1, 2π, segments, _color, transparency = true)
     push!(whirls, whirl)
@@ -125,17 +129,6 @@ scale = 1 / 400
 GLMakie.scale!(starman_sprite, scale, scale, scale)
 
 
-
-τ(x, ϕ) = begin
-    g = convert_to_geographic(x)
-    r, _ϕ, _θ = g
-    _ϕ += ϕ
-    z₁ = ℯ^(im * 0) * √((1 + sin(_θ)) / 2)
-    z₂ = ℯ^(im * _ϕ) * √((1 - sin(_θ)) / 2)
-    Quaternion([z₂; z₁])
-end
-
-
 function getcenter(nodes)
     center = [0.0; 0.0; 0.0]
     for i in eachindex(nodes)
@@ -150,27 +143,28 @@ end
 
 
 function animate(progress, totalprogress, frame)
-    q = exp(K(3) * totalprogress * 4π) * τmap(convert_to_cartesian([1.0, 0.0, 0.0]))
+    q = Quaternion(SpinVector(convert_to_cartesian([1.0, 0.0, progress * 2π]), timesign))
     index = indices[samplename]
     center = getcenter(boundary_nodes[index])
-    r, _ϕ, _θ = convert_to_geographic(center)
-    f = 0.9
-    h = exp(f * _ϕ / 4 * K(1) + f * _θ / 2 * K(2)) * q
-    
-    update!(basemap1, q)
-    update!(basemap2, G(θ1, q))
+    r, θ, ϕ = convert_to_geographic(center)
+    h = SpinVector(exp(θ * K(1) + ϕ * K(2)) * q)
+    vector = SpinVector(q)
+    update!(basemap1, vector)
+    update!(basemap2, antipodal(vector))
+    # update!(basemap1, chart)
+    # update!(basemap2, chart)
     for i in eachindex(boundary_nodes)
-        points = Quaternion[]
+        points = SpinVector[]
         for node in boundary_nodes[i]
-            r, _ϕ, _θ = convert_to_geographic(node)
-            push!(points, exp(f * _ϕ / 4 * K(1) + f * _θ / 2 * K(2)) * q)
+            r, θ, ϕ = convert_to_geographic(node)
+            push!(points, SpinVector(exp(θ * K(1) + ϕ * K(2)) * q))
         end
         update!(whirls[i], points, θ1, 2π)
         update!(_whirls[i], points, 0.0, θ1)
     end
 
-    α = cos(totalprogress * 2π) * 2π
-    θ = sin(progress * 2π) * 2π
+    α = sin(totalprogress * 2π) * 2π
+    θ = cos(progress * 2π) * 2π
     track, track1, track2, track3 = paralleltransport(h, α, θ, segments)
     for i in 1:segments
         x = project(track[i])
@@ -180,7 +174,7 @@ function animate(progress, totalprogress, frame)
         tails[i][] = [GLMakie.Point3f(vec(x)...) for _ in 1:3]
         heads[i][] = [GLMakie.Point3f(vec(x¹)...), GLMakie.Point3f(vec(x²)...), GLMakie.Point3f(vec(x³)...)]
         hue = Int(floor(i / segments * 360.0))
-        arrowcolors[i][] = [GLMakie.HSVA(hue, 100, 100, 1.0), GLMakie.HSVA(hue, 100, 100, 0.5), GLMakie.HSVA(hue, 100, 100, 0.25)]
+        arrowcolors[i][] = [GLMakie.HSVA(hue, 100, 100, 0.25), GLMakie.HSVA(hue, 100, 100, 0.5), GLMakie.HSVA(hue, 100, 100, 1.0)]
     end
 
     linepoints[] = map(x -> GLMakie.Point3f(vec(project(x))...), track)
@@ -205,7 +199,8 @@ updatecamera() = begin
     GLMakie.update_cam!(lscene.scene, GLMakie.Vec3f(vec(eyeposition)...), GLMakie.Vec3f(vec(lookat)...), GLMakie.Vec3f(vec(up)...))
 end
 
-GLMakie.record(fig, joinpath("gallery", "$modelname.mp4"), 1:frames_number) do frame
+
+write(frame::Int) = begin
     progress = frame / frames_number
     stage = min(totalstages - 1, Int(floor(totalstages * progress))) + 1
     global samplename = boundary_names[stage]
@@ -213,4 +208,12 @@ GLMakie.record(fig, joinpath("gallery", "$modelname.mp4"), 1:frames_number) do f
     println("Frame: $frame, Stage: $stage, Total Stages: $totalstages, Progress: $stageprogress")
     animate(stageprogress, progress, frame)
     updatecamera()
+end
+
+
+write(1)
+
+
+GLMakie.record(fig, joinpath("gallery", "$modelname.mp4"), 1:frames_number) do frame
+    write(frame)
 end
