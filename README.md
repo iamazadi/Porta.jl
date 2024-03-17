@@ -32,7 +32,7 @@ or get the latest experimental code.
 
 ## Usage
 For client-side code read the tests, and for examples on how to build please check out the
-models directory. See [alternativeview.jl](../master/models/alternativeview.jl) as an example!
+models directory. See [planethopf.jl](../master/models/planethopf.jl) as an example!
 
 ## Status
 - Logic [Doing]
@@ -51,6 +51,7 @@ models directory. See [alternativeview.jl](../master/models/alternativeview.jl) 
 - [The Road to Reality][4], Sir Roger Penrose (2004)
 - A [Portal][5] Special Presentation- Geometric Unity: A First Look
 - [Planet Hopf][6], Dror Bar-Natan (2010)
+- Roger Penrose, Wolfgang Rindler, SPINORS AND SPACE-TIME, Volume 1: Two-spinor calculus and relativistic fields (1984)
 - Rupert Way, [Dynamics in the Hopf bundle][7], the geometric phase and implications for dynamical systems (2008)
 
 [1]: https://www.youtube.com/channel/UCY8FW_kvEfGDj5i5j_rkaqA
