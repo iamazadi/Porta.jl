@@ -80,7 +80,7 @@ Take a point from S² into S³ as a section of the Hopf bundle.
 """
 function σmap(p::ℝ³)
     g = convert_to_geographic(p)
-    r, ϕ, θ = g
+    r, θ, ϕ = g
     z₂ = ℯ^(im * 0) * √((1 + sin(θ)) / 2)
     z₁ = ℯ^(im * ϕ) * √((1 - sin(θ)) / 2)
     -Quaternion([z₁; z₂])
@@ -95,7 +95,7 @@ Take a point from S² into S³ as a section of the Hopf bundle.
 """
 function τmap(p::ℝ³)
     g = convert_to_geographic(p)
-    r, ϕ, θ = g
+    r, θ, ϕ = g
     z₂ = ℯ^(im * 0) * √((1 + sin(θ)) / 2)
     z₁ = ℯ^(im * ϕ) * √((1 - sin(θ)) / 2)
     -Quaternion([z₂; z₁])
