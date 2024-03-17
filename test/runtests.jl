@@ -16,6 +16,7 @@ start = time()
     include(joinpath(directory, "minkowskivectorspace_tests.jl"))
     include(joinpath(directory, "minkowskispacetime_tests.jl"))
     include(joinpath(directory, "spinvector_tests.jl"))
+    include(joinpath(directory, "transfrom_tests.jl"))
 end
 
 @time @testset "The Numbers Tests" begin
