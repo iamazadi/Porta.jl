@@ -55,17 +55,20 @@ function project(q::Quaternion)
 end
 
 
+project(v::SpinVector) = project(Quaternion(v))
+
+
 """
     make(q, θ1, θ2, segments)
 
 Make the vertical subspace of the boundary `q`, with the given heights `θ1` and `θ2`, and the number of `segments`.
 """
-function make(q::Vector{Quaternion}, θ1::Float64, θ2::Float64, segments::Integer)
+function make(q::Vector{SpinVector}, θ1::Float64, θ2::Float64, segments::Integer)
     matrix = Matrix{ℝ³}(undef, length(q), segments)
     lspaceθ = collect(range(θ1, stop = θ2, length = segments))
-    for (j, p) in enumerate(q)
-        for (i, θ) in enumerate(lspaceθ)
-            matrix[j, i] = project(exp(K(3) * θ) * p)
+    for (i, p) in enumerate(q)
+        for (j, θ) in enumerate(lspaceθ)
+            matrix[i, j] = project(exp(K(3) * θ) * Quaternion(p))
         end
     end
     matrix
@@ -78,13 +81,13 @@ end
 fields: q, θ1, θ2, segments, color and observable.
 """
 mutable struct Whirl <: Sprite
-    q::Vector{Quaternion}
+    q::Vector{SpinVector}
     θ1::Float64
     θ2::Float64
     segments::Integer
     color::Any
     observable::Tuple{GLMakie.Observable{Matrix{Float64}}, GLMakie.Observable{Matrix{Float64}}, GLMakie.Observable{Matrix{Float64}}}
-    Whirl(scene::GLMakie.LScene, q::Vector{Quaternion}, θ1::Float64, θ2::Float64, segments::Integer, color::Any; transparency::Bool = false) = begin
+    Whirl(scene::GLMakie.LScene, q::Vector{SpinVector}, θ1::Float64, θ2::Float64, segments::Integer, color::Any; transparency::Bool = false) = begin
         matrix = make(q, θ1, θ2, segments)
         color_matrix= GLMakie.Observable(fill(color, length(q), segments))
         observable = buildsurface(scene, matrix, color_matrix, transparency = transparency)
@@ -98,7 +101,7 @@ end
 
 Update the shape of a `whirl`.
 """
-function update!(whirl::Whirl, q::Vector{Quaternion}, θ1::Float64, θ2::Float64)
+function update!(whirl::Whirl, q::Vector{SpinVector}, θ1::Float64, θ2::Float64)
     whirl.q = q
     whirl.θ1 = θ1
     whirl.θ2 = θ2
