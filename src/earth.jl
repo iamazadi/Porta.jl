@@ -118,7 +118,7 @@ Convert a point from cartesian coordinate to geographic coordinates.
 convert_to_geographic(p::ℝ³) = begin
     x, y, z = vec(p)
     r = norm(p)
-    [r; atan(y, x); asin(z / r)]
+    [r; asin(z / r); atan(y, x)]
 end
 
 
@@ -136,11 +136,12 @@ function getcolor(points::Vector{ℝ³}, basemap::Any, α::Float64)
     end
     height, width = size(basemap)
     margin = 20
-    ϕ = map(x -> convert_to_geographic(x)[2], points)
-    θ = map(x -> π / 2 - (π / 2 + convert_to_geographic(x)[3]), points)
-    ϕ = sum(ϕ) / number
+    geographicpoints = map(x -> convert_to_geographic(x), points)
+    θ = map(x -> -vec(x)[2], geographicpoints)
+    ϕ = map(x -> vec(x)[3], geographicpoints)
     θ = sum(θ) / number
-    ϕ, θ = (ϕ + π) / 2π, (θ + π / 2) / π
+    ϕ = sum(ϕ) / number
+    θ, ϕ = (θ + π / 2) / 2.0 / π, ((ϕ + π) / 2π) / 2.0
     x = Int(floor(ϕ * (width - 1))) + 1
     y = Int(floor(θ * (height - 1))) + 1
     colors = Dict()
@@ -247,8 +248,8 @@ end
 
 Convert a point `g` from geographic coordinates into cartesian coordinates.
 """
-function convert_to_cartesian(g::Vector{<:Real})
-    r, ϕ, θ = g
+function convert_to_cartesian(g::Vector{Float64})
+    r, θ, ϕ = g
     x = r * cos(θ) * cos(ϕ)
     y = r * cos(θ) * sin(ϕ)
     z = r * sin(θ)

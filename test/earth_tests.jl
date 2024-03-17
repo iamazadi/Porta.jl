@@ -19,8 +19,8 @@ point = normalize(ℝ³(rand(3)))
 _point = convert_to_geographic(point)
 
 @test isapprox(_point[1], 1.0)
-@test -π ≤ _point[2] ≤ π
-@test -π / 2 ≤ _point[3] ≤ π / 2
+@test -π / 2 ≤ _point[2] ≤ π / 2
+@test -π ≤ _point[3] ≤ π
 
 α = rand()
 basemap = FileIO.load("../data/basemap_color.png")
