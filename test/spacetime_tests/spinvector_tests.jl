@@ -62,3 +62,13 @@ _vector = antipodal(vector)
 @test !isapprox(vector, _vector)
 @test vector.timesign != _vector.timesign
 @test isapprox(vector.nullvector, -_vector.nullvector)
+
+
+timesign = rand([-1, 1])
+t = float(timesign)
+ζ = Complex(t * rand() + im * t * rand())
+vector = SpinVector(ζ, timesign)
+@test isapprox(ζ, vector.ξ / vector.η)
+
+
+@test all(isapprox.(mat(vector), [vector.ξ * conj(vector.ξ) vector.ξ * conj(vector.η); vector.η * conj(vector.ξ) vector.η * conj(vector.η)]))

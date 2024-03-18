@@ -15,3 +15,6 @@ r = 𝕄(origin, point3, tetrad)
 p⁰, p¹, p², p³ = vec(p)
 q⁰, q¹, q², q³ = vec(q)
 @test isapprox(Φ(p, q), (q⁰ - p⁰)^2 - (q¹ - p¹)^2 - (q² - p²)^2 - (q³ - p³)^2)
+
+
+@test size(mat(p)) == (2, 2)

@@ -25,6 +25,13 @@ end
 Base.vec(p::𝕄) = vec(p.point) - vec(p.origin)
 
 
+mat(p::𝕄) = begin
+    T, X, Y, Z = vec(p)
+    [T + Z X + im * Y;
+     X - im * Y T - Z] .* (1.0 / √2.0)
+end
+
+
 """
     vec(p, q)
 

@@ -5,16 +5,19 @@ export SpinVector
 export RiemannSphere
 export antipodal
 export transform
+export mat
 
 
 """
     Represents a spin vector represented as the intersection of the future [past] null cone with the hyperplane T = 1 [T = -1].
 
-fields: nullvector, timesign, ζ, cartesian and spherical.
+fields: nullvector, timesign, ξ, η, ζ, cartesian and spherical.
 """
 struct SpinVector <: VectorSpace
     nullvector::𝕍
     timesign::Int
+    ξ::Complex
+    η::Complex
     ζ::Union{Complex, ComplexF64, Float64}
     cartesian::ℝ³
     spherical::ℝ²
@@ -34,7 +37,9 @@ struct SpinVector <: VectorSpace
             θ = π - θ - π / 2
         end
         spherical = t > 0.0 ? ℝ²(θ, ϕ) : ℝ²(θ, π + ϕ)
-        new(nullvector, timesign, ζ, cartesian, spherical)
+        ξ = ζ
+        η = Complex(1.0)
+        new(nullvector, timesign, ξ, η, ζ, cartesian, spherical)
     end
     SpinVector(ζ::Float64, timesign::Int) = begin
         @assert(isapprox(ζ, Inf), "The spatial direction of the spin vector must either be at the point Infinity or a in the Agrand's Complex plane.")
@@ -43,7 +48,9 @@ struct SpinVector <: VectorSpace
         spherical = ℝ²(0.0, 0.0)
         nullvector = 𝕍(t * ℝ⁴(1.0, vec(cartesian)...))
         ζ = Inf
-        new(nullvector, timesign, ζ, cartesian, spherical)
+        ξ = Complex(1.0)
+        η = Complex(0.0)
+        new(nullvector, timesign, ξ, η, ζ, cartesian, spherical)
     end
     SpinVector(ξ::Complex, η::Complex, timesign::Int) = begin
         t = timesign > 0 ? 1.0 : -1.0
@@ -90,6 +97,9 @@ end
 
 
 vec(v::SpinVector) = vec(v.nullvector)
+
+
+mat(v::SpinVector) = [v.ξ; v.η] * transpose([conj(v.ξ); conj(v.η)])
 
 
 Base.isapprox(u::SpinVector, v::SpinVector; atol::Float64 = TOLERANCE) = isapprox(u.nullvector, v.nullvector, atol = atol) &&
