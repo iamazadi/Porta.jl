@@ -19,6 +19,14 @@ struct 𝕄 <: VectorSpace
     point::𝕍
     tetrad::Tetrad
     𝕄(origin::𝕍, point::𝕍, tetrad::Tetrad) = new(origin, point, tetrad)
+    𝕄(m::Matrix{<:Complex}) = begin
+        @assert(size(m) == (2, 2), "The matrix representation must be a square 2 by 2 matrix, but was given $(size(m)).")
+        T = 0.5 * real(m[1, 1] + m[2, 2])
+        X = 0.5 * real(m[1, 2] + m[2, 1])
+        Y = imag(m[1, 2])
+        Z = 0.5 * real(m[1, 1] - m[2, 2])
+        𝕄(𝕍(0., 0.0, 0.0, 0.0), 𝕍(T, X, Y, Z), tetrad)
+    end
 end
 
 

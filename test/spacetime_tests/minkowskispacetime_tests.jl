@@ -18,3 +18,7 @@ q⁰, q¹, q², q³ = vec(q)
 
 
 @test size(mat(p)) == (2, 2)
+
+
+p = 𝕄([rand() * exp(rand() * im) rand() * exp(rand() * im); rand() * exp(rand() * im) rand() * exp(rand() * im)])
+@test typeof(p) <: 𝕄
