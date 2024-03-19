@@ -1,4 +1,5 @@
 import Base.:*
+import Base.:-
 import Base.vec
 import Base.isapprox
 
@@ -42,7 +43,13 @@ mat(a::SpinTransformation) = [a.α a.β; a.γ a.δ]
 det(a::SpinTransformation) = real(a.α * a.δ - a.β * a.γ)
 
 
-*(a::SpinTransformation, b::SpinVector) = (a.α * b.ζ + a.β) / (a.γ * b.ζ + a.δ)
+*(a::SpinTransformation, b::SpinVector) = SpinVector((a.α * b.ζ + a.β) / (a.γ * b.ζ + a.δ), b.timesign)
+
+
+*(a::SpinTransformation, b::𝕄) = 𝕄(mat(a) * mat(b) * adjoint(mat(a)))
+
+
+-(a::SpinTransformation) = SpinTransformation(-a.α, -a.β, -a.γ, -a.δ)
 
 
 inverse(a::SpinTransformation) = SpinTransformation(a.δ, -a.β, -a.γ, a.α)

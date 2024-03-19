@@ -41,3 +41,11 @@ T, X, Y, Z = vec(m)
 @test isapprox(ζ1, ζ2)
 @test isapprox(ζ1, ζ)
 @test all(isapprox.(mat(m), mat(vector)))
+
+
+timesign = rand([-1, 1])
+t = float(timesign)
+ζ = Complex(t * rand() + im * t * rand())
+vector = SpinVector(ζ, timesign)
+spintransform = SpinTransformation(α, β, γ, δ)
+@test isapprox(spintransform * vector, -spintransform * vector)
