@@ -43,6 +43,8 @@ t = float(timesign)
 ξ, η = Complex(t * rand() + im * t * rand()), Complex(t * rand() + im * t * rand())
 ζ = ξ / η
 @test isapprox(SpinVector(ξ, η, timesign), SpinVector(ζ, timesign))
+θ = rand() * 2π
+@test isapprox(SpinVector(exp(im * θ) * ξ, exp(im * θ) * η, timesign), SpinVector(ζ, timesign)) # independence of phase rescaling
 
 timesign = rand([-1, 1])
 t = float(timesign)
