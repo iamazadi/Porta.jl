@@ -61,7 +61,7 @@ makefigure() = GLMakie.Figure(size = figuresize)
 fig = GLMakie.with_theme(makefigure, GLMakie.theme_black())
 pl = GLMakie.PointLight(GLMakie.Point3f(0), GLMakie.RGBf(0.0862, 0.0862, 0.0862))
 al = GLMakie.AmbientLight(GLMakie.RGBf(0.9, 0.9, 0.9))
-lscene = GLMakie.LScene(fig[1, 1], show_axis=false, scenekw = (lights = [pl, al], clear=true, backgroundcolor = :white))
+lscene = GLMakie.LScene(fig[1, 1], show_axis=false, scenekw = (lights = [pl, al], clear=true, backgroundcolor = :black))
 
 colorref = FileIO.load("data/basemap_color.png")
 basemap_color = FileIO.load("data/basemap_mask.png")
@@ -79,6 +79,20 @@ for i in eachindex(countries["name"])
     end
 end
 
+
+function getcenter(nodes)
+    center = [0.0; 0.0; 0.0]
+    for i in eachindex(nodes)
+        geographic = convert_to_geographic(nodes[i])
+        center = center + geographic
+    end
+    center[1] = 1.0 # the unit spherical Earth
+    center[2] = center[2] ./ length(nodes)
+    center[3] = center[3] ./ length(nodes)
+    convert_to_cartesian(center)
+end
+
+
 θ1 = float(π)
 timesign = 1
 q = SpinVector(ℝ³(0.0, 1.0, 0.0), timesign)
@@ -89,7 +103,9 @@ basemap2 = Basemap(lscene, q, chart, basemapsegments, basemap_color, transparenc
 whirls = []
 _whirls = []
 for i in eachindex(boundary_nodes)
-    hue = i / length(boundary_names) * 360
+    center = getcenter(boundary_nodes[i])
+    hue = dot(Quaternion(0.0, 0.0, 0.0, 1.0), Quaternion(0.0, vec(center)...)) * 360
+    # hue = i / length(boundary_names) * 360
     color = GLMakie.HSVA(hue, 100, 100, 0.25) # getcolor(boundary_nodes[i], colorref, 0.5)
     _color = GLMakie.HSVA(hue, 100, 100, 0.05) # getcolor(boundary_nodes[i], colorref, 0.1)
     w = [SpinVector(boundary_nodes[i][j], timesign) for j in eachindex(boundary_nodes[i])]
@@ -129,35 +145,26 @@ scale = 1 / 400
 GLMakie.scale!(starman_sprite, scale, scale, scale)
 
 
-function getcenter(nodes)
-    center = [0.0; 0.0; 0.0]
-    for i in eachindex(nodes)
-        geographic = convert_to_geographic(nodes[i])
-        center = center + geographic
-    end
-    center[1] = 1.0 # the unit spherical Earth
-    center[2] = center[2] ./ length(nodes)
-    center[3] = center[3] ./ length(nodes)
-    convert_to_cartesian(center)
-end
-
-
 function animate(progress, totalprogress, frame)
-    q = Quaternion(SpinVector(convert_to_cartesian([1.0, 0.0, progress * 2π]), timesign))
     index = indices[samplename]
     center = getcenter(boundary_nodes[index])
     r, θ, ϕ = convert_to_geographic(center)
-    h = SpinVector(exp(θ * K(1) + ϕ * K(2)) * q)
-    vector = SpinVector(q)
-    update!(basemap1, vector)
-    update!(basemap2, antipodal(vector))
+    ψ = totalprogress * 4π
+    α = exp(im * ψ / 2.0)
+    β = Complex(0.0)
+    γ = Complex(0.0)
+    δ = exp(-im * ψ / 2.0)
+    transform = SpinTransformation(α, β, γ, δ)
+    q = transform * SpinVector(θ , ϕ, timesign)
+    update!(basemap1, q)
+    update!(basemap2, antipodal(q))
     # update!(basemap1, chart)
     # update!(basemap2, chart)
     for i in eachindex(boundary_nodes)
         points = SpinVector[]
         for node in boundary_nodes[i]
             r, θ, ϕ = convert_to_geographic(node)
-            push!(points, SpinVector(exp(θ * K(1) + ϕ * K(2)) * q))
+            push!(points, transform * SpinVector(θ, ϕ, timesign))
         end
         update!(whirls[i], points, θ1, 2π)
         update!(_whirls[i], points, 0.0, θ1)
@@ -165,7 +172,7 @@ function animate(progress, totalprogress, frame)
 
     α = sin(totalprogress * 2π) * 2π
     θ = cos(progress * 2π) * 2π
-    track, track1, track2, track3 = paralleltransport(h, α, θ, segments)
+    track, track1, track2, track3 = paralleltransport(q, α, θ, segments)
     for i in 1:segments
         x = project(track[i])
         x¹ = normalize(project(track1[i]))
