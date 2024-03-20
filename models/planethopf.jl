@@ -13,7 +13,7 @@ boundary_names = ["Australia", "Japan", "United States of America", "United King
 frames_number = 720 # 360 * length(boundary_names)
 samplename = "United States of America"
 indices = Dict()
-ratio = 0.99
+ratio = 0.999
 x̂ = ℝ³(1.0, 0.0, 0.0)
 ŷ = ℝ³(0.0, 1.0, 0.0)
 ẑ = ℝ³(0.0, 0.0, 1.0)
@@ -104,7 +104,7 @@ whirls = []
 _whirls = []
 for i in eachindex(boundary_nodes)
     center = getcenter(boundary_nodes[i])
-    hue = dot(Quaternion(0.0, 0.0, 0.0, 1.0), Quaternion(0.0, vec(center)...)) * 360
+    hue = dot(Quaternion(0.0, 0.0, 1.0, 0.0), Quaternion(0.0, vec(center)...)) * 360
     # hue = i / length(boundary_names) * 360
     color = GLMakie.HSVA(hue, 100, 100, 0.25) # getcolor(boundary_nodes[i], colorref, 0.5)
     _color = GLMakie.HSVA(hue, 100, 100, 0.05) # getcolor(boundary_nodes[i], colorref, 0.1)
@@ -141,7 +141,7 @@ starman_sprite = GLMakie.mesh!(
     color = [tri[1][2] for tri in starman for i in 1:3],
     colormap = GLMakie.Reverse(:Spectral)
 )
-scale = 1 / 400
+scale = 1 / 350
 GLMakie.scale!(starman_sprite, scale, scale, scale)
 
 
