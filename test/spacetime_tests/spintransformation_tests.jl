@@ -75,3 +75,9 @@ realidentity = [1.0 0.0 0.0 0.0;
 @test isapprox(identitytransform * spinvector, spinvector)
 @test isapprox(mat(identitytransform), complexidentity)
 @test isapprox(0.5 * mat4(identitytransform), realidentity)
+
+
+# construction with Euler angles
+θ, ϕ, ψ = rand(3) .* 2π .- π
+v = SpinTransformation(θ, ϕ, ψ)
+@test isapprox(1.0, det(v))

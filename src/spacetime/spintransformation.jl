@@ -27,6 +27,22 @@ struct SpinTransformation
     end
     SpinTransformation(α::Complex, β::Complex, γ::Complex, δ::Complex) = new(α, β, γ, δ)
     SpinTransformation(m::Matrix{<:Complex}) = SpinTransformation(m[1, 1], m[1, 2], m[2, 1], m[2, 2])
+    SpinTransformation(θ::Float64, ϕ::Float64, ψ::Float64) = begin # Euler angles
+        if isapprox(ϕ, 0.0) && isapprox(θ, 0.0)
+            return SpinTransformation(Complex.([exp(im * ψ / 2); 0.0; 0.0; exp(-im * ψ / 2)]))
+        end
+        if isapprox(ψ, 0.0) && isapprox(ϕ, 0.0)
+            return SpinTransformation(Complex.([cos(θ / 2); -sin(θ / 2); sin(θ / 2); cos(θ / 2)]))
+        end
+        if isapprox(θ, 0.0) && isapprox(ψ, 0.0)
+            return SpinTransformation(Complex.([cos(ϕ / 2); im * sin(ϕ / 2); im * sin(ϕ / 2); cos(ϕ / 2)]))
+        end
+        e11 = cos(θ / 2) * exp(im * (ϕ + ψ) / 2)
+        e12 = -sin(θ / 2) * exp(im * (ϕ - ψ) / 2)
+        e21 = sin(θ / 2) * exp(-im * (ϕ - ψ) / 2)
+        e22 = cos(θ / 2) * exp(-im * (ϕ + ψ) / 2)
+        return SpinTransformation(Complex.([e11; e12; e21; e22]))
+    end
 end
 
 
