@@ -49,3 +49,30 @@ t = float(timesign)
 vector = SpinVector(ζ, timesign)
 spintransform = SpinTransformation(α, β, γ, δ)
 @test isapprox(spintransform * vector, -spintransform * vector)
+
+
+β, γ, δ = [Complex(rand() + im * rand()) for _ in 1:3]
+α = (β * γ + 1.0) / δ
+u¹, u², u³ = rand(3)
+u⁰ = √(u¹^2 + u²^2 + u³^2)
+point = 𝕍(u⁰, u¹, u², u³)
+spinvector = SpinVector(u)
+tetrad = Tetrad(ℝ⁴(1.0, 0.0, 0.0, 0.0), ℝ⁴(0.0, -1.0, 0.0, 0.0), ℝ⁴(0.0, 0.0, -1.0, 0.0), ℝ⁴(0.0, 0.0, 0.0, -1.0))
+origin = 𝕍(0.0, 0.0, 0.0, 0.0)
+spacetimevector = 𝕄(origin, point, tetrad)
+ψ = rand() * 2π
+α, β, γ, δ = exp(im * ψ), Complex(0.0), Complex(0.0), exp(-im * ψ)
+generictransform = SpinTransformation(α, β, γ, δ)
+complexidentity = Complex.([1 0; 0 1])
+identitytransform = SpinTransformation(complexidentity)
+realidentity = [1.0 0.0 0.0 0.0;
+                0.0 1.0 0.0 0.0;
+                0.0 0.0 1.0 0.0;
+                0.0 0.0 0.0 1.0]
+
+@test isapprox(identitytransform * spacetimevector, spacetimevector)
+@test isapprox(generictransform * spacetimevector, mat4(generictransform) * spacetimevector)
+@test isapprox(norm(generictransform * spinvector), norm(spinvector)) # unitary
+@test isapprox(identitytransform * spinvector, spinvector, atol = 1e-1)
+@test isapprox(mat(identitytransform), complexidentity)
+@test isapprox(0.5 * mat4(identitytransform), realidentity)
