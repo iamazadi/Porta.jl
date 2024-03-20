@@ -51,8 +51,6 @@ spintransform = SpinTransformation(α, β, γ, δ)
 @test isapprox(spintransform * vector, -spintransform * vector)
 
 
-β, γ, δ = [Complex(rand() + im * rand()) for _ in 1:3]
-α = (β * γ + 1.0) / δ
 u¹, u², u³ = rand(3)
 u⁰ = √(u¹^2 + u²^2 + u³^2)
 point = 𝕍(u⁰, u¹, u², u³)
@@ -73,6 +71,6 @@ realidentity = [1.0 0.0 0.0 0.0;
 @test isapprox(identitytransform * spacetimevector, spacetimevector)
 @test isapprox(generictransform * spacetimevector, mat4(generictransform) * spacetimevector)
 @test isapprox(norm(generictransform * spinvector), norm(spinvector)) # unitary
-@test isapprox(identitytransform * spinvector, spinvector, atol = 1e-1)
+@test isapprox(identitytransform * spinvector, spinvector)
 @test isapprox(mat(identitytransform), complexidentity)
 @test isapprox(0.5 * mat4(identitytransform), realidentity)
