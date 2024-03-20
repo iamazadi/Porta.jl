@@ -71,6 +71,7 @@ realidentity = [1.0 0.0 0.0 0.0;
 @test isapprox(identitytransform * spacetimevector, spacetimevector)
 @test isapprox(generictransform * spacetimevector, mat4(generictransform) * spacetimevector)
 @test isapprox(norm(generictransform * spinvector), norm(spinvector)) # unitary
+@test isapprox(mat(inverse(generictransform)), adjoint(mat(generictransform))) # unitary
 @test isapprox(identitytransform * spinvector, spinvector)
 @test isapprox(mat(identitytransform), complexidentity)
 @test isapprox(0.5 * mat4(identitytransform), realidentity)
