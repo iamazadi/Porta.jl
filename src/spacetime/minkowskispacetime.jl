@@ -1,4 +1,5 @@
 import Base.vec
+import Base.isapprox
 
 
 export 𝕄
@@ -19,13 +20,13 @@ struct 𝕄 <: VectorSpace
     point::𝕍
     tetrad::Tetrad
     𝕄(origin::𝕍, point::𝕍, tetrad::Tetrad) = new(origin, point, tetrad)
-    𝕄(m::Matrix{<:Complex}) = begin
+    𝕄(origin::𝕍, m::Matrix{<:Complex}, tetrad::Tetrad) = begin
         @assert(size(m) == (2, 2), "The matrix representation must be a square 2 by 2 matrix, but was given $(size(m)).")
         T = 0.5 * real(m[1, 1] + m[2, 2])
         X = 0.5 * real(m[1, 2] + m[2, 1])
         Y = imag(m[1, 2])
         Z = 0.5 * real(m[1, 1] - m[2, 2])
-        𝕄(𝕍(0., 0.0, 0.0, 0.0), 𝕍(T, X, Y, Z), tetrad)
+        𝕄(origin, 𝕍(T, X, Y, Z), tetrad)
     end
 end
 
@@ -59,3 +60,9 @@ The squared interval is the norm that 𝕍 induces on the Minkowski space-time �
 function Φ(p::𝕄, q::𝕄)
     lorentznorm(vec(p, q))
 end
+
+
+
+Base.isapprox(a::𝕄, b::𝕄; atol::Float64 = TOLERANCE) = isapprox(a.origin, b.origin, atol = atol) &&
+                                                        isapprox(a.point, b.point, atol = atol) &&
+                                                        isapprox(a.tetrad, b.tetrad, atol = atol)

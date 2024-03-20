@@ -20,5 +20,10 @@ q⁰, q¹, q², q³ = vec(q)
 @test size(mat(p)) == (2, 2)
 
 
-p = 𝕄([rand() * exp(rand() * im) rand() * exp(rand() * im); rand() * exp(rand() * im) rand() * exp(rand() * im)])
+p = 𝕄(origin, [rand() * exp(rand() * im) rand() * exp(rand() * im); rand() * exp(rand() * im) rand() * exp(rand() * im)], tetrad)
 @test typeof(p) <: 𝕄
+
+
+atol = 1e-4
+@test isapprox(p, p, atol = atol)
+@test !isapprox(p, r, atol = atol)
