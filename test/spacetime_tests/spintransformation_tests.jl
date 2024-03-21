@@ -29,6 +29,8 @@ vector = SpinVector(ζ, timesign)
 @test isnull(SpinVector(Quaternion(vector)).nullvector)
 @test isapprox(norm(Quaternion(vector)), 1.0)
 
+
+## check the implication of constructing spacetime vectors with spin vectors
 timesign = rand([-1, 1])
 t = float(timesign)
 ζ = Complex(t * rand() + im * t * rand())
