@@ -53,8 +53,9 @@ spintransform = SpinTransformation(α, β, γ, δ)
 
 u¹, u², u³ = rand(3)
 u⁰ = √(u¹^2 + u²^2 + u³^2)
-point = 𝕍(u⁰, u¹, u², u³)
-spinvector = SpinVector(u)
+u = [u⁰; u¹; u²; u³]
+point = 𝕍(u)
+spinvector = SpinVector(point)
 tetrad = Tetrad(ℝ⁴(1.0, 0.0, 0.0, 0.0), ℝ⁴(0.0, -1.0, 0.0, 0.0), ℝ⁴(0.0, 0.0, -1.0, 0.0), ℝ⁴(0.0, 0.0, 0.0, -1.0))
 origin = 𝕍(0.0, 0.0, 0.0, 0.0)
 spacetimevector = 𝕄(origin, point, tetrad)
@@ -90,3 +91,13 @@ z = exp(im * rand() * 2π)
 η = 2rand() - 1.0 + im * rand() * 2π
 @test !isapprox(𝕄(r * ξ, r * η), 𝕄(ξ, η)) # real scaling dependence
 @test isapprox(𝕄(z * ξ, z * η), 𝕄(ξ, η)) # phase rescaling independence
+
+
+# apply a spin transform to two vectors: one with the point at infinity and the other in Agrand's complex plane
+timesign = rand([-1, 1])
+r = ℝ³(0.0, 0.0, 1.0)
+u = SpinVector(r, timesign)
+ζ = Inf
+v = SpinVector(-1.0 + im * rand(), timesign)
+transform = SpinTransformation((rand(3) .* 2π .- π)...)
+@test !isapprox(transform * u, transform * v)

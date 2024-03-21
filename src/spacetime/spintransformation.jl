@@ -87,7 +87,13 @@ end
 det(a::SpinTransformation) = real(a.α * a.δ - a.β * a.γ)
 
 
-*(a::SpinTransformation, b::SpinVector) = SpinVector((a.α * b.ζ + a.β) / (a.γ * b.ζ + a.δ), b.timesign)
+*(a::SpinTransformation, b::SpinVector) = begin
+    if b.ζ == Inf
+        SpinVector(a.α * b.ξ + a.β * b.η, a.γ * b.ξ + a.δ * b.η, b.timesign)
+    else
+        SpinVector((a.α * b.ζ + a.β) / (a.γ * b.ζ + a.δ), b.timesign)
+    end
+end
 
 
 *(a::SpinTransformation, b::𝕄) = 𝕄(b. origin, 𝕍(0.5 .* mat4(a) * vec(b)), b.tetrad)
