@@ -37,7 +37,7 @@ Base.vec(p::𝕄) = vec(p.point) - vec(p.origin)
 mat(p::𝕄) = begin
     T, X, Y, Z = vec(p)
     [Complex(T + Z) X + im * Y;
-     X - im * Y Complex(T - Z)] .* (1.0 / √2.0)
+     X - im * Y Complex(T - Z)]
 end
 
 
