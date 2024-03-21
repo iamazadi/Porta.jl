@@ -131,12 +131,14 @@ Perform a trick to convert `q` to a Quaternion number.
 Quaternion(v::SpinVector) = Quaternion(vec(v.nullvector)[1], normalize(v.cartesian))
 
 
-𝕄(v::SpinVector) = begin
-    T = real(1.0 / √2 * (v.ξ * conj(v.ξ) + v.η * conj(v.η)))
-    X = real(1.0 / √2 * (v.ξ * conj(v.η) + v.η * conj(v.ξ)))
-    Y = real(1.0 / (im * √2) * (v.ξ * conj(v.η) - v.η * conj(v.ξ)))
-    Z = real(1.0 / √2 * (v.ξ * conj(v.ξ) - v.η * conj(v.η)))
+𝕄(ξ::Complex, η::Complex) = begin
+    T = real(1.0 / √2 * (ξ * conj(ξ) + η * conj(η)))
+    X = real(1.0 / √2 * (ξ * conj(η) + η * conj(ξ)))
+    Y = real(1.0 / (im * √2) * (ξ * conj(η) - η * conj(ξ)))
+    Z = real(1.0 / √2 * (ξ * conj(ξ) - η * conj(η)))
     tetrad = Tetrad(ℝ⁴(1.0, 0.0, 0.0, 0.0), ℝ⁴(0.0, -1.0, 0.0, 0.0), ℝ⁴(0.0, 0.0, -1.0, 0.0), ℝ⁴(0.0, 0.0, 0.0, -1.0))
     𝕄(𝕍(0.0, 0.0, 0.0, 0.0), 𝕍(T, X, Y, Z), tetrad)
 end
 
+
+𝕄(v::SpinVector) = 𝕄(v.ξ, v.η)

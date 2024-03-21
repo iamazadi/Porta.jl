@@ -81,3 +81,12 @@ realidentity = [1.0 0.0 0.0 0.0;
 θ, ϕ, ψ = rand(3) .* 2π .- π
 v = SpinTransformation(θ, ϕ, ψ)
 @test isapprox(1.0, det(v))
+
+
+timesign = rand([-1, 1])
+r = 2rand() - 1.0
+z = exp(im * rand() * 2π)
+ξ = 2rand() - 1.0 + im * rand() * 2π
+η = 2rand() - 1.0 + im * rand() * 2π
+@test !isapprox(𝕄(r * ξ, r * η), 𝕄(ξ, η)) # real scaling dependence
+@test isapprox(𝕄(z * ξ, z * η), 𝕄(ξ, η)) # phase rescaling independence
