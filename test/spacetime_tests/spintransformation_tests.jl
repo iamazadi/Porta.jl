@@ -125,3 +125,17 @@ b = SpinTransformation(_α, _β, _γ, _δ)
 
 @test typeof(a * b) <: SpinTransformation # matrix-matrix multiplication
 @test isapprox(det(a * b), 1.0) # unitary
+
+
+ζ = 2rand() - 1.0 + im * rand() * 2π
+timesign = rand([-1, 1])
+vector = SpinVector(ζ, timesign)
+velocity = rand() # the velocity parameter
+transform = zboost(velocity)
+w = dopplerfactor(velocity) # the relativistic Doppler factor
+@test isapprox(log(w), rapidity(velocity))
+@test isapprox((transform * vector).ζ, w * ζ)
+@test !isapprox(transform * vector, vector) # a pure z-boost
+# a pure z-boost corresponds to a positive/negative-definite Hermitian spin-matrix
+@test isapprox(mat(transform), convert(Matrix{Complex}, adjoint(mat(transform)))) # Hermiticity
+@test !isapprox(det(transform), 0.0) # definiteness

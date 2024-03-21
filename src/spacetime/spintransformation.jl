@@ -9,6 +9,9 @@ export mat
 export mat4
 export det
 export inverse
+export zboost
+export dopplerfactor
+export rapidity
 
 
 """
@@ -151,3 +154,13 @@ end
 
 
 𝕄(v::SpinVector) = 𝕄(v.ξ, v.η)
+
+
+# The relativistic Doppler factor
+dopplerfactor(v::Float64) = √((1 + v) / (1 - v))
+
+
+rapidity(v::Float64) = atanh(v)
+
+
+zboost(v::Float64) = SpinTransformation(Complex.([√dopplerfactor(v) 0; 0 1 / √dopplerfactor(v)]))
