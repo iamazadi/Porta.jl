@@ -5,7 +5,7 @@ v[1] = α
 m = [α β; γ δ]
 a = SpinTransformation(α, β, γ, δ)
 b = SpinTransformation(v)
-c = SpinTransformation(m) # initialization with the spin matrix
+c = SpinTransformation(m) # initialization with the spin-matrix
 @test isapprox(a, b)
 @test isapprox(b, c)
 @test !isapprox(0.0, det(a)) # non-singularity
@@ -42,9 +42,10 @@ T, X, Y, Z = vec(m)
 
 @test isapprox(ζ1, ζ2)
 @test isapprox(ζ1, ζ)
-@test all(isapprox.(mat(m), mat(vector)))
+@test all(isapprox.(mat(m), √2 .* mat(vector)))
 
 
+## determining a spin transformation by its effect on the Riemann sphere ζ, up to a sign
 timesign = rand([-1, 1])
 t = float(timesign)
 ζ = Complex(t * rand() + im * t * rand())
@@ -58,9 +59,9 @@ u⁰ = √(u¹^2 + u²^2 + u³^2)
 u = [u⁰; u¹; u²; u³]
 point = 𝕍(u)
 spinvector = SpinVector(point)
-tetrad = Tetrad(ℝ⁴(1.0, 0.0, 0.0, 0.0), ℝ⁴(0.0, -1.0, 0.0, 0.0), ℝ⁴(0.0, 0.0, -1.0, 0.0), ℝ⁴(0.0, 0.0, 0.0, -1.0))
-origin = 𝕍(0.0, 0.0, 0.0, 0.0)
-spacetimevector = 𝕄(origin, point, tetrad)
+spacetimevector = 𝕄(spinvector.ξ, spinvector.η)
+M = mat(spacetimevector)
+ξ, η = spinvector.ξ, spinvector.η
 ψ = rand() * 2π
 α, β, γ, δ = exp(im * ψ), Complex(0.0), Complex(0.0), exp(-im * ψ)
 generictransform = SpinTransformation(α, β, γ, δ)
@@ -71,6 +72,7 @@ realidentity = [1.0 0.0 0.0 0.0;
                 0.0 0.0 1.0 0.0;
                 0.0 0.0 0.0 1.0]
 
+@test isapprox(mat(spacetimevector), √2 .* [ξ; η] * adjoint([ξ; η]))
 @test isapprox(identitytransform * spacetimevector, spacetimevector)
 @test isapprox(generictransform * spacetimevector, mat4(generictransform) * spacetimevector)
 @test isapprox(norm(generictransform * spinvector), norm(spinvector)) # unitary

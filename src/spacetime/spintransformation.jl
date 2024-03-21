@@ -96,7 +96,7 @@ det(a::SpinTransformation) = real(a.α * a.δ - a.β * a.γ)
 end
 
 
-*(a::SpinTransformation, b::𝕄) = 𝕄(b. origin, 𝕍(0.5 .* mat4(a) * vec(b)), b.tetrad)
+*(a::SpinTransformation, b::𝕄) = 𝕄(b.origin, (𝕄(b.origin, mat(a) * mat(b) * adjoint(mat(a)), b.tetrad)).point, b.tetrad)
 
 
 *(M::Matrix{Float64}, a::𝕄) = 𝕄(a.origin, 𝕍(0.5 .* M * vec(a)), a.tetrad)
