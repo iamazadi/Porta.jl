@@ -105,6 +105,9 @@ end
 *(a::SpinTransformation, b::ℝ⁴) = ℝ⁴(0.5 .* mat4(a) * vec(b))
 
 
+*(a::SpinTransformation, b::SpinTransformation) = SpinTransformation(mat(a) * mat(b))
+
+
 -(a::SpinTransformation) = SpinTransformation(-a.α, -a.β, -a.γ, -a.δ)
 
 

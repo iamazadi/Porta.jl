@@ -1,4 +1,4 @@
-v = [Complex(rand() + im * rand()) for _ in 1:4]
+v = [rand() + im * rand() for _ in 1:4]
 α, β, γ, δ = v
 α = (β * γ + 1.0) / δ
 v[1] = α
@@ -103,3 +103,14 @@ u = SpinVector(r, timesign)
 v = SpinVector(-1.0 + im * rand(), timesign)
 transform = SpinTransformation((rand(3) .* 2π .- π)...)
 @test !isapprox(transform * u, transform * v)
+
+
+β, γ, δ = [rand() + im * rand() for _ in 1:3]
+α = (β * γ + 1.0) / δ
+_β, _γ, _δ = [rand() + im * rand() for _ in 1:3]
+_α = (_β * _γ + 1.0) / _δ
+a = SpinTransformation(α, β, γ, δ)
+b = SpinTransformation(_α, _β, _γ, _δ)
+
+@test typeof(a * b) <: SpinTransformation # matrix-matrix multiplication
+@test isapprox(det(a * b), 1.0) # unitary
