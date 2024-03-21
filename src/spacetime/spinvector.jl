@@ -82,11 +82,11 @@ struct SpinVector <: VectorSpace
         @assert(isapprox(norm(cartesian), 1.0), "The direction must be in the unit sphere in the Euclidean 3-space.")
         @assert(!isapprox(timesign, 0), "The future/past direction can be either +1 pr -1, but was given 0.")
         x, y, z = vec(cartesian)
-        t = timesign > 0 ? 1.0 : -1.0
-        x, y, z = vec(normalize(t * ℝ³(x, y, z)))
         if isapprox(z, 1.0)
             SpinVector(Inf, timesign)
         else
+            t = timesign > 0 ? 1.0 : -1.0
+            x, y, z = vec(normalize(t * ℝ³(x, y, z)))
             X′, Y′ = x / (1.0 - z), y / (1.0 - z)
             ζ = X′ + im * Y′
             ζ = timesign > 0 ? ζ : -1.0 / conj(ζ)

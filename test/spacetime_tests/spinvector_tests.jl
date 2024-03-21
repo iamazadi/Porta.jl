@@ -76,3 +76,11 @@ vector = SpinVector(ζ, timesign)
 
 
 @test all(isapprox.(mat(vector), [vector.ξ * conj(vector.ξ) vector.ξ * conj(vector.η); vector.η * conj(vector.ξ) vector.η * conj(vector.η)]))
+
+
+## chacking the equivalence of initialization with the infinity point and the North Pole coordinate
+r = ℝ³(0.0, 0.0, 1.0)
+u = SpinVector(r, timesign)
+ζ = Inf
+v = SpinVector(ζ, timesign)
+@test isapprox(u, v)
