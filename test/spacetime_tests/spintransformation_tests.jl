@@ -9,11 +9,21 @@ c = SpinTransformation(m) # initialization with the spin-matrix
 @test isapprox(a, b)
 @test isapprox(b, c)
 @test !isapprox(0.0, det(a)) # non-singularity
-@test isapprox(1.0, det(a)) # unitary
-@test isapprox(1.0, det(inverse(a))) # unitary
+@test isapprox(1.0, det(a)) # special unitary
+@test isapprox(1.0, det(inverse(a))) # special unitary
 
-transform = inverse(inverse(a))
-@test isapprox(transform, a)
+
+a = SpinTransformation(rand() * 2π, rand() * 2π, rand() * 2π) # with Euler angles
+b = SpinTransformation(mat(a))
+c = SpinTransformation(convert(Matrix{Complex}, adjoint(mat(a))))
+
+@test isapprox(a, b) # different constructors
+@test isapprox(inverse(inverse(a)), a) # the inverse of the inverse
+@test isapprox(1.0, det(a)) # special unitary
+@test isapprox(1.0, det(inverse(a))) # special unitary
+@test isapprox(inverse(a), c) # unitary
+@test isapprox(mat(a * c), [Complex(1) 0; 0 Complex(1)]) # identity
+@test isapprox(mat(inverse(c)), adjoint(mat(c))) # unitary
 
 identity = SpinTransformation(Complex.([1.0 0.0; 0.0 1.0]))
 @test isapprox(identity.α, Complex(1.0)) || isapprox(identity.α, -Complex(1.0)) # normalization
@@ -76,7 +86,6 @@ realidentity = [1.0 0.0 0.0 0.0;
 @test isapprox(identitytransform * spacetimevector, spacetimevector)
 @test isapprox(generictransform * spacetimevector, mat4(generictransform) * spacetimevector)
 @test isapprox(norm(generictransform * spinvector), norm(spinvector)) # unitary
-@test isapprox(mat(inverse(generictransform)), adjoint(mat(generictransform))) # unitary
 @test isapprox(identitytransform * spinvector, spinvector)
 @test isapprox(mat(identitytransform), complexidentity)
 @test isapprox(0.5 * mat4(identitytransform), realidentity)
