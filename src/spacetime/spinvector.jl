@@ -99,7 +99,7 @@ end
 vec(v::SpinVector) = vec(v.nullvector)
 
 
-mat(v::SpinVector) = [v.ξ; v.η] * transpose([conj(v.ξ); conj(v.η)])
+mat(v::SpinVector) = [v.ξ; v.η] * adjoint([v.ξ; v.η])
 
 
 Base.isapprox(u::SpinVector, v::SpinVector; atol::Float64 = TOLERANCE) = isapprox(u.nullvector, v.nullvector, atol = atol) &&
