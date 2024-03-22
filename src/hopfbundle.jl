@@ -16,7 +16,7 @@ Perform the standard S¹ free group action in complex coordinates z ∈ S³ ⊂ 
 (ℯⁱᶿ,z) ↦ ℯⁱᶿz
 """
 Φ(θ::Real, v::ℝ⁴) = Quaternion(exp(im * θ) .* [vec(v)[1] + im * vec(v)[3]; vec(v)[2] + im * vec(v)[4]])
-Φ(θ::Real, q::Quaternion) = Quaternion(exp(im * θ) .* [vec(q)[1] + im * vec(q)[3]; vec(q)[2] + im * vec(q)[4]])
+Φ(θ::Real, q::Quaternion) = Φ(θ, ℝ⁴(vec(q)))
 
 
 """
@@ -27,8 +27,7 @@ G_θ: S¹ × S³ → S³
 """
 G(θ::Real, v::ℝ⁴) = Quaternion([I(2) .* cos(θ) I(2) .* -sin(θ);
                                 I(2) .* sin(θ) I(2) .* cos(θ)] * vec(v))
-G(θ::Real, q::Quaternion) = Quaternion([I(2) .* cos(θ) I(2) .* -sin(θ);
-                                        I(2) .* sin(θ) I(2) .* cos(θ)] * vec(q))
+G(θ::Real, q::Quaternion) = G(θ, ℝ⁴(vec(q)))
 
 
 """
@@ -40,7 +39,7 @@ Apply the Hopf map as a projection.
 z = (z₁, z₂) ↦ (2Re(z₁z̅₂), 2Im(z₁z̅₂), |z₁|² - |z₂|²) = (z̅₁z₂ + z₁z̅₂, i(z̅₁z₂ + z₁z̅₂), |z₁|² - |z₂|²)
 """
 hopfmap(v::ℝ⁴) = [2(vec(v)[1] * vec(v)[2] + vec(v)[3] * vec(v)[4]); 2(vec(v)[2] * vec(v)[3] - vec(v)[1] * vec(v)[4]); vec(v)[1]^2 + vec(v)[3]^2 - vec(v)[2]^2 - vec(v)[4]^2]
-hopfmap(q::Quaternion) = [2(vec(q)[1] * vec(q)[2] + vec(q)[3] * vec(q)[4]); 2(vec(q)[2] * vec(q)[3] - vec(q)[1] * vec(q)[4]); vec(q)[1]^2 + vec(q)[3]^2 - vec(q)[2]^2 - vec(q)[4]^2]
+hopfmap(q::Quaternion) = hopfmap(ℝ⁴(vec(q)))
 
 
 """
@@ -55,12 +54,11 @@ v = (x₁, x₂, y₁, y₂) = (Re(z₁), Re(z₂), Im(z₁), Im(z₂)) ∈ S³ 
        x₁ -x₂ y₁ -y₂)
 """
 π✳(q::Dualquaternion) = begin
-    g = real(q)
-    a, b, c, d = vec(g)
-    M = 2 .* [b a d c;
-              -d c b -a;
-              a -b c -d]
-    M * vec(imag(q))
+    x₁, x₂, y₁, y₂ = vec(real(q))
+    M = [x₂ x₁ y₂ y₁;
+         -y₂ y₁ x₂ -x₁;
+         x₁ -x₂ y₁ -y₂]
+    ℝ³(2 .* M * vec(imag(q)))
 end
 
 
