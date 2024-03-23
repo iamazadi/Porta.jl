@@ -31,14 +31,6 @@ identity = SpinTransformation(Complex.([1.0 0.0; 0.0 1.0]))
 @test isapprox(identity.β, identity.γ) # identity matrix
 @test isapprox(identity.β, Complex(0.0)) # identity matrix
 
-timesign = rand([-1, 1])
-t = float(timesign)
-ζ = Complex(t * rand() + im * t * rand())
-vector = SpinVector(ζ, timesign)
-@test typeof(Quaternion(vector)) <: Quaternion
-@test isnull(SpinVector(Quaternion(vector)).nullvector)
-@test isapprox(norm(Quaternion(vector)), 1.0)
-
 
 ## check the implication of constructing spacetime vectors with spin vectors
 timesign = rand([-1, 1])
@@ -139,3 +131,19 @@ w = dopplerfactor(velocity) # the relativistic Doppler factor
 # a pure z-boost corresponds to a positive/negative-definite Hermitian spin-matrix
 @test isapprox(mat(transform), convert(Matrix{Complex}, adjoint(mat(transform)))) # Hermiticity
 @test !isapprox(det(transform), 0.0) # definiteness
+
+
+## the relation between unit quaterions and unimodular unitary spin-matrices
+timesign = rand([-1, 1])
+u = normalize(ℝ³(rand(3)))
+v = SpinVector(u, timesign)
+ψ = rand() * 2π
+t = SpinTransformation(ψ, v)
+M = mat(t)
+l, m, n = vec(u)
+N = [cos(ψ / 2) + im * n * sin(ψ / 2) (-m + im * l) * sin(ψ / 2);
+     (m + im * l) * sin(ψ / 2) cos(ψ / 2) - im * n * sin(ψ / 2)]
+@test isapprox(M, N)
+@test isapprox(det(M), 1) # unimodular
+@test isapprox(M * adjoint(M), elI) # unitary
+@test isapprox(SpinTransformation(convert(Matrix{Complex}, adjoint(M))), inverse(t)) # unitary

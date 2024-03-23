@@ -122,26 +122,6 @@ Base.isapprox(a::SpinTransformation, b::SpinTransformation; atol::Float64 = TOLE
                                                                                          isapprox(a.γ, b.γ, atol = atol) &&
                                                                                          isapprox(a.δ, b.δ, atol = atol)
 
-                    
-"""
-    SpinVector(q)
-
-Transform a quaternion nuber to a spin vector.
-"""
-function SpinVector(q::Quaternion)
-    t, x, y, z = vec(q)
-    t = √(x^2 + y^2 + z^2)
-    SpinVector(𝕍(t, x, y, z))
-end
-
-
-"""
-    Quaternion(v)
-
-Perform a trick to convert `q` to a Quaternion number.
-"""
-Quaternion(v::SpinVector) = Quaternion(vec(v.nullvector)[1], normalize(v.cartesian))
-
 
 𝕄(ξ::Complex, η::Complex) = begin
     T = real(1.0 / √2 * (ξ * conj(ξ) + η * conj(η)))
@@ -164,3 +144,11 @@ rapidity(v::Float64) = atanh(v)
 
 
 zboost(v::Float64) = SpinTransformation(Complex.([√dopplerfactor(v) 0; 0 1 / √dopplerfactor(v)]))
+
+
+"""
+    SpinTransformation(ψ, v)
+
+Construct a spin transformation with the given rotation angle `ψ` and spin vector `v`.
+"""
+SpinTransformation(ψ::Float64, v::SpinVector) = SpinTransformation(mat(Quaternion(ψ, v.cartesian)))
