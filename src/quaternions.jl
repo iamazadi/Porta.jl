@@ -262,3 +262,23 @@ R = [1 0 0 0;
      0 -1 0 0;
      0 0 -1 0;
      0 0 0 -1]
+
+
+"""
+    Quaternion(v)
+
+Transform a four-vector into a 'vectorial' quaternion.
+"""
+function Quaternion(v::𝕍)
+    T, X, Y, Z = vec(v)
+    @assert(isapprox(T, 0), "The coordinate of the given four-vector must have the first element equal to zero, but was given T = $T.")
+    Quaternion(0.0, X, Y, Z)
+end
+
+
+"""
+    Quaternion(s)
+
+Transform a spin-vector into a 'vectorial' quaternion.
+"""
+Quaternion(v::SpinVector) = Quaternion(0.0, vec(v.cartesian)...)

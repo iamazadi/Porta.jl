@@ -144,3 +144,20 @@ for i in 1:3
         end
     end
 end
+
+
+# vectorial quaternions
+v = 𝕍(0.0, rand(3)...)
+q = Quaternion(v)
+M = mat(q)
+T, X, Y, Z = vec(v)
+N = [im * Z im * X - Y; im * X + Y -im * Z]
+@test isapprox(M, N)
+
+
+# spin-vectors to quaternions
+timesign = rand([1, -1])
+ζ = (2rand() - 1) * exp(im * rand() * 2π)
+v = SpinVector(ζ, timesign)
+q = Quaternion(v)
+@test isapprox(v.cartesian, imag(q))
