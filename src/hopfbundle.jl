@@ -77,6 +77,7 @@ Take a point from S² into S³ as a section of the Hopf bundle.
 σ: S² → S³
 """
 function σmap(p::ℝ³)
+    @assert(isapprox(norm(p), 1), "The given point must be in the unit 2-sphere, but has norm $(norm(p)).")
     g = convert_to_geographic(p)
     r, θ, ϕ = g
     z₂ = ℯ^(im * 0) * √((1 + sin(θ)) / 2)
@@ -92,6 +93,7 @@ Take a point from S² into S³ as a section of the Hopf bundle.
 τ: S² → S³
 """
 function τmap(p::ℝ³)
+    @assert(isapprox(norm(p), 1), "The given point must be in the unit 2-sphere, but has norm $(norm(p)).")
     g = convert_to_geographic(p)
     r, θ, ϕ = g
     z₂ = ℯ^(im * 0) * √((1 + sin(θ)) / 2)
