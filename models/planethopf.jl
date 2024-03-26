@@ -8,8 +8,8 @@ using Porta
 figuresize = (1080, 1920)
 segments = 30
 basemapsegments = 30
-modelname = "planethopf"
-boundary_names = ["United States of America", "Australia", "Iran", "Canda", "Mexico", "Chile", "Brazil", "Turkey", "Pakistan", "India", "Russia", "China", "Antarctica"]
+modelname = "planethopf_nullrotation"
+boundary_names = ["United States of America", "Australia", "Iran", "Canada", "Mexico", "Chile", "Brazil", "Turkey", "Pakistan", "India", "Russia", "China", "Antarctica"]
 frames_number = 720 # 360 * length(boundary_names)
 indices = Dict()
 ratio = 0.999
@@ -41,7 +41,7 @@ makefigure() = GLMakie.Figure(size = figuresize)
 fig = GLMakie.with_theme(makefigure, GLMakie.theme_black())
 pl = GLMakie.PointLight(GLMakie.Point3f(0), GLMakie.RGBf(0.0862, 0.0862, 0.0862))
 al = GLMakie.AmbientLight(GLMakie.RGBf(0.9, 0.9, 0.9))
-lscene = GLMakie.LScene(fig[1, 1], show_axis=false, scenekw = (lights = [pl, al], clear=true, backgroundcolor = :white))
+lscene = GLMakie.LScene(fig[1, 1], show_axis=false, scenekw = (lights = [pl, al], clear=true, backgroundcolor = :black))
 
 θ1 = float(π)
 q = Quaternion(ℝ⁴(0.0, 0.0, 1.0, 0.0))
@@ -62,7 +62,7 @@ for i in eachindex(boundary_nodes)
 end
 
 
-function animate(progress::Float64)
+function animate1(progress::Float64)
     w = abs(sin(progress * 2π))
     ϕ = log(w) # rapidity
     ψ = progress * 2π
@@ -108,6 +108,30 @@ function animate(progress::Float64)
     end
 end
 
+
+function animate2(progress::Float64)
+    a = sin(progress * 2π)
+    X, Y, Z = vec(ℝ³(0.0, 1.0, 0.0))
+    T = 1.0
+    X̃ = X 
+    Ỹ = Y + a * (T - Z)
+    Z̃ = Z + a * Y + 0.5 * a^2 * (T - Z)
+    T̃ = T + a * Y + 0.5 * a^2 * (T - Z)
+    q = normalize(Quaternion(T̃, X̃, Ỹ, Z̃))
+    update!(basemap1, q)
+    update!(basemap2, G(θ1, q))
+    for i in eachindex(boundary_nodes)
+        points = Quaternion[]
+        for node in boundary_nodes[i]
+            r, θ, ϕ = convert_to_geographic(node)
+            push!(points, exp(ϕ / 4 * K(1) + θ / 2 * K(2)) * q)
+        end
+        update!(whirls[i], points, θ1, 2π)
+        update!(_whirls[i], points, 0.0, θ1)
+    end
+end
+
+
 updatecamera() = begin
     GLMakie.update_cam!(lscene.scene, GLMakie.Vec3f(vec(eyeposition)...), GLMakie.Vec3f(vec(lookat)...), GLMakie.Vec3f(vec(up)...))
 end
@@ -116,7 +140,7 @@ end
 write(frame::Int) = begin
     progress = frame / frames_number
     println("Frame: $frame, Progress: $progress")
-    animate(progress)
+    animate2(progress)
     updatecamera()
 end
 
