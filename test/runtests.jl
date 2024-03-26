@@ -34,6 +34,7 @@ end
     include("surface_tests.jl")
     include("whirl_tests.jl")
     include("basemap_tests.jl")
+    include("utilities_tests.jl")
 end
 
 elapsed = time() - start

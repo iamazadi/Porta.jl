@@ -25,5 +25,6 @@ include("rotation.jl")
 include("surface.jl")
 include("whirl.jl")
 include("basemap.jl")
+include("utilities.jl")
 
 end # module
