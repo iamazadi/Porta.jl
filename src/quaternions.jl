@@ -14,6 +14,7 @@ export eli
 export elj
 export elk
 export mat
+export mat4
 export det
 export K
 export J
