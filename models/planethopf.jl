@@ -63,16 +63,36 @@ end
 
 
 function animate(progress::Float64)
-    center = getcenter(boundary_nodes[1])
-    r, θ, ϕ = convert_to_geographic(center)
-    ψ = progress * 4π
-    α = exp(im * ψ / 2.0)
-    β = Complex(0.0)
-    γ = Complex(0.0)
-    δ = exp(-im * ψ / 2.0)
-    transform = SpinTransformation(α, β, γ, δ)
+    w = abs(sin(progress * 2π))
+    ϕ = log(w) # rapidity
+    ψ = progress * 2π
+    # α = exp(im * ψ / 2.0)
+    # β = Complex(0.0)
+    # γ = Complex(0.0)
+    # δ = exp(-im * ψ / 2.0)
+    # transform = SpinTransformation(α, β, γ, δ)
     # q = transform * SpinVector(θ , ϕ, timesign)
-    q = Quaternion(transform * SpinVector(ℝ³(0.0, 1.0, 0.0), 1))
+    # timesign = 1
+    # s = SpinVector(ℝ³(0.0, 1.0, 0.0), timesign)
+    # X, Y, Z = vec(s.cartesian)
+    # T = float(timesign)
+    # ζ = w * exp(im * ψ) * s.ζ
+    # s′ = SpinVector(ζ, timesign)
+    # q = Quaternion(s′)
+    # X̃, Ỹ, Z̃ = vec(s′.cartesian)
+    # T̃ = float(timesign)
+    # atol = 1e-2
+    # @assert(isapprox(X̃, X * cos(ψ) - Y * sin(ψ), atol = atol), "The X̃ value is not correct, $X != $(X̃).")
+    # @assert(isapprox(Ỹ, X * sin(ψ) + Y * cos(ψ), atol = atol), "The Ỹ value is not correct, $Y != $(Ỹ).")
+    # @assert(isapprox(Z̃, Z * cosh(ϕ) + T * sinh(ϕ), atol = atol), "The Z̃ value is not correct, $Z != $(Z̃).")
+    # @assert(isapprox(T̃, Z * sinh(ϕ) + T * cosh(ϕ), atol = atol), "The T̃ value is not correct, $T != $(T̃).")
+    X, Y, Z = vec(ℝ³(0.0, 1.0, 0.0))
+    T = 1.0
+    X̃ = X * cos(ψ) - Y * sin(ψ)
+    Ỹ = X * sin(ψ) + Y * cos(ψ)
+    Z̃ = Z * cosh(ϕ) + T * sinh(ϕ)
+    T̃ = Z * sinh(ϕ) + T * cosh(ϕ)
+    q = normalize(Quaternion(T̃, X̃, Ỹ, Z̃))
     update!(basemap1, q)
     update!(basemap2, G(θ1, q))
     # update!(basemap1, chart)
