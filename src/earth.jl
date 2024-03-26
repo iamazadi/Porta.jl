@@ -14,6 +14,7 @@ export isinside
 export getcolor
 export getbutterflycurve
 export loadcountries
+export getcenter
 
 
 """
@@ -135,38 +136,49 @@ function getcolor(points::Vector{ℝ³}, basemap::Any, α::Float64)
         return GLMakie.RGBA(1.0, 1.0, 1.0, α)
     end
     height, width = size(basemap)
-    margin = 20
     geographicpoints = map(x -> convert_to_geographic(x), points)
     θ = map(x -> -vec(x)[2], geographicpoints)
     ϕ = map(x -> vec(x)[3], geographicpoints)
-    θ = sum(θ) / number
-    ϕ = sum(ϕ) / number
-    θ, ϕ = (θ + π / 2) / 2.0 / π, ((ϕ + π) / 2π) / 2.0
-    x = Int(floor(ϕ * (width - 1))) + 1
-    y = Int(floor(θ * (height - 1))) + 1
-    colors = Dict()
-    for i in -margin:margin
-        for j in -margin:margin
-            if x + j > width || y + i > height
-                continue
+    minθ = min(θ...)
+    maxθ = max(θ...)
+    minϕ = min(ϕ...)
+    maxϕ = max(ϕ...)
+    N = 10
+    lspaceθ = range(minθ, stop = maxθ, length = N)
+    lspaceϕ = range(minϕ, stop = maxϕ, length = N)
+    colors = []
+    for θ in lspaceθ
+        for ϕ in lspaceϕ
+            p = convert_to_cartesian([1.0, θ, ϕ])
+            if isinside(p, points)
+                x = Int(floor((ϕ + π) / 2π * width))
+                y = Int(floor((θ + π / 2) / π * height))
+                color = basemap[y, x]
+                push!(colors, color)
             end
-            if x + j < 1 || y + i < 1
-                continue
-            end
-            c = basemap[y + i, x + j]
-            # if isapprox(c.r, 0) && isapprox(c.g, 0) && isapprox(c.b, 0) continue end
-            colors[c] = get(colors, c, 0) + 1
         end
     end
+    colorshist = Dict()
+    for color in colors
+        if isapprox(color.r, 1) && isapprox(color.g, 1) && isapprox(color.b, 1) && isapprox(color.alpha, 1)
+            continue
+        end
+        colorshist[color] = get(colorshist, color, 0) + 1
+    end
     array = []
-    for (key, value) in colors
+    for (key, value) in colorshist
         push!(array, (value, key))
     end
     lt(x, y) = x[1] < y[1]
     array = sort(array, lt = lt, rev = true)
-    c = array[begin][end]
-    r, g, b, a = c.r, c.g, c.b, c.alpha
-    GLMakie.RGBA(r, g, b, α)
+    try
+        c = array[begin][end]
+        r, g, b, a = c.r, c.g, c.b, c.alpha
+        return GLMakie.RGBA(r, g, b, α)
+    catch
+        println("Color not found!")
+    end
+    GLMakie.RGBA(1.0, 1.0, 1.0, α)
 end
 
 
@@ -206,7 +218,7 @@ end
 
 Determine whether the given point `p` is inside the shape `poly`.
 """
-isinside(poly::Vector{Tuple{Point{T}, Point{T}}}, p::Point{T}) where T = isodd(count(edge -> rayintersectseg(p, edge), poly))
+isinside(poly::Vector{Tuple{Point{T}, Point{T}}}, p::Point{T}) where T = iseven(count(edge -> rayintersectseg(p, edge), poly))
 
 
 """
@@ -215,19 +227,37 @@ isinside(poly::Vector{Tuple{Point{T}, Point{T}}}, p::Point{T}) where T = isodd(c
 Determine whether the given `point` is inside the `boundary`.
 """
 function isinside(point::ℝ³, boundary::Vector{ℝ³})
-    _point = convert_to_geographic(point)
-    p = Point(_point[2], _point[3])
     N = length(boundary)
     _boundary = map(x -> convert_to_geographic(x), boundary)
     poly = Vector{Tuple{Point{Float64}, Point{Float64}}}(undef, N)
     for i in 1:N
         a = _boundary[i]
         b = i == N ? _boundary[1] : _boundary[i + 1]
-        a = Point(a[2], a[3])
-        b = Point(b[2], b[3])
-        poly[i] = (a, b)
+        ar, aθ, aϕ = a
+        br, bθ, bϕ = b
+        poly[i] = (Point(aθ, aϕ), Point(bθ, bϕ))
     end
-    isinside(poly, p)
+    r, θ, ϕ = convert_to_geographic(point)
+    isinside(poly, Point(θ, ϕ))
+end
+
+
+"""
+    getcenter(nodes)
+
+Calculate the center point of the boundary given by the `nodes` vector.
+"""
+function getcenter(nodes::Vector{ℝ³})
+    center = [0.0; 0.0; 0.0]
+    for i in eachindex(nodes)
+        geographic = convert_to_geographic(nodes[i])
+        center = center + geographic
+    end
+    N = length(nodes)
+    center[1] = 1.0 # the unit spherical Earth
+    center[2] = center[2] ./ N
+    center[3] = center[3] ./ N
+    convert_to_cartesian(center)
 end
 
 
@@ -314,7 +344,7 @@ function loadcountries(attributes_path::String, nodes_path::String)
             sub = subdataframe[subdataframe.partid .== id, :]
             ϕ = sub.x ./ 180 .* π
             θ = sub.y ./ 180 .* π
-            coordinates = map(x -> convert_to_cartesian([1; x[1]; x[2]]), eachrow([ϕ θ]))[begin:end-1]
+            coordinates = map(x -> convert_to_cartesian([1; x[1]; x[2]]), eachrow([θ ϕ]))[begin:end-1]
             coordinates = decimate(coordinates, ϵ)
             histogram[id] = length(coordinates)
         end
@@ -324,7 +354,7 @@ function loadcountries(attributes_path::String, nodes_path::String)
         subdataframe = subdataframe[subdataframe.partid .== partid, :]
         ϕ = subdataframe.x ./ 180 .* π
         θ = subdataframe.y ./ 180 .* π
-        coordinates = map(x -> convert_to_cartesian([1; x[1]; x[2]]), eachrow([ϕ θ]))[begin:end-1]
+        coordinates = map(x -> convert_to_cartesian([1; x[1]; x[2]]), eachrow([θ ϕ]))[begin:end-1]
         # println("Length of points: $name : $(length(coordinates))")
         coordinates = decimate(coordinates, ϵ)
         # println("Length of points: $name : $(length(coordinates))")
