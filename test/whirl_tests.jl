@@ -6,20 +6,22 @@ q = [Quaternion(normalize(ℝ⁴(rand(4)))) for i in 1:N]
 θ1 = rand()
 θ2 = rand()
 segments = rand(5:10)
-matrix = make(q, θ1, θ2, segments)
+M = rand(4, 4)
+whirlf(x::Quaternion) = normalize(M * x)
+matrix = make(q, θ1, θ2, whirlf, segments)
 @test size(matrix) == (N, segments)
 @test typeof(matrix[1, 1]) <: ℝ³
 
 fig = GLMakie.Figure()
 lscene = GLMakie.LScene(fig[1, 1])
 color = GLMakie.RGBAf(rand(4)...)
-whirl = Whirl(lscene, q, θ1, θ2, segments, color, transparency = false)
+whirl = Whirl(lscene, q, θ1, θ2, whirlf, segments, color, transparency = false)
 
 _q = [Quaternion(normalize(ℝ⁴(rand(4)))) for i in 1:N]
 _θ1 = rand()
 _θ2 = rand()
 
-update!(whirl, _q, _θ1, _θ2)
+update!(whirl, _q, _θ1, _θ2, whirlf)
 
 @test all([isapprox(whirl.q[i], _q[i]) for i in 1:N])
 @test all([isapprox(whirl.θ1, _θ1) for i in 1:N])

@@ -9,12 +9,14 @@ segments = rand(5:10)
 color = FileIO.load("../data/basemap_color.png")
 transparency = rand(1:2) == 1 ? true : false
 q = Quaternion(normalize(ℝ⁴(rand(4))))
+M = rand(4, 4)
+f(x::Quaternion) = normalize(M * x)
 chart = (-π / 4, π / 4, -π / 4, π / 4)
-basemap = Basemap(lscene, q, chart, segments, color, transparency = transparency)
+basemap = Basemap(lscene, q, f, chart, segments, color, transparency = transparency)
 
 matrix = getsurface(basemap.observable, segments, segments)
 q = Quaternion(normalize(ℝ⁴(rand(4))))
-update!(basemap, q)
+update!(basemap, q, f)
 _matrix = getsurface(basemap.observable, segments, segments)
 
 @test all([!isapprox(matrix[i, j], _matrix[i, j]) for i in 1:segments for j in 1:segments])

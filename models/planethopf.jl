@@ -5,9 +5,9 @@ import GLMakie
 using Porta
 
 
-figuresize = (1080, 1920)
-segments = 30
-basemapsegments = 30
+figuresize = (1920, 1080)
+segments = 60
+basemapsegments = 60
 modelname = "planethopf_nullrotation"
 boundary_names = ["United States of America", "Australia", "Iran", "Canada", "Mexico", "Chile", "Brazil", "Turkey", "Pakistan", "India", "Russia", "China", "Antarctica"]
 frames_number = 720 # 360 * length(boundary_names)
@@ -17,7 +17,7 @@ x̂ = ℝ³(1.0, 0.0, 0.0)
 ŷ = ℝ³(0.0, 1.0, 0.0)
 ẑ = ℝ³(0.0, 0.0, 1.0)
 arrowsize = GLMakie.Vec3f(0.02, 0.02, 0.04)
-eyeposition = normalize(ℝ³(1.0, 1.0, 1.0)) * π
+eyeposition = normalize(ℝ³(1.0, 1.0, -2.0)) * π
 lookat = ℝ³(0.0, 0.0, 0.0)
 up = normalize(ℝ³(1.0, 0.0, 0.0))
 
@@ -41,22 +41,24 @@ makefigure() = GLMakie.Figure(size = figuresize)
 fig = GLMakie.with_theme(makefigure, GLMakie.theme_black())
 pl = GLMakie.PointLight(GLMakie.Point3f(0), GLMakie.RGBf(0.0862, 0.0862, 0.0862))
 al = GLMakie.AmbientLight(GLMakie.RGBf(0.9, 0.9, 0.9))
-lscene = GLMakie.LScene(fig[1, 1], show_axis=false, scenekw = (lights = [pl, al], clear=true, backgroundcolor = :black))
+lscene = GLMakie.LScene(fig[1, 1], show_axis=false, scenekw = (lights = [pl, al], clear=true, backgroundcolor = :white))
 
 θ1 = float(π)
 q = Quaternion(ℝ⁴(0.0, 0.0, 1.0, 0.0))
 chart = (-π / 4, π / 4, -π / 4, π / 4)
-basemap1 = Basemap(lscene, q, chart, basemapsegments, basemap_color, transparency = true)
-basemap2 = Basemap(lscene, q, chart, basemapsegments, basemap_color, transparency = true)
+M = rand(4, 4)
+_f(x::Quaternion) = normalize(M * x)
+basemap1 = Basemap(lscene, q, _f, chart, basemapsegments, basemap_color, transparency = true)
+basemap2 = Basemap(lscene, q, _f, chart, basemapsegments, basemap_color, transparency = true)
 
 whirls = []
 _whirls = []
 for i in eachindex(boundary_nodes)
     color = getcolor(boundary_nodes[i], colorref, 0.5)
     _color = getcolor(boundary_nodes[i], colorref, 0.1)
-    w = [σmap(boundary_nodes[i][j]) for j in eachindex(boundary_nodes[i])]
-    whirl = Whirl(lscene, w, 0.0, θ1, segments, color, transparency = true)
-    _whirl = Whirl(lscene, w, θ1, 2π, segments, _color, transparency = true)
+    w = _f.([σmap(boundary_nodes[i][j]) for j in eachindex(boundary_nodes[i])])
+    whirl = Whirl(lscene, w, 0.0, θ1, _f, segments, color, transparency = true)
+    _whirl = Whirl(lscene, w, θ1, 2π, _f, segments, _color, transparency = true)
     push!(whirls, whirl)
     push!(_whirls, _whirl)
 end
@@ -88,13 +90,17 @@ function animate1(progress::Float64)
     # @assert(isapprox(T̃, Z * sinh(ϕ) + T * cosh(ϕ), atol = atol), "The T̃ value is not correct, $T != $(T̃).")
     X, Y, Z = vec(ℝ³(0.0, 1.0, 0.0))
     T = 1.0
-    X̃ = X * cos(ψ) - Y * sin(ψ)
-    Ỹ = X * sin(ψ) + Y * cos(ψ)
-    Z̃ = Z * cosh(ϕ) + T * sinh(ϕ)
-    T̃ = Z * sinh(ϕ) + T * cosh(ϕ)
-    q = normalize(Quaternion(T̃, X̃, Ỹ, Z̃))
-    update!(basemap1, q)
-    update!(basemap2, G(θ1, q))
+    q = normalize(Quaternion(T, X, Y, Z))
+    f(x::Quaternion) = begin
+        T, X, Y, Z = vec(x)
+        X̃ = X * cos(ψ) - Y * sin(ψ)
+        Ỹ = X * sin(ψ) + Y * cos(ψ)
+        Z̃ = Z * cosh(ϕ) + T * sinh(ϕ)
+        T̃ = Z * sinh(ϕ) + T * cosh(ϕ)
+        normalize(Quaternion(T̃, X̃, Ỹ, Z̃))
+    end
+    update!(basemap1, q, f)
+    update!(basemap2, G(θ1, q), f)
     # update!(basemap1, chart)
     # update!(basemap2, chart)
     for i in eachindex(boundary_nodes)
@@ -103,8 +109,8 @@ function animate1(progress::Float64)
             r, θ, ϕ = convert_to_geographic(node)
             push!(points, exp(ϕ / 4 * K(1) + θ / 2 * K(2)) * q)
         end
-        update!(whirls[i], points, θ1, 2π)
-        update!(_whirls[i], points, 0.0, θ1)
+        update!(whirls[i], points, θ1, 2π, f)
+        update!(_whirls[i], points, 0.0, θ1, f)
     end
 end
 
@@ -113,21 +119,25 @@ function animate2(progress::Float64)
     a = sin(progress * 2π)
     X, Y, Z = vec(ℝ³(0.0, 1.0, 0.0))
     T = 1.0
-    X̃ = X 
-    Ỹ = Y + a * (T - Z)
-    Z̃ = Z + a * Y + 0.5 * a^2 * (T - Z)
-    T̃ = T + a * Y + 0.5 * a^2 * (T - Z)
-    q = normalize(Quaternion(T̃, X̃, Ỹ, Z̃))
-    update!(basemap1, q)
-    update!(basemap2, G(θ1, q))
+    q = normalize(Quaternion(T, X, Y, Z))
+    f(x::Quaternion) = begin
+        T, X, Y, Z = vec(x)
+        X̃ = X 
+        Ỹ = Y + a * (T - Z)
+        Z̃ = Z + a * Y + 0.5 * a^2 * (T - Z)
+        T̃ = T + a * Y + 0.5 * a^2 * (T - Z)
+        normalize(Quaternion(T̃, X̃, Ỹ, Z̃))
+    end
+    update!(basemap1, q, f)
+    update!(basemap2, G(θ1, q), f)
     for i in eachindex(boundary_nodes)
         points = Quaternion[]
         for node in boundary_nodes[i]
             r, θ, ϕ = convert_to_geographic(node)
             push!(points, exp(ϕ / 4 * K(1) + θ / 2 * K(2)) * q)
         end
-        update!(whirls[i], points, θ1, 2π)
-        update!(_whirls[i], points, 0.0, θ1)
+        update!(whirls[i], points, θ1, 2π, f)
+        update!(_whirls[i], points, 0.0, θ1, f)
     end
 end
 
