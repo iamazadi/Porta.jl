@@ -2,14 +2,15 @@ import FileIO
 import DataFrames
 import CSV
 import GLMakie
+import LinearAlgebra
 using Porta
 
 
 figuresize = (1920, 1080)
 segments = 60
 basemapsegments = 60
-modelname = "planethopf_nullrotation"
-boundary_names = ["United States of America", "Australia", "Iran", "Canada", "Mexico", "Chile", "Brazil", "Turkey", "Pakistan", "India", "Russia", "China", "Antarctica"]
+modelname = "planethopf_fourscrew"
+boundary_names = ["United States of America", "Australia", "Iran", "Canada", "Mexico", "Peru", "Chile", "Brazil", "Turkey", "Pakistan", "India", "Russia", "China", "Antarctica"]
 frames_number = 720 # 360 * length(boundary_names)
 indices = Dict()
 ratio = 0.999
@@ -17,7 +18,7 @@ x̂ = ℝ³(1.0, 0.0, 0.0)
 ŷ = ℝ³(0.0, 1.0, 0.0)
 ẑ = ℝ³(0.0, 0.0, 1.0)
 arrowsize = GLMakie.Vec3f(0.02, 0.02, 0.04)
-eyeposition = normalize(ℝ³(1.0, 1.0, -2.0)) * π
+eyeposition = normalize(ℝ³(1.0, 1.0, -2.0)) * π * ( 1 / float(√2))
 lookat = ℝ³(0.0, 0.0, 0.0)
 up = normalize(ℝ³(1.0, 0.0, 0.0))
 
@@ -27,11 +28,14 @@ basemap_color = FileIO.load("data/basemap_mask.png")
 attributespath = "data/naturalearth/geometry-attributes.csv"
 nodespath = "data/naturalearth/geometry-nodes.csv"
 countries = loadcountries(attributespath, nodespath)
+selectionindices = Int.(floor.(collect(range(1, stop = length(countries["name"]), length = 60))))
+boundary_names = countries["name"][selectionindices]
 boundary_nodes = Vector{Vector{ℝ³}}()
 for i in eachindex(countries["name"])
     for name in boundary_names
         if countries["name"][i] == name
             push!(boundary_nodes, countries["nodes"][i])
+            println(name)
             indices[name] = length(boundary_nodes)
         end
     end
@@ -65,9 +69,6 @@ end
 
 
 function animate1(progress::Float64)
-    w = abs(sin(progress * 2π))
-    ϕ = log(w) # rapidity
-    ψ = progress * 2π
     # α = exp(im * ψ / 2.0)
     # β = Complex(0.0)
     # γ = Complex(0.0)
@@ -88,7 +89,10 @@ function animate1(progress::Float64)
     # @assert(isapprox(Ỹ, X * sin(ψ) + Y * cos(ψ), atol = atol), "The Ỹ value is not correct, $Y != $(Ỹ).")
     # @assert(isapprox(Z̃, Z * cosh(ϕ) + T * sinh(ϕ), atol = atol), "The Z̃ value is not correct, $Z != $(Z̃).")
     # @assert(isapprox(T̃, Z * sinh(ϕ) + T * cosh(ϕ), atol = atol), "The T̃ value is not correct, $T != $(T̃).")
-    X, Y, Z = vec(ℝ³(0.0, 1.0, 0.0))
+    w = abs(sin(progress * 2π) * 2π)
+    ϕ = log(w) # rapidity
+    ψ = progress * 4π
+    X, Y, Z = vec(ℝ³(1.0, 0.0, 0.0))
     T = 1.0
     q = normalize(Quaternion(T, X, Y, Z))
     f(x::Quaternion) = begin
@@ -97,10 +101,29 @@ function animate1(progress::Float64)
         Ỹ = X * sin(ψ) + Y * cos(ψ)
         Z̃ = Z * cosh(ϕ) + T * sinh(ϕ)
         T̃ = Z * sinh(ϕ) + T * cosh(ϕ)
-        normalize(Quaternion(T̃, X̃, Ỹ, Z̃))
+        Quaternion(T̃, X̃, Ỹ, Z̃)
     end
-    update!(basemap1, q, f)
-    update!(basemap2, G(θ1, q), f)
+    r₁ = f(Quaternion(1.0, 0.0, 0.0, 0.0))
+    r₂ = f(Quaternion(0.0, 1.0, 0.0, 0.0))
+    r₃ = f(Quaternion(0.0, 0.0, 1.0, 0.0))
+    r₄ = f(Quaternion(0.0, 0.0, 0.0, 1.0))
+    M = reshape([vec(r₁); vec(r₂); vec(r₃); vec(r₄)], (4, 4))
+    F = LinearAlgebra.eigen(M)
+    v₁ = F.vectors[:, 1]
+    v₂ = F.vectors[:, 2]
+    v₃ = F.vectors[:, 3]
+    v₄ = F.vectors[:, 4]
+    λ = LinearAlgebra.normalize(F.values)
+    Λ = [λ[1] 0.0 0.0 0.0; 0.0 λ[2] 0.0 0.0; 0.0 0.0 λ[3] 0.0; 0.0 0.0 0.0 λ[4]]
+    M′ = F.vectors * Λ * LinearAlgebra.inv(F.vectors)
+    N = real.(F.vectors * Λ * LinearAlgebra.inv(F.vectors))
+    f′(x::Quaternion) = Quaternion(real.(N * vec(x)))
+    # println(norm(f′(Quaternion(1.0, 0.0, 0.0, 0.0))))
+    # println(norm(f′(Quaternion(0.0, 1.0, 0.0, 0.0))))
+    # println(norm(f′(Quaternion(0.0, 0.0, 1.0, 0.0))))
+    # println(norm(f′(Quaternion(0.0, 0.0, 0.0, 1.0))))
+    update!(basemap1, q, f′)
+    update!(basemap2, G(θ1, q), f′)
     # update!(basemap1, chart)
     # update!(basemap2, chart)
     for i in eachindex(boundary_nodes)
@@ -109,8 +132,8 @@ function animate1(progress::Float64)
             r, θ, ϕ = convert_to_geographic(node)
             push!(points, exp(ϕ / 4 * K(1) + θ / 2 * K(2)) * q)
         end
-        update!(whirls[i], points, θ1, 2π, f)
-        update!(_whirls[i], points, 0.0, θ1, f)
+        update!(whirls[i], points, θ1, 2π, f′)
+        update!(_whirls[i], points, 0.0, θ1, f′)
     end
 end
 
@@ -150,7 +173,7 @@ end
 write(frame::Int) = begin
     progress = frame / frames_number
     println("Frame: $frame, Progress: $progress")
-    animate2(progress)
+    animate1(progress)
     updatecamera()
 end
 
