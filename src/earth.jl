@@ -143,7 +143,7 @@ function getcolor(points::Vector{ℝ³}, basemap::Any, α::Float64)
     maxθ = max(θ...)
     minϕ = min(ϕ...)
     maxϕ = max(ϕ...)
-    N = 10
+    N = 100
     lspaceθ = range(minθ, stop = maxθ, length = N)
     lspaceϕ = range(minϕ, stop = maxϕ, length = N)
     colors = []
