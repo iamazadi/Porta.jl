@@ -9,16 +9,15 @@ using Porta
 figuresize = (1920, 1080)
 segments = 60
 basemapsegments = 60
-modelname = "planethopf_fourscrew"
-boundary_names = ["United States of America", "Australia", "Iran", "Canada", "Mexico", "Peru", "Chile", "Brazil", "Turkey", "Pakistan", "India", "Russia", "China", "Antarctica"]
-frames_number = 720 # 360 * length(boundary_names)
+modelname = "planethopf"
+frames_number = 1440 # 360 * length(boundary_names)
 indices = Dict()
 ratio = 0.999
 x̂ = ℝ³(1.0, 0.0, 0.0)
 ŷ = ℝ³(0.0, 1.0, 0.0)
 ẑ = ℝ³(0.0, 0.0, 1.0)
 arrowsize = GLMakie.Vec3f(0.02, 0.02, 0.04)
-eyeposition = normalize(ℝ³(1.0, 1.0, -2.0)) * π * ( 1 / float(√2))
+eyeposition = normalize(ℝ³(1.0, 1.0, 1.0)) * π
 lookat = ℝ³(0.0, 0.0, 0.0)
 up = normalize(ℝ³(1.0, 0.0, 0.0))
 
@@ -28,8 +27,11 @@ basemap_color = FileIO.load("data/basemap_mask.png")
 attributespath = "data/naturalearth/geometry-attributes.csv"
 nodespath = "data/naturalearth/geometry-nodes.csv"
 countries = loadcountries(attributespath, nodespath)
-selectionindices = Int.(floor.(collect(range(1, stop = length(countries["name"]), length = 60))))
+selectionindices = Int.(floor.(collect(range(1, stop = length(countries["name"]), length = 100))))
 boundary_names = countries["name"][selectionindices]
+if "Antarctica" ∉ boundary_names
+    push!(boundary_names, "Antarctica")
+end
 boundary_nodes = Vector{Vector{ℝ³}}()
 for i in eachindex(countries["name"])
     for name in boundary_names
@@ -49,51 +51,45 @@ lscene = GLMakie.LScene(fig[1, 1], show_axis=false, scenekw = (lights = [pl, al]
 
 θ1 = float(π)
 q = Quaternion(ℝ⁴(0.0, 0.0, 1.0, 0.0))
-chart = (-π / 4, π / 4, -π / 4, π / 4)
+chart = (-π / 2, π / 2, -π / 2, π / 2)
 M = rand(4, 4)
 _f(x::Quaternion) = normalize(M * x)
-basemap1 = Basemap(lscene, q, _f, chart, basemapsegments, basemap_color, transparency = true)
+basemap1 = Basemap(lscene, q, _f, chart, basemapsegments, basemap_color, transparency = false)
 basemap2 = Basemap(lscene, q, _f, chart, basemapsegments, basemap_color, transparency = true)
 
 whirls = []
 _whirls = []
 for i in eachindex(boundary_nodes)
-    color = getcolor(boundary_nodes[i], colorref, 0.5)
+    color = getcolor(boundary_nodes[i], colorref, 0.3)
     _color = getcolor(boundary_nodes[i], colorref, 0.1)
     w = _f.([σmap(boundary_nodes[i][j]) for j in eachindex(boundary_nodes[i])])
-    whirl = Whirl(lscene, w, 0.0, θ1, _f, segments, color, transparency = true)
+    whirl = Whirl(lscene, w, 0.0, θ1, _f, segments, color, transparency = false)
     _whirl = Whirl(lscene, w, θ1, 2π, _f, segments, _color, transparency = true)
     push!(whirls, whirl)
     push!(_whirls, _whirl)
 end
 
 
-function animate1(progress::Float64)
-    # α = exp(im * ψ / 2.0)
-    # β = Complex(0.0)
-    # γ = Complex(0.0)
-    # δ = exp(-im * ψ / 2.0)
-    # transform = SpinTransformation(α, β, γ, δ)
-    # q = transform * SpinVector(θ , ϕ, timesign)
-    # timesign = 1
-    # s = SpinVector(ℝ³(0.0, 1.0, 0.0), timesign)
-    # X, Y, Z = vec(s.cartesian)
-    # T = float(timesign)
-    # ζ = w * exp(im * ψ) * s.ζ
-    # s′ = SpinVector(ζ, timesign)
-    # q = Quaternion(s′)
-    # X̃, Ỹ, Z̃ = vec(s′.cartesian)
-    # T̃ = float(timesign)
-    # atol = 1e-2
-    # @assert(isapprox(X̃, X * cos(ψ) - Y * sin(ψ), atol = atol), "The X̃ value is not correct, $X != $(X̃).")
-    # @assert(isapprox(Ỹ, X * sin(ψ) + Y * cos(ψ), atol = atol), "The Ỹ value is not correct, $Y != $(Ỹ).")
-    # @assert(isapprox(Z̃, Z * cosh(ϕ) + T * sinh(ϕ), atol = atol), "The Z̃ value is not correct, $Z != $(Z̃).")
-    # @assert(isapprox(T̃, Z * sinh(ϕ) + T * cosh(ϕ), atol = atol), "The T̃ value is not correct, $T != $(T̃).")
-    w = abs(sin(progress * 2π) * 2π)
-    ϕ = log(w) # rapidity
-    ψ = progress * 4π
-    X, Y, Z = vec(ℝ³(1.0, 0.0, 0.0))
+function animate_fourscrew(progress::Float64, status::Int)
+    if status == 1 # roation
+        w = 1.0
+        ϕ = log(w) # rapidity
+        ψ = progress * 2π
+    end
+    if status == 2 # boost
+        w = max(1e-4, abs(cos(progress * 2π) * π))
+        ϕ = log(w) # rapidity
+        ψ = 0.0
+    end
+    if status == 3 # four-screw
+        w = max(1e-4, abs(cos(progress * 2π) * π))
+        ϕ = log(w) # rapidity
+        ψ = progress * 4π
+    end
+    X, Y, Z = vec(ℝ³(0.0, 1.0, 0.0))
     T = 1.0
+    u = 𝕍(ℝ⁴(T, X, Y, Z))
+    @assert(isnull(u), "u in not null, $u.")
     q = normalize(Quaternion(T, X, Y, Z))
     f(x::Quaternion) = begin
         T, X, Y, Z = vec(x)
@@ -109,28 +105,31 @@ function animate1(progress::Float64)
     r₄ = f(Quaternion(0.0, 0.0, 0.0, 1.0))
     M = reshape([vec(r₁); vec(r₂); vec(r₃); vec(r₄)], (4, 4))
     F = LinearAlgebra.eigen(M)
-    v₁ = F.vectors[:, 1]
-    v₂ = F.vectors[:, 2]
-    v₃ = F.vectors[:, 3]
-    v₄ = F.vectors[:, 4]
-    λ = LinearAlgebra.normalize(F.values)
+    λ = LinearAlgebra.normalize(F.values) # normalize eigenvalues for a unimodular transformation
     Λ = [λ[1] 0.0 0.0 0.0; 0.0 λ[2] 0.0 0.0; 0.0 0.0 λ[3] 0.0; 0.0 0.0 0.0 λ[4]]
     M′ = F.vectors * Λ * LinearAlgebra.inv(F.vectors)
-    N = real.(F.vectors * Λ * LinearAlgebra.inv(F.vectors))
-    f′(x::Quaternion) = Quaternion(real.(N * vec(x)))
-    # println(norm(f′(Quaternion(1.0, 0.0, 0.0, 0.0))))
-    # println(norm(f′(Quaternion(0.0, 1.0, 0.0, 0.0))))
-    # println(norm(f′(Quaternion(0.0, 0.0, 1.0, 0.0))))
-    # println(norm(f′(Quaternion(0.0, 0.0, 0.0, 1.0))))
+    N = real.(M′)
+    f′(x::Quaternion) = N * x
+
+    s = SpinVector(u)
+    T̃, X̃, Ỹ, Z̃ = vec(f′(Quaternion(u.a)))
+    v = 𝕍(ℝ⁴(T̃, X̃, Ỹ, Z̃))
+    @assert(isnull(v), "v in not null, $v.")
+    s′ = SpinVector(v)
+    ζ = w * exp(im * ψ) * s.ζ
+    ζ′ = s′.ζ
+    if (ζ′ == Inf)
+        ζ = real(ζ)
+    end
+    @assert(isapprox(ζ, ζ′), "The transformation induced on the Argand plane is not correct, $ζ != $ζ′.")
+   
     update!(basemap1, q, f′)
     update!(basemap2, G(θ1, q), f′)
-    # update!(basemap1, chart)
-    # update!(basemap2, chart)
     for i in eachindex(boundary_nodes)
         points = Quaternion[]
         for node in boundary_nodes[i]
             r, θ, ϕ = convert_to_geographic(node)
-            push!(points, exp(ϕ / 4 * K(1) + θ / 2 * K(2)) * q)
+            push!(points, exp(ϕ / 2 * K(1) + θ * K(2)) * q)
         end
         update!(whirls[i], points, θ1, 2π, f′)
         update!(_whirls[i], points, 0.0, θ1, f′)
@@ -138,10 +137,12 @@ function animate1(progress::Float64)
 end
 
 
-function animate2(progress::Float64)
+function animate_nullrotation(progress::Float64)
     a = sin(progress * 2π)
     X, Y, Z = vec(ℝ³(0.0, 1.0, 0.0))
     T = 1.0
+    u = 𝕍(ℝ⁴(T, X, Y, Z))
+    @assert(isnull(u), "u in not null, $u.")
     q = normalize(Quaternion(T, X, Y, Z))
     f(x::Quaternion) = begin
         T, X, Y, Z = vec(x)
@@ -151,13 +152,27 @@ function animate2(progress::Float64)
         T̃ = T + a * Y + 0.5 * a^2 * (T - Z)
         normalize(Quaternion(T̃, X̃, Ỹ, Z̃))
     end
-    update!(basemap1, q, f)
+
+    s = SpinVector(u)
+    T̃, X̃, Ỹ, Z̃ = vec(f(Quaternion(u.a)))
+    v = 𝕍(ℝ⁴(T̃, X̃, Ỹ, Z̃))
+    @assert(isnull(v), "v in not null, $v.")
+    s′ = SpinVector(v)
+    β = Complex(im)
+    ζ = a * s.ζ + β
+    ζ′ = s′.ζ
+    if (ζ′ == Inf)
+        ζ = real(ζ)
+    end
+    @assert(isapprox(ζ, ζ′), "The transformation induced on the Argand plane is not correct, $ζ != $ζ′.")
+
+    update!(basemap1, G(0.0, q), f)
     update!(basemap2, G(θ1, q), f)
     for i in eachindex(boundary_nodes)
         points = Quaternion[]
         for node in boundary_nodes[i]
             r, θ, ϕ = convert_to_geographic(node)
-            push!(points, exp(ϕ / 4 * K(1) + θ / 2 * K(2)) * q)
+            push!(points, exp(ϕ / 2 * K(1) + θ * K(2)) * q)
         end
         update!(whirls[i], points, θ1, 2π, f)
         update!(_whirls[i], points, 0.0, θ1, f)
@@ -172,8 +187,19 @@ end
 
 write(frame::Int) = begin
     progress = frame / frames_number
-    println("Frame: $frame, Progress: $progress")
-    animate1(progress)
+    totalstages = 4
+    stage = min(totalstages - 1, Int(floor(totalstages * progress))) + 1
+    stageprogress = totalstages * (progress - (stage - 1) * 1.0 / totalstages)
+    println("Frame: $frame, Stage: $stage, Total Stages: $totalstages, Progress: $stageprogress")
+    if stage == 1
+        animate_fourscrew(stageprogress, 1)
+    elseif stage == 2
+        animate_fourscrew(stageprogress, 2)
+    elseif stage == 3
+        animate_fourscrew(stageprogress, 3)
+    elseif stage == 4
+        animate_nullrotation(stageprogress)
+    end
     updatecamera()
 end
 
