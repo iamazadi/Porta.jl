@@ -1,6 +1,4 @@
 import FileIO
-import DataFrames
-import CSV
 import GLMakie
 import LinearAlgebra
 using Porta

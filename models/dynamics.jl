@@ -1,6 +1,3 @@
-import FileIO
-import DataFrames
-import CSV
 import GLMakie
 using LinearAlgebra
 using Serialization
