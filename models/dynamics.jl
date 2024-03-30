@@ -1,4 +1,3 @@
-import GLMakie
 using LinearAlgebra
 using Serialization
 using ModelingToolkit, DifferentialEquations, Latexify
@@ -31,11 +30,6 @@ version = "r₀=$(r₀)_λ₀=$(float(real(λ₀)))_$(operator)_𝑖$(abs(float(
 modelname = "segment26_gamma3_$version"
 L = 10.0 # max x range
 L′ = -L
-ẑ = [0.0; 0.0; 1.0]
-α = 0.2
-markersize = 0.04
-linewidth = 8.0
-arrowsize = GLMakie.Vec3f(0.02, 0.02, 0.04)
 
 
 getλ(s) = λ₀ + r₀ * exp(im * (s + ϕ₀))
