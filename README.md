@@ -3,13 +3,13 @@
 This project helps with Eric Weinstein's the Graph-Wall-Tome (GWT) project. Watch visual models on the YouTube [channel][1].
 
 ## Requirements
-CSV v0.10.12
+- CSV v0.10.13
 - DataFrames v1.6.1
-- DifferentialEquations v7.12.0
-- FileIO v1.16.2
+- DifferentialEquations v7.13.0
+- FileIO v1.16.3
 - GLMakie v0.9.9
-- Latexify v0.16.1
-- ModelingToolkit v9.1.0
+- Latexify v0.16.2
+- ModelingToolkit v9.9.0
 
 
 ## Installation
