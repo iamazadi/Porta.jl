@@ -51,8 +51,8 @@ models directory. See [planethopf.jl](../master/models/planethopf.jl) as an exam
 - [The Road to Reality][4], Sir Roger Penrose (2004)
 - A [Portal][5] Special Presentation- Geometric Unity: A First Look
 - [Planet Hopf][6], Dror Bar-Natan (2010)
-- Roger Penrose, Wolfgang Rindler, SPINORS AND SPACE-TIME, Volume 1: Two-spinor calculus and relativistic fields (1984)
-- Rupert Way, [Dynamics in the Hopf bundle][7], the geometric phase and implications for dynamical systems (2008)
+- Roger Penrose, Wolfgang Rindler, [SPINORS AND SPACE-TIME][7], Volume 1: Two-spinor calculus and relativistic fields (1984)
+- Rupert Way, [Dynamics in the Hopf bundle][8], the geometric phase and implications for dynamical systems (2008)
 
 [1]: https://www.youtube.com/channel/UCY8FW_kvEfGDj5i5j_rkaqA
 [2]: https://cds.cern.ch/record/181783/files/cer-000093203.pdf
@@ -60,4 +60,5 @@ models directory. See [planethopf.jl](../master/models/planethopf.jl) as an exam
 [4]: https://www.amazon.com/Road-Reality-Complete-Guide-Universe/dp/0679776311
 [5]: https://youtu.be/Z7rd04KzLcg
 [6]: http://drorbn.net/AcademicPensieve/Projects/PlanetHopf/
-[7]: https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&cad=rja&uact=8&ved=2ahUKEwiCm-SnytGAAxUK2qQKHUB9CjoQFnoECBUQAQ&url=http%3A%2F%2Fpersonal.maths.surrey.ac.uk%2Fst%2FT.Bridges%2FGEOMETRIC-PHASE%2FRW_Finalformthesis.pdf&usg=AOvVaw2Fx2-wD95a3deuUiUaRef3&opi=89978449
+[7]: https://doi.org/10.1017/CBO9780511564048
+[8]: http://personal.maths.surrey.ac.uk/st/T.Bridges/GEOMETRIC-PHASE/RW_Finalformthesis.pdf
