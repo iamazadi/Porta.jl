@@ -1,9 +1,6 @@
 # Geometrize the quantum!
 
-![Gallery: Alternative view](https://github.com/iamazadi/Porta.jl/blob/master/docs/_posts_images/IMG_5621.gif)
-
-This project helps with Eric Weinstein's the Graph-Wall-Tome (GWT) project. Watch visual
-models on the YouTube [channel][1].
+This project helps with Eric Weinstein's the Graph-Wall-Tome (GWT) project. Watch visual models on the YouTube [channel][1].
 
 ## Requirements
 CSV v0.10.12
@@ -31,8 +28,7 @@ or get the latest experimental code.
 ```
 
 ## Usage
-For client-side code read the tests, and for examples on how to build please check out the
-models directory. See [planethopf.jl](../master/models/planethopf.jl) as an example!
+For client-side code read the tests, and for examples on how to build please check out the models directory. See [planethopf.jl](../master/models/planethopf.jl) as an example!
 
 ## Status
 - Logic [Doing]
