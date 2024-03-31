@@ -35,3 +35,7 @@ data/basemap_mask11.png
 
 # VS Code settings
 .vscode
+
+
+# documentation build
+/build
