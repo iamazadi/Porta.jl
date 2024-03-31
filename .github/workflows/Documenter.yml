@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master # update to match your development branch (master, main, dev, trunk, ...)
-    tags: '0.1.5'
+    tags: '*'
   pull_request:
 
 jobs:
@@ -19,6 +19,10 @@ jobs:
         with:
           version: '1.10'
       - uses: julia-actions/cache@v1
+      - uses: julia-actions/julia-buildpkg@v1
+      - uses: julia-actions/julia-runtest@v1
+        with:
+          prefix: xvfb-run -s '-screen 0 1024x768x24'
       - name: Install dependencies
         run: julia --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
       - name: Build and deploy
