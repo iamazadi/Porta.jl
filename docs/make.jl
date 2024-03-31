@@ -2,10 +2,12 @@ using Documenter
 using Porta  # your package name here
 
 makedocs(
-    sitename = "Porta",  # your package name here
+    clean = false,
+    sitename = "Porta.jl",  # your package name here
+    canonical = "https://iamazadi.github.io/Porta.jl/dev/",
     format = Documenter.HTML(prettyurls = false),  # optional
     pages = [
-        "Introduction" => "index.md"
+        "Home" => "index.md"
     ]
 )
 
