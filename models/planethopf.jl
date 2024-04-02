@@ -44,10 +44,10 @@ al = GLMakie.AmbientLight(GLMakie.RGBf(0.9, 0.9, 0.9))
 lscene = GLMakie.LScene(fig[1, 1], show_axis=false, scenekw = (lights = [pl, al], clear=true, backgroundcolor = :white))
 
 θ1 = float(π)
-q = Quaternion(ℝ⁴(0.0, 0.0, 1.0, 0.0))
+q = Quaternion(ℝ⁴(0.0, 1.0, 0.0, 0.0))
 chart = (-π / 2, π / 2, -π / 2, π / 2)
-M = rand(4, 4)
-_f(x::Quaternion) = normalize(M * x)
+M = I(4)
+_f(x::Quaternion) = M * x
 basemap1 = Basemap(lscene, q, _f, chart, basemapsegments, basemap_color, transparency = true)
 basemap2 = Basemap(lscene, q, _f, chart, basemapsegments, basemap_color, transparency = true)
 basemap3 = Basemap(lscene, q, _f, chart, basemapsegments, basemap_color, transparency = true)
@@ -58,7 +58,7 @@ _whirls = []
 for i in eachindex(boundary_nodes)
     color = getcolor(boundary_nodes[i], colorref, 0.1)
     _color = getcolor(boundary_nodes[i], colorref, 0.05)
-    w = _f.([σmap(boundary_nodes[i][j]) for j in eachindex(boundary_nodes[i])])
+    w = [σmap(boundary_nodes[i][j]) for j in eachindex(boundary_nodes[i])]
     whirl = Whirl(lscene, w, 0.0, θ1, _f, segments, color, transparency = true)
     _whirl = Whirl(lscene, w, θ1, 2π, _f, segments, _color, transparency = true)
     push!(whirls, whirl)
@@ -156,13 +156,18 @@ function animate_nullrotation(progress::Float64)
     v = 𝕍(ℝ⁴(T̃, X̃, Ỹ, Z̃))
     @assert(isnull(v), "v in not null, $v.")
     s′ = SpinVector(v)
-    β = Complex(im)
-    ζ = a * s.ζ + β
+    β = Complex(im * a)
+    α = 1.0
+    ζ = α * s.ζ + β
     ζ′ = s′.ζ
     if (ζ′ == Inf)
         ζ = real(ζ)
     end
     @assert(isapprox(ζ, ζ′), "The transformation induced on the Argand plane is not correct, $ζ != $ζ′.")
+    vector = 𝕍(normalize(ℝ⁴(1.0, 0.0, 0.0, 1.0)))
+    vector′ = 𝕍(vec(f(Quaternion(vec(vector)))))
+    @assert(isnull(vector), "vector t + z in not null, $vector.")
+    @assert(isapprox(vector, vector′), "The null vector t + z is not invariant under the null rotation, $vector != $vector′.")
 
     update!(basemap1, q, f)
     update!(basemap2, q , x -> f(exp(K(3) * π / 2) * x))
