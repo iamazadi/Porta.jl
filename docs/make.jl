@@ -5,7 +5,8 @@ makedocs(
     sitename = "Porta.jl",  # your package name here
     format = Documenter.HTML(prettyurls = false),  # optional
     pages = [
-        "Home" => "index.md"
+        "Home" => "index.md",
+        "Hopf Fibration" => "hopffibration.md"
     ]
 )
 
