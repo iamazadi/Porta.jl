@@ -47,7 +47,8 @@ For client-side code read the tests, and for examples on how to build please che
 - A [Portal][5] Special Presentation- Geometric Unity: A First Look
 - [Planet Hopf][6], Dror Bar-Natan (2010)
 - Roger Penrose, Wolfgang Rindler, [SPINORS AND SPACE-TIME][7], Volume 1: Two-spinor calculus and relativistic fields (1984)
-- Rupert Way, [Dynamics in the Hopf bundle][8], the geometric phase and implications for dynamical systems (2008)
+- Zachary Treisman, [A Young Person's Guide to the Hopf Fibration][8], 2009.
+- Rupert Way, [Dynamics in the Hopf bundle][9], the geometric phase and implications for dynamical systems (2008)
 
 [1]: https://www.youtube.com/channel/UCY8FW_kvEfGDj5i5j_rkaqA
 [2]: https://cds.cern.ch/record/181783/files/cer-000093203.pdf
@@ -56,4 +57,5 @@ For client-side code read the tests, and for examples on how to build please che
 [5]: https://youtu.be/Z7rd04KzLcg
 [6]: http://drorbn.net/AcademicPensieve/Projects/PlanetHopf/
 [7]: https://doi.org/10.1017/CBO9780511564048
-[8]: http://personal.maths.surrey.ac.uk/st/T.Bridges/GEOMETRIC-PHASE/RW_Finalformthesis.pdf
+[8]: https://arxiv.org/abs/0908.1205
+[9]: http://personal.maths.surrey.ac.uk/st/T.Bridges/GEOMETRIC-PHASE/RW_Finalformthesis.pdf
