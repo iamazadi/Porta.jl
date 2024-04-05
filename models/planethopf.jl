@@ -77,12 +77,12 @@ function animate_fourscrew(progress::Float64, status::Int)
         ψ = progress * 2π
     end
     if status == 2 # boost
-        w = abs(cos(progress * 2π))
+        w = max(1e-4, abs(cos(progress * 2π)))
         ϕ = log(w) # rapidity
         ψ = 0.0
     end
     if status == 3 # four-screw
-        w = abs(cos(progress * 2π))
+        w = max(1e-4, abs(cos(progress * 2π)))
         ϕ = log(w) # rapidity
         ψ = progress * 2π
     end
