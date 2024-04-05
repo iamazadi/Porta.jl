@@ -35,9 +35,9 @@ end
 """
     project(q)
 
-Take the given point `q` ∈ S³ ⊂ ℂ² into the Euclidean space ℝ³ using stereographic projection.
+Take the given point `q` ∈ S³ ⊂ ℂ² into the Euclidean space E³ ⊂ ℝ³ using stereographic projection.
 """
 function project(q::Quaternion)
-    v = ℝ³(vec(q)[1], vec(q)[2], vec(q)[3]) * (1.0 / (1.0 - vec(q)[4]))
+    v = ℝ³(vec(q)[2], vec(q)[3], vec(q)[4]) * (1.0 / (1.0 - vec(q)[1]))
     normalize(v) * tanh(norm(v))
 end
