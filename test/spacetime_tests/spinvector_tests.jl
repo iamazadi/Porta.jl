@@ -67,6 +67,12 @@ _vector = antipodal(vector)
 @test vector.timesign != _vector.timesign
 @test isapprox(vector.nullvector, -_vector.nullvector)
 
+vector = SpinVector(ℝ³(0.0, 0.0, 1.0), timesign) # The point at infinity
+_vector = antipodal(vector)
+@test !isapprox(vector, _vector)
+@test vector.timesign != _vector.timesign
+@test isapprox(vector.nullvector, -_vector.nullvector)
+
 
 timesign = rand([-1, 1])
 t = float(timesign)
