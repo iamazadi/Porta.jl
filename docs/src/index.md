@@ -48,4 +48,5 @@ For client-side code read the tests, and for examples on how to build please che
 - A [Portal](https://youtu.be/Z7rd04KzLcg) Special Presentation- Geometric Unity: A First Look
 - [Planet Hopf](http://drorbn.net/AcademicPensieve/Projects/PlanetHopf/), Dror Bar-Natan (2010)
 - Roger Penrose, Wolfgang Rindler, [SPINORS AND SPACE-TIME](https://doi.org/10.1017/CBO9780511564048), Volume 1: Two-spinor calculus and relativistic fields (1984)
+- Zachary Treisman, [A Young Person's Guide to the Hopf Fibration](https://arxiv.org/abs/0908.1205), 2009.
 - Rupert Way, [Dynamics in the Hopf bundle](http://personal.maths.surrey.ac.uk/st/T.Bridges/GEOMETRIC-PHASE/RW_Finalformthesis.pdf), the geometric phase and implications for dynamical systems (2008)
