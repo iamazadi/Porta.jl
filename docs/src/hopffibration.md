@@ -183,7 +183,7 @@ A four-screw is a kind of restricted Lorentz transformation where a z-boost and 
 In the second case, we fix the rotation angle `ψ` by setting it to zero, and this time animate the rapidity by changing the value of `ϕ` at each time step.
 
     if status == 2 # boost
-        w = abs(cos(progress * 2π))
+        w = max(1e-4, abs(cos(progress * 2π)))
         ϕ = log(w) # rapidity
         ψ = 0.0
     end
@@ -191,7 +191,7 @@ In the second case, we fix the rotation angle `ψ` by setting it to zero, and th
 Third, in order to get a complete picture of a four-screw we animate both rapidity `ϕ` and rotation `ψ`, at the same time.
 
     if status == 3 # four-screw
-        w = abs(cos(progress * 2π))
+        w = max(1e-4, abs(cos(progress * 2π)))
         ϕ = log(w) # rapidity
         ψ = progress * 2π
     end
@@ -322,7 +322,7 @@ Next, we instantiate another spin-vector using `f(u) = v` in order to examine th
     for u in [u₁, u₂, u₃, -u₁, -u₂, -u₃]
         v = 𝕍(vec(f(Quaternion(u.a))))
         @assert(isnull(v), "v ∈ 𝕍 in not null, $v.")
-        s = SpinVector(u) # TODO: visualize the spin-vectors as frames on S⁺
+        s = SpinVector(u)
         s′ = SpinVector(v)
         β = Complex(im * a)
         α = 1.0
