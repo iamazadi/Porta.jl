@@ -57,5 +57,5 @@ lorentznorm(u::𝕍) = dot(u, u, mat(tetrad))
 
 istimelike(u::𝕍) = lorentznorm(u) > 0.0
 isspacelike(u::𝕍) = lorentznorm(u) < 0.0
-isnull(u::𝕍) = isapprox(lorentznorm(u), 0.0, atol = TOLERANCE)
+isnull(u::𝕍; atol::Float64 = TOLERANCE) = isapprox(lorentznorm(u), 0.0, atol = atol)
 iscausal(u::𝕍) = istimelike(u) || isnull(u)

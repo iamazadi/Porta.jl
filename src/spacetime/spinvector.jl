@@ -62,7 +62,7 @@ struct SpinVector <: VectorSpace
         SpinVector(nullvector)
     end
     SpinVector(nullvector::𝕍) = begin
-        @assert(isnull(nullvector), "The spin vector must be a null vector.")
+        @assert(isnull(nullvector, atol = 1e-5), "The spin vector must be a null vector: $nullvector.")
         t, x, y, z = vec(nullvector)
         timesign = t > 0.0 ? 1 : -1
         x, y, z = timesign > 0 ? vec(normalize(ℝ³(x, y, z))) : vec(normalize(-ℝ³(x, y, z)))
