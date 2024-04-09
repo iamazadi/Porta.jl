@@ -1,8 +1,8 @@
 using Documenter
-using Porta  # your package name here
+using Porta
 
 makedocs(
-    sitename = "Porta.jl",  # your package name here
+    sitename = "Porta.jl",
     format = Documenter.HTML(prettyurls = false),  # optional
     pages = [
         "Home" => "index.md",
