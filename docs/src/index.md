@@ -49,4 +49,5 @@ For client-side code read the tests, and for examples on how to build please che
 - [Planet Hopf](http://drorbn.net/AcademicPensieve/Projects/PlanetHopf/), Dror Bar-Natan (2010)
 - Roger Penrose, Wolfgang Rindler, [SPINORS AND SPACE-TIME](https://doi.org/10.1017/CBO9780511564048), Volume 1: Two-spinor calculus and relativistic fields (1984)
 - Zachary Treisman, [A Young Person's Guide to the Hopf Fibration](https://arxiv.org/abs/0908.1205), 2009.
-- Rupert Way, [Dynamics in the Hopf bundle](http://personal.maths.surrey.ac.uk/st/T.Bridges/GEOMETRIC-PHASE/RW_Finalformthesis.pdf), the geometric phase and implications for dynamical systems (2008)
+- [Mathematical Gauge Theory](https://doi.org/10.1007/978-3-319-68439-0), with Applications to the Standard Model of Particle Physics, Mark J.D. Hamilton, (2018).
+- [Dynamics in the Hopf bundle](http://personal.maths.surrey.ac.uk/st/T.Bridges/GEOMETRIC-PHASE/RW_Finalformthesis.pdf), the geometric phase and implications for dynamical systems, Rupert Way, (2008)
