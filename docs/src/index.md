@@ -42,12 +42,12 @@ For client-side code read the tests, and for examples on how to build please che
 - Geometric Unity [TODO]
 
 ## References
-- Physics and Geometry, [Edward Witten](https://cds.cern.ch/record/181783/files/cer-000093203.pdf) (1987)
+- Physics and Geometry, [Edward Witten](https://cds.cern.ch/record/181783/files/cer-000093203.pdf), (1987)
 - The iconic [Wall](http://www.math.stonybrook.edu/~tony/scgp/wall-story/wall-story.html) of Stony Brook University
-- [The Road to Reality](https://www.amazon.com/Road-Reality-Complete-Guide-Universe/dp/0679776311), Sir Roger Penrose (2004)
+- [The Road to Reality](https://www.amazon.com/Road-Reality-Complete-Guide-Universe/dp/0679776311), Sir Roger Penrose, (2004)
 - A [Portal](https://youtu.be/Z7rd04KzLcg) Special Presentation- Geometric Unity: A First Look
-- [Planet Hopf](http://drorbn.net/AcademicPensieve/Projects/PlanetHopf/), Dror Bar-Natan (2010)
-- Roger Penrose, Wolfgang Rindler, [SPINORS AND SPACE-TIME](https://doi.org/10.1017/CBO9780511564048), Volume 1: Two-spinor calculus and relativistic fields (1984)
-- Zachary Treisman, [A Young Person's Guide to the Hopf Fibration](https://arxiv.org/abs/0908.1205), 2009.
-- [Mathematical Gauge Theory](https://doi.org/10.1007/978-3-319-68439-0), with Applications to the Standard Model of Particle Physics, Mark J.D. Hamilton, (2018).
+- [Planet Hopf](http://drorbn.net/AcademicPensieve/Projects/PlanetHopf/), Dror Bar-Natan, (2010)
+- [SPINORS AND SPACE-TIME](https://doi.org/10.1017/CBO9780511564048), Volume 1: Two-spinor calculus and relativistic fields, Roger Penrose, Wolfgang Rindler, (1984)
+- [A Young Person's Guide to the Hopf Fibration](https://arxiv.org/abs/0908.1205), Zachary Treisman, (2009)
+- [Mathematical Gauge Theory](https://doi.org/10.1007/978-3-319-68439-0), with Applications to the Standard Model of Particle Physics, Mark J.D. Hamilton, (2018)
 - [Dynamics in the Hopf bundle](http://personal.maths.surrey.ac.uk/st/T.Bridges/GEOMETRIC-PHASE/RW_Finalformthesis.pdf), the geometric phase and implications for dynamical systems, Rupert Way, (2008)
