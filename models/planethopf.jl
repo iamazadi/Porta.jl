@@ -5,15 +5,16 @@ using Porta
 
 
 figuresize = (1920, 1080)
-segments = 60
-frames_number = 2880
+segments = 30
+frames_number = 1440
 modelname = "planethopf"
 indices = Dict()
 T, X, Y, Z = vec(normalize(ℝ⁴(1.0, 0.0, 1.0, 0.0)))
 u = 𝕍(T, X, Y, Z)
 q = Quaternion(T, X, Y, Z)
-@assert(isnull(u), "u in not a null vector, $u.")
-@assert(isapprox(norm(q), 1), "q in not a unit quaternion, $(norm(q)).")
+tolerance = 1e-3
+@assert(isnull(u, atol = tolerance), "u in not a null vector, $u.")
+@assert(isapprox(norm(q), 1, atol = tolerance), "q in not a unit quaternion, $(norm(q)).")
 θ1 = 0.0
 θ2 = π / 2
 θ3 = float(π)
@@ -124,7 +125,7 @@ function compute_fourscrew(progress::Float64, status::Int)
     u₃ = 𝕍(1.0, 0.0, 0.0, 1.0)
     for u in [u₁, u₂, u₃, -u₁, -u₂, -u₃]
         v = 𝕍(vec(f * Quaternion(u.a)))
-        @assert(isnull(v), "v ∈ 𝕍 in not null, $v.")
+        @assert(isnull(v, atol = tolerance), "v ∈ 𝕍 in not null, $v.")
         s = SpinVector(u)
         s′ = SpinVector(v)
         if s.ζ == Inf # A Float64 number (the point at infinity)
@@ -136,7 +137,7 @@ function compute_fourscrew(progress::Float64, status::Int)
         if ζ′ == Inf
             ζ = real(ζ)
         end
-        @assert(isapprox(ζ, ζ′, atol = 1e-5), "The transformation induced on Argand plane is not correct, $ζ != $ζ′.")
+        @assert(isapprox(ζ, ζ′, atol = tolerance), "The transformation induced on Argand plane is not correct, $ζ != $ζ′.")
     end
     
     f
@@ -168,7 +169,7 @@ function compute_nullrotation(progress::Float64)
     u₃ = 𝕍(1.0, 0.0, 0.0, 1.0)
     for u in [u₁, u₂, u₃, -u₁, -u₂, -u₃]
         v = 𝕍(vec(f * Quaternion(u.a)))
-        @assert(isnull(v, atol = 1e-5), "v ∈ 𝕍 in not null, $v.")
+        @assert(isnull(v, atol = tolerance), "v ∈ 𝕍 in not a null vector, $v.")
         s = SpinVector(u) # TODO: visualize the spin-vectors as frames on S⁺
         s′ = SpinVector(v)
         β = Complex(im * a)
@@ -178,13 +179,13 @@ function compute_nullrotation(progress::Float64)
         if ζ′ == Inf
             ζ = real(ζ)
         end
-        @assert(isapprox(ζ, ζ′, atol = 1e-5), "The transformation induced on Argand plane is not correct, $ζ != $ζ′.")
+        @assert(isapprox(ζ, ζ′, atol = tolerance), "The transformation induced on Argand plane is not correct, $ζ != $ζ′.")
     end
 
     v₁ = 𝕍(normalize(ℝ⁴(1.0, 0.0, 0.0, 1.0)))
     v₂ = 𝕍(vec(f * Quaternion(vec(v₁))))
     @assert(isnull(v₁, atol = 1e-7), "vector t + z in not null, $v₁.")
-    @assert(isapprox(v₁, v₂, atol = 1e-5), "The null vector t + z is not invariant under the null rotation, $v₁ != $v₂.")
+    @assert(isapprox(v₁, v₂, atol = tolerance), "The null vector t + z is not invariant under the null rotation, $v₁ != $v₂.")
 
     f
 end

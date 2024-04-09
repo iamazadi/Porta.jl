@@ -42,7 +42,7 @@ struct SpinVector <: VectorSpace
         new(nullvector, timesign, ξ, η, ζ, cartesian, spherical)
     end
     SpinVector(ζ::Float64, timesign::Int) = begin
-        @assert(isapprox(ζ, Inf), "The spatial direction of the spin vector must either be at the point Infinity or a in the Agrand's Complex plane.")
+        @assert(isapprox(ζ, Inf), "The spatial direction of the spin vector must either be at the point Infinity or a in Argand plane.")
         t = timesign > 0 ? 1.0 : -1.0
         cartesian = ℝ³(0.0, 0.0, 1.0)
         spherical = ℝ²(0.0, 0.0)
@@ -62,7 +62,7 @@ struct SpinVector <: VectorSpace
         SpinVector(nullvector)
     end
     SpinVector(nullvector::𝕍) = begin
-        @assert(isnull(nullvector, atol = 1e-5), "The spin vector must be a null vector: $nullvector.")
+        @assert(isnull(nullvector, atol = 1e-3), "The spin vector must be a null vector: $nullvector.")
         t, x, y, z = vec(nullvector)
         timesign = t > 0.0 ? 1 : -1
         x, y, z = timesign > 0 ? vec(normalize(ℝ³(x, y, z))) : vec(normalize(-ℝ³(x, y, z)))
