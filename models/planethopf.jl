@@ -15,13 +15,13 @@ q = Quaternion(T, X, Y, Z)
 tolerance = 1e-3
 @assert(isnull(u, atol = tolerance), "u in not a null vector, $u.")
 @assert(isapprox(norm(q), 1, atol = tolerance), "q in not a unit quaternion, $(norm(q)).")
-θ1 = 0.0
-θ2 = π / 2
-θ3 = float(π)
-θ4 = 3π / 2
-θ5 = 2π
+gauge1 = 0.0
+gauge2 = π / 2
+gauge3 = float(π)
+gauge4 = 3π / 2
+gauge5 = 2π
 chart = (-π / 4, π / 4, -π / 4, π / 4)
-f = I(4)
+M = I(4)
 eyeposition = normalize(ℝ³(1.0, 1.0, 1.0)) * π * 0.8
 lookat = ℝ³(0.0, 0.0, 0.0)
 up = normalize(ℝ³(1.0, 0.0, 0.0))
@@ -61,10 +61,10 @@ lscene = GLMakie.LScene(fig[1, 1], show_axis=false, scenekw = (lights = [pl, al]
 
 reference = FileIO.load("data/basemap_color.png")
 mask = FileIO.load("data/basemap_mask.png")
-basemap1 = Basemap(lscene, q, θ1, f, chart, segments, mask, transparency = true)
-basemap2 = Basemap(lscene, q, θ2, f, chart, segments, mask, transparency = true)
-basemap3 = Basemap(lscene, q, θ3, f, chart, segments, mask, transparency = true)
-basemap4 = Basemap(lscene, q, θ4, f, chart, segments, mask, transparency = true)
+basemap1 = Basemap(lscene, q, gauge1, M, chart, segments, mask, transparency = true)
+basemap2 = Basemap(lscene, q, gauge2, M, chart, segments, mask, transparency = true)
+basemap3 = Basemap(lscene, q, gauge3, M, chart, segments, mask, transparency = true)
+basemap4 = Basemap(lscene, q, gauge4, M, chart, segments, mask, transparency = true)
 
 whirls1 = []
 whirls2 = []
@@ -75,10 +75,10 @@ for i in eachindex(boundary_nodes)
     color2 = getcolor(boundary_nodes[i], reference, 0.2)
     color3 = getcolor(boundary_nodes[i], reference, 0.3)
     color4 = getcolor(boundary_nodes[i], reference, 0.4)
-    whirl1 = Whirl(lscene, points[i], θ1, θ2, f, segments, color1, transparency = true)
-    whirl2 = Whirl(lscene, points[i], θ2, θ3, f, segments, color2, transparency = true)
-    whirl3 = Whirl(lscene, points[i], θ3, θ4, f, segments, color3, transparency = true)
-    whirl4 = Whirl(lscene, points[i], θ4, 2π, f, segments, color4, transparency = true)
+    whirl1 = Whirl(lscene, points[i], gauge1, gauge2, M, segments, color1, transparency = true)
+    whirl2 = Whirl(lscene, points[i], gauge2, gauge3, M, segments, color2, transparency = true)
+    whirl3 = Whirl(lscene, points[i], gauge3, gauge4, M, segments, color3, transparency = true)
+    whirl4 = Whirl(lscene, points[i], gauge4, gauge5, M, segments, color4, transparency = true)
     push!(whirls1, whirl1)
     push!(whirls2, whirl2)
     push!(whirls3, whirl3)
@@ -114,17 +114,17 @@ function compute_fourscrew(progress::Float64, status::Int)
     r₂ = transform(Quaternion(0.0, 1.0, 0.0, 0.0))
     r₃ = transform(Quaternion(0.0, 0.0, 1.0, 0.0))
     r₄ = transform(Quaternion(0.0, 0.0, 0.0, 1.0))
-    M = reshape([vec(r₁); vec(r₂); vec(r₃); vec(r₄)], (4, 4))
-    F = LinearAlgebra.eigen(M)
-    λ = LinearAlgebra.normalize(F.values) # normalize eigenvalues for a unimodular transformation
+    _M = reshape([vec(r₁); vec(r₂); vec(r₃); vec(r₄)], (4, 4))
+    decomposition = LinearAlgebra.eigen(_M)
+    λ = LinearAlgebra.normalize(decomposition.values) # normalize eigenvalues for a unimodular transformation
     Λ = [λ[1] 0.0 0.0 0.0; 0.0 λ[2] 0.0 0.0; 0.0 0.0 λ[3] 0.0; 0.0 0.0 0.0 λ[4]]
-    f = real.(F.vectors * Λ * LinearAlgebra.inv(F.vectors))
+    M = real.(decomposition.vectors * Λ * LinearAlgebra.inv(decomposition.vectors))
 
     u₁ = 𝕍(1.0, 1.0, 0.0, 0.0)
     u₂ = 𝕍(1.0, 0.0, 1.0, 0.0)
     u₃ = 𝕍(1.0, 0.0, 0.0, 1.0)
-    for u in [u₁, u₂, u₃, -u₁, -u₂, -u₃]
-        v = 𝕍(vec(f * Quaternion(u.a)))
+    for u in [u₁, u₂, u₃]
+        v = 𝕍(vec(M * Quaternion(u.a)))
         @assert(isnull(v, atol = tolerance), "v ∈ 𝕍 in not null, $v.")
         s = SpinVector(u)
         s′ = SpinVector(v)
@@ -140,7 +140,7 @@ function compute_fourscrew(progress::Float64, status::Int)
         @assert(isapprox(ζ, ζ′, atol = tolerance), "The transformation induced on Argand plane is not correct, $ζ != $ζ′.")
     end
     
-    f
+    M
 end
 
 
@@ -158,17 +158,17 @@ function compute_nullrotation(progress::Float64)
     r₂ = transform(Quaternion(0.0, 1.0, 0.0, 0.0))
     r₃ = transform(Quaternion(0.0, 0.0, 1.0, 0.0))
     r₄ = transform(Quaternion(0.0, 0.0, 0.0, 1.0))
-    M = reshape([vec(r₁); vec(r₂); vec(r₃); vec(r₄)], (4, 4))
-    F = LinearAlgebra.eigen(M)
-    λ = F.values
+    _M = reshape([vec(r₁); vec(r₂); vec(r₃); vec(r₄)], (4, 4))
+    decomposition = LinearAlgebra.eigen(_M)
+    λ = decomposition.values
     Λ = [λ[1] 0.0 0.0 0.0; 0.0 λ[2] 0.0 0.0; 0.0 0.0 λ[3] 0.0; 0.0 0.0 0.0 λ[4]]
-    f = real.(F.vectors * Λ * LinearAlgebra.inv(F.vectors))
+    M = real.(decomposition.vectors * Λ * LinearAlgebra.inv(decomposition.vectors))
 
     u₁ = 𝕍(1.0, 1.0, 0.0, 0.0)
     u₂ = 𝕍(1.0, 0.0, 1.0, 0.0)
     u₃ = 𝕍(1.0, 0.0, 0.0, 1.0)
-    for u in [u₁, u₂, u₃, -u₁, -u₂, -u₃]
-        v = 𝕍(vec(f * Quaternion(u.a)))
+    for u in [u₁, u₂, u₃]
+        v = 𝕍(vec(M * Quaternion(u.a)))
         @assert(isnull(v, atol = tolerance), "v ∈ 𝕍 in not a null vector, $v.")
         s = SpinVector(u) # TODO: visualize the spin-vectors as frames on S⁺
         s′ = SpinVector(v)
@@ -183,11 +183,11 @@ function compute_nullrotation(progress::Float64)
     end
 
     v₁ = 𝕍(normalize(ℝ⁴(1.0, 0.0, 0.0, 1.0)))
-    v₂ = 𝕍(vec(f * Quaternion(vec(v₁))))
-    @assert(isnull(v₁, atol = 1e-7), "vector t + z in not null, $v₁.")
+    v₂ = 𝕍(vec(M * Quaternion(vec(v₁))))
+    @assert(isnull(v₁, atol = tolerance), "vector t + z in not null, $v₁.")
     @assert(isapprox(v₁, v₂, atol = tolerance), "The null vector t + z is not invariant under the null rotation, $v₁ != $v₂.")
 
-    f
+    M
 end
 
 
@@ -202,23 +202,23 @@ animate(frame::Int) = begin
     stageprogress = totalstages * (progress - (stage - 1) * 1.0 / totalstages)
     println("Frame: $frame, Stage: $stage, Total Stages: $totalstages, Progress: $stageprogress")
     if stage == 1
-        f = compute_fourscrew(stageprogress, 1)
+        M = compute_fourscrew(stageprogress, 1)
     elseif stage == 2
-        f = compute_fourscrew(stageprogress, 2)
+        M = compute_fourscrew(stageprogress, 2)
     elseif stage == 3
-        f = compute_fourscrew(stageprogress, 3)
+        M = compute_fourscrew(stageprogress, 3)
     elseif stage == 4
-        f = compute_nullrotation(stageprogress)
+        M = compute_nullrotation(stageprogress)
     end
-    update!(basemap1, q, θ1, f)
-    update!(basemap2, q, θ2, f)
-    update!(basemap3, q, θ3, f)
-    update!(basemap4, q, θ4, f)
+    update!(basemap1, q, gauge1, M)
+    update!(basemap2, q, gauge2, M)
+    update!(basemap3, q, gauge3, M)
+    update!(basemap4, q, gauge4, M)
     for i in eachindex(whirls1)
-        update!(whirls1[i], points[i], θ1, θ2, f)
-        update!(whirls2[i], points[i], θ2, θ3, f)
-        update!(whirls3[i], points[i], θ3, θ4, f)
-        update!(whirls4[i], points[i], θ4, θ5, f)
+        update!(whirls1[i], points[i], gauge1, gauge2, M)
+        update!(whirls2[i], points[i], gauge2, gauge3, M)
+        update!(whirls3[i], points[i], gauge3, gauge4, M)
+        update!(whirls4[i], points[i], gauge4, gauge5, M)
     end
     updatecamera()
 end
