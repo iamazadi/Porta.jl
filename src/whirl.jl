@@ -13,49 +13,49 @@ abstract type Sprite end
 
 
 """
-    make(q, θ1, θ2, f, segments)
+    make(x, gauge1, gauge2, M, segments)
 
-Make the vertical subspace of the boundary `q`, with the given heights `θ1` and `θ2`, transform `f` and the number of `segments`.
+Make the vertical subspace of the boundary `x`, with the given heights `gauge1` and `gauge2`, transform `M` and the number of `segments`.
 """
-function make(q::Vector{Quaternion}, θ1::Float64, θ2::Float64, f::Matrix{Float64}, segments::Integer)
-    lspaceθ = range(θ1, stop = θ2, length = segments)
-    [project(normalize(f * (q[i] * Quaternion(exp(K(3) * θ))))) for i in 1:length(q), θ in lspaceθ]
+function make(x::Vector{Quaternion}, gauge1::Float64, gauge2::Float64, M::Matrix{Float64}, segments::Integer)
+    lspacegauge = range(gauge1, stop = gauge2, length = segments)
+    [project(normalize(M * (x[i] * Quaternion(exp(K(3) * gauge))))) for i in 1:length(x), gauge in lspacegauge]
 end
 
 
 """
     Represents a whirl.
 
-fields: q, θ1, θ2, f, segments, color and observable.
+fields: x, gauge1, gauge2, M, segments, color and observable.
 """
 mutable struct Whirl <: Sprite
-    q::Vector{Quaternion}
-    θ1::Float64
-    θ2::Float64
-    f::Matrix{Float64}
+    x::Vector{Quaternion}
+    gauge1::Float64
+    gauge2::Float64
+    M::Matrix{Float64}
     segments::Integer
     color::Any
     observable::Tuple{GLMakie.Observable{Matrix{Float64}}, GLMakie.Observable{Matrix{Float64}}, GLMakie.Observable{Matrix{Float64}}}
-    Whirl(scene::GLMakie.LScene, q::Vector{Quaternion}, θ1::Float64, θ2::Float64, f::Matrix{Float64}, segments::Integer, color::Any; transparency::Bool = false) = begin
-        matrix = make(q, θ1, θ2, f, segments)
-        color_matrix = GLMakie.Observable(fill(color, length(q), segments))
+    Whirl(scene::GLMakie.LScene, x::Vector{Quaternion}, gauge1::Float64, gauge2::Float64, M::Matrix{Float64}, segments::Integer, color::Any; transparency::Bool = false) = begin
+        matrix = make(x, gauge1, gauge2, M, segments)
+        color_matrix = GLMakie.Observable(fill(color, length(x), segments))
         observable = buildsurface(scene, matrix, color_matrix, transparency = transparency)
-        new(q, θ1, θ2, f, segments, color_matrix, observable)
+        new(x, gauge1, gauge2, M, segments, color_matrix, observable)
     end
 end
 
 
 """
-    update!(whirl, q, θ1, θ2, f)
+    update!(whirl, x, gauge1, gauge2, M)
 
-Update the shape of a `whirl` with the given boundary points `q`, gauges `θ1` and `θ2`, and transformation `f`.
+Update the shape of a `whirl` with the given boundary points `x`, gauges `gauge1` and `gauge2`, and transformation `M`.
 """
-function update!(whirl::Whirl, q::Vector{Quaternion}, θ1::Float64, θ2::Float64, f::Matrix{Float64})
-    whirl.q = q
-    whirl.θ1 = θ1
-    whirl.θ2 = θ2
-    whirl.f = f
-    matrix = make(q, θ1, θ2, f, whirl.segments)
+function update!(whirl::Whirl, x::Vector{Quaternion}, gauge1::Float64, gauge2::Float64, M::Matrix{Float64})
+    whirl.x = x
+    whirl.gauge1 = gauge1
+    whirl.gauge2 = gauge2
+    whirl.M = M
+    matrix = make(x, gauge1, gauge2, M, whirl.segments)
     updatesurface!(matrix, whirl.observable)
 end
 
@@ -66,5 +66,5 @@ end
 Update the `color` of a `whirl`.
 """
 function update!(whirl::Whirl, color::Any)
-    whirl.color[] = fill(color, length(whirl.q), whirl.segments)
+    whirl.color[] = fill(color, length(whirl.x), whirl.segments)
 end
