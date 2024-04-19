@@ -91,10 +91,11 @@ det(a::SpinTransformation) = real(a.α * a.δ - a.β * a.γ)
 
 
 *(a::SpinTransformation, b::SpinVector) = begin
-    if b.ζ == Inf
-        SpinVector(a.α * b.ξ + a.β * b.η, a.γ * b.ξ + a.δ * b.η, b.timesign)
+    if isapprox(b.a[2], Complex(0))
+        SpinVector(a.α * b.a[1] + a.β * b.a[2], a.γ * b.a[1] + a.δ * b.a[2], b.timesign)
     else
-        SpinVector((a.α * b.ζ + a.β) / (a.γ * b.ζ + a.δ), b.timesign)
+        ζ = b.a[1] / b.a[2]
+        SpinVector((a.α * ζ + a.β) / (a.γ * ζ + a.δ), b.timesign)
     end
 end
 
@@ -133,7 +134,7 @@ Base.isapprox(a::SpinTransformation, b::SpinTransformation; atol::Float64 = TOLE
 end
 
 
-𝕄(v::SpinVector) = 𝕄(v.ξ, v.η)
+𝕄(v::SpinVector) = 𝕄(v.a...)
 
 
 # The relativistic Doppler factor
@@ -151,4 +152,4 @@ zboost(v::Float64) = SpinTransformation(Complex.([√dopplerfactor(v) 0; 0 1 / �
 
 Construct a spin transformation with the given rotation angle `ψ` and spin vector `v`.
 """
-SpinTransformation(ψ::Float64, v::SpinVector) = SpinTransformation(mat(Quaternion(ψ, v.cartesian)))
+SpinTransformation(ψ::Float64, v::SpinVector) = SpinTransformation(mat(Quaternion(ψ, ℝ³(v))))

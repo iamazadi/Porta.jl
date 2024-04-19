@@ -61,9 +61,9 @@ u⁰ = √(u¹^2 + u²^2 + u³^2)
 u = [u⁰; u¹; u²; u³]
 point = 𝕍(u)
 spinvector = SpinVector(point)
-spacetimevector = 𝕄(spinvector.ξ, spinvector.η)
+spacetimevector = 𝕄(spinvector.a[1], spinvector.a[2])
 M = mat(spacetimevector)
-ξ, η = spinvector.ξ, spinvector.η
+ξ, η = spinvector.a[1], spinvector.a[2]
 ψ = rand() * 2π
 α, β, γ, δ = exp(im * ψ), Complex(0.0), Complex(0.0), exp(-im * ψ)
 generictransform = SpinTransformation(α, β, γ, δ)
@@ -126,7 +126,7 @@ velocity = rand() # the velocity parameter
 transform = zboost(velocity)
 w = dopplerfactor(velocity) # the relativistic Doppler factor
 @test isapprox(log(w), rapidity(velocity))
-@test isapprox((transform * vector).ζ, w * ζ)
+@test isapprox(Complex(transform * vector), w * ζ)
 @test !isapprox(transform * vector, vector) # a pure z-boost
 # a pure z-boost corresponds to a positive/negative-definite Hermitian spin-matrix
 @test isapprox(mat(transform), convert(Matrix{Complex}, adjoint(mat(transform)))) # Hermiticity

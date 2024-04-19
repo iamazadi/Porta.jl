@@ -282,4 +282,4 @@ end
 
 Transform a spin-vector into a 'vectorial' quaternion.
 """
-Quaternion(v::SpinVector) = Quaternion(0.0, vec(v.cartesian)...)
+Quaternion(v::SpinVector) = Quaternion(0.0, vec(ℝ³(v))...)
