@@ -4,7 +4,7 @@ import LinearAlgebra
 using Porta
 
 
-figuresize = (1920, 1080)
+figuresize = (4096, 2160)
 segments = 30
 frames_number = 1440
 modelname = "planethopf"
@@ -57,7 +57,7 @@ makefigure() = GLMakie.Figure(size = figuresize)
 fig = GLMakie.with_theme(makefigure, GLMakie.theme_black())
 pl = GLMakie.PointLight(GLMakie.Point3f(0), GLMakie.RGBf(0.0862, 0.0862, 0.0862))
 al = GLMakie.AmbientLight(GLMakie.RGBf(0.9, 0.9, 0.9))
-lscene = GLMakie.LScene(fig[1, 1], show_axis=false, scenekw = (lights = [pl, al], clear=true, backgroundcolor = :white))
+lscene = GLMakie.LScene(fig[1, 1], show_axis=false, scenekw = (lights = [pl, al], clear=true, backgroundcolor = :black))
 
 reference = FileIO.load("data/basemap_color.png")
 mask = FileIO.load("data/basemap_mask.png")
@@ -128,12 +128,12 @@ function compute_fourscrew(progress::Float64, status::Int)
         @assert(isnull(v, atol = tolerance), "v ∈ 𝕍 in not null, $v.")
         s = SpinVector(u)
         s′ = SpinVector(v)
-        if s.ζ == Inf # A Float64 number (the point at infinity)
-            ζ = s.ζ
+        if Complex(s) == Inf # A Float64 number (the point at infinity)
+            ζ = Complex(s)
         else # A Complex number
-            ζ = w * exp(im * ψ) * s.ζ
+            ζ = w * exp(im * ψ) * Complex(s)
         end
-        ζ′ = s′.ζ
+        ζ′ = Complex(s′)
         if ζ′ == Inf
             ζ = real(ζ)
         end
@@ -174,8 +174,8 @@ function compute_nullrotation(progress::Float64)
         s′ = SpinVector(v)
         β = Complex(im * a)
         α = 1.0
-        ζ = α * s.ζ + β
-        ζ′ = s′.ζ
+        ζ = α * Complex(s) + β
+        ζ′ = Complex(s′)
         if ζ′ == Inf
             ζ = real(ζ)
         end
