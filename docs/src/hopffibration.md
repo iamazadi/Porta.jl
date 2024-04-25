@@ -8,7 +8,6 @@ The Hopf fibration is a fiber bundle with a two-dimensional sphere as the base s
 
 Into the bargain, the Earth rotates about its axis every 24 hours. That spinning transformation of the Earth, together with the non-trivial product space of the Hopf bundle, can be encoded naturally into a monolithic visualization. It also makes sense to visualize differential operators in the Minkowski space-time as vectors in a cross-section of the Hopf bundle and then study the properties of spin-transformations. The choice of a gauge transformation (or trivialization) along with Lorentz transformations of Minkowski spacetime should not have any effect on physical laws. It is therefore a great model to understand these transformations and walk the road to reality. The following explains how the source code for generating animations of the Hopf fibration works (alternative views of Planet Hopf). We follow the beginning of chapter 4 of [Mark J.D. Hamilton (2018)](https://doi.org/10.1007/978-3-319-68439-0) for a formal definition of the Hopf fibration as a fiber bundle. The book *Mathematical Gauge Theory* explains the Standard Model to students of both mathematics and physics, covers both the specific gauge theory of the Standard Model and generalizations, and is highly accessible and self-contained. Then, the definitions are going to be used to explain the source code in terms of computational methods and types.
 
-![board1](./assets/fiberbundle/mobiusband.png)
 ![image1](./assets/fiberbundle/1.png)
 ![board2](./assets/fiberbundle/pi.png)
 ![image2](./assets/fiberbundle/2.png)
@@ -43,7 +42,7 @@ The linear right action by multiplication is called a *free* action, because for
 ![board7](./assets/fiberbundle/s3.png)
 ![image12](./assets/fiberbundle/12.png)
 
-In addition, we define the unit n-sphere, for the Hopf action works on spheres. So, the unit sphere of dimension ``n`` is defined as: ``S^n:\{(w_1, w_2, ..., w_{n+1}) \in \mathbb{R}^{n+1} | \sum_{\substack{1<i<n+1}}{w_i}^2 = 1\}``. As an example, the unit circle ``S^1 \in \mathbb{C}`` is a one-dimensional sphere with ``n = 1``, and ``{w_1}^2 + {w_2}^2 = 1``, where ``w_1`` and ``w_2`` are the horizontal and vertical axes in the complex plane, respectively.
+In addition, we define the unit n-sphere, for the Hopf action works on spheres. So, the unit sphere of dimension ``n`` is defined as: ``S^n:\{(w_1, w_2, ..., w_{n+1}) \in \mathbb{R}^{n+1} | \sum_{\substack{1 \leq i \leq n+1}}{w_i}^2 = 1\}``. As an example, the unit circle ``S^1 \in \mathbb{C}`` is a one-dimensional sphere with ``n = 1``, and ``{w_1}^2 + {w_2}^2 = 1``, where ``w_1`` and ``w_2`` are the horizontal and vertical axes in the complex plane, respectively.
 
 ![image13](./assets/fiberbundle/13.png)
 ![board8](./assets/fiberbundle/c2.png)
@@ -92,7 +91,7 @@ Using a local trivialization ``(U, \phi_U): E_x = \pi^{-1}(x)`` we find that the
 ![board14](./assets/fiberbundle/fiber.png)
 ![image26](./assets/fiberbundle/26.png)
 
-The composition of the local trivialization with the projection onto the second factor gives us yet another useful map between fibers ``E_x`` over ``x`` and the general fiber ``F``. It is a differentiable and invertible map (diffeomorphism) and equals ``\phi_U = pr_2 \ o \ \phi_U |_{E_x}: E_x \to F``. Given that the local trivialization ``\phi_U: E_U \to U \times F`` is a diffeomorphism (invertible and smooth), the projection ``pr_1: U \times F \to U`` onto the first factor of ``\phi_U`` is a submersion. That is to say the differntial of ``pr_1`` is surjective. ``D pr_1: T(U \times F) \to TU`` takes vectors from the tangent space of ``U \times F`` into vectors in the tangent space of ``U``, such that every element of ``TU`` has some element in ``T(U \times F)``. As a result, the map ``\pi: E \to M`` is also a submersion, which means ``D \pi: TE \to TM`` is surjective. Every tangent vector in the domain ``TM`` has some tangent vector in the codomain ``TE``.
+The composition of the local trivialization with the projection onto the second factor gives us yet another useful map between fibers ``E_x`` over ``x`` and the general fiber ``F``. It is a differentiable and invertible map (diffeomorphism) and equals ``\phi_U = pr_2 \ o \ \phi_U |_{E_x}: E_x \to F``. Given that the local trivialization ``\phi_U: E_U \to U \times F`` is a diffeomorphism (invertible and smooth), the projection ``pr_1: U \times F \to U`` onto the first factor of ``\phi_U`` is a submersion. That is to say the differntial of ``pr_1`` is surjective. ``D pr_1: T(U \times F) \to TU`` takes vectors from the tangent space of ``U \times F`` into vectors in the tangent space of ``U``, such that every element of ``TU`` has some element in ``T(U \times F)``. As a result, the map ``\pi: E \to M`` is also a submersion, which means ``D \pi: TE \to TM`` is surjective. Every tangent vector in the codomain ``TM`` has some tangent vector in the domain ``TE``.
 
 ![image27](./assets/fiberbundle/27.png)
 ![board15](./assets/fiberbundle/directsum.png)
@@ -103,7 +102,6 @@ So far, we have established that the bundle projection map, taking points from t
 ![image29](./assets/fiberbundle/29.png)
 ![board16](./assets/fiberbundle/path.png)
 ![image30](./assets/fiberbundle/30.png)
-![board17](./assets/fiberbundle/twistedproduct.png)
 ![image31](./assets/fiberbundle/31.png)
 
 ## Import the Required Packages
