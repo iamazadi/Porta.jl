@@ -1,6 +1,6 @@
 # Geometrize the quantum!
 
-This project helps with Eric Weinstein's the Graph-Wall-Tome (GWT) project. Watch visual models on the YouTube [channel][1].
+This project is inspired by Eric Weinstein's Graph-Wall-Tome (GWT) project. Watch visual models on the YouTube [channel][1].
 
 [![](https://img.shields.io/badge/docs-dev-blue.svg)](https://iamazadi.github.io/Porta.jl/dev/)
 
@@ -41,21 +41,12 @@ For client-side code read the tests, and for examples on how to build please che
 - Geometric Unity [TODO]
 
 ## References
-- Physics and Geometry, [Edward Witten][2] (1987)
-- The iconic [wall][3] of Stony Brook University
-- [The Road to Reality][4], Sir Roger Penrose (2004)
-- A [Portal][5] Special Presentation- Geometric Unity: A First Look
-- [Planet Hopf][6], Dror Bar-Natan (2010)
-- Roger Penrose, Wolfgang Rindler, [SPINORS AND SPACE-TIME][7], Volume 1: Two-spinor calculus and relativistic fields (1984)
-- Zachary Treisman, [A Young Person's Guide to the Hopf Fibration][8], 2009.
-- Rupert Way, [Dynamics in the Hopf bundle][9], the geometric phase and implications for dynamical systems (2008)
-
-[1]: https://www.youtube.com/channel/UCY8FW_kvEfGDj5i5j_rkaqA
-[2]: https://cds.cern.ch/record/181783/files/cer-000093203.pdf
-[3]: http://www.math.stonybrook.edu/~tony/scgp/wall-story/wall-story.html
-[4]: https://www.amazon.com/Road-Reality-Complete-Guide-Universe/dp/0679776311
-[5]: https://youtu.be/Z7rd04KzLcg
-[6]: http://drorbn.net/AcademicPensieve/Projects/PlanetHopf/
-[7]: https://doi.org/10.1017/CBO9780511564048
-[8]: https://arxiv.org/abs/0908.1205
-[9]: http://personal.maths.surrey.ac.uk/st/T.Bridges/GEOMETRIC-PHASE/RW_Finalformthesis.pdf
+- Physics and Geometry, [Edward Witten](https://cds.cern.ch/record/181783/files/cer-000093203.pdf), (1987)
+- The iconic [Wall](https://scgp.stonybrook.edu/archives/6264) of Stony Brook University
+- [The Road to Reality](https://www.amazon.com/Road-Reality-Complete-Guide-Universe/dp/0679776311), Sir Roger Penrose, (2004)
+- A [Portal](https://youtu.be/Z7rd04KzLcg ) Special Presentation- Geometric Unity: A First Look
+- [Planet Hopf](http://drorbn.net/AcademicPensieve/Projects/PlanetHopf/), Dror Bar-Natan, (2010)
+- [SPINORS AND SPACE-TIME](https://doi.org/10.1017/CBO9780511564048), Volume 1: Two-spinor calculus and relativistic fields, Roger Penrose, Wolfgang Rindler, (1984)
+- [A Young Person's Guide to the Hopf Fibration](https://arxiv.org/abs/0908.1205), Zachary Treisman, (2009)
+- [Mathematical Gauge Theory](https://doi.org/10.1007/978-3-319-68439-0), with Applications to the Standard Model of Particle Physics, Mark J.D. Hamilton, (2018)
+- [Dynamics in the Hopf bundle](https://personalpages.surrey.ac.uk/t.bridges/GEOMETRIC-PHASE/index.html), the geometric phase and implications for dynamical systems, Rupert Way, (2008)
