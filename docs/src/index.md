@@ -28,7 +28,7 @@ or get the latest experimental code.
 ```
 
 ## Usage
-For client-side code read the tests, and for examples on how to build please check out the models directory. See `planethopf.jl` as an example!
+For client-side code read the tests, and for examples on how to build, please check out the models directory. See `planethopf.jl` as an example.
 
 ## Status
 - Logic [Doing]
