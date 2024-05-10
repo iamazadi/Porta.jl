@@ -4,7 +4,7 @@ Description = "Read the documentation of the Porta.jl project."
 
 # Geometrize the quantum!
 
-This project is inspired by Eric Weinstein's Graph-Wall-Tome (GWT) project. Watch visual models on the YouTube [channel](https://www.youtube.com/channel/UCY8FW_kvEfGDj5i5j_rkaqA).
+This project is inspired by Eric Weinstein's Graph-Wall-Tome (GWT) project. Watch visual models on the YouTube [channel](https://youtube.com/@iamazadi?si=Ef7T911xWIj-NBkQ).
 
 ## Requirements
 - CSV v0.10.13

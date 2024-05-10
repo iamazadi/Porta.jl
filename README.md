@@ -1,6 +1,6 @@
 # Geometrize the quantum!
 
-This project is inspired by Eric Weinstein's Graph-Wall-Tome (GWT) project. Watch visual models on the YouTube [channel][1].
+This project is inspired by Eric Weinstein's Graph-Wall-Tome (GWT) project. Watch visual models on the YouTube [channel](https://youtube.com/@iamazadi?si=Ef7T911xWIj-NBkQ).
 
 [![](https://img.shields.io/badge/docs-dev-blue.svg)](https://iamazadi.github.io/Porta.jl/dev/)
 
