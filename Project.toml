@@ -12,6 +12,8 @@ GeometryBasics = "5c1252a2-5f33-56bf-86c9-59e7332b4326"
 LibSerialPort = "a05a14c7-6e3b-5ba9-90a2-45558833e1df"
 Makie = "ee78f7c6-11fb-53f2-987a-cfe4a2b5a57a"
 MeshIO = "7269a6da-0436-5bbc-96c2-40638cbb6118"
+SerialPorts = "5d0f9de7-4c7f-54f5-bec2-484e8c04014e"
+Sockets = "6462fe0b-24de-5631-8697-dd941f90decc"
 
 [compat]
 CSV = "0.10"
