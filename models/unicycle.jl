@@ -47,8 +47,6 @@ end
 figuresize = (1080, 1920)
 segments = 30
 frames_number = 360
-rollingwheel_accumulator = 0.0
-reactionwheel_accumulator = 0.0
 
 x̂ = ℝ³([1.0; 0.0; 0.0])
 ŷ = ℝ³([0.0; 1.0; 0.0])
@@ -88,7 +86,7 @@ reactionwheel_stl_path = joinpath("data", "unicycle", "unicycle_reaction_wheel.S
 
 chassis_colormap = :grays
 rollingwheel_colormap = :phase
-reactionwheel_colormap = :balance
+reactionwheel_colormap = :delta
 
 makefigure() = GLMakie.Figure(size = figuresize)
 fig = GLMakie.with_theme(makefigure, GLMakie.theme_black())
@@ -141,147 +139,97 @@ lookat = deepcopy(_p)
 GLMakie.update_cam!(lscene.scene, GLMakie.Vec3f(eyeposition...), GLMakie.Vec3f(lookat...), GLMakie.Vec3f(up...))
 
 
-parsetext(text::String) = begin
-    readings = Dict()
-    if length(text) > 30
-        index = findfirst("A1: ", text)
-        if !isnothing(index)
-            r1_text = replace(text, text[begin:index[end]] => "")
-            if length(r1_text) > 3
-                index = findfirst("A2:", r1_text)
-                if !isnothing(index)
-                    r1_text = replace(r1_text, r1_text[index[begin]:end] => "")
-                    if length(r1_text) > 3
-                        r1_text = strip(r1_text)
-                        println(r1_text)
-                        items = split(r1_text, ',')
-                        try
-                            readings["R1"] = []
-                            push!(readings["R1"], parse(Float64, items[1]))
-                            push!(readings["R1"], parse(Float64, items[2]))
-                            push!(readings["R1"], parse(Float64, items[3]))
-                        catch e
-                            println("Not parsed: $r1_text")
-                        end
-                    end
-                end
-            end
-        end
-        
-        index = findfirst("A2: ", text)
-        if !isnothing(index)
-            r2_text = replace(text, text[begin:index[end]] => "")
-            if length(r2_text) > 3
-                index = findfirst("A3:", r2_text)
-                if !isnothing(index)
-                    r2_text = replace(r2_text, r2_text[index[begin]:end] => "")
-                    if length(r2_text) > 3
-                        r2_text = strip(r2_text)
-                        println(r2_text)
-                        items = split(r2_text, ',')
-                        try
-                            readings["R2"] = []
-                            push!(readings["R2"], parse(Float64, items[1]))
-                            push!(readings["R2"], parse(Float64, items[2]))
-                            push!(readings["R2"], parse(Float64, items[3]))
-                        catch e
-                            println("Not parsed: $r2_text")
-                        end
-                    end
-                end
-            end
-        end
-        
-        index = findfirst("A3: ", text)
-        if !isnothing(index)
-            r3_text = replace(text, text[begin:index[end]] => "")
-            if length(r3_text) > 3
-                index = findfirst("A4:", r3_text)
-                if !isnothing(index)
-                    r3_text = replace(r3_text, r3_text[index[begin]:end] => "")
-                    if length(r3_text) > 3
-                        r3_text = strip(r3_text)
-                        println(r3_text)
-                        items = split(r3_text, ',')
-                        try
-                            readings["R3"] = []
-                            push!(readings["R3"], parse(Float64, items[1]))
-                            push!(readings["R3"], parse(Float64, items[2]))
-                            push!(readings["R3"], parse(Float64, items[3]))
-                        catch e
-                            println("Not parsed: $r3_text")
-                        end
-                    end
-                end
-            end
-        end
-
-        index = findfirst("A4: ", text)
-        if !isnothing(index)
-            r4_text = replace(text, text[begin:index[end]] => "")
-            if length(r4_text) > 3
-                index = findfirst("c1:", r4_text)
-                if !isnothing(index)
-                    r4_text = replace(r4_text, r4_text[index[begin]:end] => "")
-                    if length(r4_text) > 3
-                        r4_text = strip(r4_text)
-                        println(r4_text)
-                        items = split(r4_text, ',')
-                        try
-                            readings["R4"] = []
-                            push!(readings["R4"], parse(Float64, items[1]))
-                            push!(readings["R4"], parse(Float64, items[2]))
-                            push!(readings["R4"], parse(Float64, items[3]))
-                        catch e
-                            println("Not parsed: $r4_text")
-                        end
-                    end
-                end
-            end
-        end
-
-        index = findfirst("c1: ", text)
-        if !isnothing(index)
-            v1_text = replace(text, text[begin:index[end]] => "")
-            if length(v1_text) > 1
-                index = findfirst(", ", v1_text)
-                if !isnothing(index)
-                    v1_text = replace(v1_text, v1_text[index[begin]:end] => "")
-                    if length(v1_text) > 0
-                        v1_text = strip(v1_text)
-                        println(v1_text)
-                        try
-                            readings["v1"] = parse(Int, v1_text)
-                        catch e
-                            println("Not parsed: $v1_text")
-                        end
-                    end
-                end
-            end
-        end
-
-        index = findfirst("c2: ", text)
-        if !isnothing(index)
-            v2_text = replace(text, text[begin:index[end]] => "")
-            if length(v2_text) > 1
-                index = findfirst(", ", v2_text)
-                if !isnothing(index)
-                    v2_text = replace(v2_text, v2_text[index[begin]:end] => "")
-                    if length(v2_text) > 0
-                        v2_text = strip(v2_text)
-                        println(v2_text)
-                        try
-                            readings["v2"] = parse(Int, v2_text)
-                        catch e
-                            println("Not parsed: $v2_text")
-                        end
+parse3vector(text::String, beginninglabel::String, endinglabel::String, delimiter::String) = begin
+    vector = []
+    index = findfirst(beginninglabel, text)
+    if !isnothing(index)
+        _text = replace(text, text[begin:index[end]] => "")
+        if length(_text) > 3
+            index = findfirst(endinglabel, _text)
+            if !isnothing(index)
+                _text = replace(_text, _text[index[begin]:end] => "")
+                if length(_text) > 3
+                    _text = strip(_text)
+                    println(_text)
+                    items = split(_text, delimiter)
+                    try
+                        push!(vector, parse(Float64, items[1]))
+                        push!(vector, parse(Float64, items[2]))
+                        push!(vector, parse(Float64, items[3]))
+                    catch e
+                        println("Not parsed: $_text. $e")
                     end
                 end
             end
         end
     end
+    vector
+end
+
+
+parsescalar(text::String, beginninglabel::String, endinglabel::String) = begin
+    scalar = Nothing
+    index = findfirst(beginninglabel, text)
+    if !isnothing(index)
+        _text = replace(text, text[begin:index[end]] => "")
+        if length(_text) > 1
+            index = findfirst(endinglabel, _text)
+            if !isnothing(index)
+                _text = replace(_text, _text[index[begin]:end] => "")
+                if length(_text) > 0
+                    _text = strip(_text)
+                    println(_text)
+                    try
+                        scalar = parse(Int, _text)
+                    catch e
+                        println("Not parsed: $_text. $e")
+                    end
+                end
+            end
+        end
+    end
+    scalar
+end
+
+
+parsetext(text::String) = begin
+    readings = Dict()
+    if length(text) > 30
+        vector = parse3vector(text, "A1: ", "A2: ", ",")
+        if length(vector) == 3
+            readings["R1"] = vector
+        end
+
+        vector = parse3vector(text, "A2: ", "A3: ", ",")
+        if length(vector) == 3
+            readings["R2"] = vector
+        end
+
+        vector = parse3vector(text, "A3: ", "A4: ", ",")
+        if length(vector) == 3
+            readings["R3"] = vector
+        end
+
+        vector = parse3vector(text, "A4: ", "c1: ", ",")
+        if length(vector) == 3
+            readings["R4"] = vector
+        end
+
+        scalar = parsescalar(text, "c1: ", ", ")
+        if !isnothing(scalar)
+            readings["v1"] = scalar
+        end
+
+        scalar = parsescalar(text, "c2: ", ", ")
+        if !isnothing(scalar)
+            readings["v2"] = scalar
+        end
+    end
     readings
 end
+
+
+rotate(point::Vector{Float64}, q::Quaternion) = vec(conj(q) * Quaternion(0.0, (point)...) * q)[2:4]
 
 
 clientside  = connect("192.168.4.1", 10000)
@@ -302,10 +250,10 @@ errormonitor(@async while (isopen(clientside) && run)
         R4 = readings["R4"]
         v1 = readings["v1"]
         v2 = readings["v2"]
-        R1 = LinearAlgebra.normalize(R1)
-        R2 = LinearAlgebra.normalize(R2)
-        R3 = LinearAlgebra.normalize(R3)
-        R4 = LinearAlgebra.normalize(R4)
+        R1 = R1
+        R2 = R2
+        R3 = R3
+        R4 = R4
         R0 = GLMakie.Vec3f(R1[1], R1[2], R1[3]) + GLMakie.Vec3f(-R2[1], R2[2], -R2[3]) + GLMakie.Vec3f(R3[3], R3[1], R3[2]) + GLMakie.Vec3f(R4[3], -R4[1], -R4[2])
         R0 = R0 .* 0.25
         pitch = atan(R0[1], R0[3])
@@ -328,8 +276,8 @@ errormonitor(@async while (isopen(clientside) && run)
         y = cr * sp * cy + sr * cp * sy
         z = cr * cp * sy - sr * sp * cy
         q = Quaternion(w, x, y, z)
-        q = q * chassis_q0
-        q = GLMakie.Quaternion(vec(q)...)
+        chassis_q = q * chassis_q0
+        q = GLMakie.Quaternion(vec(chassis_q)...)
         GLMakie.rotate!(robot, q)
 
         
@@ -343,12 +291,11 @@ errormonitor(@async while (isopen(clientside) && run)
         p2 = deepcopy(Float64.([reference_point2...]))
         p3 = deepcopy(Float64.([reference_point3...]))
         p4 = deepcopy(Float64.([reference_point4...]))
-        point1[] = GLMakie.Point3f(vec(conj(g) * Quaternion(0.0, (p1 - _p)...) * g)[2:4] + _p)
-        point2[] = GLMakie.Point3f(vec(conj(g) * Quaternion(0.0, (p2 - _p)...) * g)[2:4] + _p)
-        point3[] = GLMakie.Point3f(vec(conj(g) * Quaternion(0.0, (p3 - _p)...) * g)[2:4] + _p)
-        point4[] = GLMakie.Point3f(vec(conj(g) * Quaternion(0.0, (p4 - _p)...) * g)[2:4] + _p)
+        point1[] = GLMakie.Point3f(rotate(p1 - _p, g) + _p)
+        point2[] = GLMakie.Point3f(rotate(p2 - _p, g) + _p)
+        point3[] = GLMakie.Point3f(rotate(p3 - _p, g) + _p)
+        point4[] = GLMakie.Point3f(rotate(p4 - _p, g) + _p)
         ps[] = [GLMakie.Point3f(point1[]...), GLMakie.Point3f(point2[]...), GLMakie.Point3f(point3[]...), GLMakie.Point3f(point4[]...)]
-        # ns[] = [GLMakie.Vec3f(R1[1], R1[2], R1[3]), GLMakie.Vec3f(-R2[1], R2[2], -R2[3]), GLMakie.Vec3f(R3[3], R3[1], R3[2]),  GLMakie.Vec3f(R4[3], -R4[1], -R4[2])]
         ns[] = [GLMakie.Vec3f(-R1[1], R1[2], R1[3]), GLMakie.Vec3f(R2[1], R2[2], -R2[3]), GLMakie.Vec3f(-R3[3], R3[1], R3[2]),  GLMakie.Vec3f(-R4[3], -R4[1], -R4[2])]
     end
 end)
