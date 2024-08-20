@@ -199,27 +199,22 @@ parsetext(text::String) = begin
         if length(vector) == 3
             readings["R1"] = vector
         end
-
         vector = parse3vector(text, "A2: ", "A3: ", ",")
         if length(vector) == 3
             readings["R2"] = vector
         end
-
         vector = parse3vector(text, "A3: ", "A4: ", ",")
         if length(vector) == 3
             readings["R3"] = vector
         end
-
         vector = parse3vector(text, "A4: ", "c1: ", ",")
         if length(vector) == 3
             readings["R4"] = vector
         end
-
         scalar = parsescalar(text, "c1: ", ", ")
         if !isnothing(scalar)
             readings["v1"] = scalar
         end
-
         scalar = parsescalar(text, "c2: ", ", ")
         if !isnothing(scalar)
             readings["v2"] = scalar
