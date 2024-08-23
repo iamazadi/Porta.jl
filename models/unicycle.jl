@@ -98,6 +98,14 @@ end
 rotate(point::Vector{Float64}, q::Porta.Quaternion) = vec(conj(q) * Porta.Quaternion(0.0, (point)...) * q)[2:4]
 
 
+mat33(q::Porta.Quaternion) = begin
+    qw, qx, qy, qz = vec(q)
+    [1.0 - 2(qy^2) - 2(qz^2) 	2qx * qy - 2qz * qw 	2qx * qz + 2qy * qw;
+     2qx * qy + 2qz * qw 	1.0 - 2(qx^2) - 2(qz^2) 	2qy * qz - 2qx * qw;
+     2qx * qz - 2qy * qw 	2qy * qz + 2qx * qw 	1.0 - 2(qx^2) - 2(qy^2)]
+end
+
+
 find_centerofmass(stl) = begin
     center_of_mass = [0.0; 0.0; 0.0]
     points_number = 0
@@ -200,6 +208,7 @@ rollingwheel = make_sprite(lscene.scene, robot, rollingwheel_origin, rollingwhee
 reactionwheel = make_sprite(lscene.scene, robot, reactionwheel_origin, reactionwheel_rotation, reactionwheel_scale, reactionwheel_stl, reactionwheel_colormap)
 
 arrowscale = 0.1
+smallarrowscale = arrowscale * 0.5
 R1_tail = vec(point1[])
 R2_tail = vec(point2[])
 R3_tail = vec(point3[])
@@ -233,7 +242,7 @@ reference_point4 = deepcopy(point4[])
 _p = Float64.([chassis_origin...])
 
 pivot_ps = GLMakie.Observable([pivot[], pivot[], pivot[]])
-pivot_ns = GLMakie.Observable([GLMakie.Vec3f(1, 0, 0), GLMakie.Vec3f(0, 1, 0), GLMakie.Vec3f(0, 0, 1)])
+pivot_ns = GLMakie.Observable(map(x -> x .* smallarrowscale, [GLMakie.Vec3f(1, 0, 0), GLMakie.Vec3f(0, 1, 0), GLMakie.Vec3f(0, 0, 1)]))
 ps1 = GLMakie.Observable([point1[], point1[], point1[]])
 ps2 = GLMakie.Observable([point2[], point2[], point2[]])
 ps3 = GLMakie.Observable([point3[], point3[], point3[]])
@@ -277,9 +286,8 @@ align = :center
 
 ê = [GLMakie.Vec3f(1, 0, 0), GLMakie.Vec3f(0, 1, 0), GLMakie.Vec3f(0, 0, 1)]
 # The rotation of the inertial frame Ô to the body frame B̂
-α = 0.0
-_O_B_R = [cos(α) 0.0 sin(α); 0.0 1.0 0.0; -sin(α) 0.0 cos(α)]
-O_B_R = LinearAlgebra.inv(_O_B_R)
+O_B_R = [ê[1] ê[2] ê[3]]
+_O_B_R = LinearAlgebra.inv(O_B_R)
 # The rotation of the local frame of the sensor i to the robot frame B
 _A1_B_R = [-ê[2] -ê[1] ê[3]]
 _A2_B_R = [ê[1] ê[2] -ê[3]]
@@ -314,6 +322,7 @@ errormonitor(@async while (isopen(clientside) && run)
         R2 = A2_B_R * _R2
         R3 = A3_B_R * _R3
         R4 = A4_B_R * _R4
+        _R = (R1 + R2 + R3 + R4) .* 0.25
         roll1 = atan(R1[2], R1[3])
         roll2 = atan(R2[2], R2[3])
         roll3 = atan(R3[2], R3[3])
@@ -323,7 +332,12 @@ errormonitor(@async while (isopen(clientside) && run)
         pitch3 = atan(R3[1], R3[3])
         pitch4 = atan(R4[1], R4[3])
       
-        q = Porta.Quaternion(roll2, x̂) * Porta.Quaternion(pitch2, ŷ)
+        roll = atan(_R[2], _R[3])
+        pitch = atan(_R[1], _R[3])
+        q = Porta.Quaternion(roll, x̂) * Porta.Quaternion(pitch, ŷ)
+        O_B_R = mat33(q)
+        println("roll: $roll, pitch: $pitch.")
+
         q1 = Porta.Quaternion(roll1, x̂) * Porta.Quaternion(pitch1, ŷ)
         q2 = Porta.Quaternion(roll2, x̂) * Porta.Quaternion(pitch2, ŷ)
         q3 = Porta.Quaternion(roll3, x̂) * Porta.Quaternion(pitch3, ŷ)
@@ -335,11 +349,15 @@ errormonitor(@async while (isopen(clientside) && run)
         p2 = deepcopy(Float64.([reference_point2...]))
         p3 = deepcopy(Float64.([reference_point3...]))
         p4 = deepcopy(Float64.([reference_point4...]))
-        pivot[] = GLMakie.Point3f(rotate(pivotpoint - _p, q) + _p)
-        point1[] = GLMakie.Point3f(rotate(p1 - _p, q1) + _p)
-        point2[] = GLMakie.Point3f(rotate(p2 - _p, q2) + _p)
-        point3[] = GLMakie.Point3f(rotate(p3 - _p, q3) + _p)
-        point4[] = GLMakie.Point3f(rotate(p4 - _p, q4) + _p)
+        pivot[] = GLMakie.Point3f(O_B_R * (pivotpoint - _p) + _p)
+        # point1[] = GLMakie.Point3f(rotate(p1 - _p, q1) + _p)
+        # point2[] = GLMakie.Point3f(rotate(p2 - _p, q2) + _p)
+        # point3[] = GLMakie.Point3f(rotate(p3 - _p, q3) + _p)
+        # point4[] = GLMakie.Point3f(rotate(p4 - _p, q4) + _p)
+        point1[] = GLMakie.Point3f(mat33(q1) * (p1 - _p) + _p)
+        point2[] = GLMakie.Point3f(mat33(q2) * (p2 - _p) + _p)
+        point3[] = GLMakie.Point3f(mat33(q3) * (p3 - _p) + _p)
+        point4[] = GLMakie.Point3f(mat33(q4) * (p4 - _p) + _p)
         ps[] = [GLMakie.Point3f(point1[]...), GLMakie.Point3f(point2[]...), GLMakie.Point3f(point3[]...), GLMakie.Point3f(point4[]...)]
         ns[] = map(x -> x .* arrowscale, [GLMakie.Vec3f(R1...), GLMakie.Vec3f(R2...), GLMakie.Vec3f(R3...),  GLMakie.Vec3f(R4...)])
 
@@ -348,8 +366,6 @@ errormonitor(@async while (isopen(clientside) && run)
         ps2[] = [GLMakie.Point3f(point2[]...), GLMakie.Point3f(point2[]...), GLMakie.Point3f(point2[]...)]
         ps3[] = [GLMakie.Point3f(point3[]...), GLMakie.Point3f(point3[]...), GLMakie.Point3f(point3[]...)]
         ps4[] = [GLMakie.Point3f(point4[]...), GLMakie.Point3f(point4[]...), GLMakie.Point3f(point4[]...)]
-        
-        smallarrowscale = arrowscale * 0.5
         ns1[] = map(x -> x .* LinearAlgebra.norm(R1) .* smallarrowscale, map(x -> rotate(Float64.([x...]), q1), [_A1_B_R * ê[1], _A1_B_R * ê[2], _A1_B_R * ê[3]]))
         ns2[] = map(x -> x .* LinearAlgebra.norm(R2) .* smallarrowscale, map(x -> rotate(Float64.([x...]), q2), [_A2_B_R * ê[1], _A2_B_R * ê[2], _A2_B_R * ê[3]]))
         ns3[] = map(x -> x .* LinearAlgebra.norm(R3) .* smallarrowscale, map(x -> rotate(Float64.([x...]), q3), [_A3_B_R * ê[1], _A3_B_R * ê[2], _A3_B_R * ê[3]]))
