@@ -281,10 +281,10 @@ ê = [GLMakie.Vec3f(1, 0, 0), GLMakie.Vec3f(0, 1, 0), GLMakie.Vec3f(0, 0, 1)]
 _O_B_R = [cos(α) 0.0 sin(α); 0.0 1.0 0.0; -sin(α) 0.0 cos(α)]
 O_B_R = LinearAlgebra.inv(_O_B_R)
 # The rotation of the local frame of the sensor i to the robot frame B
-_A1_B_R = [-ê[2] -ê[1] -ê[3]]
-_A2_B_R = [ê[1] ê[2] ê[3]]
-_A3_B_R = [-ê[3] ê[1] -ê[2]]
-_A4_B_R = [-ê[3] -ê[1] ê[2]]
+_A1_B_R = [-ê[2] -ê[1] ê[3]]
+_A2_B_R = [ê[1] ê[2] -ê[3]]
+_A3_B_R = [-ê[3] ê[1] ê[2]]
+_A4_B_R = [-ê[3] -ê[1] -ê[2]]
 A1_B_R = LinearAlgebra.inv(_A1_B_R)
 A2_B_R = LinearAlgebra.inv(_A2_B_R)
 A3_B_R = LinearAlgebra.inv(_A3_B_R)
@@ -323,12 +323,12 @@ errormonitor(@async while (isopen(clientside) && run)
         pitch3 = atan(R3[1], R3[3])
         pitch4 = atan(R4[1], R4[3])
       
-        q = Porta.Quaternion(roll2, x̂) * Porta.Quaternion(-pitch2, ŷ)
+        q = Porta.Quaternion(roll2, x̂) * Porta.Quaternion(pitch2, ŷ)
         q1 = Porta.Quaternion(roll1, x̂) * Porta.Quaternion(pitch1, ŷ)
         q2 = Porta.Quaternion(roll2, x̂) * Porta.Quaternion(pitch2, ŷ)
         q3 = Porta.Quaternion(roll3, x̂) * Porta.Quaternion(pitch3, ŷ)
         q4 = Porta.Quaternion(roll4, x̂) * Porta.Quaternion(pitch4, ŷ)
-        g = q * chassis_q0
+        g = -q * chassis_q0
         GLMakie.rotate!(robot, GLMakie.Quaternion(g)) # change the comibination to correct for an API difference
         pivotpoint = deepcopy(Float64.([pivot_reference_point...]))
         p1 = deepcopy(Float64.([reference_point1...]))
