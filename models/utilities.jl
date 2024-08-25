@@ -39,7 +39,7 @@ parse3vector(text::String, beginninglabel::String, endinglabel::String, delimite
 end
 
 
-parsescalar(text::String, beginninglabel::String, endinglabel::String) = begin
+parsescalar(text::String, beginninglabel::String, endinglabel::String; type::DataType = Int) = begin
     scalar = Nothing
     index = findfirst(beginninglabel, text)
     if !isnothing(index)
@@ -51,7 +51,7 @@ parsescalar(text::String, beginninglabel::String, endinglabel::String) = begin
                 if length(_text) > 0
                     _text = strip(_text)
                     try
-                        scalar = parse(Int, _text)
+                        scalar = parse(type, _text)
                     catch e
                         println("Not parsed: $_text. $e")
                     end
