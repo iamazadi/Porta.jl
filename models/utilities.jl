@@ -63,38 +63,6 @@ parsescalar(text::String, beginninglabel::String, endinglabel::String; type::Dat
 end
 
 
-parsetext(text::String) = begin
-    readings = Dict()
-    if length(text) > 30
-        vector = parse3vector(text, "A1: ", "A2: ", ",")
-        if length(vector) == 3
-            readings["R1"] = vector
-        end
-        vector = parse3vector(text, "A2: ", "A3: ", ",")
-        if length(vector) == 3
-            readings["R2"] = vector
-        end
-        vector = parse3vector(text, "A3: ", "A4: ", ",")
-        if length(vector) == 3
-            readings["R3"] = vector
-        end
-        vector = parse3vector(text, "A4: ", "c1: ", ",")
-        if length(vector) == 3
-            readings["R4"] = vector
-        end
-        scalar = parsescalar(text, "c1: ", ", ")
-        if !isnothing(scalar)
-            readings["v1"] = scalar
-        end
-        scalar = parsescalar(text, "c2: ", ", ")
-        if !isnothing(scalar)
-            readings["v2"] = scalar
-        end
-    end
-    readings
-end
-
-
 rotate(point::Vector{Float64}, q::Porta.Quaternion) = vec(conj(q) * Porta.Quaternion(0.0, (point)...) * q)[2:4]
 
 
@@ -139,4 +107,44 @@ make_sprite(scene, parent, origin, rotation, scale, stl, colormap) = begin
     end
     # plot the part with transformation & color
     GLMakie.mesh!(scene, stl; color = [tri[1][2] for tri in stl for i in 1:3], colormap = colormap, transformation = child)
+end
+
+
+parsetext(text::String) = begin
+    readings = Dict()
+    if length(text) > 30
+        vector = parse3vector(text, "A1: ", "A2: ", ",")
+        if length(vector) == 3
+            readings["R1"] = vector
+        end
+        vector = parse3vector(text, "A2: ", "A3: ", ",")
+        if length(vector) == 3
+            readings["R2"] = vector
+        end
+        vector = parse3vector(text, "A3: ", "A4: ", ",")
+        if length(vector) == 3
+            readings["R3"] = vector
+        end
+        vector = parse3vector(text, "A4: ", "c1: ", ",")
+        if length(vector) == 3
+            readings["R4"] = vector
+        end
+        scalar = parsescalar(text, "beta: ", ", ", type = Float64)
+        if !isnothing(scalar)
+            readings["beta"] = scalar
+        end
+        scalar = parsescalar(text, "gamma: ", ", ", type = Float64)
+        if !isnothing(scalar)
+            readings["gamma"] = scalar
+        end
+        scalar = parsescalar(text, "c1: ", ", ")
+        if !isnothing(scalar)
+            readings["v1"] = scalar
+        end
+        scalar = parsescalar(text, "c2: ", ", ")
+        if !isnothing(scalar)
+            readings["v2"] = scalar
+        end
+    end
+    readings
 end
