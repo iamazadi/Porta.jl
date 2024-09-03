@@ -77,16 +77,16 @@ chassis_stl_path = joinpath("data", "unicycle", "unicycle_chassis.STL")
 rollingwheel_stl_path = joinpath("data", "unicycle", "unicycle_main_wheel.STL")
 reactionwheel_stl_path = joinpath("data", "unicycle", "unicycle_reaction_wheel.STL")
 
-chassis_colormap = :Blues
-rollingwheel_colormap = :rose
-reactionwheel_colormap = :gold
+chassis_colormap = :fruitpunch
+rollingwheel_colormap = :oxy
+reactionwheel_colormap = :vanimo
 
 makefigure() = GLMakie.Figure(size = figuresize)
 fig = GLMakie.with_theme(makefigure, GLMakie.theme_black())
 pl = GLMakie.PointLight(GLMakie.Point3f(0), GLMakie.RGBf(0.0862, 0.0862, 0.0862))
 al = GLMakie.AmbientLight(GLMakie.RGBf(0.9, 0.9, 0.9))
 backgroundcolor = GLMakie.RGBf(1.0, 1.0, 1.0)
-lscene = GLMakie.LScene(fig[1, 1], show_axis = true, scenekw = (lights = [pl, al], clear = true, backgroundcolor = backgroundcolor))
+lscene = GLMakie.LScene(fig[1, 1], show_axis = true, scenekw = (lights = [pl, al], clear = true, backgroundcolor = :purple))
 
 chassis_stl = FileIO.load(chassis_stl_path)
 reactionwheel_stl = FileIO.load(reactionwheel_stl_path)
@@ -234,7 +234,7 @@ errormonitor(@async while (isopen(clientside) && run)
         ns3[] = map(x -> x .* LinearAlgebra.norm(R3) .* smallarrowscale, [B_O_R * B_A3_R * ê[1], B_O_R * B_A3_R * ê[2], B_O_R * B_A3_R * ê[3]])
         ns4[] = map(x -> x .* LinearAlgebra.norm(R4) .* smallarrowscale, [B_O_R * B_A4_R * ê[1], B_O_R * B_A4_R * ê[2], B_O_R * B_A4_R * ê[3]])
 
-        mq = GLMakie.Quaternion(Porta.Quaternion(float(-v1) / 600.0 * 2pi, ẑ))
+        mq = GLMakie.Quaternion(Porta.Quaternion(float(-v1) / 300.0 * 2pi, ẑ))
         rq = GLMakie.Quaternion(Porta.Quaternion(float(-v2) / 1800.0 * 2pi, x̂))
         GLMakie.rotate!(rollingwheel, mq)
         GLMakie.rotate!(reactionwheel, rq)
