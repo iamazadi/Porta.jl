@@ -6,7 +6,8 @@ makedocs(
     format = Documenter.HTML(prettyurls = false),  # optional
     pages = [
         "Home" => "index.md",
-        "Hopf Fibration" => "hopffibration.md"
+        "Hopf Fibration" => "hopffibration.md",
+        "Reaction Wheel Unicycle" => "reactionwheelunicycle.md"
     ]
 )
 
