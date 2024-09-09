@@ -49,6 +49,7 @@ B_A4_R = LinearAlgebra.inv(A4_B_R)
 P = [[1.0; vec(p1 - pivot)] [1.0; vec(p2 - pivot)] [1.0; vec(p3 - pivot)] [1.0; vec(p4 - pivot)]]
 X = transpose(P) * LinearAlgebra.inv(P * transpose(P))
 
+r_w = 75.0 # +-0.1mm
 chassis_scale = 0.001
 rollingwheel_scale = 1.0
 reactionwheel_scale = 1.0
@@ -77,16 +78,16 @@ chassis_stl_path = joinpath("data", "unicycle", "unicycle_chassis.STL")
 rollingwheel_stl_path = joinpath("data", "unicycle", "unicycle_main_wheel.STL")
 reactionwheel_stl_path = joinpath("data", "unicycle", "unicycle_reaction_wheel.STL")
 
-chassis_colormap = :fruitpunch
-rollingwheel_colormap = :oxy
-reactionwheel_colormap = :vanimo
+chassis_colormap = :inferno
+rollingwheel_colormap = :gold
+reactionwheel_colormap = :plasma
 
 makefigure() = GLMakie.Figure(size = figuresize)
 fig = GLMakie.with_theme(makefigure, GLMakie.theme_black())
 pl = GLMakie.PointLight(GLMakie.Point3f(0), GLMakie.RGBf(0.0862, 0.0862, 0.0862))
 al = GLMakie.AmbientLight(GLMakie.RGBf(0.9, 0.9, 0.9))
 backgroundcolor = GLMakie.RGBf(1.0, 1.0, 1.0)
-lscene = GLMakie.LScene(fig[1, 1], show_axis = true, scenekw = (lights = [pl, al], clear = true, backgroundcolor = :purple))
+lscene = GLMakie.LScene(fig[1, 1], show_axis = true, scenekw = (lights = [pl, al], clear = true, backgroundcolor = :navyblue))
 
 chassis_stl = FileIO.load(chassis_stl_path)
 reactionwheel_stl = FileIO.load(reactionwheel_stl_path)
