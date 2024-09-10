@@ -40,7 +40,7 @@ Description = "How the reaction wheel unicycle works."
 
 ``{}^gp_{c3} = r_w * cos(\alpha) + l_c cos(\beta) cos(\alpha)``
 
-``{}_r_cT = \begin{bmatrix} 1 & 0 & 0 & 0 \\ 0 & 1 & 0 & 0 \\ 0 & 0 & 1 & l_cr \\ 0 & 0 & 0 & 1 \end{bmatrix} \begin{bmatrix} 1 & 0 & 0 & 0 \\ 0 & cos(\gamma) & -sin(\gamma) & 0 \\ 0 & sin(\gamma) & cos(\gamma) & 0 \\ 0 & 0 & 0 & 1 \end{bmatrix} \begin{bmatrix} 1 & 0 & 0 & 0 \\ 0 & 1 & 0 & 0 \\ 0 & 0 & 1 & l_r \\ 0 & 0 & 0 & 1 \end{bmatrix} = \begin{bmatrix} 1 & 0 & 0 & 0 \\ 0 & cos(\gamma) & -sin(\gamma) & -l_r sin(\gamma) \\ 0 & sin(\gamma) & cos(\gamma) & l_cr + l_r cos(\gamma) \\ 0 & 0 & 0 & 1 \end{bmatrix}``
+``{}_r^cT = \begin{bmatrix} 1 & 0 & 0 & 0 \\ 0 & 1 & 0 & 0 \\ 0 & 0 & 1 & l_cr \\ 0 & 0 & 0 & 1 \end{bmatrix} \begin{bmatrix} 1 & 0 & 0 & 0 \\ 0 & cos(\gamma) & -sin(\gamma) & 0 \\ 0 & sin(\gamma) & cos(\gamma) & 0 \\ 0 & 0 & 0 & 1 \end{bmatrix} \begin{bmatrix} 1 & 0 & 0 & 0 \\ 0 & 1 & 0 & 0 \\ 0 & 0 & 1 & l_r \\ 0 & 0 & 0 & 1 \end{bmatrix} = \begin{bmatrix} 1 & 0 & 0 & 0 \\ 0 & cos(\gamma) & -sin(\gamma) & -l_r sin(\gamma) \\ 0 & sin(\gamma) & cos(\gamma) & l_cr + l_r cos(\gamma) \\ 0 & 0 & 0 & 1 \end{bmatrix}``
 
 ``{}_r^gT = {}_c^gT \times {}_r^cT = \begin{bmatrix} {}_r^gt_{11} & {}_r^gt_{12} & {}_r^gt_{13} & {}_r^gt_{14} \\ {}_r^gt_{21} & {}_r^gt_{22} & {}_r^gt_{23} & {}_r^gt_{24} \\ -cos(\alpha) sin(\beta) & {}_r^gt_{32} & {}_r^gt_{33} & {}_r^gt_{34} \\ 0 & 0 & 0 & 1 \end{bmatrix}``
 
@@ -68,11 +68,11 @@ Description = "How the reaction wheel unicycle works."
 
 ``{}^rP_r = \begin{bmatrix} 0 \\ 0 \\ 0 \\ 1 \end{bmatrix}``
 
-``{}^gP_r = {}_r^gT \times {}^rP_r = \begin{bmatrix} {}^gP_{r1} \\ {}^gP_{r2} \\ {}^gP_{r3} \\ 1 \end{bmatrix}``
+``{}^gP_r = {}_r^gT \times {}^rP_r = \begin{bmatrix} {}^gp_{r1} \\ {}^gp_{r2} \\ {}^gp_{r3} \\ 1 \end{bmatrix}``
 
 ``{}^gp_{r1} = x + r_w sin(\alpha) sin(\delta) + (l_c + l_cr) cos(\beta) sin(\alpha) sin(\delta) + (l_c + l_cr) sin(\beta) cos(\delta) + l_r cos(\gamma) cos(\beta) sin(\alpha) si(\delta) + l_r cos(\gamma) sin(\beta) cos(\delta) + l_r sin(\gamma) cos(\alpha) sin(\delta)``
 
-``{}^gp_{r2} = y - r_w sin(\alpha) cos(\delta) - (l_c + l_cr) cos(\beta) sin(\alpha) cos(\delta) + (l_c + l_cr) sin(\beta) sin(\delta) - l_r cos(\gamma) cos(\beta) sin(\alpha) cos(\delta) + l_r cos(\gamma) sin(\beta) sin(\delta) - l_r sin(\gama) cos(\alpha) cos(\delta)``
+``{}^gp_{r2} = y - r_w sin(\alpha) cos(\delta) - (l_c + l_cr) cos(\beta) sin(\alpha) cos(\delta) + (l_c + l_cr) sin(\beta) sin(\delta) - l_r cos(\gamma) cos(\beta) sin(\alpha) cos(\delta) + l_r cos(\gamma) sin(\beta) sin(\delta) - l_r sin(\gamma) cos(\alpha) cos(\delta)``
 
 ``{}^gp_{r3} = r_w cos(\alpha) + (l_c + l_cr) cos(\beta) cos(\alpha) + l_r cos(\gamma) cos(\beta) cos(\alpha) - l_r sin(\gamma) sin(\alpha)``
 
@@ -82,13 +82,13 @@ Description = "How the reaction wheel unicycle works."
 
 ``V_r = \frac{dP_r}{dt}``
 
-``{\Omega}_w = \begin{bmatrix} 0 \\ \dot{\theta} \\ 0 \\ 0 \end{bmatrix} + \begin{bmatrix} \dot{\alpha} \\ 0 \\ 0 \\ 0 \end{bmatrix} + {}_g^{w2}T \ times \begin{bmatrix} 0 \\ 0 \\ \dot{\delta} \\ 0 \end{bmatrix} = \begin{bmatrix} 0 \\ \dot{\theta} \\ 0 \\ 0 \end{bmatrix} + \begin{bmatrix} \dot{\alpha} \\ 0 \\ 0 \\ 0 \end{bmatrix} + {}_{w2}^gT^{-1} \ times \begin{bmatrix} 0 \\ 0 \\ \dot{\delta} \\ 0 \end{bmatrix} = \begin{bmatrix} \dot{\alpha} \\ \dot{\theta} + \dot{\delta} sin(\alpha) \\ \dot{\delta} cos{\alpha} \end{bmatrix}``
+``{\Omega}_w = \begin{bmatrix} 0 \\ \dot{\theta} \\ 0 \\ 0 \end{bmatrix} + \begin{bmatrix} \dot{\alpha} \\ 0 \\ 0 \\ 0 \end{bmatrix} + {}_g^{w2}T \times \begin{bmatrix} 0 \\ 0 \\ \dot{\delta} \\ 0 \end{bmatrix} = \begin{bmatrix} 0 \\ \dot{\theta} \\ 0 \\ 0 \end{bmatrix} + \begin{bmatrix} \dot{\alpha} \\ 0 \\ 0 \\ 0 \end{bmatrix} + {}_{w2}^gT^{-1} \times \begin{bmatrix} 0 \\ 0 \\ \dot{\delta} \\ 0 \end{bmatrix} = \begin{bmatrix} \dot{\alpha} \\ \dot{\theta} + \dot{\delta} sin(\alpha) \\ \dot{\delta} cos{\alpha} \end{bmatrix}``
 
-``{\Omega}_c = \begin{matrix} 0 \\ \dot{\beta} \\ 0 \\ 0 \end{bmatrix} + {}_{w2}^cT \times \begin{bmatrix} \dot{\alpha} \\ 0 \\ 0 \\ 0 \end{bmatrix} + {}_g^cT \times \begin{bmatrix} 0 \\ 0 \\ \dot{\delta} \\ 0 \end{bmatrix} = \begin{matrix} 0 \\ \dot{\beta} \\ 0 \\ 0 \end{bmatrix} + {}_c^{w2T^{-1} \times \begin{bmatrix} \dot{\alpha} \\ 0 \\ 0 \\ 0 \end{bmatrix} + {}_c^gT^{-1} \times \begin{bmatrix} 0 \\ 0 \\ \dot{\delta} \\ 0 \end{bmatrix} = \begin{bmatrix} \dot{\alpha} cos{\beta} - \dot{\delta} cos(\alpha) sin(\beta) \\ \dot{\beta} + \dot{\delta} sin(\alpha) \\ \dot{\alpha} sin(\beta) + \dot{\delta} cos(\alpha) cos(\beta) \end{bmatrix}``
+``{\Omega}_c = \begin{bmatrix} 0 \\ \dot{\beta} \\ 0 \\ 0 \end{bmatrix} + {}_{w2}^cT \times \begin{bmatrix} \dot{\alpha} \\ 0 \\ 0 \\ 0 \end{bmatrix} + {}_g^cT \times \begin{bmatrix} 0 \\ 0 \\ \dot{\delta} \\ 0 \end{bmatrix} = \begin{matrix} 0 \\ \dot{\beta} \\ 0 \\ 0 \end{bmatrix} + {}_c^{w2T^{-1} \times \begin{bmatrix} \dot{\alpha} \\ 0 \\ 0 \\ 0 \end{bmatrix} + {}_c^gT^{-1} \times \begin{bmatrix} 0 \\ 0 \\ \dot{\delta} \\ 0 \end{bmatrix} = \begin{bmatrix} \dot{\alpha} cos{\beta} - \dot{\delta} cos(\alpha) sin(\beta) \\ \dot{\beta} + \dot{\delta} sin(\alpha) \\ \dot{\alpha} sin(\beta) + \dot{\delta} cos(\alpha) cos(\beta) \end{bmatrix}``
 
 ``{}_r^{w2}T = {}_{w2}^gT \times {}_r^gT``
 
-``{\Omega}_r = \begin{bmatrix} \dot{\gamma} \\ 0 \\ 0 \\ 0 \end{bmatrix} + {}_c^rT \times \begin{bmatrix} 0 \\ \dot{\beta} \\ 0 \\ 0 \end{bmatrix} + {}_{w2}^rT \times \begin{bmatrix} \dot{alpha} \\ 0 \\ 0 \\ 0 \end{bmatrix} + {}_g^rT \times \begin{bmatrix} 0 \\ 0 \\ \dot{\delta} \\ 0 \end{bmatrix} = \begin{bmatrix} \dot{\gamma} \\ 0 \\ 0 \\ 0 \end{bmatrix} + {}_r^cT^{-1} \times \begin{bmatrix} 0 \\ \dot{\beta} \\ 0 \\ 0 \end{bmatrix} + {}_r^{w2}T^{-1} \times \begin{bmatrix} \dot{alpha} \\ 0 \\ 0 \\ 0 \end{bmatrix} + {}_r^gT^{-1} \times \begin{bmatrix} 0 \\ 0 \\ \dot{\delta} \\ 0 \end{bmatrix} = \begin{bmatrix} \dot{gamma} + \dot{\alpha} cos(\beta) - \dot{\delta} cos(\alpha) sin(\beta) \\ {\omega}_{r2} \\ {\omega}_{r3} \\ 0 \end{bmatrix}``
+``{\Omega}_r = \begin{bmatrix} \dot{\gamma} \\ 0 \\ 0 \\ 0 \end{bmatrix} + {}_c^rT \times \begin{bmatrix} 0 \\ \dot{\beta} \\ 0 \\ 0 \end{bmatrix} + {}_{w2}^rT \times \begin{bmatrix} \dot{\alpha} \\ 0 \\ 0 \\ 0 \end{bmatrix} + {}_g^rT \times \begin{bmatrix} 0 \\ 0 \\ \dot{\delta} \\ 0 \end{bmatrix} = \begin{bmatrix} \dot{\gamma} \\ 0 \\ 0 \\ 0 \end{bmatrix} + {}_r^cT^{-1} \times \begin{bmatrix} 0 \\ \dot{\beta} \\ 0 \\ 0 \end{bmatrix} + {}_r^{w2}T^{-1} \times \begin{bmatrix} \dot{\alpha} \\ 0 \\ 0 \\ 0 \end{bmatrix} + {}_r^gT^{-1} \times \begin{bmatrix} 0 \\ 0 \\ \dot{\delta} \\ 0 \end{bmatrix} = \begin{bmatrix} \dot{\gamma} + \dot{\alpha} cos(\beta) - \dot{\delta} cos(\alpha) sin(\beta) \\ {\omega}_{r2} \\ {\omega}_{r3} \\ 0 \end{bmatrix}``
 
 ``{\omega}_{r2} = \dot{\beta} cos(\gamma) + \dot{\alpha} sin(\beta) sin(\gamma) + \dot{\delta} sin(\alpha) cos(\gamma) + \dot{\delta} cos(\alpha) cos(\beta) sin(\gamma)``
 
@@ -128,7 +128,7 @@ Description = "How the reaction wheel unicycle works."
 
 Wheel dynamics:
 
-``m_{11} \ddot(\beta) + m_{12} \ddot(\gamma) + m_{13} \ddot{\delta} + m_{14} \ddot(\theta) + c_{11} \dot{\beta}^2 + c_{12} \dot{\gamma}^2 + c_{13} \dot{\delta}^2 + c_{14} \dot{\alpha} \dot{\delta} + c_{15} \dot{\beta} \dot{\gamma} + c_{16} \dot{\beta} \dot{\delta} + c_{17} \dot{\gamma} \dot{\delta} = {\tau}_w``
+``m_{11} \ddot{\beta} + m_{12} \ddot{\gamma} + m_{13} \ddot{\delta} + m_{14} \ddot{\theta} + c_{11} \dot{\beta}^2 + c_{12} \dot{\gamma}^2 + c_{13} \dot{\delta}^2 + c_{14} \dot{\alpha} \dot{\delta} + c_{15} \dot{\beta} \dot{\gamma} + c_{16} \dot{\beta} \dot{\delta} + c_{17} \dot{\gamma} \dot{\delta} = {\tau}_w``
 
 Chassis longitudinal dynamics:
 
@@ -140,7 +140,7 @@ Chassis lateral dynamics:
 
 Reaction wheel dynamics:
 
-``m_{41} \ddot{\alpha} + m_{42} \ddot{\gamma} + m_{43} \ddot{\delta} + m_{44} \ddot{\theta} + c_{41} \dot{\alpha}^2 + c_{42} \dot{\beta}^2 + c_{43} \dot{\delta}^2 + c_{44} \dot{\alpha} \dot{\beta} + c_{45} \dot{\alpha} \dot{\delta} + c_{46} \dot{\beta} \dot{\delta} + c_{47} \dot{\delta} \dot{\theta} + g_{41} = {\tua}_r``
+``m_{41} \ddot{\alpha} + m_{42} \ddot{\gamma} + m_{43} \ddot{\delta} + m_{44} \ddot{\theta} + c_{41} \dot{\alpha}^2 + c_{42} \dot{\beta}^2 + c_{43} \dot{\delta}^2 + c_{44} \dot{\alpha} \dot{\beta} + c_{45} \dot{\alpha} \dot{\delta} + c_{46} \dot{\beta} \dot{\delta} + c_{47} \dot{\delta} \dot{\theta} + g_{41} = {\tau}_r``
 
 Turning dynamics:
 
