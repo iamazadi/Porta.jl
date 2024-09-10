@@ -28,25 +28,25 @@ ê = [GLMakie.Vec3f(1, 0, 0), GLMakie.Vec3f(0, 1, 0), GLMakie.Vec3f(0, 0, 1)]
 # Parameters
 m_w = 0.1 # kg # Wheel mass
 m_c = 0.2 # kg # Chassis mass
-m_p = 0.1 # kg # Pendulum mass
+m_r = 0.1 # kg # Pendulum mass
 I_w1 = 0.01 # kg . m² # Wheel x-dir. moment of inertia
 I_w2 = 0.02 # kg . m² # Wheel y-dir. moment of inertia
 I_w3 = 0.01 # kg . m² # Wheel z-dir. moment of inertia
 I_c1 = 0.17 # kg . m² # Chassis x-dir. moment of inertia
 I_c2 = 0.11 # kg . m² # Chassis y-dir. moment of inertia
 I_c3 = 0.08 # kg . m² # Chassis z-dir. moment of inertia
-I_p1 = 0.03 # kg . m² # Pendulum x-dir. moment of inertia
-I_p2 = 0.03 # kg . m² # Pendulum y-dir. moment of inertia
-I_p3 = 0.0003 # kg . m² # Pendulum z-dir. moment of inertia
+I_r1 = 0.03 # kg . m² # Reaction wheel x-dir. moment of inertia
+I_r2 = 0.03 # kg . m² # Reaction wheel y-dir. moment of inertia
+I_r3 = 0.0003 # kg . m² # Reaction wheel z-dir. moment of inertia
 r_w = 0.0750 # +-0.0001m # Wheel radius
 l_c = 0.1 # m # Distance between wheel center of mass and chassis center of mass
-l_cp = 0.1 # m # Distance between chassis center of mass and pendulum pivot
-l_p = 0.1 # m # Distance between pendulum pivot and center of mass
+l_cr = 0.1 # m # Distance between chassis center of mass and pendulum pivot
+l_r = 0.1 # m # Distance between pendulum pivot and center of mass
 
 g = 9.81 # m/s² # Gravitational acceleration
 I_w = [I_w1; I_w2; I_w3; 0.0] # Wheel moment of inertia
 I_c = [I_c1; I_c2; I_c3; 0.0] # Chassis moment of inertia
-I_p = [I_p1; I_p2; I_p3; 0.0] # Pendulum moment of inertia
+I_r = [I_r1; I_r2; I_r3; 0.0] # Reaction wheel moment of inertia
 
 
 chassis_scale = 0.001
@@ -127,9 +127,9 @@ observablepointW1 = GLMakie.Observable(GLMakie.Point3f(0.0, 0.0, -0.011))
 observablepointW2 = GLMakie.Observable(GLMakie.Point3f(0.0, 0.0, -0.011))
 observablepointW3 = GLMakie.Observable(GLMakie.Point3f(0.0, 0.0, -0.011))
 observablepointC = GLMakie.Observable(GLMakie.Point3f(0.0, 0.0, 0.0))
-observablepointP = GLMakie.Observable(GLMakie.Point3f(0.0, 0.0, 0.154))
-observablepoints = [observablepointG, observablepointCP, observablepointW1, observablepointW2, observablepointW3, observablepointC, observablepointP]
-corrdinateframetitles = ["ΣG", "ΣCP", "ΣW1", "ΣW2", "ΣW3", "ΣC", "ΣP"]
+observablepointR = GLMakie.Observable(GLMakie.Point3f(0.0, 0.0, 0.154))
+observablepoints = [observablepointG, observablepointCP, observablepointW1, observablepointW2, observablepointW3, observablepointC, observablepointR]
+corrdinateframetitles = ["ΣG", "ΣCP", "ΣW1", "ΣW2", "ΣW3", "ΣC", "ΣR"]
 
 psG = GLMakie.lift(x -> [x, x, x], observablepointG)
 psCP = GLMakie.lift(x -> [x, x, x], observablepointCP)
@@ -137,16 +137,16 @@ psW1 = GLMakie.lift(x -> [x, x, x], observablepointW1)
 psW2 = GLMakie.lift(x -> [x, x, x], observablepointW2)
 psW3 = GLMakie.lift(x -> [x, x, x], observablepointW3)
 psC = GLMakie.lift(x -> [x, x, x], observablepointC)
-psP = GLMakie.lift(x -> [x, x, x], observablepointP)
+psR = GLMakie.lift(x -> [x, x, x], observablepointR)
 nsG = GLMakie.Observable(ê .* arrowscale)
 nsCP = GLMakie.Observable(ê .* arrowscale)
 nsW1 = GLMakie.Observable(ê .* arrowscale)
 nsW2 = GLMakie.Observable(ê .* arrowscale)
 nsW3 = GLMakie.Observable([ê[1], ê[3], ê[2]] .* arrowscale)
 nsC = GLMakie.Observable(ê .* arrowscale)
-nsP = GLMakie.Observable(ê .* arrowscale)
-coordinateframes_ps = [psG, psCP, psW1, psW2, psW3, psC, psP]
-coordinateframes_ns = [nsG, nsCP, nsW1, nsW2, nsW3, nsC, nsP]
+nsR = GLMakie.Observable(ê .* arrowscale)
+coordinateframes_ps = [psG, psCP, psW1, psW2, psW3, psC, psR]
+coordinateframes_ns = [nsG, nsCP, nsW1, nsW2, nsW3, nsC, nsR]
 
 arrowsize = GLMakie.Vec3f(0.01, 0.02, 0.03)
 linewidth = 0.01
@@ -168,7 +168,7 @@ rotation1 = GLMakie.@lift(Porta.Quaternion(getrotation(ẑ, $rotationaxis)...))
 rotation2 = GLMakie.@lift(Porta.Quaternion($rotationangle, $rotationaxis))
 rotation = GLMakie.@lift(GLMakie.Quaternion($rotation2 * $rotation1))
 GLMakie.text!(lscene,
-    GLMakie.@lift([$observablepointG, $observablepointCP, $observablepointW1, $observablepointW2, $observablepointW3, $observablepointC, $observablepointP]),
+    GLMakie.@lift([$observablepointG, $observablepointCP, $observablepointW1, $observablepointW2, $observablepointW3, $observablepointC, $observablepointR]),
     text = corrdinateframetitles,
     rotation = rotation,
     align = (:left, :baseline),
@@ -221,12 +221,12 @@ c_g_T = GLMakie.@lift($w2_g_T * $c_w2_T)
 c_P_c = [0.0; 0.0; 0.0; 1.0]
 g_P_c = GLMakie.@lift($c_g_T * c_P_c)
 
-p_c_T = GLMakie.@lift([[1.0; 0.0; 0.0; 0.0] [0.0; 1.0; 0.0; 0.0] [0.0; 0.0; 1.0; 0.0] [0.0; 0.0; l_cp; 1.0]] * [[1.0; 0.0; 0.0; 0.0] [0.0; cos($γ); sin($γ); 0.0] [0.0; -sin($γ); cos($γ); 0.0] [0.0; 0.0; 0.0; 1.0]] * [[1.0; 0.0; 0.0; 0.0] [0.0; 1.0; 0.0; 0.0] [0.0; 0.0; 1.0; 0.0] [0.0; 0.0; l_p; 1.0]])
+r_c_T = GLMakie.@lift([[1.0; 0.0; 0.0; 0.0] [0.0; 1.0; 0.0; 0.0] [0.0; 0.0; 1.0; 0.0] [0.0; 0.0; l_cr; 1.0]] * [[1.0; 0.0; 0.0; 0.0] [0.0; cos($γ); sin($γ); 0.0] [0.0; -sin($γ); cos($γ); 0.0] [0.0; 0.0; 0.0; 1.0]] * [[1.0; 0.0; 0.0; 0.0] [0.0; 1.0; 0.0; 0.0] [0.0; 0.0; 1.0; 0.0] [0.0; 0.0; l_r; 1.0]])
 
-p_g_T = GLMakie.@lift($c_g_T * $p_c_T)
+r_g_T = GLMakie.@lift($c_g_T * $r_c_T)
 
-p_P_p = [0.0; 0.0; 0.0; 1.0]
-g_P_p = GLMakie.@lift($p_g_T * p_P_p)
+r_P_r = [0.0; 0.0; 0.0; 1.0]
+g_P_r = GLMakie.@lift($r_g_T * r_P_r)
 
 w2_cp_Transform = [[1.0; 0.0; 0.0; 0.0] [0.0; cos(α[]); sin(α[]); 0.0] [0.0; -sin(α[]); cos(α[]); 0.0] [0.0; -r_w * sin(α[]); r_w * cos(α[]); 1.0]]
 @assert(isapprox(w2_cp_T[], w2_cp_Transform))
@@ -240,20 +240,20 @@ c_g_Transform = [[cos(β[]) * cos(δ[]) - sin(α[]) * sin(β[]) * sin(δ[]); cos
 @assert(isapprox(c_g_T[], c_g_Transform))
 g_Position_c = [x[] + r_w * sin(α[]) * sin(δ[]) + l_c * cos(β[]) * sin(α[]) * sin(δ[]) + l_c * sin(β[]) * cos(δ[]); y[] - r_w * sin(α[]) * cos(δ[]) - l_c * cos(β[]) * sin(α[]) * cos(δ[]) + l_c * sin(β[]) * sin(δ[]); r_w * cos(α[]) + l_c * cos(β[]) * cos(α[]); 1.0]
 @assert(isapprox(g_P_c[], g_Position_c))
-p_c_Transform = [[1.0; 0.0; 0.0; 0.0] [0.0; cos(γ[]); sin(γ[]); 0.0] [0.0; -sin(γ[]); cos(γ[]); 0.0] [0.0; -l_p * sin(γ[]); l_cp + l_p * cos(γ[]); 1.0]]
-@assert(isapprox(p_c_T[], p_c_Transform))
-p_g_Transform = [[cos(β[]) * cos(δ[]) - sin(α[]) * sin(β[]) * sin(δ[]); cos(β[]) * sin(δ[]) + sin(α[]) * sin(β[]) * cos(δ[]); -cos(α[]) * sin(β[]); 0.0] [-sin(δ[]) * cos(α[]) * cos(γ[]) + cos(δ[]) * sin(β[]) * sin(γ[]) + sin(δ[]) * sin(α[]) * cos(β[]) * sin(γ[]); cos(δ[]) * cos(α[]) * cos(γ[]) + sin(δ[]) * sin(β[]) * sin(γ[]) - cos(δ[]) * sin(α[]) * cos(β[]) * sin(γ[]); sin(α[]) * cos(γ[]) + cos(α[]) * cos(β[]) * sin(γ[]); 0.0] [sin(δ[]) * cos(α[]) * sin(γ[]) + cos(δ[]) * sin(β[]) * cos(γ[]) + sin(δ[]) * sin(α[]) * cos(β[]) * cos(γ[]); -cos(δ[]) * cos(α[]) * sin(γ[]) + sin(δ[]) * sin(β[]) * cos(γ[]) - cos(δ[]) * sin(α[]) * cos(β[]) * cos(γ[]); -sin(α[]) * sin(γ[]) + cos(α[]) * cos(β[]) * cos(γ[]); 0.0] [l_p * sin(δ[]) * cos(α[]) * sin(γ[]) + (l_cp + l_p * cos(γ[])) * (cos(δ[]) * sin(β[]) + sin(δ[]) * sin(α[]) * cos(β[])) + l_c * sin(β[]) * cos(δ[]) + l_c * cos(β[]) * sin(δ[]) * sin(α[]) + x[] + r_w * sin(δ[]) * sin(α[]); -l_p * cos(δ[]) * cos(α[]) * sin(γ[]) + (l_cp + l_p * cos(γ[])) * (sin(δ[]) * sin(β[]) - cos(δ[]) * sin(α[]) * cos(β[])) + l_c * sin(β[]) * sin(δ[]) - l_c * cos(β[]) * cos(δ[]) * sin(α[]) + y[] - r_w * cos(δ[]) * sin(α[]); -l_p * sin(α[]) * sin(γ[]) + (l_cp + l_p * cos(γ[])) * cos(α[]) * cos(β[]) + l_c * cos(β[]) * cos(α[]) + r_w * cos(α[]); 1.0]]
-@assert(isapprox(p_g_T[], p_g_Transform))
-g_Position_p = [x[] + r_w * sin(α[]) * sin(δ[]) + (l_c + l_cp) * cos(β[]) * sin(α[]) * sin(δ[]) + (l_c + l_cp) * sin(β[]) * cos(δ[]) + l_p * cos(γ[]) * cos(β[]) * sin(α[]) * sin(δ[]) + l_p * cos(γ[]) * sin(β[]) * cos(δ[]) + l_p * sin(γ[]) * cos(α[]) * sin(δ[]); y[] - r_w * sin(α[]) * cos(δ[]) - (l_c + l_cp) * cos(β[]) * sin(α[]) * cos(δ[]) + (l_c + l_cp) * sin(β[]) * sin(δ[]) - l_p * cos(γ[]) * cos(β[]) * sin(α[]) * cos(δ[]) + l_p * cos(γ[]) * sin(β[]) * sin(δ[]) - l_p * sin(γ[]) * cos(α[]) * cos(δ[]); r_w * cos(α[]) + (l_c + l_cp) * cos(β[]) * cos(α[]) + l_p * cos(γ[]) * cos(β[]) * cos(α[]) - l_p * sin(γ[]) * sin(α[]); 1.0]
-@assert(isapprox(g_P_p[], g_Position_p))
+r_c_Transform = [[1.0; 0.0; 0.0; 0.0] [0.0; cos(γ[]); sin(γ[]); 0.0] [0.0; -sin(γ[]); cos(γ[]); 0.0] [0.0; -l_r * sin(γ[]); l_cr + l_r * cos(γ[]); 1.0]]
+@assert(isapprox(r_c_T[], r_c_Transform))
+r_g_Transform = [[cos(β[]) * cos(δ[]) - sin(α[]) * sin(β[]) * sin(δ[]); cos(β[]) * sin(δ[]) + sin(α[]) * sin(β[]) * cos(δ[]); -cos(α[]) * sin(β[]); 0.0] [-sin(δ[]) * cos(α[]) * cos(γ[]) + cos(δ[]) * sin(β[]) * sin(γ[]) + sin(δ[]) * sin(α[]) * cos(β[]) * sin(γ[]); cos(δ[]) * cos(α[]) * cos(γ[]) + sin(δ[]) * sin(β[]) * sin(γ[]) - cos(δ[]) * sin(α[]) * cos(β[]) * sin(γ[]); sin(α[]) * cos(γ[]) + cos(α[]) * cos(β[]) * sin(γ[]); 0.0] [sin(δ[]) * cos(α[]) * sin(γ[]) + cos(δ[]) * sin(β[]) * cos(γ[]) + sin(δ[]) * sin(α[]) * cos(β[]) * cos(γ[]); -cos(δ[]) * cos(α[]) * sin(γ[]) + sin(δ[]) * sin(β[]) * cos(γ[]) - cos(δ[]) * sin(α[]) * cos(β[]) * cos(γ[]); -sin(α[]) * sin(γ[]) + cos(α[]) * cos(β[]) * cos(γ[]); 0.0] [l_r * sin(δ[]) * cos(α[]) * sin(γ[]) + (l_cr + l_r * cos(γ[])) * (cos(δ[]) * sin(β[]) + sin(δ[]) * sin(α[]) * cos(β[])) + l_c * sin(β[]) * cos(δ[]) + l_c * cos(β[]) * sin(δ[]) * sin(α[]) + x[] + r_w * sin(δ[]) * sin(α[]); -l_r * cos(δ[]) * cos(α[]) * sin(γ[]) + (l_cr + l_r * cos(γ[])) * (sin(δ[]) * sin(β[]) - cos(δ[]) * sin(α[]) * cos(β[])) + l_c * sin(β[]) * sin(δ[]) - l_c * cos(β[]) * cos(δ[]) * sin(α[]) + y[] - r_w * cos(δ[]) * sin(α[]); -l_r * sin(α[]) * sin(γ[]) + (l_cr + l_r * cos(γ[])) * cos(α[]) * cos(β[]) + l_c * cos(β[]) * cos(α[]) + r_w * cos(α[]); 1.0]]
+@assert(isapprox(r_g_T[], r_g_Transform))
+g_Position_r = [x[] + r_w * sin(α[]) * sin(δ[]) + (l_c + l_cr) * cos(β[]) * sin(α[]) * sin(δ[]) + (l_c + l_cr) * sin(β[]) * cos(δ[]) + l_r * cos(γ[]) * cos(β[]) * sin(α[]) * sin(δ[]) + l_r * cos(γ[]) * sin(β[]) * cos(δ[]) + l_r * sin(γ[]) * cos(α[]) * sin(δ[]); y[] - r_w * sin(α[]) * cos(δ[]) - (l_c + l_cr) * cos(β[]) * sin(α[]) * cos(δ[]) + (l_c + l_cr) * sin(β[]) * sin(δ[]) - l_r * cos(γ[]) * cos(β[]) * sin(α[]) * cos(δ[]) + l_r * cos(γ[]) * sin(β[]) * sin(δ[]) - l_r * sin(γ[]) * cos(α[]) * cos(δ[]); r_w * cos(α[]) + (l_c + l_cr) * cos(β[]) * cos(α[]) + l_r * cos(γ[]) * cos(β[]) * cos(α[]) - l_r * sin(γ[]) * sin(α[]); 1.0]
+@assert(isapprox(g_P_r[], g_Position_r))
 
 
 g_P_w1 = GLMakie.Observable(g_P_w[])
 g_P_w2 = GLMakie.Observable(g_P_w[])
 g_P_c1 = GLMakie.Observable(g_P_c[])
 g_P_c2 = GLMakie.Observable(g_P_c[])
-g_P_p1 = GLMakie.Observable(g_P_p[])
-g_P_p2 = GLMakie.Observable(g_P_p[])
+g_P_r1 = GLMakie.Observable(g_P_r[])
+g_P_r2 = GLMakie.Observable(g_P_r[])
 V_w = GLMakie.lift(g_P_w) do g_P_w
     g_P_w2[] = g_P_w1[]
     g_P_w1[] = g_P_w
@@ -264,10 +264,10 @@ V_c = GLMakie.lift(g_P_c) do g_P_c
     g_P_c1[] = g_P_c
     g_P_c1[] - g_P_c2[]
 end
-V_p = GLMakie.lift(g_P_p) do g_P_p
-    g_P_p2[] = g_P_p1[]
-    g_P_p1[] = g_P_p
-    g_P_p1[] - g_P_p2[]
+V_r = GLMakie.lift(g_P_r) do g_P_r
+    g_P_r2[] = g_P_r1[]
+    g_P_r1[] = g_P_r
+    g_P_r1[] - g_P_r2[]
 end
 
 α1 = GLMakie.Observable(α[])
@@ -310,27 +310,27 @@ end
 dx = GLMakie.@lift(r_w * $dθ * cos($δ))
 dy = GLMakie.@lift(r_w * $dθ * sin($δ))
 
-p_w2_T = GLMakie.@lift(LinearAlgebra.inv($w2_g_T) * $p_g_T)
+r_w2_T = GLMakie.@lift(LinearAlgebra.inv($w2_g_T) * $r_g_T)
 Ω_w = GLMakie.@lift([0.0; $dθ; 0.0; 0.0] + [$dα; 0.0; 0.0; 0.0] + LinearAlgebra.inv($w2_g_T) * [0.0; 0.0; $dδ; 0.0])
 Ω_c = GLMakie.@lift([0.0; $dβ; 0.0; 0.0] + LinearAlgebra.inv($c_w2_T) * [$dα; 0.0; 0.0; 0.0] + LinearAlgebra.inv($c_g_T) * [0.0; 0.0; $dδ; 0.0])
-Ω_p = GLMakie.@lift([$dγ; 0.0; 0.0; 0.0] + LinearAlgebra.inv($p_c_T) * [0.0; $dβ; 0.0; 0.0] + LinearAlgebra.inv($p_w2_T) * [$dα; 0.0; 0.0; 0.0] + LinearAlgebra.inv($p_g_T) * [0.0; 0.0; $dδ; 0.0])
+Ω_r = GLMakie.@lift([$dγ; 0.0; 0.0; 0.0] + LinearAlgebra.inv($r_c_T) * [0.0; $dβ; 0.0; 0.0] + LinearAlgebra.inv($r_w2_T) * [$dα; 0.0; 0.0; 0.0] + LinearAlgebra.inv($r_g_T) * [0.0; 0.0; $dδ; 0.0])
 
 Ω_wheel = [dα[]; dθ[] + dδ[] * sin(α[]); dδ[] * cos(α[]); 0.0]
 Ω_chassis = [dα[] * cos(β[]) - dδ[] * cos(α[]) * sin(β[]); dβ[] + dδ[] * sin(α[]); dα[] * sin(β[]) + dδ[] * cos(α[]) * cos(β[]); 0.0]
-Ω_pendulum = [dγ[] + dα[] * cos(β[]) - dδ[] * cos(α[]) * sin(β[]); dβ[] * cos(γ[]) + dα[] * sin(β[]) * sin(γ[]) + dδ[] * sin(α[]) * cos(γ[]) + dδ[] * cos(α[]) * cos(β[]) * sin(γ[]); -dβ[] * sin(γ[]) + dα[] * sin(β[]) * cos(γ[]) - dδ[] * sin(α[]) * sin(γ[]) + dδ[] * cos(α[]) * cos(β[]) * cos(γ[]); 0.0]
+Ω_reactionwheel = [dγ[] + dα[] * cos(β[]) - dδ[] * cos(α[]) * sin(β[]); dβ[] * cos(γ[]) + dα[] * sin(β[]) * sin(γ[]) + dδ[] * sin(α[]) * cos(γ[]) + dδ[] * cos(α[]) * cos(β[]) * sin(γ[]); -dβ[] * sin(γ[]) + dα[] * sin(β[]) * cos(γ[]) - dδ[] * sin(α[]) * sin(γ[]) + dδ[] * cos(α[]) * cos(β[]) * cos(γ[]); 0.0]
 @assert(isapprox(Ω_w[], Ω_wheel))
 @assert(isapprox(Ω_c[], Ω_chassis))
-@assert(isapprox(Ω_p[], Ω_pendulum))
+@assert(isapprox(Ω_r[], Ω_reactionwheel))
 
 T_w = GLMakie.@lift(0.5 * m_w * transpose($V_w) * $V_w .+ 0.5 * transpose($Ω_w) * I_w * $Ω_w)
 P_w = GLMakie.@lift(m_w * g * $g_P_w[3])
 T_c = GLMakie.@lift(0.5 * m_c * transpose($V_c) * $V_c .+ 0.5 * transpose($Ω_c) * I_c * $Ω_c)
 P_c = GLMakie.@lift(m_c * g * $g_P_c[3])
-T_p = GLMakie.@lift(0.5 * m_p * transpose($V_p) * $V_p .+ 0.5 * transpose($Ω_p) * I_p * $Ω_p)
-P_p = GLMakie.@lift(m_p * g * $g_P_p[3])
+T_r = GLMakie.@lift(0.5 * m_r * transpose($V_r) * $V_r .+ 0.5 * transpose($Ω_r) * I_r * $Ω_r)
+P_r = GLMakie.@lift(m_r * g * $g_P_r[3])
 
-T_total = GLMakie.@lift($T_w + $T_c + $T_p)
-P_total = GLMakie.@lift($P_w + $P_c + $P_p)
+T_total = GLMakie.@lift($T_w + $T_c + $T_r)
+P_total = GLMakie.@lift($P_w + $P_c + $P_r)
 L = GLMakie.@lift($T_total .- $P_total)
 m = 7 # the number of generalized coordinates
 n = 2 # the number of kinematic constraints
