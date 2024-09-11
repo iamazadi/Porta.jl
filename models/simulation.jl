@@ -40,8 +40,7 @@ I_r2 = 0.03 # kg . m² # Reaction wheel y-dir. moment of inertia
 I_r3 = 0.0003 # kg . m² # Reaction wheel z-dir. moment of inertia
 r_w = 0.0750 # +-0.0001m # Wheel radius
 l_c = 0.1 # m # Distance between wheel center of mass and chassis center of mass
-l_cr = 0.1 # m # Distance between chassis center of mass and pendulum pivot
-l_r = 0.1 # m # Distance between pendulum pivot and center of mass
+l_cr = 0.1 # m # Distance between chassis center of mass and reaction wheel pivot
 
 g = 9.81 # m/s² # Gravitational acceleration
 I_w = [I_w1; I_w2; I_w3; 0.0] # Wheel moment of inertia
@@ -221,7 +220,7 @@ c_g_T = GLMakie.@lift($w2_g_T * $c_w2_T)
 c_P_c = [0.0; 0.0; 0.0; 1.0]
 g_P_c = GLMakie.@lift($c_g_T * c_P_c)
 
-r_c_T = GLMakie.@lift([[1.0; 0.0; 0.0; 0.0] [0.0; 1.0; 0.0; 0.0] [0.0; 0.0; 1.0; 0.0] [0.0; 0.0; l_cr; 1.0]] * [[1.0; 0.0; 0.0; 0.0] [0.0; cos($γ); sin($γ); 0.0] [0.0; -sin($γ); cos($γ); 0.0] [0.0; 0.0; 0.0; 1.0]] * [[1.0; 0.0; 0.0; 0.0] [0.0; 1.0; 0.0; 0.0] [0.0; 0.0; 1.0; 0.0] [0.0; 0.0; l_r; 1.0]])
+r_c_T = GLMakie.@lift([[1.0; 0.0; 0.0; 0.0] [0.0; 1.0; 0.0; 0.0] [0.0; 0.0; 1.0; 0.0] [0.0; 0.0; l_cr; 1.0]] * [[1.0; 0.0; 0.0; 0.0] [0.0; cos($γ); sin($γ); 0.0] [0.0; -sin($γ); cos($γ); 0.0] [0.0; 0.0; 0.0; 1.0]] * [[1.0; 0.0; 0.0; 0.0] [0.0; 1.0; 0.0; 0.0] [0.0; 0.0; 1.0; 0.0] [0.0; 0.0; 0.0; 1.0]])
 
 r_g_T = GLMakie.@lift($c_g_T * $r_c_T)
 
@@ -240,11 +239,11 @@ c_g_Transform = [[cos(β[]) * cos(δ[]) - sin(α[]) * sin(β[]) * sin(δ[]); cos
 @assert(isapprox(c_g_T[], c_g_Transform))
 g_Position_c = [x[] + r_w * sin(α[]) * sin(δ[]) + l_c * cos(β[]) * sin(α[]) * sin(δ[]) + l_c * sin(β[]) * cos(δ[]); y[] - r_w * sin(α[]) * cos(δ[]) - l_c * cos(β[]) * sin(α[]) * cos(δ[]) + l_c * sin(β[]) * sin(δ[]); r_w * cos(α[]) + l_c * cos(β[]) * cos(α[]); 1.0]
 @assert(isapprox(g_P_c[], g_Position_c))
-r_c_Transform = [[1.0; 0.0; 0.0; 0.0] [0.0; cos(γ[]); sin(γ[]); 0.0] [0.0; -sin(γ[]); cos(γ[]); 0.0] [0.0; -l_r * sin(γ[]); l_cr + l_r * cos(γ[]); 1.0]]
+r_c_Transform = [[1.0; 0.0; 0.0; 0.0] [0.0; cos(γ[]); sin(γ[]); 0.0] [0.0; -sin(γ[]); cos(γ[]); 0.0] [0.0; 0.0; l_cr; 1.0]]
 @assert(isapprox(r_c_T[], r_c_Transform))
-r_g_Transform = [[cos(β[]) * cos(δ[]) - sin(α[]) * sin(β[]) * sin(δ[]); cos(β[]) * sin(δ[]) + sin(α[]) * sin(β[]) * cos(δ[]); -cos(α[]) * sin(β[]); 0.0] [-sin(δ[]) * cos(α[]) * cos(γ[]) + cos(δ[]) * sin(β[]) * sin(γ[]) + sin(δ[]) * sin(α[]) * cos(β[]) * sin(γ[]); cos(δ[]) * cos(α[]) * cos(γ[]) + sin(δ[]) * sin(β[]) * sin(γ[]) - cos(δ[]) * sin(α[]) * cos(β[]) * sin(γ[]); sin(α[]) * cos(γ[]) + cos(α[]) * cos(β[]) * sin(γ[]); 0.0] [sin(δ[]) * cos(α[]) * sin(γ[]) + cos(δ[]) * sin(β[]) * cos(γ[]) + sin(δ[]) * sin(α[]) * cos(β[]) * cos(γ[]); -cos(δ[]) * cos(α[]) * sin(γ[]) + sin(δ[]) * sin(β[]) * cos(γ[]) - cos(δ[]) * sin(α[]) * cos(β[]) * cos(γ[]); -sin(α[]) * sin(γ[]) + cos(α[]) * cos(β[]) * cos(γ[]); 0.0] [l_r * sin(δ[]) * cos(α[]) * sin(γ[]) + (l_cr + l_r * cos(γ[])) * (cos(δ[]) * sin(β[]) + sin(δ[]) * sin(α[]) * cos(β[])) + l_c * sin(β[]) * cos(δ[]) + l_c * cos(β[]) * sin(δ[]) * sin(α[]) + x[] + r_w * sin(δ[]) * sin(α[]); -l_r * cos(δ[]) * cos(α[]) * sin(γ[]) + (l_cr + l_r * cos(γ[])) * (sin(δ[]) * sin(β[]) - cos(δ[]) * sin(α[]) * cos(β[])) + l_c * sin(β[]) * sin(δ[]) - l_c * cos(β[]) * cos(δ[]) * sin(α[]) + y[] - r_w * cos(δ[]) * sin(α[]); -l_r * sin(α[]) * sin(γ[]) + (l_cr + l_r * cos(γ[])) * cos(α[]) * cos(β[]) + l_c * cos(β[]) * cos(α[]) + r_w * cos(α[]); 1.0]]
+r_g_Transform = [[cos(β[]) * cos(δ[]) - sin(α[]) * sin(β[]) * sin(δ[]); cos(β[]) * sin(δ[]) + sin(α[]) * sin(β[]) * cos(δ[]); -cos(α[]) * sin(β[]); 0.0] [-sin(δ[]) * cos(α[]) * cos(γ[]) + cos(δ[]) * sin(β[]) * sin(γ[]) + sin(δ[]) * sin(α[]) * cos(β[]) * sin(γ[]); cos(δ[]) * cos(α[]) * cos(γ[]) + sin(δ[]) * sin(β[]) * sin(γ[]) - cos(δ[]) * sin(α[]) * cos(β[]) * sin(γ[]); sin(α[]) * cos(γ[]) + cos(α[]) * cos(β[]) * sin(γ[]); 0.0] [sin(δ[]) * cos(α[]) * sin(γ[]) + cos(δ[]) * sin(β[]) * cos(γ[]) + sin(δ[]) * sin(α[]) * cos(β[]) * cos(γ[]); -cos(δ[]) * cos(α[]) * sin(γ[]) + sin(δ[]) * sin(β[]) * cos(γ[]) - cos(δ[]) * sin(α[]) * cos(β[]) * cos(γ[]); -sin(α[]) * sin(γ[]) + cos(α[]) * cos(β[]) * cos(γ[]); 0.0] [l_cr * (cos(δ[]) * sin(β[]) + sin(δ[]) * sin(α[]) * cos(β[])) + l_c * sin(β[]) * cos(δ[]) + l_c * cos(β[]) * sin(δ[]) * sin(α[]) + x[] + r_w * sin(δ[]) * sin(α[]); l_cr * (sin(δ[]) * sin(β[]) - cos(δ[]) * sin(α[]) * cos(β[])) + l_c * sin(β[]) * sin(δ[]) - l_c * cos(β[]) * cos(δ[]) * sin(α[]) + y[] - r_w * cos(δ[]) * sin(α[]); l_cr * cos(α[]) * cos(β[]) + l_c * cos(β[]) * cos(α[]) + r_w * cos(α[]); 1.0]]
 @assert(isapprox(r_g_T[], r_g_Transform))
-g_Position_r = [x[] + r_w * sin(α[]) * sin(δ[]) + (l_c + l_cr) * cos(β[]) * sin(α[]) * sin(δ[]) + (l_c + l_cr) * sin(β[]) * cos(δ[]) + l_r * cos(γ[]) * cos(β[]) * sin(α[]) * sin(δ[]) + l_r * cos(γ[]) * sin(β[]) * cos(δ[]) + l_r * sin(γ[]) * cos(α[]) * sin(δ[]); y[] - r_w * sin(α[]) * cos(δ[]) - (l_c + l_cr) * cos(β[]) * sin(α[]) * cos(δ[]) + (l_c + l_cr) * sin(β[]) * sin(δ[]) - l_r * cos(γ[]) * cos(β[]) * sin(α[]) * cos(δ[]) + l_r * cos(γ[]) * sin(β[]) * sin(δ[]) - l_r * sin(γ[]) * cos(α[]) * cos(δ[]); r_w * cos(α[]) + (l_c + l_cr) * cos(β[]) * cos(α[]) + l_r * cos(γ[]) * cos(β[]) * cos(α[]) - l_r * sin(γ[]) * sin(α[]); 1.0]
+g_Position_r = [x[] + r_w * sin(α[]) * sin(δ[]) + (l_c + l_cr) * cos(β[]) * sin(α[]) * sin(δ[]) + (l_c + l_cr) * sin(β[]) * cos(δ[]); y[] - r_w * sin(α[]) * cos(δ[]) - (l_c + l_cr) * cos(β[]) * sin(α[]) * cos(δ[]) + (l_c + l_cr) * sin(β[]) * sin(δ[]); r_w * cos(α[]) + (l_c + l_cr) * cos(β[]) * cos(α[]); 1.0]
 @assert(isapprox(g_P_r[], g_Position_r))
 
 

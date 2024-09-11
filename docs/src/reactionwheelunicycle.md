@@ -56,7 +56,7 @@ Description = "How the reaction wheel unicycle works."
 
 ``{}^gp_{c3} = r_w cos(\alpha) + l_c cos(\beta) cos(\alpha)``
 
-``{}_r^cT = \begin{bmatrix} 1 & 0 & 0 & 0 \\ 0 & 1 & 0 & 0 \\ 0 & 0 & 1 & l_{cr} \\ 0 & 0 & 0 & 1 \end{bmatrix} \begin{bmatrix} 1 & 0 & 0 & 0 \\ 0 & cos(\gamma) & -sin(\gamma) & 0 \\ 0 & sin(\gamma) & cos(\gamma) & 0 \\ 0 & 0 & 0 & 1 \end{bmatrix} \begin{bmatrix} 1 & 0 & 0 & 0 \\ 0 & 1 & 0 & 0 \\ 0 & 0 & 1 & l_r \\ 0 & 0 & 0 & 1 \end{bmatrix} = \begin{bmatrix} 1 & 0 & 0 & 0 \\ 0 & cos(\gamma) & -sin(\gamma) & -l_r sin(\gamma) \\ 0 & sin(\gamma) & cos(\gamma) & l_{cr} + l_r cos(\gamma) \\ 0 & 0 & 0 & 1 \end{bmatrix}``
+``{}_r^cT = \begin{bmatrix} 1 & 0 & 0 & 0 \\ 0 & 1 & 0 & 0 \\ 0 & 0 & 1 & l_{cr} \\ 0 & 0 & 0 & 1 \end{bmatrix} \begin{bmatrix} 1 & 0 & 0 & 0 \\ 0 & cos(\gamma) & -sin(\gamma) & 0 \\ 0 & sin(\gamma) & cos(\gamma) & 0 \\ 0 & 0 & 0 & 1 \end{bmatrix} \begin{bmatrix} 1 & 0 & 0 & 0 \\ 0 & 1 & 0 & 0 \\ 0 & 0 & 1 & 0 \\ 0 & 0 & 0 & 1 \end{bmatrix} = \begin{bmatrix} 1 & 0 & 0 & 0 \\ 0 & cos(\gamma) & -sin(\gamma) & 0 \\ 0 & sin(\gamma) & cos(\gamma) & l_{cr} + 0 \\ 0 & 0 & 0 & 1 \end{bmatrix}``
 
 ``{}_r^gT = {}_c^gT \times {}_r^cT = \begin{bmatrix} {}_r^gt_{11} & {}_r^gt_{12} & {}_r^gt_{13} & {}_r^gt_{14} \\ {}_r^gt_{21} & {}_r^gt_{22} & {}_r^gt_{23} & {}_r^gt_{24} \\ -cos(\alpha) sin(\beta) & {}_r^gt_{32} & {}_r^gt_{33} & {}_r^gt_{34} \\ 0 & 0 & 0 & 1 \end{bmatrix}``
 
@@ -66,7 +66,7 @@ Description = "How the reaction wheel unicycle works."
 
 ``{}_r^gt_{13} = sin(\delta) cos(\alpha) sin(\gamma) + cos(\delta) sin(\beta) cos(\gamma) + sin(\delta) sin(\alpha) cos(\beta) cos(\gamma)``
 
-``{}_r^gt_{14} = l_r sin(\delta) cos(\alpha) sin(\gamma) + (l_{cr} + l_r cos(\gamma)) (cos(\delta) sin(\beta) + sin(\delta) sin(\alpha) cos(\beta)) + l_c sin(\beta) cos(\delta) + l_c cos(\beta) sin(\delta) sin(\alpha) + x + r_w sin(\delta) sin(\alpha)``
+``{}_r^gt_{14} = 0 + l_{cr} (cos(\delta) sin(\beta) + sin(\delta) sin(\alpha) cos(\beta)) + l_c sin(\beta) cos(\delta) + l_c cos(\beta) sin(\delta) sin(\alpha) + x + r_w sin(\delta) sin(\alpha)``
 
 ``{}_r^gt_{21} = cos(\beta) sin(\delta) + sin(\alpha) sin(\beta) cos(\delta)``
 
@@ -74,23 +74,23 @@ Description = "How the reaction wheel unicycle works."
 
 ``{}_r^gt_{23} = -cos(\delta) cos(\alpha) sin(\gamma) + sin(\delta) sin(\beta) cos(\gamma) - cos(\delta) sin(\alpha) cos(\beta) cos(\gamma)``
 
-``{}_r^gt_{24} = -l_r cos(\delta) cos(\alpha) sin(\gamma) + (l_{cr} + l_r cos(\gamma)) (sin(\delta) sin(\beta) - cos(\delta) sin(\alpha) cos(\beta)) + l_c sin(\beta) sin(\delta) - l_c cos(\beta) cos(\delta) sin(\alpha) + y - r_w cos(\delta) sin(\alpha)``
+``{}_r^gt_{24} = l_{cr} (sin(\delta) sin(\beta) - cos(\delta) sin(\alpha) cos(\beta)) + l_c sin(\beta) sin(\delta) - l_c cos(\beta) cos(\delta) sin(\alpha) + y - r_w cos(\delta) sin(\alpha)``
 
 ``{}_r^gt_{32} = sin(\alpha) cos(\gamma) + cos(\alpha) cos(\beta) sin(\gamma)``
 
 ``{}_r^gt_{33} = -sin(\alpha) sin(\gamma) + cos(\alpha) cos(\beta) cos(\gamma)``
 
-``{}_r^gt_{34} = -l_r sin(\alpha) sin(\gamma) + (l_{cr} + l_r cos(\gamma)) cos(\alpha) cos(\beta) + l_c cos(\beta) cos(\alpha) + r_w cos(\alpha)``
+``{}_r^gt_{34} = l_{cr} cos(\alpha) cos(\beta) + l_c cos(\beta) cos(\alpha) + r_w cos(\alpha)``
 
 ``{}^rP_r = \begin{bmatrix} 0 \\ 0 \\ 0 \\ 1 \end{bmatrix}``
 
 ``{}^gP_r = {}_r^gT \times {}^rP_r = \begin{bmatrix} {}^gp_{r1} \\ {}^gp_{r2} \\ {}^gp_{r3} \\ 1 \end{bmatrix}``
 
-``{}^gp_{r1} = x + r_w sin(\alpha) sin(\delta) + (l_c + l_{cr}) cos(\beta) sin(\alpha) sin(\delta) + (l_c + l_{cr}) sin(\beta) cos(\delta) + l_r cos(\gamma) cos(\beta) sin(\alpha) sin(\delta) + l_r cos(\gamma) sin(\beta) cos(\delta) + l_r sin(\gamma) cos(\alpha) sin(\delta)``
+``{}^gp_{r1} = x + r_w sin(\alpha) sin(\delta) + (l_c + l_{cr}) cos(\beta) sin(\alpha) sin(\delta) + (l_c + l_{cr}) sin(\beta) cos(\delta)``
 
-``{}^gp_{r2} = y - r_w sin(\alpha) cos(\delta) - (l_c + l_{cr}) cos(\beta) sin(\alpha) cos(\delta) + (l_c + l_{cr}) sin(\beta) sin(\delta) - l_r cos(\gamma) cos(\beta) sin(\alpha) cos(\delta) + l_r cos(\gamma) sin(\beta) sin(\delta) - l_r sin(\gamma) cos(\alpha) cos(\delta)``
+``{}^gp_{r2} = y - r_w sin(\alpha) cos(\delta) - (l_c + l_{cr}) cos(\beta) sin(\alpha) cos(\delta) + (l_c + l_{cr}) sin(\beta) sin(\delta)``
 
-``{}^gp_{r3} = r_w cos(\alpha) + (l_c + l_{cr}) cos(\beta) cos(\alpha) + l_r cos(\gamma) cos(\beta) cos(\alpha) - l_r sin(\gamma) sin(\alpha)``
+``{}^gp_{r3} = r_w cos(\alpha) + (l_c + l_{cr}) cos(\beta) cos(\alpha)``
 
 ``V_w = \frac{dP_w}{dt}``
 
