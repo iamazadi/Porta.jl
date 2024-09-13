@@ -56,7 +56,7 @@ Description = "How the reaction wheel unicycle works."
 
 ``{}^gp_{c3} = r_w cos(\alpha) + l_c cos(\beta) cos(\alpha)``
 
-``{}_r^cT = \begin{bmatrix} 1 & 0 & 0 & 0 \\ 0 & 1 & 0 & 0 \\ 0 & 0 & 1 & l_{cr} \\ 0 & 0 & 0 & 1 \end{bmatrix} \begin{bmatrix} 1 & 0 & 0 & 0 \\ 0 & cos(\gamma) & -sin(\gamma) & 0 \\ 0 & sin(\gamma) & cos(\gamma) & 0 \\ 0 & 0 & 0 & 1 \end{bmatrix} \begin{bmatrix} 1 & 0 & 0 & 0 \\ 0 & 1 & 0 & 0 \\ 0 & 0 & 1 & 0 \\ 0 & 0 & 0 & 1 \end{bmatrix} = \begin{bmatrix} 1 & 0 & 0 & 0 \\ 0 & cos(\gamma) & -sin(\gamma) & 0 \\ 0 & sin(\gamma) & cos(\gamma) & l_{cr} + 0 \\ 0 & 0 & 0 & 1 \end{bmatrix}``
+``{}_r^cT = \begin{bmatrix} 1 & 0 & 0 & 0 \\ 0 & 1 & 0 & 0 \\ 0 & 0 & 1 & l_{cr} \\ 0 & 0 & 0 & 1 \end{bmatrix} \begin{bmatrix} 1 & 0 & 0 & 0 \\ 0 & cos(\gamma) & -sin(\gamma) & 0 \\ 0 & sin(\gamma) & cos(\gamma) & 0 \\ 0 & 0 & 0 & 1 \end{bmatrix} \begin{bmatrix} 1 & 0 & 0 & 0 \\ 0 & 1 & 0 & 0 \\ 0 & 0 & 1 & 0 \\ 0 & 0 & 0 & 1 \end{bmatrix} = \begin{bmatrix} 1 & 0 & 0 & 0 \\ 0 & cos(\gamma) & -sin(\gamma) & 0 \\ 0 & sin(\gamma) & cos(\gamma) & l_{cr} \\ 0 & 0 & 0 & 1 \end{bmatrix}``
 
 ``{}_r^gT = {}_c^gT \times {}_r^cT = \begin{bmatrix} {}_r^gt_{11} & {}_r^gt_{12} & {}_r^gt_{13} & {}_r^gt_{14} \\ {}_r^gt_{21} & {}_r^gt_{22} & {}_r^gt_{23} & {}_r^gt_{24} \\ -cos(\alpha) sin(\beta) & {}_r^gt_{32} & {}_r^gt_{33} & {}_r^gt_{34} \\ 0 & 0 & 0 & 1 \end{bmatrix}``
 
@@ -161,3 +161,176 @@ Reaction wheel dynamics:
 Turning dynamics:
 
 ``m_{51} \ddot{\alpha} + m_{52} \ddot{\beta} + m_{53} \ddot{\gamma} + m_{54} \ddot{\delta} + m_{55} \ddot{\theta} + c_{51} \dot{\alpha}^2 + c_{52} \dot{\beta}^2 + c_{53} \dot{\gamma}^2 + c_{54} \dot{\alpha} \dot{\beta} + c_{55} \dot{\alpha} \dot{\gamma} + c_{56} \dot{\alpha} \dot{\delta} + c_{57} \dot{\alpha} \dot{\theta} + c_{58} \dot{\beta} \dot{\gamma} + c_{59} \dot{\beta} \dot{\delta} + c_{510} \dot{\gamma} \dot{\delta} + c_{511} \dot{\delta} \dot{\theta} = 0``
+
+``
+\begin{align}
+\frac{\mathrm{d} x\left( t \right)}{\mathrm{d}t} &= r_{w} \cos\left( \delta\left( t \right) \right) \frac{\mathrm{d} \theta\left( t \right)}{\mathrm{d}t} \\
+\frac{\mathrm{d} y\left( t \right)}{\mathrm{d}t} &= r_{w} \sin\left( \delta\left( t \right) \right) \frac{\mathrm{d} \theta\left( t \right)}{\mathrm{d}t} \\
+\frac{\mathrm{d} z\left( t \right)}{\mathrm{d}t} &= 0 \\
+I_{w} &= \left[
+\begin{array}{cccc}
+I_{w1} & 0 & 0 & 0 \\
+0 & I_{w2} & 0 & 0 \\
+0 & 0 & I_{w3} & 0 \\
+0 & 0 & 0 & 0 \\
+\end{array}
+\right] \\
+I_{c} &= \left[
+\begin{array}{cccc}
+I_{c1} & 0 & 0 & 0 \\
+0 & I_{c2} & 0 & 0 \\
+0 & 0 & I_{c3} & 0 \\
+0 & 0 & 0 & 0 \\
+\end{array}
+\right] \\
+I_{r} &= \left[
+\begin{array}{cccc}
+I_{r1} & 0 & 0 & 0 \\
+0 & I_{r2} & 0 & 0 \\
+0 & 0 & I_{r3} & 0 \\
+0 & 0 & 0 & 0 \\
+\end{array}
+\right] \\
+\mathrm{w2}_{cp\_T}\left( t \right) &= \left[
+\begin{array}{cccc}
+1 & 0 & 0 & 0 \\
+0 & \cos\left( \alpha\left( t \right) \right) &  - \sin\left( \alpha\left( t \right) \right) &  - r_{w} \sin\left( \alpha\left( t \right) \right) \\
+0 & \sin\left( \alpha\left( t \right) \right) & \cos\left( \alpha\left( t \right) \right) & r_{w} \cos\left( \alpha\left( t \right) \right) \\
+0 & 0 & 0 & 1 \\
+\end{array}
+\right] \\
+\mathrm{cp}_{g\_T}\left( t \right) &= \left[
+\begin{array}{cccc}
+\cos\left( \delta\left( t \right) \right) &  - \sin\left( \delta\left( t \right) \right) & 0 & x\left( t \right) \\
+\sin\left( \delta\left( t \right) \right) & \cos\left( \delta\left( t \right) \right) & 0 & y\left( t \right) \\
+0 & 0 & 1 & 0 \\
+0 & 0 & 0 & 1 \\
+\end{array}
+\right] \\
+\mathrm{w2}_{g\_T}\left( t \right) &= \mathrm{cp}_{g\_T}\left( t \right) \mathrm{w2}_{cp\_T}\left( t \right) \\
+w2_{P\_w} &= \left[
+\begin{array}{c}
+0 \\
+0 \\
+0 \\
+1 \\
+\end{array}
+\right] \\
+g_{P\_w}\left( t \right) &= \mathrm{w2}_{g\_T}\left( t \right) w2_{P\_w} \\
+c_{w2\_T}\left( t \right) &= \left[
+\begin{array}{cccc}
+\cos\left( \beta\left( t \right) \right) & 0 & \sin\left( \beta\left( t \right) \right) & l_{c} \sin\left( \beta\left( t \right) \right) \\
+0 & 1 & 0 & 0 \\
+ - \sin\left( \beta\left( t \right) \right) & 0 & \cos\left( \beta\left( t \right) \right) & l_{c} \cos\left( \beta\left( t \right) \right) \\
+0 & 0 & 0 & 1 \\
+\end{array}
+\right] \\
+c_{g\_T}\left( t \right) &= \mathrm{w2}_{g\_T}\left( t \right) c_{w2\_T}\left( t \right) \\
+c_{P\_c} &= \left[
+\begin{array}{c}
+0 \\
+0 \\
+0 \\
+1 \\
+\end{array}
+\right] \\
+g_{P\_c}\left( t \right) &= c_{g\_T}\left( t \right) c_{P\_c} \\
+r_{c\_T}\left( t \right) &= \left[
+\begin{array}{cccc}
+1 & 0 & 0 & 0 \\
+0 & \cos\left( \gamma\left( t \right) \right) &  - \sin\left( \gamma\left( t \right) \right) & 0 \\
+0 & \sin\left( \gamma\left( t \right) \right) & \cos\left( \gamma\left( t \right) \right) & l_{cr} \\
+0 & 0 & 0 & 1 \\
+\end{array}
+\right] \\
+r_{g\_T}\left( t \right) &= c_{g\_T}\left( t \right) r_{c\_T}\left( t \right) \\
+r_{P\_r} &= \left[
+\begin{array}{c}
+0 \\
+0 \\
+0 \\
+1 \\
+\end{array}
+\right] \\
+g_{P\_r}\left( t \right) &= r_{g\_T}\left( t \right) r_{P\_r} \\
+r_{w2\_T}\left( t \right) &= \mathrm{inv}\left( \mathrm{w2}_{g\_T}\left( t \right) \right) r_{g\_T}\left( t \right) \\
+V_{w}\left( t \right) &= \frac{\mathrm{d} g_{P\_w}\left( t \right)}{\mathrm{d}t} \\
+V_{c}\left( t \right) &= \frac{\mathrm{d} g_{P\_c}\left( t \right)}{\mathrm{d}t} \\
+V_{r}\left( t \right) &= \frac{\mathrm{d} g_{P\_r}\left( t \right)}{\mathrm{d}t} \\
+\Omega_{w}\left( t \right) &= \mathrm{broadcast}\left( +, \left[
+\begin{array}{c}
+_{derivative}\left( \alpha\left( t \right), t, 1 \right) \\
+_{derivative}\left( \theta\left( t \right), t, 1 \right) \\
+0 \\
+0 \\
+\end{array}
+\right], \mathrm{inv}\left( \mathrm{w2}_{g\_T}\left( t \right) \right) \left[
+\begin{array}{c}
+0 \\
+0 \\
+_{derivative}\left( \delta\left( t \right), t, 1 \right) \\
+0 \\
+\end{array}
+\right] \right) \\
+\Omega_{c}\left( t \right) &= \mathrm{broadcast}\left( +, \mathrm{broadcast}\left( +, \left[
+\begin{array}{c}
+0 \\
+_{derivative}\left( \beta\left( t \right), t, 1 \right) \\
+0 \\
+0 \\
+\end{array}
+\right], \mathrm{inv}\left( c_{w2\_T}\left( t \right) \right) \left[
+\begin{array}{c}
+_{derivative}\left( \alpha\left( t \right), t, 1 \right) \\
+0 \\
+0 \\
+0 \\
+\end{array}
+\right] \right), \mathrm{inv}\left( c_{g\_T}\left( t \right) \right) \left[
+\begin{array}{c}
+0 \\
+0 \\
+_{derivative}\left( \delta\left( t \right), t, 1 \right) \\
+0 \\
+\end{array}
+\right] \right) \\
+\Omega_{r}\left( t \right) &= \mathrm{broadcast}\left( +, \mathrm{broadcast}\left( +, \mathrm{broadcast}\left( +, \left[
+\begin{array}{c}
+_{derivative}\left( \gamma\left( t \right), t, 1 \right) \\
+0 \\
+0 \\
+0 \\
+\end{array}
+\right], \mathrm{inv}\left( r_{c\_T}\left( t \right) \right) \left[
+\begin{array}{c}
+0 \\
+_{derivative}\left( \beta\left( t \right), t, 1 \right) \\
+0 \\
+0 \\
+\end{array}
+\right] \right), \mathrm{inv}\left( r_{w2\_T}\left( t \right) \right) \left[
+\begin{array}{c}
+_{derivative}\left( \alpha\left( t \right), t, 1 \right) \\
+0 \\
+0 \\
+0 \\
+\end{array}
+\right] \right), \mathrm{inv}\left( r_{g\_T}\left( t \right) \right) \left[
+\begin{array}{c}
+0 \\
+0 \\
+_{derivative}\left( \delta\left( t \right), t, 1 \right) \\
+0 \\
+\end{array}
+\right] \right) \\
+T_{w}\left( t \right) &= \mathrm{adjoint}\left( V_{w}\left( t \right) \right) \mathrm{broadcast}\left( *, V_{w}\left( t \right), \mathrm{Ref}\left( 0.5 m_{w} \right) \right)_{1} + \mathrm{adjoint}\left( \Omega_{w}\left( t \right) \right) \mathrm{broadcast}\left( *, I_{w} \Omega_{w}\left( t \right), 0.5 \right)_{1} \\
+P_{w}\left( t \right) &= g g_{P\_w}\left( t \right)_{3} m_{w} \\
+T_{c}\left( t \right) &= \mathrm{adjoint}\left( V_{c}\left( t \right) \right) \mathrm{broadcast}\left( *, V_{c}\left( t \right), \mathrm{Ref}\left( 0.5 m_{c} \right) \right)_{1} + \mathrm{adjoint}\left( \Omega_{c}\left( t \right) \right) \mathrm{broadcast}\left( *, I_{c} \Omega_{c}\left( t \right), 0.5 \right)_{1} \\
+P_{c}\left( t \right) &= g g_{P\_c}\left( t \right)_{3} m_{c} \\
+T_{r}\left( t \right) &= \mathrm{adjoint}\left( V_{r}\left( t \right) \right) \mathrm{broadcast}\left( *, V_{r}\left( t \right), \mathrm{Ref}\left( 0.5 m_{r} \right) \right)_{1} + \mathrm{adjoint}\left( \Omega_{r}\left( t \right) \right) \mathrm{broadcast}\left( *, I_{r} \Omega_{r}\left( t \right), 0.5 \right)_{1} \\
+P_{r}\left( t \right) &= g g_{P\_r}\left( t \right)_{3} m_{r} \\
+T_{total}\left( t \right) &= T_{r}\left( t \right) + T_{c}\left( t \right) + T_{w}\left( t \right) \\
+P_{total}\left( t \right) &= P_{w}\left( t \right) + P_{c}\left( t \right) + P_{r}\left( t \right) \\
+L\left( t \right) &= T_{total}\left( t \right) - P_{total}\left( t \right)
+\end{align}
+``
