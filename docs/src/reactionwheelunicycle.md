@@ -231,7 +231,7 @@ w2_{P\_w} = \left[
 \begin{array}{cccc}
 \cos\left( \beta\left( t \right) \right) & 0 & \sin\left( \beta\left( t \right) \right) & l_{c} \sin\left( \beta\left( t \right) \right) \newline
 0 & 1 & 0 & 0 \newline
- - \sin\left( \beta\left( t \right) \right) & 0 & \cos\left( \beta\left( t \right) \right) & l_{c} \cos\left( \beta\left( t \right) \right) \newline
+-\sin\left( \beta\left( t \right) \right) & 0 & \cos\left( \beta\left( t \right) \right) & l_{c} \cos\left( \beta\left( t \right) \right) \newline
 0 & 0 & 0 & 1 \newline
 \end{array}
 \right]``
