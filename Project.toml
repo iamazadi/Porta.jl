@@ -15,8 +15,11 @@ LibSerialPort = "a05a14c7-6e3b-5ba9-90a2-45558833e1df"
 Makie = "ee78f7c6-11fb-53f2-987a-cfe4a2b5a57a"
 MeshIO = "7269a6da-0436-5bbc-96c2-40638cbb6118"
 ModelingToolkit = "961ee093-0014-501f-94e3-6117800e7a78"
+OrdinaryDiffEq = "1dea7af3-3e70-54e6-95c3-0bf5283fa5ed"
+Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 SerialPorts = "5d0f9de7-4c7f-54f5-bec2-484e8c04014e"
 Sockets = "6462fe0b-24de-5631-8697-dd941f90decc"
+SymbolicUtils = "d1185830-fcd6-423d-90d6-eec64667417b"
 Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7"
 
 [compat]
