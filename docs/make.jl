@@ -7,6 +7,7 @@ makedocs(
     pages = [
         "Home" => "index.md",
         "Hopf Fibration" => "hopffibration.md",
+        "News Report" => "newsreport.md",
         "Reaction Wheel Unicycle" => "reactionwheelunicycle.md"
     ]
 )
