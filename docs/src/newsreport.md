@@ -26,7 +26,6 @@ If you look closely, there are two spheres in the middle that change hue over ti
 
 ```julia
 timesign = -1
-# timesign = rand([1; -1])
 ο = SpinVector([Complex(1.0); Complex(0.0)], timesign)
 ι = SpinVector([Complex(0.0); Complex(1.0)], timesign)
 @assert(isapprox(dot(ο, ι), 1.0),
@@ -42,11 +41,8 @@ generate() = 2rand() - 1 + im * (2rand() - 1)
         "The second component of the spin vector $κ is not equal to minus the inner product of $κ and $ο.")
 
 t = 𝕍(1.0, 0.0, 0.0, 0.0)
-
 x = 𝕍(0.0, 1.0, 0.0, 0.0)
-
 y = 𝕍(0.0, 0.0, 1.0, 0.0)
-
 z = 𝕍(0.0, 0.0, 0.0, 1.0)
 
 οflagpole = √2 * (t + z)
