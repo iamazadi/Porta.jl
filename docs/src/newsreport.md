@@ -326,7 +326,7 @@ Given a spin structure on a pseudo-Riemannian manifold and the spinor bundle ``S
 
 ### The Iconic Wall
 
-![theiconicwall](./assets/spinspace/theiconicwall.PNG)
+![corrected-wall](./assets/spinspace/corrected-wall.jpg)
 
 ### Tome
 
