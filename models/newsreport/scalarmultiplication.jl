@@ -21,8 +21,8 @@ function makenullcone(M::Matrix{Float64}; timesign::Int = -1)
 end
 
 
-# figuresize = (4096, 2160)
-figuresize = (1920, 1080)
+figuresize = (4096, 2160)
+# figuresize = (1920, 1080)
 segments = 30
 frames_number = 1440
 modelname = "scalarmultiplication"
@@ -382,6 +382,10 @@ animate(frame::Int) = begin
         ιlinepoints[i][] = _ιlinepoints
         οlinecolors[i][] = _οlinecolors
         ιlinecolors[i][] = _ιlinecolors
+        GLMakie.notify(οlinepoints[i])
+        GLMakie.notify(ιlinepoints[i])
+        GLMakie.notify(οlinecolors[i])
+        GLMakie.notify(ιlinecolors[i])
     end
 
     spherematrix = makesphere(M)
@@ -389,8 +393,8 @@ animate(frame::Int) = begin
     updatesurface!(spherematrix, sphereobservable)
     updatesurface!(nullconematrix, nullconeobservable)
     hue = Float64(frame) / Float64(frames_number) * 360.0
-    spherecolor[] = fill(GLMakie.RGBAf(convert_hsvtorgb([hue; 1.0; 1.0])..., 0.5), segments, segments)
-    nullconecolor[] = fill(GLMakie.RGBAf(convert_hsvtorgb([360.0 - hue; 1.0; 1.0])..., 0.5), segments, segments)
+    spherecolor[] = fill(GLMakie.RGBAf(convert_hsvtorgb([hue; 1.0; 1.0])..., 0.4), segments, segments)
+    nullconecolor[] = fill(GLMakie.RGBAf(convert_hsvtorgb([360.0 - hue; 1.0; 1.0])..., 0.4), segments, segments)
 
     updatecamera()
 end
