@@ -24,6 +24,35 @@ The axes t (red), x (green), y (blue), and z (orange) are parts of a Minkowski t
 
 If you look closely, there are two spheres in the middle that change hue over time. One of them is the past null cone and the other is the sphere S^{-1}. You will recognize the null cone as soon as it turns into a cone momentarily. If a spin-vector is in S^{-1}, then under restricted spin-transformations it does not leave the sphere S^{-1} to S^{+1}. The past null cone is the directions of light that reach our eyes from the past. But, the sphere S^{-1} is the light that we can observe around us in the present moment (assume we’re in deep space and away from heavenly objects). Under spin-transformations the null cone and the sphere S^{-1} change too, because they are embedded in Minkowski spacetime of dimension 4.
 
+```julia
+timesign = -1
+# timesign = rand([1; -1])
+ο = SpinVector([Complex(1.0); Complex(0.0)], timesign)
+ι = SpinVector([Complex(0.0); Complex(1.0)], timesign)
+@assert(isapprox(dot(ο, ι), 1.0),
+        "The inner product of spin vectors $ι and $ο is not unity.")
+@assert(isapprox(dot(ι, ο), -1.0),
+        "The inner product of spin vectors $ι and $ο is not unity.")
+
+generate() = 2rand() - 1 + im * (2rand() - 1)
+κ = SpinVector(generate(), generate(), timesign)
+@assert(isapprox(dot(κ, ι), vec(κ)[1]),
+        "The first component of the spin vector $κ is not equal to the inner product of $κ and $ι.")
+@assert(isapprox(dot(κ, ο), -vec(κ)[2]),
+        "The second component of the spin vector $κ is not equal to minus the inner product of $κ and $ο.")
+
+t = 𝕍(1.0, 0.0, 0.0, 0.0)
+
+x = 𝕍(0.0, 1.0, 0.0, 0.0)
+
+y = 𝕍(0.0, 0.0, 1.0, 0.0)
+
+z = 𝕍(0.0, 0.0, 0.0, 1.0)
+
+οflagpole = √2 * (t + z)
+ιflagpole = √2 * (t - z)
+```
+
 For example, the Standard Model is formulated on 4-dimensional Minkowski spacetime, over which all fiber bundles can be trivialized and spinors have a simple explicit description.
 For the Symmetries relevant in field theories, the groups act on fields and leave the Lagrangian or the action (the spacetime integral over the Lagrangian) invariant.
 In theoretical physics, Lie groups like the Lorentz and Poincaré groups, which are related to spacetime symmetries, and gauge groups, defining *internal* symmetries, are important cornerstones.
@@ -348,3 +377,13 @@ Dirac forms are used in the Standard Model to define a *Dirac mass term* in the 
 # References
 
 1. Mark J.D. Hamilton, Mathematical Gauge Theory: With Applications to the Standard Model of Particle Physics, Springer Cham, [DOI](https://doi.org/10.1007/978-3-319-68439-0), published: 10 January 2018.
+
+2. Sir Roger Penrose, [The Road to Reality](https://www.amazon.com/Road-Reality-Complete-Guide-Universe/dp/0679776311), (2004).
+
+3. Roger Penrose, Wolfgang Rindler, [Spinors and Space-Time](https://doi.org/10.1017/CBO9780511564048), Volume 1: Two-spinor calculus and relativistic fields, (1984).
+
+4. Richard M. Murray and Zexiang Li, A Mathematical Introduction to Robotic Manipulation, 1st Edition, 1994, CRC Press, [read](https://www.cse.lehigh.edu/~trink/Courses/RoboticsII/reading/murray-li-sastry-94-complete.pdf), [buy](https://www.amazon.com/Mathematical-Introduction-Robotic-Manipulation/dp/0849379814).
+
+5. [Edward Witten](https://cds.cern.ch/record/181783/files/cer-000093203.pdf), Physics and Geometry, (1987).
+
+6. The iconic [Wall](https://scgp.stonybrook.edu/archives/6264) of Stony Brook University.
