@@ -14,6 +14,16 @@ Tell us the facts of the story.
 
 ## Where
 
+What is the relation between a spin-frame and a Minkowski tetrad? The spin-frame is denoted by omicron (black) and iota (silver). Omicron and iota serve as two flag poles, where we also show their respective flags. In order to see the flags, find the arcs in the x direction that move with omicron and iota during a series of transformations. The spin-frame is in a vector space over complex numbers. The spin space has the axioms of an abstract vector space. But, we have defined a special inner product for 2-spinors, such that the product of omicron and iota equals unity, whereas the product of iota and omicron equals minus unity. In other words, the inner product eats a pair of spin-vectors in the Hopf bundle and spits out a complex number (a scalar).
+
+![fourscrew](./assets/spinspace/fourscrew.PNG)
+
+The axes t (red), x (green), y (blue), and z (orange) are parts of a Minkowski tetrad in Minkowski spacetime. Choosing the default Minkowski tetrad, the tetrad aligns with the Cartesian axes of real dimension four. But, when we apply a spin-transformation, the tetrad no longer aligns with Cartesian coordinates, and with it the spin-frame bases omicron and iota change as well. The kinds of spin transformation that we apply are four-screws and null rotations, and so they are restricted transformations. Restricted transformations do not alter the sign of time. Here, the time sign is negative one, which is the same as the wall clock time.
+
+![nullrotation](./assets/spinspace/nullrotation.PNG)
+
+If you look closely, there are two spheres in the middle that change hue over time. One of them is the past null cone and the other is the sphere S^{-1}. You will recognize the null cone as soon as it turns into a cone momentarily. If a spin-vector is in S^{-1}, then under restricted spin-transformations it does not leave the sphere S^{-1} to S^{+1}. The past null cone is the directions of light that reach our eyes from the past. But, the sphere S^{-1} is the light that we can observe around us in the present moment (assume we’re in deep space and away from heavenly objects). Under spin-transformations the null cone and the sphere S^{-1} change too, because they are embedded in Minkowski spacetime of dimension 4.
+
 For example, the Standard Model is formulated on 4-dimensional Minkowski spacetime, over which all fiber bundles can be trivialized and spinors have a simple explicit description.
 For the Symmetries relevant in field theories, the groups act on fields and leave the Lagrangian or the action (the spacetime integral over the Lagrangian) invariant.
 In theoretical physics, Lie groups like the Lorentz and Poincaré groups, which are related to spacetime symmetries, and gauge groups, defining *internal* symmetries, are important cornerstones.
@@ -146,6 +156,8 @@ Even though spinors are elementary objects, some of their properties (like the p
 The existence of **gauge symmetries** is particularly important: it can be shown that a quantum field theory involving massless spin 1 bosons can be consistent (i.e. unitary, see Sect. 7.1.3) only if it is gauge invariant [125,143].
 
 ### Graph
+
+![graph](./assets/spinspace/graph.PNG)
 
 ## What
 
@@ -289,7 +301,11 @@ Given a spin structure on a pseudo-Riemannian manifold and the spinor bundle ``S
 
 ### The Iconic Wall
 
+![theiconicwall](./assets/spinspace/theiconicwall.PNG)
+
 ### Tome
+
+![tome](./assets/spinspace/tome.jpg)
 
 # Wrap Up
 
@@ -313,6 +329,9 @@ In non-abelian gauge theories, like quantum chromodynamics (QCD), there are also
 In physics, the quadratic term ``[A_\mu, A_\nu]`` in the expression for ``F_{\mu\nu}`` (leading to cubic and quartic terms in the *Yang-Mills Lagrangian*, see Definition 7.3.1 and the corresponding local formula in Eq. (7.1)) is interpreted as a direct interaction between gauge bosons described by the gauge field ``A_\mu``.
 These covariant derivatives appear in physics, in particular, in the Lagrangians and field equations defining gauge theories.
 This non-linearity, called *minimal coupling*, leads to non-quadratic terms in the Lagrangian (see Definition 7.5.5 and Definition 7.6.2 as well as the local formulas in Eqs. (7.3) and (7.4)), which are interpreted as an interaction between gauge bosons described by ``A_\mu`` and the particles described by the field ``\phi``.
+
+![feynmandiagrams](./assets/spinspace/feynmandiagrams.PNG)
+
 Figure 5.2 shows the Feynman diagrams for the cubic and quartic terms which appear in the Klein-Gordon Lagrangian in Eq. (7.3), representing the interaction between a gauge field ``A`` and a charged scalar field described locally by a map ``\phi`` with values in ``V``.
 Fig 5.2 Feynman diagrams for interaction between gauge field and charged scalar
 
