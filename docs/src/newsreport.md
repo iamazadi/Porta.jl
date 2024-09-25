@@ -14,15 +14,19 @@ Tell us the facts of the story.
 
 ## Where
 
+![fourscrew1](./assets/spinspace/fourscrew1.png)
+
 What is the relation between a spin-frame and a Minkowski tetrad? The spin-frame is denoted by omicron (black) and iota (silver). Omicron and iota serve as two flag poles, where we also show their respective flags. In order to see the flags, find the arcs in the x direction that move with omicron and iota during a series of transformations. The spin-frame is in a vector space over complex numbers. The spin space has the axioms of an abstract vector space. But, we have defined a special inner product for 2-spinors, such that the product of omicron and iota equals unity, whereas the product of iota and omicron equals minus unity. In other words, the inner product eats a pair of spin-vectors in the Hopf bundle and spits out a complex number (a scalar).
 
-![fourscrew](./assets/spinspace/fourscrew.PNG)
+![fourscrew2](./assets/spinspace/fourscrew2.png)
 
 The axes t (red), x (green), y (blue), and z (orange) are parts of a Minkowski tetrad in Minkowski spacetime. Choosing the default Minkowski tetrad, the tetrad aligns with the Cartesian axes of real dimension four. But, when we apply a spin-transformation, the tetrad no longer aligns with Cartesian coordinates, and with it the spin-frame bases omicron and iota change as well. The kinds of spin transformation that we apply are four-screws and null rotations, and so they are restricted transformations. Restricted transformations do not alter the sign of time. Here, the time sign is negative one, which is the same as the wall clock time.
 
-![nullrotation](./assets/spinspace/nullrotation.PNG)
+![fourscrew3](./assets/spinspace/fourscrew3.png)
 
 If you look closely, there are two spheres in the middle that change hue over time. One of them is the past null cone and the other is the sphere S^{-1}. You will recognize the null cone as soon as it turns into a cone momentarily. If a spin-vector is in S^{-1}, then under restricted spin-transformations it does not leave the sphere S^{-1} to S^{+1}. The past null cone is the directions of light that reach our eyes from the past. But, the sphere S^{-1} is the light that we can observe around us in the present moment (assume we’re in deep space and away from heavenly objects). Under spin-transformations the null cone and the sphere S^{-1} change too, because they are embedded in Minkowski spacetime of dimension 4.
+
+![nullrotation](./assets/spinspace/nullrotation.png)
 
 ```julia
 timesign = -1
