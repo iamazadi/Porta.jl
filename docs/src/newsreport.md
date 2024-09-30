@@ -32,26 +32,101 @@ If you look closely, there are two spheres in the middle that change hue over ti
 timesign = -1
 ο = SpinVector([Complex(1.0); Complex(0.0)], timesign)
 ι = SpinVector([Complex(0.0); Complex(1.0)], timesign)
-@assert(isapprox(dot(ο, ι), 1.0),
-        "The inner product of spin vectors $ι and $ο is not unity.")
-@assert(isapprox(dot(ι, ο), -1.0),
-        "The inner product of spin vectors $ι and $ο is not unity.")
+@assert(isapprox(dot(ο, ι), 1.0), "The inner product of spin vectors $ι and $ο is not unity.")
+@assert(isapprox(dot(ι, ο), -1.0), "The inner product of spin vectors $ι and $ο is not unity.")
+```
 
+```julia
 generate() = 2rand() - 1 + im * (2rand() - 1)
 κ = SpinVector(generate(), generate(), timesign)
-@assert(isapprox(dot(κ, ι), vec(κ)[1]),
-        "The first component of the spin vector $κ is not equal to the inner product of $κ and $ι.")
-@assert(isapprox(dot(κ, ο), -vec(κ)[2]),
-        "The second component of the spin vector $κ is not equal to minus the inner product of $κ and $ο.")
+ϵ = 0.01
+ζ = Complex(κ)
+ζ′ = ζ - 1.0 / √2 * ϵ / κ.a[2]
+κ = SpinVector(ζ, timesign)
+κ′ = SpinVector(ζ′, timesign)
+ω = SpinVector(generate(), generate(), timesign)
+ζ = Complex(ω)
+ζ′ = ζ - 1.0 / √2 * ϵ / ω.a[2]
+ω = SpinVector(ζ, timesign)
+ω′ = SpinVector(ζ′, timesign)
+@assert(isapprox(dot(κ, ι), vec(κ)[1]), "The first component of the spin vector $κ is not equal to the inner product of $κ and $ι.")
+@assert(isapprox(dot(κ, ο), -vec(κ)[2]), "The second component of the spin vector $κ is not equal to minus the inner product of $κ and $ο.")
+@assert(isapprox(dot(ω, ι), vec(ω)[1]), "The first component of the spin vector $ω is not equal to the inner product of $ω and $ι.")
+@assert(isapprox(dot(ω, ο), -vec(ω)[2]), "The second component of the spin vector $ω is not equal to minus the inner product of $ω and $ο.")
+```
 
+```julia
 t = 𝕍(1.0, 0.0, 0.0, 0.0)
 x = 𝕍(0.0, 1.0, 0.0, 0.0)
 y = 𝕍(0.0, 0.0, 1.0, 0.0)
 z = 𝕍(0.0, 0.0, 0.0, 1.0)
-
-οflagpole = √2 * (t + z)
-ιflagpole = √2 * (t - z)
+ο = √2 * (t + z)
+ι = √2 * (t - z)
 ```
+
+![innerproduct360](./assets/spinspace/innerproduct360.png)
+
+The phase of the inner product of spin-vectors is shown as a prism arc. In a Minkowski tetrad with bases t, x, y and z, (with signature (+,-,-,-)) there are a pair of basis vectors for spin-vectors: omicron and iota. For example, the spin-vectors kappa and omega, each are linear combinations of omicron and iota. The product of kappa and omega is a complex number that has a magnitude and a phase. Being spin-vectors, the arrows of omicron, iota, kappa and omega represent the flagpoles, and the flag planes are attached to the flagpoles as arcs.
+
+![innerproduct720](./assets/spinspace/innerproduct720.png)
+
+In order to find the inner product of kappa and omega we make use of both flagpoles and flag planes. First, note that the flagpoles span a 2-plane in the Minkowski vector space. Then, we perform the Gram-Schmidt orthogonalization method to find the orthogonal complement of the 2-plane. Next, find the intersection of the flag planes and the orthogonal complement 2-plane from the previous step. By this step, the flag plane of kappa results in vector U, whereas the flag plane of omega projects to arrow V. Then, we normalize U and V. Finally, the angle that U and V make with each other measure pi plus two times the argument of the inner product of kappa and omega.
+
+![innerproduct1080](./assets/spinspace/innerproduct1080.png)
+
+Furthermore, the arrow that is denoted by p bisects the angle between U and V, and measures the phase angle minus pi half (modulus two pi). Also, a spatial rotation about the axis p is done for animating the Minkowski vector space so that all of the components of the inner product are visible from a 720-degree view.
+
+![innerproduct1440](./assets/spinspace/innerproduct1440.png)
+
+```julia
+κ = 𝕍(κ)
+κ′ = 𝕍(κ′)
+ω = 𝕍(ω)
+ω′ = 𝕍(ω′)
+zero = 𝕍(0.0, 0.0, 0.0, 0.0)
+B = stack([vec(κ), vec(ω), vec(zero), vec(zero)])
+N = LinearAlgebra.nullspace(B)
+a = 𝕍(N[begin:end, 1])
+b = 𝕍(N[begin:end, 2])
+a = 𝕍(LinearAlgebra.normalize(vec(a - κ - ω)))
+b = 𝕍(LinearAlgebra.normalize(vec(b - κ - ω)))
+
+v₁ = κ.a
+v₂ = ω.a
+v₃ = a.a
+v₄ = b.a
+
+e₁ = v₁
+ê₁ = normalize(e₁)
+e₂ = v₂ - dot(ê₁, v₂) * ê₁
+ê₂ = normalize(e₂)
+e₃ = v₃ - dot(ê₁, v₃) * ê₁ - dot(ê₂, v₃) * ê₂
+ê₃ = normalize(e₃)
+e₄ = v₄ - dot(ê₁, v₄) * ê₁ - dot(ê₂, v₄) * ê₂ - dot(ê₃, v₄) * ê₃
+ê₄ = normalize(e₄)
+
+ê₁ = 𝕍(ê₁)
+ê₂ = 𝕍(ê₂)
+ê₃ = 𝕍(ê₃)
+ê₄ = 𝕍(ê₄)
+```
+
+![innerproductspositiveus](./assets/spinspace/innerproductspositiveus.png)
+
+```julia
+κflagplanedirection = 𝕍(LinearAlgebra.normalize(vec(κ′ - κ)))
+ωflagplanedirection = 𝕍(LinearAlgebra.normalize(vec(ω′ - ω)))
+global u = LinearAlgebra.normalize(vec((-dot(ê₃, κflagplanedirection) * ê₃ + -dot(ê₄, κflagplanedirection) * ê₄)))
+global v = LinearAlgebra.normalize(vec((-dot(ê₃, ωflagplanedirection) * ê₃ + -dot(ê₄, ωflagplanedirection) * ê₄)))
+p = 𝕍(LinearAlgebra.normalize(u + v))
+global p = -dot(ê₃, p) * ê₃ + -dot(ê₄, p) * ê₄
+axis = normalize(ℝ³(vec(p)[2:4]))
+M = mat4(Quaternion(progress * 4π, axis))
+ο_transformed = M * Quaternion(vec(ο))
+ι_transformed = M * Quaternion(vec(ι))
+```
+
+![innerproductspositivechina](./assets/spinspace/innerproductspositivechina.png)
 
 For example, the Standard Model is formulated on 4-dimensional Minkowski spacetime, over which all fiber bundles can be trivialized and spinors have a simple explicit description.
 For the Symmetries relevant in field theories, the groups act on fields and leave the Lagrangian or the action (the spacetime integral over the Lagrangian) invariant.
