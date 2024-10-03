@@ -78,6 +78,15 @@ Furthermore, the arrow that is denoted by p bisects the angle between U and V, a
 
 ![innerproduct1440](./assets/spinspace/innerproduct1440.png)
 
+A spin-vector is named kappa and another spin-vector is named omega. The extra piece of information that makes spinors special is the flagpoles of spin-vectors. Using a differential operator in the plane of complex numbers, starting with zeta complex, the spin counterpart of the spin vector zeta prime equals zeta minus one over the square root of two times a constant named epsilon, over eta (the second component of the spin-vector). Except for this transformation of zeta to zeta prime, which is parameterized by epsilon, the spin-vectors kappa and kappa prime have the same features such as time sign. The same transformation produces the names omega and omega prime. With iota and omicron as the basis vectors of the spin-space G dot, we assert the following propositions:
+
+- The first component of the spin vector κ is equal to the inner product of κ and ι.
+- The second component of the spin vector κ is equal to minus the inner product of κ and ο.
+- The first component of the spin vector ω is equal to the inner product of ω and ι.
+- The second component of the spin vector ω is equal to minus the inner product of ω and ο.
+
+![innerproduct](./assets/spinspace/innerproduct.png)
+
 ```julia
 κ = 𝕍(κ)
 κ′ = 𝕍(κ′)
@@ -90,7 +99,11 @@ a = 𝕍(N[begin:end, 1])
 b = 𝕍(N[begin:end, 2])
 a = 𝕍(LinearAlgebra.normalize(vec(a - κ - ω)))
 b = 𝕍(LinearAlgebra.normalize(vec(b - κ - ω)))
+```
 
+When we stack the Minkowski vector space representation of kappa and omega and fill the rest with zero to get a square matrix B, the null space of B is where the piece of information about spinors exist. By performing a Gram-Schmidt procedure we find the set of orthonormal basis vectors for the inner product of kappa and omega. In the following lines, the spin-vectors an and b are bases of the null space of matrix B.
+
+```julia
 v₁ = κ.a
 v₂ = ω.a
 v₃ = a.a
@@ -112,6 +125,8 @@ ê₄ = 𝕍(ê₄)
 ```
 
 ![innerproductspositiveus](./assets/spinspace/innerproductspositiveus.png)
+
+The flagpoles of kappa and omega are obtained by subtracting kappa from kappa prime and omega from omega prime, respectively. Projecting the flagpole of kappa onto the 2-plane spanned by subspace bases of ê₃ and ê₄ gives you vector U. The same subspace gives you V for the flagpole of omega. The inner product eats two spin-vectors such as kappa and omega, and spits out a complex number that has a magnitude and a phase angle. The angle U and V make with each other determines the phase of the inner product times two. This 2-plane is the orthogonal complement of the 2-plane that contains kappa and omega (and is spanned by ê₁ and ê₂). The camera looks at the sum of the vectors kappa and omega.
 
 ```julia
 κflagplanedirection = 𝕍(LinearAlgebra.normalize(vec(κ′ - κ)))
