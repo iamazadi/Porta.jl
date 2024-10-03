@@ -126,7 +126,7 @@ ê₄ = 𝕍(ê₄)
 
 ![innerproductspositiveus](./assets/spinspace/innerproductspositiveus.png)
 
-The flagpoles of kappa and omega are obtained by subtracting kappa from kappa prime and omega from omega prime, respectively. Projecting the flagpole of kappa onto the 2-plane spanned by subspace bases of ê₃ and ê₄ gives you vector U. The same subspace gives you V for the flagpole of omega. The inner product eats two spin-vectors such as kappa and omega, and spits out a complex number that has a magnitude and a phase angle. The angle U and V make with each other determines the phase of the inner product times two. This 2-plane is the orthogonal complement of the 2-plane that contains kappa and omega (and is spanned by ê₁ and ê₂). The camera looks at the sum of the vectors kappa and omega.
+The flag planes of kappa and omega are obtained by subtracting kappa from kappa prime and omega from omega prime, respectively. Projecting the flag plane of kappa onto the 2-plane spanned by subspace bases of ê₃ and ê₄ gives you vector U. The same subspace gives you V for the flag plane of omega. The inner product eats two spin-vectors such as kappa and omega, and spits out a complex number that has a magnitude and a phase angle. The angle that U and V make with each other determines the phase of the inner product times two plus pi. This 2-plane is the orthogonal complement of the 2-plane that contains kappa and omega (and is spanned by ê₁ and ê₂). The camera looks at the sum of the vectors kappa and omega.
 
 ```julia
 κflagplanedirection = 𝕍(LinearAlgebra.normalize(vec(κ′ - κ)))
