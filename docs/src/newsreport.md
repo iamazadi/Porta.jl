@@ -145,7 +145,7 @@ M = mat4(Quaternion(progress * 4π, axis))
 
 ```julia
 ζ = Complex(κ + ω)
-_τ = SpinVector(ζ, timesign)
+τ = SpinVector(ζ, timesign)
 ζ′ = Complex(κ′ + ω′)
 τ′ = SpinVector(ζ′, timesign)
 gauge1 = -imag(dot(κ, ω))
