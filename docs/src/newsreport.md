@@ -307,7 +307,17 @@ The existence of **gauge symmetries** is particularly important: it can be shown
 
 ### Graph
 
-![graph](./assets/spinspace/graph.PNG)
+**Edward Witten**:
+
+If one wants to summarize our knowledge of physics in the briefest possible terms, there are three really fundamental observations:
+
+1. Spacetime is a pseudo-Riemannian manifold ``M``, endowed with a metric tensor and governed by geometrical laws.
+
+2. Over ``M`` is a Principal G-bundle ``X`` with a nonabelian gauge group ``G``.
+
+3. Fermions are sections of ``(\hat{S}_+ \otimes V_R) \oplus (\hat{S}_- \otimes V_{\tilde{R}})``. ``R`` and ``\tilde{R}`` are not isomorphic; their failure to be isomorphic explains why the light fermions are light and presumably has its origins in a representation difference ``\Delta`` in some underlying theory.
+
+All of this must be supplemented with the understanding that the geometrical laws obeyed by the metric tensor, the gauge fields, and the fermions are to be interpreted in quantum mechanical terms.
 
 ## What
 
@@ -347,7 +357,7 @@ The third equation is called the **cycycle condition**.
 Theorem 5.5.4 (Structure Equation) The curvature form ``F`` of a connection form ``A`` satisfies ``F = dA + \frac{1}{2}[A,A]``.
 
 Proof We check the formula by inserting ``X,Y \in T_pP`` on both sides of the equation, where we distinguish the following three cases:
-1. Both ``X`` and ``Y`` are vertical: Then ``X`` and ``Y`` are fundamental vectors, ``X = \tilde{V}_p, \ Y = \tilde{W}_p`` for certain elements ``V,W \in g``. We get ``F(X,Y) = dA(\pi_H(X), \pi_H(Y)) = 0``. On the other hand we have ``\frac{1}{2}[A,A](X,Y) = [A(X),A(Y)] = [V,W]``. The differential ``dA`` of a 1-form ``A`` is given according to Proposition A.2.22 by ``dA(X,Y) = L_X(A(Y))-L_Y(A(X))-A([X,Y])``, where we extend the vectors ``X`` and ``Y`` to vector fields in a neighbourhood of ``p``. If we choose the extension by fundamental vector fields ``\tilde{V}`` and ``\tilde{W}``, then ``dA(X,Y) = L_X(W) - L_Y(V) - [V,W] = -[V,W]`` since ``V`` and ``W`` are constant maps from ``P`` to ``g`` and we used that ``[\tilde{V},\tilde{W}] = \tilde{[V,W]}`` according to Proposition 3.4.4. This implies the claim.
+1. Both ``X`` and ``Y`` are vertical: Then ``X`` and ``Y`` are fundamental vectors, ``X = \tilde{V}_p, \ Y = \tilde{W}_p`` for certain elements ``V,W \in g``. We get ``F(X,Y) = dA(\pi_H(X), \pi_H(Y)) = 0``. On the other hand we have ``\frac{1}{2}[A,A](X,Y) = [A(X),A(Y)] = [V,W]``. The differential ``dA`` of a 1-form ``A`` is given according to Proposition A.2.22 by ``dA(X,Y) = L_X(A(Y))-L_Y(A(X))-A([X,Y])``, where we extend the vectors ``X`` and ``Y`` to vector fields in a neighbourhood of ``p``. If we choose the extension by fundamental vector fields ``\tilde{V}`` and ``\tilde{W}``, then ``dA(X,Y) = L_X(W) - L_Y(V) - [V,W] = -[V,W]`` since ``V`` and ``W`` are constant maps from ``P`` to ``g`` and we used that ``[\tilde{V},\tilde{W}] = \widetilde{[V,W]}`` according to Proposition 3.4.4. This implies the claim.
 2. Both ``X`` and ``Y`` are horizontal: Then ``F(X,Y) = dA(X,Y)`` and ``\frac{1}{2}[A,A](X,Y) = [A(X), A(Y)] = [0,0]=0``. This implies the claim.
 3. ``X`` is vertical and ``Y`` is horizontal: Then ``X = \tilde{V}_p`` for some ``V \in g``. We have ``F(X,Y) = dA(\pi_H(X),\pi_H(Y)) = dA(0, Y) = 0`` and ``\frac{1}{2}[A,A](X,Y) = [A(X),A(Y)] - [V,0] = 0``. Furthermore, ``dA(X,Y) = L_{\tilde{V}}(A(Y)) - L_Y(V) - A([\tilde{V},Y]) = -A([\tilde{V},Y]) = 0`` since ``[\tilde{V},Y]`` is horizontal by Lemma 5.5.5. This implies the claim.
 
