@@ -143,6 +143,35 @@ M = mat4(Quaternion(progress * 4π, axis))
 
 ![innerproductspositivechina](./assets/spinspace/innerproductspositivechina.png)
 
+```julia
+ζ = Complex(_κ + _ω)
+_τ = SpinVector(ζ, timesign)
+ζ′ = Complex(_κ′ + _ω′)
+_τ′ = SpinVector(ζ′, timesign)
+gauge1 = -imag(dot(_κ, _ω))
+gauge2 = -imag(dot(_κ, _τ))
+gauge3 = float(π)
+@assert(isapprox(dot(_τ, _ι), vec(_τ)[1]), "The second component of the spin vector $_τ  is not equal to minus the inner product of $_τ and $_ι.")
+@assert(isapprox(dot(_τ, _ο), -vec(_τ)[2]), "The second component of the spin vector $_τ is not equal to minus the inner product of $_τ and $_ο.")
+```
+
+The geometry of "spin-vector addition" is shown. The spin-vectors exist in a spin-space that is equipped with three operations: scalar multiplication, inner product and addition. The addition of spin-vectors κ and ω results in another spin-vector κ + ω in the spin-space, which has its own flagpole and flag plane. Taking κ and ω as null vectors in the sphere of future null directions, the flagpole of κ is represented by a point (complex number) and the null flag of κ is represented as a point sufficiently close to κ that is used to assign a direction tangent to the sphere at κ.
+
+![addition02](./assets/spinspace/addition02.png)
+
+The tails of the flagpoles of κ, ω and κ + ω are in a circle in the sphere of future null directions. The circumcircle of the triangle made by joining the tails of the three spin-vectors makes angles with the flagpoles and null planes. Meaning, the distance between κ and the center of the circle is equal to the distance between ω and the center. Also, the distance of the addition of κ and ω and the circle center is the same as the distance between κ and the center. For the circumcircle, we have three collinear points in the Argand complex plane. However, lines in the Argand plane become circles in sections of the three-dimensional sphere. The angle that the flagpoles of κ and ω make with the circle should be twice the argument of the inner product of the two spin-vectors (modulus 2π with a possible addition of π).
+
+![addition08](./assets/spinspace/addition08.png)
+
+```julia
+w = (Complex(κ + ω) - Complex(κ)) / (Complex(ω) - Complex(κ))
+@assert(imag(w) ≤ 0 || isapprox(imag(w), 0.0), "The flagpoles are not collinear: $(Complex(κ)), $(Complex(ω)), $(Complex(κ + ω))")
+```
+
+In an interesting way, the argument (phase) of the inner product of κ and ω is equal to half of the sum of the angles that the spin-vectors make with the circle, which is in turn equal to the angle that U and V make with each other minus π (also see the geometric descriptions of the inner product to construct U and V). In the case of spin-vector addition, the angles that the flag planes of κ, ω and κ + ω, each make with the circle are equal. But, be careful with determining the signs of the flag planes and the possible addition of π to the flag plane of κ + ω. For determining flag plane signs, see also Figure 1-21 in page 64 of Roger Penrose and Wolfgang Rindler, Spinors and Space-Time, Volume 1: Two-spinor calculus and relativistic fields, (1984).
+
+![addition09](./assets/spinspace/addition09.png)
+
 For example, the Standard Model is formulated on 4-dimensional Minkowski spacetime, over which all fiber bundles can be trivialized and spinors have a simple explicit description.
 For the Symmetries relevant in field theories, the groups act on fields and leave the Lagrangian or the action (the spacetime integral over the Lagrangian) invariant.
 In theoretical physics, Lie groups like the Lorentz and Poincaré groups, which are related to spacetime symmetries, and gauge groups, defining *internal* symmetries, are important cornerstones.

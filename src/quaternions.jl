@@ -60,6 +60,10 @@ struct Quaternion
         @assert(isapprox(norm(u), 1.0), "The input vector must have unit norm, but the norm is $(norm(u)).")
         Quaternion(ℝ⁴(cos(ψ / 2), vec(sin(ψ / 2) * u)...))
     end
+    Quaternion(ψ::Int64, u::ℝ³) = begin
+        @assert(isapprox(norm(u), 1.0), "The input vector must have unit norm, but the norm is $(norm(u)).")
+        Quaternion(ℝ⁴(cos(float(ψ) / 2), vec(sin(float(ψ) / 2) * u)...))
+    end
 end
 
 

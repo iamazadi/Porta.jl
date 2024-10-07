@@ -1,6 +1,9 @@
 import FileIO
 import GLMakie
 import LinearAlgebra
+import Symbolics
+import ModelingToolkit
+import NonlinearSolve
 using Porta
 
 
@@ -13,11 +16,18 @@ function makeplane(u::𝕍, v::𝕍, M::Matrix{Float64})
 end
 
 
+function makeflagplane(u::𝕍, v::𝕍, M::Matrix{Float64})
+    lspace1 = range(-1.0, stop = 1.0, length = segments)
+    lspace2 = range(0.0, stop = 1.0, length = segments)
+    [project(M * normalize(Quaternion((f * u + s * v).a))) for f in lspace1, s in lspace2]
+end
+
+
 figuresize = (4096, 2160)
 # figuresize = (1920, 1080)
-segments = 30
+segments = 60
 frames_number = 1440
-modelname = "addition1"
+modelname = "addition"
 indices = Dict()
 T, X, Y, Z = vec(normalize(ℝ⁴(1.0, 0.0, 1.0, 0.0)))
 u = 𝕍(T, X, Y, Z)
@@ -37,7 +47,7 @@ M = I(4)
 x̂ = ℝ³([1.0; 0.0; 0.0])
 ŷ = ℝ³([0.0; 1.0; 0.0])
 ẑ = ℝ³([0.0; 0.0; 1.0])
-eyeposition = normalize(ℝ³(1.0, 1.0, 1.0))
+eyeposition = normalize(ℝ³(1.0, 1.0, 1.0)) * float(π)
 lookat = ℝ³(0.0, 0.0, 0.0)
 up = normalize(ℝ³(0.0, 0.0, 1.0))
 totalstages = 1
@@ -47,7 +57,7 @@ attributespath = "data/naturalearth/geometry-attributes.csv"
 nodespath = "data/naturalearth/geometry-nodes.csv"
 countries = loadcountries(attributespath, nodespath)
 boundary_names = Set()
-while length(boundary_names) < 10
+while length(boundary_names) < 15
     push!(boundary_names, rand(countries["name"]))
 end
 boundary_nodes = Vector{Vector{ℝ³}}()
@@ -82,49 +92,78 @@ mask = FileIO.load("data/basemap_mask.png")
 basemap1 = Basemap(lscene, q, gauge1, M, chart, segments, mask, transparency = true)
 basemap2 = Basemap(lscene, q, gauge2, M, chart, segments, mask, transparency = true)
 basemap3 = Basemap(lscene, q, gauge3, M, chart, segments, mask, transparency = true)
-basemap4 = Basemap(lscene, q, gauge4, M, chart, segments, mask, transparency = true)
+basemap4 = Basemap(lscene, q, 2π, M, chart, segments, mask, transparency = true)
 
 whirls1 = []
 whirls2 = []
-whirls3 = []
-whirls4 = []
 for i in eachindex(boundary_nodes)
-    color1 = getcolor(boundary_nodes[i], reference, 0.1)
-    color2 = getcolor(boundary_nodes[i], reference, 0.2)
-    color3 = getcolor(boundary_nodes[i], reference, 0.3)
-    color4 = getcolor(boundary_nodes[i], reference, 0.4)
+    color1 = getcolor(boundary_nodes[i], reference, 0.25)
+    color2 = getcolor(boundary_nodes[i], reference, 0.5)
     whirl1 = Whirl(lscene, points[i], gauge1, gauge2, M, segments, color1, transparency = true)
     whirl2 = Whirl(lscene, points[i], gauge2, gauge3, M, segments, color2, transparency = true)
-    whirl3 = Whirl(lscene, points[i], gauge3, gauge4, M, segments, color3, transparency = true)
-    whirl4 = Whirl(lscene, points[i], gauge4, gauge5, M, segments, color4, transparency = true)
     push!(whirls1, whirl1)
     push!(whirls2, whirl2)
-    push!(whirls3, whirl3)
-    push!(whirls4, whirl4)
 end
 
 timesign = -1
-ο = SpinVector([Complex(1.0); Complex(0.0)], timesign)
-ι = SpinVector([Complex(0.0); Complex(1.0)], timesign)
-@assert(isapprox(dot(ο, ι), 1.0), "The inner product of spin vectors $ι and $ο is not unity.")
-@assert(isapprox(dot(ι, ο), -1.0), "The inner product of spin vectors $ι and $ο is not unity.")
+_ο = SpinVector([Complex(1.0); Complex(0.0)], timesign)
+_ι = SpinVector([Complex(0.0); Complex(1.0)], timesign)
+@assert(isapprox(dot(_ο, _ι), 1.0), "The inner product of spin vectors $_ι and $_ο is not unity.")
+@assert(isapprox(dot(_ι, _ο), -1.0), "The inner product of spin vectors $_ι and $_ο is not unity.")
 
 generate() = 2rand() - 1 + im * (2rand() - 1)
-κ = SpinVector(generate(), generate(), timesign)
+_κ = SpinVector(generate(), generate(), timesign)
+_ω = SpinVector(generate(), generate(), timesign)
 ϵ = 0.01
-ζ = Complex(κ)
-ζ′ = ζ - 1.0 / √2 * ϵ / κ.a[2]
-κ = SpinVector(ζ, timesign)
-κ′ = SpinVector(ζ′, timesign)
-ω = SpinVector(generate(), generate(), timesign)
-ζ = Complex(ω)
-ζ′ = ζ - 1.0 / √2 * ϵ / ω.a[2]
-ω = SpinVector(ζ, timesign)
-ω′ = SpinVector(ζ′, timesign)
-@assert(isapprox(dot(κ, ι), vec(κ)[1]), "The first component of the spin vector $κ is not equal to the inner product of $κ and $ι.")
-@assert(isapprox(dot(κ, ο), -vec(κ)[2]), "The second component of the spin vector $κ is not equal to minus the inner product of $κ and $ο.")
-@assert(isapprox(dot(ω, ι), vec(ω)[1]), "The first component of the spin vector $ω is not equal to the inner product of $ω and $ι.")
-@assert(isapprox(dot(ω, ο), -vec(ω)[2]), "The second component of the spin vector $ω is not equal to minus the inner product of $ω and $ο.")
+ζ = Complex(_κ)
+ζ′ = ζ - 1.0 / √2 * ϵ / _κ.a[2]
+_κ = SpinVector(ζ, timesign)
+_κ′ = SpinVector(ζ′, timesign)
+ζ = Complex(_ω)
+ζ′ = ζ - 1.0 / √2 * ϵ / _ω.a[2]
+_ω = SpinVector(ζ, timesign)
+_ω′ = SpinVector(ζ′, timesign)
+ζ = Complex(_κ + _ω)
+_τ = SpinVector(ζ, timesign)
+ζ′ = Complex(_κ′ + _ω′)
+_τ′ = SpinVector(ζ′, timesign)
+gauge1 = -imag(dot(_κ, _ω))
+gauge2 = -imag(dot(_κ, _τ))
+gauge3 = float(π)
+@assert(isapprox(dot(_κ, _ι), vec(_κ)[1]), "The first component of the spin vector $_κ is not equal to the inner product of $_κ and $_ι.")
+@assert(isapprox(dot(_κ, _ο), -vec(_κ)[2]), "The second component of the spin vector $_κ is not equal to minus the inner product of $_κ and $_ο.")
+@assert(isapprox(dot(_ω, _ι), vec(_ω)[1]), "The first component of the spin vector $_ω is not equal to the inner product of $_ω and $_ι.")
+@assert(isapprox(dot(_ω, _ο), -vec(_ω)[2]), "The second component of the spin vector $_ω is not equal to minus the inner product of $_ω and $_ο.")
+@assert(isapprox(dot(_ω, _ι), vec(_ω)[1]), "The first component of the spin vector $_ω is not equal to the inner product of $_ω and $_ι.")
+@assert(isapprox(dot(_τ, _ι), vec(_τ)[1]), "The second component of the spin vector $_τ  is not equal to minus the inner product of $_τ and $_ι.")
+@assert(isapprox(dot(_τ, _ο), -vec(_τ)[2]), "The second component of the spin vector $_τ is not equal to minus the inner product of $_τ and $_ο.")
+
+# ζ = Complex(κ)
+# x₁, y₁ = real(ζ), imag(ζ)
+# ζ = Complex(ω)
+# x₂, y₂ = real(ζ), imag(ζ)
+# ζ = Complex(κ + ω)
+# x₃, y₃ = real(ζ), imag(ζ)
+
+w = (Complex(_κ + _ω) - Complex(_κ)) / (Complex(_ω) - Complex(_κ))
+@assert(imag(w) ≤ 0 || isapprox(imag(w), 0.0), "The flagpoles are not collinear: $(Complex(_κ)), $(Complex(_ω)), $(Complex(_κ + _ω))")
+    
+center = (Complex(_ω) - Complex(_κ)) * (w - abs(w)^2) / (2im * imag(w)) + Complex(_κ)  # Simplified denominator
+radius = abs(Complex(_κ) - center)
+
+# # h and k (circle center) are variables
+# Symbolics.@variables h, k
+# eqs = [(x₂ - h)^2 + (y₂ - k)^2 - ((x₁ - h)^2 + (y₁ - k)^2) ~ 0.0
+#        (x₃ - h)^2 + (y₃ - k)^2 - ((x₁ - h)^2 + (y₁ - k)^2) ~ 0.0]
+# # Symbolics.symbolic_solve(expr, [h, k])
+# ModelingToolkit.@mtkbuild ns = ModelingToolkit.NonlinearSystem(eqs)
+# h₀ = (x₁ + x₂ + x₃) / 3.0
+# k₀ = (y₁ + y₂ + y₃) / 3.0
+# guesses = [h => h₀, k => k₀]
+# prob = ModelingToolkit.NonlinearProblem(ns, guesses)
+# sol = NonlinearSolve.solve(prob, NonlinearSolve.NewtonRaphson())
+# center = Complex(sol...)
+# radius = abs(center - Complex(κ))
 
 t = 𝕍(1.0, 0.0, 0.0, 0.0)
 x = 𝕍(0.0, 1.0, 0.0, 0.0)
@@ -132,16 +171,21 @@ y = 𝕍(0.0, 0.0, 1.0, 0.0)
 z = 𝕍(0.0, 0.0, 0.0, 1.0)
 ο = √2 * (t + z)
 ι = √2 * (t - z)
+ο′ = 0.999 * √2 * (t + z)
+ι′ = 0.999 * √2 * (t - z)
 
-κ = 𝕍(κ)
-κ′ = 𝕍(κ′)
-ω = 𝕍(ω)
-ω′ = 𝕍(ω′)
+κ = 𝕍(_κ)
+κ′ = 𝕍(_κ′)
+ω = 𝕍(_ω)
+ω′ = 𝕍(_ω′)
+τ = 𝕍(_τ)
+τ′ = 𝕍(_τ′)
 zero = 𝕍(0.0, 0.0, 0.0, 0.0)
 B = stack([vec(κ), vec(ω), vec(zero), vec(zero)])
 N = LinearAlgebra.nullspace(B)
 a = 𝕍(N[begin:end, 1])
 b = 𝕍(N[begin:end, 2])
+
 a = 𝕍(LinearAlgebra.normalize(vec(a - κ - ω)))
 b = 𝕍(LinearAlgebra.normalize(vec(b - κ - ω)))
 
@@ -171,6 +215,11 @@ p = 𝕍(LinearAlgebra.normalize(vec(u + v)))
 arrowsize = GLMakie.Vec3f(0.06, 0.08, 0.1)
 linewidth = 0.04
 tail = GLMakie.Observable(GLMakie.Point3f(0.0, 0.0, 0.0))
+οtail = GLMakie.Observable(GLMakie.Point3f(0.0, 0.0, 0.0))
+ιtail = GLMakie.Observable(GLMakie.Point3f(0.0, 0.0, 0.0))
+κtail = GLMakie.Observable(GLMakie.Point3f(0.0, 0.0, 0.0))
+ωtail = GLMakie.Observable(GLMakie.Point3f(0.0, 0.0, 0.0))
+τtail = GLMakie.Observable(GLMakie.Point3f(0.0, 0.0, 0.0))
 thead = GLMakie.Observable(GLMakie.Point3f(vec(project(Quaternion(vec(t))))...))
 xhead = GLMakie.Observable(GLMakie.Point3f(vec(project(Quaternion(vec(x))))...))
 yhead = GLMakie.Observable(GLMakie.Point3f(vec(project(Quaternion(vec(y))))...))
@@ -179,12 +228,13 @@ zhead = GLMakie.Observable(GLMakie.Point3f(vec(project(Quaternion(vec(z))))...))
 ιhead = GLMakie.Observable(GLMakie.Point3f(vec(project(Quaternion(vec(ι))))...))
 κhead = GLMakie.Observable(GLMakie.Point3f(vec(project(Quaternion(vec(κ))))...))
 ωhead = GLMakie.Observable(GLMakie.Point3f(vec(project(Quaternion(vec(ω))))...))
+τhead = GLMakie.Observable(GLMakie.Point3f(vec(project(Quaternion(vec(τ))))...))
 uhead = GLMakie.Observable(GLMakie.Point3f(vec(project(Quaternion(vec(u))))...))
 vhead = GLMakie.Observable(GLMakie.Point3f(vec(project(Quaternion(vec(v))))...))
 phead = GLMakie.Observable(GLMakie.Point3f(vec(project(Quaternion(vec(p))))...))
-ps = GLMakie.@lift([$tail, $tail, $tail, $tail, $tail, $tail, $tail, $tail, $tail, $tail, $tail])
-ns = GLMakie.@lift([$thead, $xhead, $yhead, $zhead, $οhead, $ιhead, $κhead, $ωhead, $uhead, $vhead, $phead])
-colorants = [:red, :blue, :green, :orange, :black, :silver, :purple, :navyblue, :purple, :navyblue, :gold]
+ps = GLMakie.@lift([$tail, $tail, $tail, $tail, $οtail, $ιtail, $κtail, $ωtail, $τtail, $tail, $tail, $tail])
+ns = GLMakie.@lift([$thead, $xhead, $yhead, $zhead, $οhead, $ιhead, $κhead, $ωhead, $τhead, $uhead, $vhead, $phead])
+colorants = [:red, :blue, :green, :orange, :black, :silver, :purple, :navyblue, :olive , :purple, :navyblue, :gold]
 GLMakie.arrows!(lscene,
     ps, ns, fxaa = true, # turn on anti-aliasing
     color = colorants,
@@ -198,64 +248,81 @@ collection = collect(range(0.0, stop = 1.0, length = segments))
 ιlinepoints = []
 κlinepoints = []
 ωlinepoints = []
+τlinepoints = []
 οlinecolors = []
 ιlinecolors = []
 κlinecolors = []
 ωlinecolors = []
+τlinecolors = []
 οlines = []
 ιlines = []
 κlines = []
 ωlines = []
+τlines = []
 for (i, scale1) in enumerate(collection)
     _οlinepoints = GLMakie.Observable(GLMakie.Point3f[])
     _ιlinepoints = GLMakie.Observable(GLMakie.Point3f[])
     _κlinepoints = GLMakie.Observable(GLMakie.Point3f[])
     _ωlinepoints = GLMakie.Observable(GLMakie.Point3f[])
+    _τlinepoints = GLMakie.Observable(GLMakie.Point3f[])
     _οlinecolors = GLMakie.Observable(Int[])
     _ιlinecolors = GLMakie.Observable(Int[])
     _κlinecolors = GLMakie.Observable(Int[])
     _ωlinecolors = GLMakie.Observable(Int[])
+    _τlinecolors = GLMakie.Observable(Int[])
     for (j, scale2) in enumerate(collection)
         οvector = LinearAlgebra.normalize(vec(scale1 * ο + scale2 * x))
         ιvector = LinearAlgebra.normalize(vec(scale1 * ι + scale2 * -x))
         κvector = LinearAlgebra.normalize(vec(scale1 * κ + scale2 * κ′))
         ωvector = LinearAlgebra.normalize(vec(scale1 * ω + scale2 * ω′))
+        τvector = LinearAlgebra.normalize(vec(scale1 * τ + scale2 * τ′))
         οpoint = GLMakie.Point3f(vec(project(Quaternion(οvector)))...)
         ιpoint = GLMakie.Point3f(vec(project(Quaternion(ιvector)))...)
         κpoint = GLMakie.Point3f(vec(project(Quaternion(κvector)))...)
         ωpoint = GLMakie.Point3f(vec(project(Quaternion(ωvector)))...)
+        τpoint = GLMakie.Point3f(vec(project(Quaternion(τvector)))...)
         push!(_οlinepoints[], οpoint)
         push!(_ιlinepoints[], ιpoint)
         push!(_κlinepoints[], κpoint)
         push!(_ωlinepoints[], ωpoint)
+        push!(_τlinepoints[], τpoint)
         push!(_οlinecolors[], i + j)
         push!(_ιlinecolors[], i + j)
         push!(_κlinecolors[], i + j)
         push!(_ωlinecolors[], i + j)
+        push!(_τlinecolors[], i + j)
     end
     push!(οlinepoints, _οlinepoints)
     push!(ιlinepoints, _ιlinepoints)
     push!(κlinepoints, _κlinepoints)
     push!(ωlinepoints, _ωlinepoints)
+    push!(τlinepoints, _τlinepoints)
     push!(οlinecolors, _οlinecolors)
     push!(ιlinecolors, _ιlinecolors)
     push!(κlinecolors, _κlinecolors)
     push!(ωlinecolors, _ωlinecolors)
+    push!(τlinecolors, _τlinecolors)
     οline = GLMakie.lines!(lscene, οlinepoints[i], color = οlinecolors[i], linewidth = linewidth, colorrange = (1, 2segments), colormap = :spring)
     ιline = GLMakie.lines!(lscene, ιlinepoints[i], color = ιlinecolors[i], linewidth = linewidth, colorrange = (1, 2segments), colormap = :summer)
     κline = GLMakie.lines!(lscene, κlinepoints[i], color = κlinecolors[i], linewidth = linewidth, colorrange = (1, 2segments), colormap = :fall)
     ωline = GLMakie.lines!(lscene, ωlinepoints[i], color = ωlinecolors[i], linewidth = linewidth, colorrange = (1, 2segments), colormap = :winter)
+    τline = GLMakie.lines!(lscene, τlinepoints[i], color = τlinecolors[i], linewidth = linewidth, colorrange = (1, 2segments), colormap = :rainbow)
     push!(οlines, οline)
     push!(ιlines, ιline)
     push!(κlines, κline)
     push!(ωlines, ωline)
+    push!(τlines, τline)
 end
 
 arcpoints = GLMakie.Observable(GLMakie.Point3f[])
 arccolors = GLMakie.Observable(Int[])
-arc = GLMakie.lines!(lscene, arcpoints, color = arccolors, linewidth = 2linewidth, colorrange = (1, segments), colormap = :prism)
+arc = GLMakie.lines!(lscene, arcpoints, color = arccolors, linewidth = 3linewidth, colorrange = (1, segments), colormap = :prism)
 
-titles = ["t", "x", "y", "z", "ο", "ι", "κ", "ω", "U", "V", "p"]
+circlepoints = GLMakie.Observable(GLMakie.Point3f[])
+circlecolors = GLMakie.Observable(Int[])
+circle = GLMakie.lines!(lscene, circlepoints, color = circlecolors, linewidth = 2linewidth, colorrange = (1, segments), colormap = :Paired_12)
+
+titles = ["t", "x", "y", "z", "ο", "ι", "κ", "ω", "κ+ω", "U", "V", "p"]
 eyeposition_observable = lscene.scene.camera.eyeposition
 lookat_observable = lscene.scene.camera.lookat
 rotationaxis = GLMakie.@lift(normalize(ℝ³(Float64.([vec($eyeposition_observable)...] - [vec($lookat_observable)...])...)))
@@ -264,7 +331,7 @@ rotation1 = GLMakie.@lift(Porta.Quaternion(getrotation(ẑ, $rotationaxis)...))
 rotation2 = GLMakie.@lift(Porta.Quaternion($rotationangle, $rotationaxis))
 rotation = GLMakie.@lift(GLMakie.Quaternion($rotation2 * $rotation1))
 GLMakie.text!(lscene,
-    GLMakie.@lift(map(x -> GLMakie.Point3f(vec((isnan(x) ? ẑ : x))), [$thead, $xhead, $yhead, $zhead, $οhead, $ιhead, $κhead, $ωhead, $uhead, $vhead, $phead])),
+    GLMakie.@lift(map(x -> GLMakie.Point3f(vec((isnan(x) ? ẑ : x))), [$thead, $xhead, $yhead, $zhead, $οhead + $οtail, $ιhead + $ιtail, $κhead + $κtail, $ωhead + $ωtail, $τhead + $τtail, $uhead, $vhead, $phead])),
     text = titles,
     color = colorants[begin:end],
     rotation = rotation,
@@ -281,14 +348,103 @@ orthogonalplanematrix = makeplane(a, b, M)
 orthogonalplanecolor = GLMakie.Observable(fill(GLMakie.RGBAf(0.5, 0.5, 0.5, 0.5), segments, segments))
 orthogonalplaneobservable = buildsurface(lscene, orthogonalplanematrix, orthogonalplanecolor, transparency = true)
 
+κflagplanematrix = makeflagplane(κ, κ′ - κ, M)
+κflagplanecolor = GLMakie.Observable(fill(GLMakie.RGBAf(0.5, 0.5, 0.5, 0.5), segments, segments))
+κflagplaneobservable = buildsurface(lscene, κflagplanematrix, κflagplanecolor, transparency = false)
+ωflagplanematrix = makeflagplane(ω, ω′ - ω, M)
+ωflagplanecolor = GLMakie.Observable(fill(GLMakie.RGBAf(0.5, 0.5, 0.5, 0.5), segments, segments))
+ωflagplaneobservable = buildsurface(lscene, ωflagplanematrix, ωflagplanecolor, transparency = false)
+τflagplanematrix = makeflagplane(τ, τ′ - τ, M)
+τflagplanecolor = GLMakie.Observable(fill(GLMakie.RGBAf(0.5, 0.5, 0.5, 0.5), segments, segments))
+τflagplaneobservable = buildsurface(lscene, τflagplanematrix, τflagplanecolor, transparency = false)
+
 
 updatecamera() = begin
     GLMakie.update_cam!(lscene.scene, GLMakie.Vec3f(vec(eyeposition)...), GLMakie.Vec3f(vec(lookat)...), GLMakie.Vec3f(vec(up)...))
 end
 
 
+updatehopfbundle(M::Matrix{Float64}) = begin
+    update!(basemap1, q, gauge1, M)
+    update!(basemap2, q, gauge2, M)
+    update!(basemap3, q, gauge3, M)
+    update!(basemap4, q, 2π, M)
+    for i in eachindex(whirls1)
+        update!(whirls1[i], points[i], min(gauge1, gauge2), max(gauge1, gauge2), M)
+        update!(whirls2[i], points[i], gauge3, 2π, M)
+    end
+end
+
+
+animate1(frame::Int) = begin
+    κflagplanedirection = 𝕍(LinearAlgebra.normalize(vec(κ′ - κ)))
+    ωflagplanedirection = 𝕍(LinearAlgebra.normalize(vec(ω′ - ω)))
+    global u = LinearAlgebra.normalize(vec((-dot(ê₃, κflagplanedirection) * ê₃ + -dot(ê₄, κflagplanedirection) * ê₄)))
+    global v = LinearAlgebra.normalize(vec((-dot(ê₃, ωflagplanedirection) * ê₃ + -dot(ê₄, ωflagplanedirection) * ê₄)))
+    p = -𝕍(LinearAlgebra.normalize(u + v))
+    global p = dot(ê₃, p) * ê₃ + dot(ê₄, p) * ê₄
+    axis = normalize(ℝ³(vec(p)[2:4]))
+    progress = Float64(frame / frames_number)
+    M = mat4(Quaternion(progress * 4π, axis))
+    t_transformed = M * Quaternion(vec(t))
+    x_transformed = M * Quaternion(vec(x))
+    y_transformed = M * Quaternion(vec(y))
+    z_transformed = M * Quaternion(vec(z))
+    ο_transformed = M * Quaternion(vec(ο))
+    ι_transformed = M * Quaternion(vec(ι))
+    κ_transformed = M * Quaternion(vec(κ))
+    κ′_transformed = M * Quaternion(vec(κ′))
+    ω_transformed = M * Quaternion(vec(ω))
+    ω′_transformed = M * Quaternion(vec(ω′))
+    τ_transformed = M * Quaternion(vec(τ))
+    τ′_transformed = M * Quaternion(vec(τ′))
+    u_transformed = M * Quaternion(vec(u))
+    v_transformed = M * Quaternion(vec(v))
+    p_transformed = M * Quaternion(vec(p))
+    updatehopfbundle(M)
+    planematrix = makeplane(ê₁, ê₂, M) # the timelike 2-plane spanned by the flagpoles of κ and ω
+    orthogonalplanematrix = makeplane(ê₃, ê₄, M) # σ, the spacelike 2-plane through O, which is the orthogonal complement of the timelike 2-plane spanned by the flagpoles of κ and ω
+    updatesurface!(planematrix, planeobservable)
+    updatesurface!(orthogonalplanematrix, orthogonalplaneobservable)
+    hue = Float64(frame) / Float64(frames_number) * 360.0
+    planecolor[] = [GLMakie.RGBAf(convert_hsvtorgb([hue; 1.0; 1.0])..., 0.25) for i in 1:segments, j in 1:segments]
+    orthogonalplanecolor[] = [GLMakie.RGBAf(convert_hsvtorgb([360.0 - hue; 1.0; 1.0])..., 0.25) for i in 1:segments, j in 1:segments]
+    κflagplanematrix = makeflagplane(𝕍(vec(κ)), 𝕍(LinearAlgebra.normalize(vec(κ′ - κ))), M)
+    ωflagplanematrix = makeflagplane(𝕍(vec(ω)), 𝕍(LinearAlgebra.normalize(vec(ω′ - ω))), M)
+    τflagplanematrix = makeflagplane(𝕍(vec(τ)), 𝕍(LinearAlgebra.normalize(vec(τ′ - τ))), M)
+    updatesurface!(κflagplanematrix, κflagplaneobservable)
+    updatesurface!(ωflagplanematrix, ωflagplaneobservable)
+    updatesurface!(τflagplanematrix, τflagplaneobservable)
+    κflagplanecolor[] = [GLMakie.RGBAf(convert_hsvtorgb([277.0; 0.87; 0.94])..., 0.75) for i in 1:segments, j in 1:segments]
+    ωflagplanecolor[] = [GLMakie.RGBAf(convert_hsvtorgb([240.0; 1.0; 0.5])..., 0.75) for i in 1:segments, j in 1:segments]
+    τflagplanecolor[] = [GLMakie.RGBAf(convert_hsvtorgb([58.0; 0.42; 0.73])..., 0.75) for i in 1:segments, j in 1:segments]
+    κhead[] = GLMakie.Point3f(vec(project(Quaternion(LinearAlgebra.normalize(vec(κ′_transformed - κ_transformed)))))...)
+    ωhead[] = GLMakie.Point3f(vec(project(Quaternion(LinearAlgebra.normalize(vec(ω′_transformed - ω_transformed)))))...)
+    τhead[] = GLMakie.Point3f(vec(project(Quaternion(LinearAlgebra.normalize(vec(τ′_transformed - τ_transformed)))))...)
+    κtail[] = GLMakie.Point3f(vec(project(κ_transformed))...)
+    ωtail[] = GLMakie.Point3f(vec(project(ω_transformed))...)
+    τtail[] = GLMakie.Point3f(vec(project(τ_transformed))...)
+    οtail[] = GLMakie.Point3f(vec(project(κ_transformed))...)
+    ιtail[] = GLMakie.Point3f(vec(project(κ_transformed))...)
+    οhead[] = GLMakie.Point3f(vec(project(Quaternion(LinearAlgebra.normalize(vec(ο_transformed)))))...) * 0.25
+    ιhead[] = GLMakie.Point3f(vec(project(Quaternion(LinearAlgebra.normalize(vec(ι_transformed)))))...) * 0.25
+    thead[] = GLMakie.Point3f(vec(project(t_transformed))...) * 0.5
+    xhead[] = GLMakie.Point3f(vec(project(x_transformed))...) * 0.5
+    yhead[] = GLMakie.Point3f(vec(project(y_transformed))...) * 0.5
+    zhead[] = GLMakie.Point3f(vec(project(z_transformed))...) * 0.5
+    uhead[] = GLMakie.Point3f(vec(project(u_transformed))...)
+    vhead[] = GLMakie.Point3f(vec(project(v_transformed))...)
+    phead[] = GLMakie.Point3f(vec(project(p_transformed))...)
+    point = project(κ_transformed) + project(ω_transformed) + project(τ_transformed)
+    point = isnan(vec(point)[1]) ? ẑ : normalize(point)
+    global lookat = point
+    global eyeposition = normalize(point) * float(π)
+end
+
+
 animate(frame::Int) = begin
-    progress = frame / frames_number
+    animate1(frame)
+    progress = Float64(frame / frames_number)
     stage = min(totalstages - 1, Int(floor(totalstages * progress))) + 1
     stageprogress = totalstages * (progress - (stage - 1) * 1.0 / totalstages)
     println("Frame: $frame, Stage: $stage, Total Stages: $totalstages, Progress: $stageprogress")
@@ -296,59 +452,11 @@ animate(frame::Int) = begin
     ωflagplanedirection = 𝕍(LinearAlgebra.normalize(vec(ω′ - ω)))
     global u = LinearAlgebra.normalize(vec((-dot(ê₃, κflagplanedirection) * ê₃ + -dot(ê₄, κflagplanedirection) * ê₄)))
     global v = LinearAlgebra.normalize(vec((-dot(ê₃, ωflagplanedirection) * ê₃ + -dot(ê₄, ωflagplanedirection) * ê₄)))
-    _p = 𝕍(SpinVector(κ) + SpinVector(ω))
-    _p = dot(ê₁, _p) * ê₁ + dot(ê₂, _p) * ê₂
-    p = 𝕍(LinearAlgebra.normalize(u + v))
-    global p = -dot(ê₃, p) * ê₃ + -dot(ê₄, p) * ê₄
-    axis = normalize(ℝ³(vec(_p)[2:4]))
+    p = -𝕍(LinearAlgebra.normalize(u + v))
+    global p = dot(ê₃, p) * ê₃ + dot(ê₄, p) * ê₄
+    axis = normalize(ℝ³(vec(p)[2:4]))
     M = mat4(Quaternion(progress * 4π, axis))
-    t_transformed = normalize(M * Quaternion(vec(t)))
-    x_transformed = normalize(M * Quaternion(vec(x)))
-    y_transformed = normalize(M * Quaternion(vec(y)))
-    z_transformed = normalize(M * Quaternion(vec(z)))
-    ο_transformed = normalize(M * Quaternion(vec(ο)))
-    ι_transformed = normalize(M * Quaternion(vec(ι)))
-    κ_transformed = normalize(M * Quaternion(vec(κ)))
-    ω_transformed = normalize(M * Quaternion(vec(ω)))
-    u_transformed = normalize(M * Quaternion(vec(u)))
-    v_transformed = normalize(M * Quaternion(vec(v)))
-    p_transformed = normalize(M * Quaternion(vec(p)))
-    _p_transformed = M * Quaternion(vec(_p))
-
-    update!(basemap1, q, gauge1, M)
-    update!(basemap2, q, gauge2, M)
-    update!(basemap3, q, gauge3, M)
-    update!(basemap4, q, gauge4, M)
-    for i in eachindex(whirls1)
-        update!(whirls1[i], points[i], gauge1, gauge2, M)
-        update!(whirls2[i], points[i], gauge2, gauge3, M)
-        update!(whirls3[i], points[i], gauge3, gauge4, M)
-        update!(whirls4[i], points[i], gauge4, gauge5, M)
-    end
-
-    # the timelike 2-plane spanned by the flagpoles of κ and ω
-    planematrix = makeplane(ê₁, ê₂, M)
-    # σ, the spacelike 2-plane through O,
-    # which is the orthogonal complement of the timelike 2-plane spanned by the flagpoles of κ and ω
-    orthogonalplanematrix = makeplane(ê₃, ê₄, M)
-    updatesurface!(planematrix, planeobservable)
-    updatesurface!(orthogonalplanematrix, orthogonalplaneobservable)
-    hue = Float64(frame) / Float64(frames_number) * 360.0
-    planecolor[] = fill(GLMakie.RGBAf(convert_hsvtorgb([0.9 * hue + 0.1 * rand() - 0.1 * rand(); 1.0; 1.0])..., 0.4), segments, segments)
-    orthogonalplanecolor[] = fill(GLMakie.RGBAf(convert_hsvtorgb([360.0 - (0.9 * hue + 0.1 * rand() - 0.1 * rand()); 1.0; 1.0])..., 0.4), segments, segments)
-
-    thead[] = GLMakie.Point3f(vec(project(t_transformed))...)
-    xhead[] = GLMakie.Point3f(vec(project(x_transformed))...)
-    yhead[] = GLMakie.Point3f(vec(project(y_transformed))...)
-    zhead[] = GLMakie.Point3f(vec(project(z_transformed))...)
-    οhead[] = GLMakie.Point3f(vec(project(ο_transformed))...)
-    ιhead[] = GLMakie.Point3f(vec(project(ι_transformed))...)
-    κhead[] = GLMakie.Point3f(vec(project(κ_transformed))...)
-    ωhead[] = GLMakie.Point3f(vec(project(ω_transformed))...)
-    uhead[] = GLMakie.Point3f(vec(project(u_transformed))...)
-    vhead[] = GLMakie.Point3f(vec(project(v_transformed))...)
-    phead[] = GLMakie.Point3f(vec(project(p_transformed))...)
-
+    τ_transformed = M * Quaternion(vec(τ))
     _arcpoints = GLMakie.Point3f[]
     _arccolors = Int[]
     for (i, scale) in enumerate(collection)
@@ -361,54 +469,76 @@ animate(frame::Int) = begin
     arccolors[] = _arccolors
     GLMakie.notify(arcpoints)
     GLMakie.notify(arccolors)
-
+    _circlepoints = GLMakie.Point3f[]
+    _circlecolors = Int[]
+    for (i, ϕ) in enumerate(collect(range(-4π, stop = 4π, length = segments)))
+        κζ = Complex(_κ)
+        ωζ = Complex(_ω)
+        ζ = κζ - ωζ
+        circlevector = M * Quaternion(vec(𝕍(SpinVector(κζ + ϕ * ζ, timesign))))
+        circlepoint = GLMakie.Point3f(vec(project(circlevector))...)
+        push!(_circlepoints, circlepoint)
+        push!(_circlecolors, i)
+    end
+    circlepoints[] = _circlepoints
+    circlecolors[] = _circlecolors
+    GLMakie.notify(circlepoints)
+    GLMakie.notify(circlecolors)
     # the flag planes
     for (i, scale1) in enumerate(collection)
         _οlinepoints = GLMakie.Point3f[]
         _ιlinepoints = GLMakie.Point3f[]
         _κlinepoints = GLMakie.Point3f[]
         _ωlinepoints = GLMakie.Point3f[]
+        _τlinepoints = GLMakie.Point3f[]
         _οlinecolors = Int[]
         _ιlinecolors = Int[]
         _κlinecolors = Int[]
         _ωlinecolors = Int[]
+        _τlinecolors = Int[]
         for (j, scale2) in enumerate(collection)
-            οvector = M * normalize(Quaternion(vec(scale1 * ο + scale2 * x)))
-            ιvector = M * normalize(Quaternion(vec(scale1 * ι + scale2 * -x)))
+            οvector = M * normalize(Quaternion(vec(scale1 * κ + scale2 * x)))
+            ιvector = M * normalize(Quaternion(vec(scale1 * κ + scale2 * -x)))
             κvector = M * normalize(Quaternion(vec(scale1 * κ + scale2 * 𝕍(LinearAlgebra.normalize(vec(κ′ - κ))))))
             ωvector = M * normalize(Quaternion(vec(scale1 * ω + scale2 * 𝕍(LinearAlgebra.normalize(vec(ω′ - ω))))))
+            τvector = M * normalize(Quaternion(vec(scale1 * τ + scale2 * 𝕍(LinearAlgebra.normalize(vec(τ′ - τ))))))
             οpoint = GLMakie.Point3f(vec(project(οvector))...)
             ιpoint = GLMakie.Point3f(vec(project(ιvector))...)
             κpoint = GLMakie.Point3f(vec(project(κvector))...)
             ωpoint = GLMakie.Point3f(vec(project(ωvector))...)
+            τpoint = GLMakie.Point3f(vec(project(τvector))...)
             push!(_οlinepoints, οpoint)
             push!(_ιlinepoints, ιpoint)
             push!(_κlinepoints, κpoint)
             push!(_ωlinepoints, ωpoint)
+            push!(_τlinepoints, τpoint)
             push!(_οlinecolors, i + j)
             push!(_ιlinecolors, i + j)
             push!(_κlinecolors, i + j)
             push!(_ωlinecolors, i + j)
+            push!(_τlinecolors, i + j)
         end
         οlinepoints[i][] = _οlinepoints
         ιlinepoints[i][] = _ιlinepoints
         κlinepoints[i][] = _κlinepoints
         ωlinepoints[i][] = _ωlinepoints
+        τlinepoints[i][] = _τlinepoints
         οlinecolors[i][] = _οlinecolors
         ιlinecolors[i][] = _ιlinecolors
         κlinecolors[i][] = _κlinecolors
         ωlinecolors[i][] = _ωlinecolors
+        τlinecolors[i][] = _τlinecolors
         GLMakie.notify(οlinepoints[i])
         GLMakie.notify(ιlinepoints[i])
         GLMakie.notify(κlinepoints[i])
         GLMakie.notify(ωlinepoints[i])
+        GLMakie.notify(τlinepoints[i])
         GLMakie.notify(οlinecolors[i])
         GLMakie.notify(ιlinecolors[i])
         GLMakie.notify(κlinecolors[i])
         GLMakie.notify(ωlinecolors[i])
+        GLMakie.notify(τlinecolors[i])
     end
-
-    global lookat = project(_p_transformed)
     updatecamera()
 end
 
@@ -419,3 +549,5 @@ animate(1)
 GLMakie.record(fig, joinpath("gallery", "$modelname.mp4"), 1:frames_number) do frame
     animate(frame)
 end
+
+GLMakie.save(joinpath("gallery", "$(modelname)01.png"), fig)
