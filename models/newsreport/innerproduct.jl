@@ -14,8 +14,8 @@ end
 
 
 figuresize = (4096, 2160)
-# figuresize = (1920, 1080)
-segments = 60
+segments = 30
+segments2 = 60
 frames_number = 1440
 modelname = "innerproduct"
 indices = Dict()
@@ -46,7 +46,6 @@ totalstages = 1
 attributespath = "data/naturalearth/geometry-attributes.csv"
 nodespath = "data/naturalearth/geometry-nodes.csv"
 countries = loadcountries(attributespath, nodespath)
-# boundary_names = ["United States of America", "Iran", "Australia", "New Zealand"]
 boundary_names = Set()
 while length(boundary_names) < 10
     push!(boundary_names, rand(countries["name"]))
@@ -80,10 +79,10 @@ lscene = GLMakie.LScene(fig[1, 1], show_axis=false, scenekw = (lights = [pl, al]
 
 reference = FileIO.load("data/basemap_color.png")
 mask = FileIO.load("data/basemap_mask.png")
-basemap1 = Basemap(lscene, q, gauge1, M, chart, segments, mask, transparency = true)
-basemap2 = Basemap(lscene, q, gauge2, M, chart, segments, mask, transparency = true)
-basemap3 = Basemap(lscene, q, gauge3, M, chart, segments, mask, transparency = true)
-basemap4 = Basemap(lscene, q, gauge4, M, chart, segments, mask, transparency = true)
+basemap1 = Basemap(lscene, q, gauge1, M, chart, segments2, mask, transparency = true)
+basemap2 = Basemap(lscene, q, gauge2, M, chart, segments2, mask, transparency = true)
+basemap3 = Basemap(lscene, q, gauge3, M, chart, segments2, mask, transparency = true)
+basemap4 = Basemap(lscene, q, gauge4, M, chart, segments2, mask, transparency = true)
 
 whirls1 = []
 whirls2 = []
@@ -301,7 +300,6 @@ animate(frame::Int) = begin
     global p = -dot(ê₃, p) * ê₃ + -dot(ê₄, p) * ê₄
     axis = normalize(ℝ³(vec(p)[2:4]))
     M = mat4(Quaternion(progress * 4π, axis))
-
     t_transformed = M * Quaternion(vec(t))
     x_transformed = M * Quaternion(vec(x))
     y_transformed = M * Quaternion(vec(y))
@@ -313,7 +311,12 @@ animate(frame::Int) = begin
     u_transformed = M * Quaternion(vec(u))
     v_transformed = M * Quaternion(vec(v))
     p_transformed = M * Quaternion(vec(p))
-
+    point = project(p_transformed)
+    point = isnan(vec(point)[1]) ? ẑ : normalize(point)
+    global lookat = point
+    point = cross(project(u_transformed), project(v_transformed)) + cross(project(κ_transformed), project(ω_transformed))
+    point = isnan(vec(point)[1]) ? ẑ : normalize(point)
+    global eyeposition = normalize(point) * float(π)
     update!(basemap1, q, gauge1, M)
     update!(basemap2, q, gauge2, M)
     update!(basemap3, q, gauge3, M)
@@ -333,8 +336,8 @@ animate(frame::Int) = begin
     updatesurface!(planematrix, planeobservable)
     updatesurface!(orthogonalplanematrix, orthogonalplaneobservable)
     hue = Float64(frame) / Float64(frames_number) * 360.0
-    planecolor[] = fill(GLMakie.RGBAf(convert_hsvtorgb([hue; 1.0; 1.0])..., 0.4), segments, segments)
-    orthogonalplanecolor[] = fill(GLMakie.RGBAf(convert_hsvtorgb([360.0 - hue; 1.0; 1.0])..., 0.4), segments, segments)
+    planecolor[] = fill(GLMakie.RGBAf(convert_hsvtorgb([hue; 1.0; 1.0])..., 0.5), segments, segments)
+    orthogonalplanecolor[] = fill(GLMakie.RGBAf(convert_hsvtorgb([360.0 - hue; 1.0; 1.0])..., 0.5), segments, segments)
 
     thead[] = GLMakie.Point3f(vec(project(t_transformed))...)
     xhead[] = GLMakie.Point3f(vec(project(x_transformed))...)

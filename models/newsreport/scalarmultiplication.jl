@@ -54,7 +54,10 @@ totalstages = 4
 attributespath = "data/naturalearth/geometry-attributes.csv"
 nodespath = "data/naturalearth/geometry-nodes.csv"
 countries = loadcountries(attributespath, nodespath)
-boundary_names = ["United States of America", "Iran", "China", "Chile", "South Africa", "New Zealand"]
+boundary_names = Set()
+while length(boundary_names) < 10
+    push!(boundary_names, rand(countries["name"]))
+end
 boundary_nodes = Vector{Vector{ℝ³}}()
 for i in eachindex(countries["name"])
     for name in boundary_names

@@ -103,6 +103,8 @@ b = 𝕍(LinearAlgebra.normalize(vec(b - κ - ω)))
 
 When we stack the Minkowski vector space representation of kappa and omega and fill the rest with zero to get a square matrix B, the null space of B is where the piece of information about spinors exist. By performing a Gram-Schmidt procedure we find the set of orthonormal basis vectors for the inner product of kappa and omega. In the following lines, the spin-vectors an and b are bases of the null space of matrix B.
 
+![innerproduct180](./assets/spinspace/innerproduct180.png)
+
 ```julia
 v₁ = κ.a
 v₂ = ω.a
@@ -307,7 +309,7 @@ The existence of **gauge symmetries** is particularly important: it can be shown
 
 ### Graph
 
-**Edward Witten**:
+**Edward Witten** *(1987)*:
 
 If one wants to summarize our knowledge of physics in the briefest possible terms, there are three really fundamental observations:
 
