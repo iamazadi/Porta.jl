@@ -23,7 +23,7 @@ end
 
 figuresize = (4096, 2160)
 # figuresize = (1920, 1080)
-segments = 30
+segments = 60
 frames_number = 1440
 modelname = "scalarmultiplication"
 indices = Dict()
