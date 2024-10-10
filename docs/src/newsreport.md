@@ -542,7 +542,7 @@ Dirac forms are used in the Standard Model to define a *Dirac mass term* in the 
 
 3. Roger Penrose, Wolfgang Rindler, [Spinors and Space-Time](https://doi.org/10.1017/CBO9780511564048), Volume 1: Two-spinor calculus and relativistic fields, (1984).
 
-4. Richard M. Murray and Zexiang Li, A Mathematical Introduction to Robotic Manipulation, 1st Edition, 1994, CRC Press, [read](https://www.cse.lehigh.edu/~trink/Courses/RoboticsII/reading/murray-li-sastry-94-complete.pdf), [buy](https://www.amazon.com/Mathematical-Introduction-Robotic-Manipulation/dp/0849379814).
+4. MJD Hamilton, The Higgs boson for mathematicians. Lecture notes on gauge theory and symmetry breaking, arXiv preprint arXiv:1512.02632, (2015).
 
 5. [Edward Witten](https://cds.cern.ch/record/181783/files/cer-000093203.pdf), Physics and Geometry, (1987).
 
