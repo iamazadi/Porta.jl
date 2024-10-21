@@ -14,11 +14,11 @@ end
 
 ## The space of abstract inner products
 
-u = Quaternion(rand(4))
-v = Quaternion(rand(4))
-v₁ = Quaternion(rand(4))
-v₂ = Quaternion(rand(4))
-z = Quaternion(0.0, 0.0, 0.0, 0.0)
+u = ℍ(rand(4))
+v = ℍ(rand(4))
+v₁ = ℍ(rand(4))
+v₂ = ℍ(rand(4))
+z = ℍ(0.0, 0.0, 0.0, 0.0)
 α, β = rand(2)
 @test isapprox(dot(u, v), dot(v, u)) # Symmetric
 @test isapprox(dot(u, α * v₁ + β * v₂), α * dot(u, v₁) + β * dot(u, v₂)) # Linear
@@ -26,39 +26,39 @@ z = Quaternion(0.0, 0.0, 0.0, 0.0)
 @test isapprox(dot(z, z), 0) # positive semidefinite II
 
 
-q = Quaternion(rand(4))
+q = ℍ(rand(4))
 @test isapprox(conj(conj(q)), q)
 @test isapprox(mat(conj(q)), elI .* q.a - eli .* q.b - elj .* q.c - elk .* q.d)
 @test isapprox(det(q), q.a^2 + q.b^2 + q.c^2 + q.d^2)
 h = q * conj(q)
 @test isapprox(mat(h), elI .* (q.a^2 + q.b^2 + q.c^2 + q.d^2))
 
-q = Quaternion(normalize(ℝ⁴(rand(4))))
+q = ℍ(normalize(ℝ⁴(rand(4))))
 @test isapprox(norm(q), 1.0)
 @test isapprox(norm(q), q.a^2 + q.b^2 + q.c^2 + q.d^2)
 
 
-g = Quaternion(rand(4))
-q = Quaternion(rand(4))
+g = ℍ(rand(4))
+q = ℍ(rand(4))
 a = real(g)
 v = imag(g)
 a′ = real(q)
 v′ = imag(q)
-@test isapprox(g + q, Quaternion(a + a′, vec(v + v′)...))
-@test isapprox(g * q, Quaternion(a * a′ - dot(v, v′), vec(a′ * v + a * v′ + cross(v, v′))...))
+@test isapprox(g + q, ℍ(a + a′, vec(v + v′)...))
+@test isapprox(g * q, ℍ(a * a′ - dot(v, v′), vec(a′ * v + a * v′ + cross(v, v′))...))
 
 
 ψ = 2π
 u = normalize(ℝ³(rand(3)))
-g = Quaternion(0.0, u)
-q = Quaternion(ψ, u)
+g = ℍ(0.0, u)
+q = ℍ(ψ, u)
 @test isapprox(g, -q) # ψ ↦ ψ + 2π
 
 
-e = Quaternion(ℝ⁴(1.0, 0.0, 0.0, 0.0))
-i = Quaternion(0.0, 1.0, 0.0, 0.0)
-j = Quaternion(0.0, 0.0, 1.0, 0.0)
-k = Quaternion(0.0, 0.0, 0.0, 1.0)
+e = ℍ(ℝ⁴(1.0, 0.0, 0.0, 0.0))
+i = ℍ(0.0, 1.0, 0.0, 0.0)
+j = ℍ(0.0, 0.0, 1.0, 0.0)
+k = ℍ(0.0, 0.0, 0.0, 1.0)
 
 # i² = -1
 @test isapprox(i * i, -e)
@@ -73,9 +73,9 @@ k = Quaternion(0.0, 0.0, 0.0, 1.0)
 
 θ = rand() * 2π
 u = normalize(ℝ³(rand(3)))
-q = Quaternion(θ, u)
+q = ℍ(θ, u)
 
-conjugate = Quaternion(transpose(R) * mat4(q) * R)
+conjugate = ℍ(transpose(R) * mat4(q) * R)
 @test isapprox(conj(q), conjugate)
 
 # |q| = 1
@@ -89,7 +89,7 @@ conjugate = Quaternion(transpose(R) * mat4(q) * R)
 @test isapprox(K(3), transpose(R) * J(2) * R, atol = TOLERANCE)
 
 # Check to see if the following vectors form a basis for ℝ⁴
-ξ = Quaternion(rand(4))
+ξ = ℍ(rand(4))
 
 # <ξ, ξ> = 1
 @test isapprox(norm(ξ)^2, abs(dot(ξ, ξ)), atol = TOLERANCE)
@@ -148,7 +148,7 @@ end
 
 # vectorial quaternions
 v = 𝕍(0.0, rand(3)...)
-q = Quaternion(v)
+q = ℍ(v)
 M = mat(q)
 T, X, Y, Z = vec(v)
 N = [im * Z im * X - Y; im * X + Y -im * Z]
@@ -159,5 +159,5 @@ N = [im * Z im * X - Y; im * X + Y -im * Z]
 timesign = rand([1, -1])
 ζ = (2rand() - 1) * exp(im * rand() * 2π)
 v = SpinVector(ζ, timesign)
-q = Quaternion(v)
+q = ℍ(v)
 @test isapprox(ℝ³(v), imag(q))

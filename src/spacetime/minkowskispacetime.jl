@@ -28,6 +28,14 @@ struct 𝕄 <: VectorSpace
         Z = 0.5 * real(m[1, 1] - m[2, 2])
         𝕄(origin, 𝕍(T, X, Y, Z), tetrad)
     end
+    𝕄(ξ::Complex, η::Complex) = begin
+        T = real(1.0 / √2 * (ξ * conj(ξ) + η * conj(η)))
+        X = real(1.0 / √2 * (ξ * conj(η) + η * conj(ξ)))
+        Y = real(1.0 / (im * √2) * (ξ * conj(η) - η * conj(ξ)))
+        Z = real(1.0 / √2 * (ξ * conj(ξ) - η * conj(η)))
+        tetrad = Tetrad(ℝ⁴(1.0, 0.0, 0.0, 0.0), ℝ⁴(0.0, -1.0, 0.0, 0.0), ℝ⁴(0.0, 0.0, -1.0, 0.0), ℝ⁴(0.0, 0.0, 0.0, -1.0))
+        𝕄(𝕍(0.0, 0.0, 0.0, 0.0), 𝕍(T, X, Y, Z), tetrad)
+    end
 end
 
 

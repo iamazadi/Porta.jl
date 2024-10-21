@@ -15,18 +15,18 @@ export gettranslation
 
 
 """
-    Represents a Dual-Quaternion number.
+    Represents a Dual-ℍ number.
 
 fields: real and imag.
 """
 struct Dualquaternion
-    real::Quaternion
-    imag::Quaternion
-    Dualquaternion(g::Quaternion, q::Quaternion) = new(g, q)
-    Dualquaternion(q::Quaternion, t::ℝ³) = new(normalize(q), 0.5 * (Quaternion(ℝ⁴(0.0, vec(t)...)) * normalize(q)))
+    real::ℍ
+    imag::ℍ
+    Dualquaternion(g::ℍ, q::ℍ) = new(g, q)
+    Dualquaternion(q::ℍ, t::ℝ³) = new(normalize(q), 0.5 * (ℍ(ℝ⁴(0.0, vec(t)...)) * normalize(q)))
     Dualquaternion(q::Dualquaternion) = Dualquaternion(normalize(q.real), normalize(q.imag))
-    Dualquaternion(q::Quaternion) = Dualquaternion(normalize(q), ℝ³(0.0, 0.0, 0.0))
-    Dualquaternion(t::ℝ³) = Dualquaternion(Quaternion(1.0, 0.0, 0.0, 0.0), t)
+    Dualquaternion(q::ℍ) = Dualquaternion(normalize(q), ℝ³(0.0, 0.0, 0.0))
+    Dualquaternion(t::ℝ³) = Dualquaternion(ℍ(1.0, 0.0, 0.0, 0.0), t)
 end
 
 
@@ -93,7 +93,7 @@ norm(q::Dualquaternion) = [norm(real(q)); dot(real(q), imag(q)) * (1.0 / norm(re
 
 Normalize the dual-quaternion number `q` so that its norm equals unity, i.e. norm(a) == 1.
 """
-normalize(q::Dualquaternion) = Dualquaternion(real(q) * (1.0 / norm(real(q))), Quaternion(ℝ⁴(0.0, vec(gettranslation(q))...)) * real(q) * (1.0 /  norm(real(q))))
+normalize(q::Dualquaternion) = Dualquaternion(real(q) * (1.0 / norm(real(q))), ℍ(ℝ⁴(0.0, vec(gettranslation(q))...)) * real(q) * (1.0 /  norm(real(q))))
 
 
 """

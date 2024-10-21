@@ -2,7 +2,7 @@ import GLMakie
 import FileIO
 
 
-x = Quaternion(normalize(ℝ⁴(rand(4))))
+x = ℍ(normalize(ℝ⁴(rand(4))))
 gauge = rand() * 2π
 M = I(4)
 chart = (-π / 4, π / 4, -π / 4, π / 4)
@@ -20,7 +20,7 @@ transparency = rand(1:2) == 1 ? true : false
 basemap = Basemap(lscene, x, gauge, M, chart, segments, color, transparency = transparency)
 
 matrix = getsurface(basemap.observable, segments, segments)
-x = Quaternion(normalize(ℝ⁴(rand(4))))
+x = ℍ(normalize(ℝ⁴(rand(4))))
 update!(basemap, x, gauge, M)
 _matrix = getsurface(basemap.observable, segments, segments)
 

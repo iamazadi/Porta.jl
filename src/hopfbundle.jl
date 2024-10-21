@@ -15,8 +15,8 @@ Perform the standard S¹ free group action in complex coordinates z ∈ S³ ⊂ 
 Φ: S¹ × S³ → S³
 (ℯⁱᶿ,z) ↦ ℯⁱᶿz
 """
-Φ(θ::Real, v::ℝ⁴) = Quaternion(exp(im * θ) .* [vec(v)[1] + im * vec(v)[3]; vec(v)[2] + im * vec(v)[4]])
-Φ(θ::Real, q::Quaternion) = Φ(θ, ℝ⁴(vec(q)))
+Φ(θ::Real, v::ℝ⁴) = ℍ(exp(im * θ) .* [vec(v)[1] + im * vec(v)[3]; vec(v)[2] + im * vec(v)[4]])
+Φ(θ::Real, q::ℍ) = Φ(θ, ℝ⁴(vec(q)))
 
 
 """
@@ -25,9 +25,9 @@ Perform the standard S¹ free group action in complex coordinates z ∈ S³ ⊂ 
 The S¹ group action in real coordinates.
 G_θ: S¹ × S³ → S³
 """
-G(θ::Real, v::ℝ⁴) = Quaternion([I(2) .* cos(θ) I(2) .* -sin(θ);
+G(θ::Real, v::ℝ⁴) = ℍ([I(2) .* cos(θ) I(2) .* -sin(θ);
                                 I(2) .* sin(θ) I(2) .* cos(θ)] * vec(v))
-G(θ::Real, q::Quaternion) = G(θ, ℝ⁴(vec(q)))
+G(θ::Real, q::ℍ) = G(θ, ℝ⁴(vec(q)))
 
 
 """
@@ -39,7 +39,7 @@ Apply the Hopf map as a projection.
 z = (z₁, z₂) ↦ (2Re(z₁z̅₂), 2Im(z₁z̅₂), |z₁|² - |z₂|²) = (z̅₁z₂ + z₁z̅₂, i(z̅₁z₂ + z₁z̅₂), |z₁|² - |z₂|²)
 """
 hopfmap(v::ℝ⁴) = [2(vec(v)[1] * vec(v)[2] + vec(v)[3] * vec(v)[4]); 2(vec(v)[2] * vec(v)[3] - vec(v)[1] * vec(v)[4]); vec(v)[1]^2 + vec(v)[3]^2 - vec(v)[2]^2 - vec(v)[4]^2]
-hopfmap(q::Quaternion) = hopfmap(ℝ⁴(vec(q)))
+hopfmap(q::ℍ) = hopfmap(ℝ⁴(vec(q)))
 
 
 """
@@ -67,7 +67,7 @@ end
 
 create a vector in the vertical subspace of the Hopf bundle with the given point `v` and constant `α`, which spans K₃v.
 """
-ver(v::Quaternion, α::Real) = α * (K(3) * v)
+ver(v::ℍ, α::Real) = α * (K(3) * v)
 
 
 """
@@ -82,7 +82,7 @@ function σmap(p::ℝ³)
     r, θ, ϕ = g
     z₂ = ℯ^(im * 0) * √((1 + sin(θ)) / 2)
     z₁ = ℯ^(im * ϕ) * √((1 - sin(θ)) / 2)
-    -Quaternion([z₁; z₂])
+    -ℍ([z₁; z₂])
 end
 
 
@@ -98,7 +98,7 @@ function τmap(p::ℝ³)
     r, θ, ϕ = g
     z₂ = ℯ^(im * 0) * √((1 + sin(θ)) / 2)
     z₁ = ℯ^(im * ϕ) * √((1 - sin(θ)) / 2)
-    -Quaternion([z₂; z₁])
+    -ℍ([z₂; z₁])
 end
 
 
@@ -108,7 +108,7 @@ end
 Apply the Hopf map to the given point `q`.
 π: S³ → S²
 """
-πmap(v::Quaternion) = begin
+πmap(v::ℍ) = begin
     z₁, z₂ = vec(v)[1] + vec(v)[3] * im, vec(v)[2] + vec(v)[4] * im
     w₃ = conj(z₁) * z₂ + z₁ * conj(z₂)
     w₂ = im * (conj(z₁) * z₂ - z₁ * conj(z₂))

@@ -8,7 +8,7 @@ import Base.:+
 import Base.:-
 import Base.:*
 
-export Quaternion
+export ℍ
 export elI
 export eli
 export elj
@@ -21,7 +21,7 @@ export J
 export R
 
 
-# The global constants defining elementary Quaternions
+# The global constants defining elementary ℍs
 const elI = Complex.([1 0; 0 1])
 const eli = Complex.([0 im; im 0])
 const elj = Complex.([0 -1; 1 0])
@@ -33,36 +33,36 @@ const elk = Complex.([im 0; 0 -im])
 
 fields: a, b, c and d.
 """
-struct Quaternion
+struct ℍ
     a::Float64
     b::Float64
     c::Float64
     d::Float64
-    Quaternion(a::Float64, b::Float64, c::Float64, d::Float64) = new(a, b, c, d)
-    Quaternion(a::ℝ⁴) = Quaternion(vec(a)...)
-    Quaternion(v::Vector{Float64}) = Quaternion(v...)
-    Quaternion(z::Vector{<:Complex}) = Quaternion(real(z[1]), real(z[2]), imag(z[1]), imag(z[2]))
-    Quaternion(m::Matrix{Float64}) = Quaternion(m[1,1], m[1,2], m[1,3], m[1,4])
-    Quaternion(M::Matrix{<:Complex}) = begin
+    ℍ(a::Float64, b::Float64, c::Float64, d::Float64) = new(a, b, c, d)
+    ℍ(a::ℝ⁴) = ℍ(vec(a)...)
+    ℍ(v::Vector{Float64}) = ℍ(v...)
+    ℍ(z::Vector{<:Complex}) = ℍ(real(z[1]), real(z[2]), imag(z[1]), imag(z[2]))
+    ℍ(m::Matrix{Float64}) = ℍ(m[1,1], m[1,2], m[1,3], m[1,4])
+    ℍ(M::Matrix{<:Complex}) = begin
         if isapprox(M, elI)
-            return Quaternion(1.0, 0.0, 0.0, 0.0)
+            return ℍ(1.0, 0.0, 0.0, 0.0)
         elseif isapprox(M, eli)
-            return Quaternion(0.0, 1.0, 0.0, 0.0)
+            return ℍ(0.0, 1.0, 0.0, 0.0)
         elseif isapprox(M, elj)
-            return Quaternion(0.0, 0.0, 1.0, 0.0)
+            return ℍ(0.0, 0.0, 1.0, 0.0)
         elseif isapprox(M, elk)
-            return Quaternion(0.0, 0.0, 0.0, 1.0)
+            return ℍ(0.0, 0.0, 0.0, 1.0)
         else
             @assert(false, "The direct construction for the given matrix has not been implemented, try other constructors instead.")
         end
     end
-    Quaternion(ψ::Float64, u::ℝ³) = begin
+    ℍ(ψ::Float64, u::ℝ³) = begin
         @assert(isapprox(norm(u), 1.0), "The input vector must have unit norm, but the norm is $(norm(u)).")
-        Quaternion(ℝ⁴(cos(ψ / 2), vec(sin(ψ / 2) * u)...))
+        ℍ(ℝ⁴(cos(ψ / 2), vec(sin(ψ / 2) * u)...))
     end
-    Quaternion(ψ::Int64, u::ℝ³) = begin
+    ℍ(ψ::Int64, u::ℝ³) = begin
         @assert(isapprox(norm(u), 1.0), "The input vector must have unit norm, but the norm is $(norm(u)).")
-        Quaternion(ℝ⁴(cos(float(ψ) / 2), vec(sin(float(ψ) / 2) * u)...))
+        ℍ(ℝ⁴(cos(float(ψ) / 2), vec(sin(float(ψ) / 2) * u)...))
     end
 end
 
@@ -72,7 +72,7 @@ end
  
  Reshape the number `q` as a column 4-vector.
  """
-Base.vec(q::Quaternion) = [q.a; q.b; q.c; q.d]
+Base.vec(q::ℍ) = [q.a; q.b; q.c; q.d]
 
 
 """
@@ -80,15 +80,15 @@ Base.vec(q::Quaternion) = [q.a; q.b; q.c; q.d]
 
 Print a string representation of the given quaternion `q`.
 """
-Base.show(io::IO, q::Quaternion) = print(io, "($(q.a) + $(q.b) i + $(q.c) j + $(q.d) k) ∈ ℍ")
+Base.show(io::IO, q::ℍ) = print(io, "($(q.a) + $(q.b) i + $(q.c) j + $(q.d) k) ∈ ℍ")
 
 
 """
     mat(q)
 
-Represent the number `q` by a complex 2x2 matrix in terms a basis of elementary Quaternions: I, i, j and k.
+Represent the number `q` by a complex 2x2 matrix in terms a basis of elementary ℍs: I, i, j and k.
 """
-mat(q::Quaternion) = [q.a + im * q.d -q.c + im * q.b; q.c + im * q.b q.a - im * q.d]
+mat(q::ℍ) = [q.a + im * q.d -q.c + im * q.b; q.c + im * q.b q.a - im * q.d]
 
 
 """
@@ -96,7 +96,7 @@ mat(q::Quaternion) = [q.a + im * q.d -q.c + im * q.b; q.c + im * q.b q.a - im * 
 
 Represent the number `q` by a quaternionic 4x4 matrix in terms a basis for so(4), the Lie algebra of the Lie group of rotations about a fixed point in ℝ⁴.
 """
-mat4(q::Quaternion) = q.a .* I(4) + q.b .* K(2) + q.c .* K(3) + q.d .* K(1)
+mat4(q::ℍ) = q.a .* I(4) + q.b .* K(2) + q.c .* K(3) + q.d .* K(1)
 
 
 """
@@ -104,7 +104,7 @@ mat4(q::Quaternion) = q.a .* I(4) + q.b .* K(2) + q.c .* K(3) + q.d .* K(1)
 
 Return the real part of the quaternion number `q`.
 """
-Base.real(q::Quaternion) = q.a
+Base.real(q::ℍ) = q.a
 
 
 """
@@ -112,7 +112,7 @@ Base.real(q::Quaternion) = q.a
 
 Return the imaginary (vectorial) part of the quaternion number `q`.
 """
-Base.imag(q::Quaternion) = ℝ³(q.b, q.c, q.d)
+Base.imag(q::ℍ) = ℝ³(q.b, q.c, q.d)
 
 
 """
@@ -120,7 +120,7 @@ Base.imag(q::Quaternion) = ℝ³(q.b, q.c, q.d)
 
 Compute the conjugate of a quaternion number `q`.
 """
-Base.conj(q::Quaternion) = Quaternion(real(q), vec(-imag(q))...)
+Base.conj(q::ℍ) = ℍ(real(q), vec(-imag(q))...)
 
 
 """
@@ -128,7 +128,7 @@ Base.conj(q::Quaternion) = Quaternion(real(q), vec(-imag(q))...)
 
 Compute the determinant of a quaternion number `q`.
 """
-det(q::Quaternion) = det(mat(q))
+det(q::ℍ) = det(mat(q))
 det(M::Matrix{<:Complex}) = begin
     @assert(size(M) == (2, 2), "The size of the matrix must be a square 2 by 2, but was given the size: $(size(M)).")
     real(M[1, 1] * M[2, 2] - M[1, 2] * M[2, 1])
@@ -140,7 +140,7 @@ end
 
 Inexact equality comparison.
 """
-Base.isapprox(g::Quaternion, q::Quaternion; atol::Float64 = TOLERANCE) = isapprox(g.a, q.a, atol = atol) &&
+Base.isapprox(g::ℍ, q::ℍ; atol::Float64 = TOLERANCE) = isapprox(g.a, q.a, atol = atol) &&
                                                                          isapprox(g.b, q.b, atol = atol) &&
                                                                          isapprox(g.c, q.c, atol = atol) &&
                                                                          isapprox(g.d, q.d, atol = atol)
@@ -151,7 +151,7 @@ Base.isapprox(g::Quaternion, q::Quaternion; atol::Float64 = TOLERANCE) = isappro
 
 Compute the 2-norm as if `q` were a vector of the corresponding length.
 """
-norm(q::Quaternion) = norm(ℝ⁴(vec(q)))
+norm(q::ℍ) = norm(ℝ⁴(vec(q)))
 
 
 """
@@ -159,7 +159,7 @@ norm(q::Quaternion) = norm(ℝ⁴(vec(q)))
 
 Normalize the number `q` so that its 2-norm equals unity, i.e. norm(a) == 1.
 """
-normalize(q::Quaternion) = Quaternion(normalize(ℝ⁴(vec(q))))
+normalize(q::ℍ) = ℍ(normalize(ℝ⁴(vec(q))))
 
 
 """
@@ -167,20 +167,20 @@ normalize(q::Quaternion) = Quaternion(normalize(ℝ⁴(vec(q))))
 
 Compute the dot product between two vector representations of `g` and `q`.
 """
-dot(g::Quaternion, q::Quaternion) = dot(ℝ⁴(vec(g)), ℝ⁴(vec(q)))
-dot(g::ℝ⁴, q::Quaternion) = dot(g, ℝ⁴(vec(q)))
-dot(g::Quaternion, q::ℝ⁴) = dot(ℝ⁴(vec(g)), q)
+dot(g::ℍ, q::ℍ) = dot(ℝ⁴(vec(g)), ℝ⁴(vec(q)))
+dot(g::ℝ⁴, q::ℍ) = dot(g, ℝ⁴(vec(q)))
+dot(g::ℍ, q::ℝ⁴) = dot(ℝ⁴(vec(g)), q)
 
 
-+(q::Quaternion) = q
--(q::Quaternion) = Quaternion(-vec(q))
-(+)(g::Quaternion, q::Quaternion) = Quaternion(mat4(g) + mat4(q))
-(-)(g::Quaternion, q::Quaternion) = Quaternion(mat4(g) - mat4(q))
-(*)(q::Quaternion, λ::Real) = Quaternion(mat4(q) .* λ)
-(*)(λ::Real, q::Quaternion) = q * λ
-(*)(g::Quaternion, q::Quaternion) = Quaternion(mat4(g) * mat4(q))
-(*)(m::Matrix{<:Real}, q::Quaternion) = Quaternion(m * vec(q))
-(*)(m::Matrix{<:Complex}, q::Quaternion) = m * mat(q)
++(q::ℍ) = q
+-(q::ℍ) = ℍ(-vec(q))
+(+)(g::ℍ, q::ℍ) = ℍ(mat4(g) + mat4(q))
+(-)(g::ℍ, q::ℍ) = ℍ(mat4(g) - mat4(q))
+(*)(q::ℍ, λ::Real) = ℍ(mat4(q) .* λ)
+(*)(λ::Real, q::ℍ) = q * λ
+(*)(g::ℍ, q::ℍ) = ℍ(mat4(g) * mat4(q))
+(*)(m::Matrix{<:Real}, q::ℍ) = ℍ(m * vec(q))
+(*)(m::Matrix{<:Complex}, q::ℍ) = m * mat(q)
 
 
 """
@@ -270,20 +270,20 @@ R = [1 0 0 0;
 
 
 """
-    Quaternion(v)
+    ℍ(v)
 
 Transform a four-vector into a 'vectorial' quaternion.
 """
-function Quaternion(v::𝕍)
+function ℍ(v::𝕍)
     T, X, Y, Z = vec(v)
     @assert(isapprox(T, 0), "The coordinate of the given four-vector must have the first element equal to zero, but was given T = $T.")
-    Quaternion(0.0, X, Y, Z)
+    ℍ(0.0, X, Y, Z)
 end
 
 
 """
-    Quaternion(s)
+    ℍ(s)
 
 Transform a spin-vector into a 'vectorial' quaternion.
 """
-Quaternion(v::SpinVector) = Quaternion(0.0, vec(ℝ³(v))...)
+ℍ(v::SpinVector) = ℍ(0.0, vec(ℝ³(v))...)

@@ -2,7 +2,7 @@ import GLMakie
 
 
 N = rand(5:10)
-x = [Quaternion(normalize(ℝ⁴(rand(4)))) for i in 1:N]
+x = [ℍ(normalize(ℝ⁴(rand(4)))) for i in 1:N]
 gauge1 = rand()
 gauge2 = rand()
 segments = rand(5:10)
@@ -16,7 +16,7 @@ lscene = GLMakie.LScene(fig[1, 1])
 color = GLMakie.RGBAf(rand(4)...)
 whirl = Whirl(lscene, x, gauge1, gauge2, M, segments, color, transparency = false)
 
-_x = [Quaternion(normalize(ℝ⁴(rand(4)))) for i in 1:N]
+_x = [ℍ(normalize(ℝ⁴(rand(4)))) for i in 1:N]
 _gauge1 = rand()
 _gauge2 = rand()
 

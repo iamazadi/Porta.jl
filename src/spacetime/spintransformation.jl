@@ -124,19 +124,6 @@ Base.isapprox(a::SpinTransformation, b::SpinTransformation; atol::Float64 = TOLE
                                                                                          isapprox(a.δ, b.δ, atol = atol)
 
 
-𝕄(ξ::Complex, η::Complex) = begin
-    T = real(1.0 / √2 * (ξ * conj(ξ) + η * conj(η)))
-    X = real(1.0 / √2 * (ξ * conj(η) + η * conj(ξ)))
-    Y = real(1.0 / (im * √2) * (ξ * conj(η) - η * conj(ξ)))
-    Z = real(1.0 / √2 * (ξ * conj(ξ) - η * conj(η)))
-    tetrad = Tetrad(ℝ⁴(1.0, 0.0, 0.0, 0.0), ℝ⁴(0.0, -1.0, 0.0, 0.0), ℝ⁴(0.0, 0.0, -1.0, 0.0), ℝ⁴(0.0, 0.0, 0.0, -1.0))
-    𝕄(𝕍(0.0, 0.0, 0.0, 0.0), 𝕍(T, X, Y, Z), tetrad)
-end
-
-
-𝕄(v::SpinVector) = 𝕄(v.a...)
-
-
 # The relativistic Doppler factor
 dopplerfactor(v::Float64) = √((1 + v) / (1 - v))
 
@@ -152,4 +139,4 @@ zboost(v::Float64) = SpinTransformation(Complex.([√dopplerfactor(v) 0; 0 1 / �
 
 Construct a spin transformation with the given rotation angle `ψ` and spin vector `v`.
 """
-SpinTransformation(ψ::Float64, v::SpinVector) = SpinTransformation(mat(Quaternion(ψ, ℝ³(v))))
+SpinTransformation(ψ::Float64, v::SpinVector) = SpinTransformation(mat(ℍ(ψ, ℝ³(v))))
