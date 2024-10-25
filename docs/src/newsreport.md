@@ -9,13 +9,13 @@ Show a small piece of the story.
 
 # Context
 
-## Where, Who, What, How and Why
+## Where, When, Who, What, How and Why?
 
 Tell us the facts of the story.
 
 ![2](./assets/spinspace/2.PNG)
 
-## Where
+## Where and When
 
 ![3](./assets/spinspace/3.PNG)
 

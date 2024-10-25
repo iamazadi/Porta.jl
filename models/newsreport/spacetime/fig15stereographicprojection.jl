@@ -4,38 +4,6 @@ import LinearAlgebra
 using Porta
 
 
-function makeplane(transformation::SpinTransformation; segments::Int = 60)
-    lspace1 = range(-π, stop = float(π), length = segments)
-    lspace2 = range(-π / 2, stop = π / 2, length = segments)
-    sphere = [convert_to_cartesian([1.0; θ; ϕ]) for θ in lspace2, ϕ in lspace1]
-    T = 1.0
-    surface = map(x -> 𝕍(transformation * SpinVector(𝕍(T, vec(sign(T) * √abs(T) * x)...))), sphere)
-    return map(x -> project(normalize(ℍ(vec(x)))), surface)
-end
-
-
-function makeplane2(transformation::SpinTransformation; segments::Int = 60)
-    lspace1 = range(-π, stop = float(π), length = segments)
-    lspace2 = range(-π / 2, stop = π / 2, length = segments)
-    sphere = [convert_to_cartesian([1.0; θ; ϕ]) for θ in lspace2, ϕ in lspace1]
-    T = 1.0
-    surface = map(x -> 𝕍(transformation * SpinVector( 𝕍(T, vec(sign(T) * √abs(T) * x)...))), sphere)
-    surface = map(x -> 𝕍(vec(x) .* (1.0 / (1.0 - vec(x)[4]))) , surface)
-    return map(x -> project(ℍ(vec(x))), surface)
-end
-
-
-function makeplane3(transformation::SpinTransformation; segments::Int = 60)
-    lspace1 = range(-π, stop = float(π), length = segments)
-    lspace2 = range(-π / 2, stop = (π / 2), length = segments)
-    sphere = [convert_to_cartesian([1.0; θ; ϕ]) for θ in lspace2, ϕ in lspace1]
-    T = 1.0
-    surface = map(x -> 𝕍(transformation * SpinVector( 𝕍(T, vec(sign(T) * √abs(T) * x)...))), sphere)
-    surface = map(x -> 𝕍(vec(x)[1], vec(x)[2] / (1.0 - vec(x)[4]), vec(x)[3] / (1.0 - vec(x)[4]) , 0.0), surface)
-    return map(x -> ℝ³(vec(x)[2], vec(x)[3], 0.0), surface)
-end
-
-
 figuresize = (4096, 2160)
 segments = 360
 frames_number = 360
@@ -125,14 +93,15 @@ P′ball = GLMakie.meshscatter!(lscene2, P′projection, markersize = 0.05, colo
 ϕ = rand()
 ψ = rand()
 transformation = SpinTransformation(θ, ϕ, ψ)
-planematrix = makeplane(transformation, segments = segments)
+T = 1.0
+planematrix = makesphere(transformation, T, segments = segments)
 # planeobservable1 = buildsurface(lscene1, planematrix, mask, transparency = true)
 planeobservable2 = buildsurface(lscene2, planematrix, mask, transparency = true)
 
-plane2matrix = makeplane2(transformation, segments = segments)
+plane2matrix = makespheretminusz(transformation, T = T, segments = segments)
 plane2observable = buildsurface(lscene1, plane2matrix, mask, transparency = true)
 
-plane3matrix = makeplane3(transformation, segments = segments)
+plane3matrix = makestereographicprojectionplane(transformation, T = T, segments = segments)
 plane3observable = buildsurface(lscene2, plane3matrix, mask, transparency = true)
 
 segmentPN = GLMakie.@lift([GLMakie.Point3f(project(normalize(ℍ(vec($Pvobservable + α * 𝕍(LinearAlgebra.normalize(vec($Nvobservable - $Pvobservable)))))))) for α in range(-float(2π), stop = float(2π), length = segments)])
@@ -159,9 +128,9 @@ animate(frame::Int) = begin
     ψ = sin(progress * 2π)
     spintransform = SpinTransformation(θ, ϕ, ψ)
     Pvobservable[] = 𝕍(spintransform * κ)
-    planematrix = makeplane(spintransform, segments = segments)
-    plane2matrix = makeplane2(spintransform, segments = segments)
-    plane3matrix = makeplane3(spintransform, segments = segments)
+    planematrix = makesphere(spintransform, T, segments = segments)
+    plane2matrix = makespheretminusz(spintransform, T = T, segments = segments)
+    plane3matrix = makestereographicprojectionplane(spintransform, T = T, segments = segments)
     # updatesurface!(planematrix, planeobservable1)
     updatesurface!(planematrix, planeobservable2)
     updatesurface!(plane2matrix, plane2observable)

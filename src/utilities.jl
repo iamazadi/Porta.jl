@@ -6,6 +6,10 @@ export project
 export updatecamera
 export maketwosphere
 export makesphere
+export makespheretminusz
+export makestereographicprojectionplane
+export makeflagplane
+export projectontoplane
 
 
 """
@@ -65,6 +69,9 @@ Converts the quaternion number `q` to a quaternion type in Makie for interoperab
 GLMakie.Quaternion(q::ℍ) = GLMakie.Quaternion(vec(q)[2:4]..., vec(q)[1])
 
 
+ℝ³(p::GLMakie.Point3f) = ℝ³(Float64.(vec(p))...)
+
+
 """
     Point3f(v)
 
@@ -94,7 +101,7 @@ end
 """
     maketwosphere(origin)
 
-Make a 2-sphere as a matrix of 3D points.
+Make a 2-sphere as a matrix of 3D points with the given `origin` as the center point.
 """
 function maketwosphere(origin::ℝ³)
     lspace1 = range(-π, stop = float(π), length = segments)
@@ -104,10 +111,24 @@ end
 
 
 """
-    makesphere(M, T)
+    makesphere(transformation, T)
 
-Make a 2-surface as a section of the null cone with the given transformation `M` and temporal section `T`.
+Make a cross-section of the null cone with the given spin `transformation`` and temporal section `T`.
 """
+function makesphere(transformation::SpinTransformation, T::Float64; segments::Int = 60)
+    lspace1 = range(-π, stop = float(π), length = segments)
+    lspace2 = range(-π / 2, stop = π / 2, length = segments)
+    sphere = [convert_to_cartesian([1.0; θ; ϕ]) for θ in lspace2, ϕ in lspace1]
+    if isapprox(T, 0.0)
+        surface = map(x -> 𝕍(T, vec(x)...), sphere)
+    else
+        surface = map(x -> 𝕍(T, vec(sign(T) * √abs(T) * x)...), sphere)
+    end
+    surface = map(x -> 𝕍(transformation * SpinVector(x)), surface)
+    return map(x -> project(normalize(ℍ(vec(x)))), surface)
+end
+
+
 function makesphere(M::ℍ, T::Float64; segments::Int = 60)
     lspace1 = range(-π, stop = float(π), length = segments)
     lspace2 = range(-π / 2, stop = π / 2, length = segments)
@@ -118,4 +139,77 @@ function makesphere(M::ℍ, T::Float64; segments::Int = 60)
         surface = map(x -> 𝕍(T, vec(sign(T) * √abs(T) * x)...), sphere)
     end
     return map(x -> project(M * normalize(ℍ(vec(x)))), surface)
+end
+
+
+function makesphere(M::Matrix{Float64}, T::Float64; segments::Int = 60)
+    lspace1 = range(-π, stop = float(π), length = segments)
+    lspace2 = range(-π / 2, stop = π / 2, length = segments)
+    sphere = [convert_to_cartesian([1.0; θ; ϕ]) for θ in lspace2, ϕ in lspace1]
+    if isapprox(T, 0.0)
+        surface = map(x -> 𝕍(T, vec(x)...), sphere)
+    else
+        surface = map(x -> 𝕍(T, vec(sign(T) * √abs(T) * x)...), sphere)
+    end
+    return map(x -> project(M * normalize(ℍ(vec(x)))), surface)
+end
+
+
+function makespheretminusz(transformation::SpinTransformation; T::Float64 = 1.0, segments::Int = 60)
+    lspace1 = range(-π, stop = float(π), length = segments)
+    lspace2 = range(-π / 2, stop = π / 2, length = segments)
+    sphere = [convert_to_cartesian([1.0; θ; ϕ]) for θ in lspace2, ϕ in lspace1]
+    surface = map(x -> 𝕍(transformation * SpinVector( 𝕍(T, vec(sign(T) * √abs(T) * x)...))), sphere)
+    surface = map(x -> 𝕍(vec(x) .* (1.0 / (1.0 - vec(x)[4]))) , surface)
+    return map(x -> project(ℍ(vec(x))), surface)
+end
+
+
+"""
+    makestereographicprojectionplane(transformation)
+
+Transform the cross-section of the null cone corresponding to T = 1 with the given spin `transformation`,
+such that it is equivalent to the stereographic projection.
+"""
+function makestereographicprojectionplane(transformation::SpinTransformation; T::Float64 = 1.0, segments::Int = 60)
+    lspace1 = range(-π, stop = float(π), length = segments)
+    lspace2 = range(-π / 2, stop = (π / 2), length = segments)
+    sphere = [convert_to_cartesian([1.0; θ; ϕ]) for θ in lspace2, ϕ in lspace1]
+    surface = map(x -> 𝕍(transformation * SpinVector( 𝕍(T, vec(sign(T) * √abs(T) * x)...))), sphere)
+    surface = map(x -> 𝕍(vec(x)[1], vec(x)[2] / (1.0 - vec(x)[4]), vec(x)[3] / (1.0 - vec(x)[4]) , 0.0), surface)
+    return map(x -> ℝ³(vec(x)[2], vec(x)[3], 0.0), surface)
+end
+
+
+function makestereographicprojectionplane(M::Matrix{Float64}; T::Float64 = 1.0, segments::Int = 60)
+    lspace1 = range(-π, stop = float(π), length = segments)
+    lspace2 = range(-π / 2, stop = (π / 2), length = segments)
+    sphere = [convert_to_cartesian([1.0; θ; ϕ]) for θ in lspace2, ϕ in lspace1]
+    surface = map(x -> 𝕍(M * vec(𝕍(SpinVector( 𝕍(T, vec(sign(T) * √abs(T) * x)...))))), sphere)
+    surface = map(x -> 𝕍(vec(x)[1], vec(x)[2] / (1.0 - vec(x)[4]), vec(x)[3] / (1.0 - vec(x)[4]) , 0.0), surface)
+    return map(x -> ℝ³(vec(x)[2], vec(x)[3], 0.0), surface)
+end
+
+
+"""
+    projectontoplane(x)
+
+Project the given 4-vector `x` onto a cross-section of the null cone such that it is equivalent to the stereographic projection.
+"""
+function projectontoplane(x::𝕍)
+    v = 𝕍(vec(x)[1], vec(x)[2] / (1.0 - vec(x)[4]), vec(x)[3] / (1.0 - vec(x)[4]) , 0.0)
+    ℝ³(vec(v)[2], vec(v)[3], 0.0)
+end
+
+
+"""
+    makeflagplane(u, v)
+
+Make a half plane with the given 4-vectors `u` and `v`.
+"""
+function makeflagplane(u::𝕍, v::𝕍; segments::Int = 60)
+    lspace1 = range(-1.0, stop = 1.0, length = segments)
+    lspace2 = range(0.0, stop = 1.0, length = segments)
+    matrix = [f * u + s * v for f in lspace1, s in lspace2]
+    map(x -> project(normalize(ℍ(vec(x)))), matrix)
 end
