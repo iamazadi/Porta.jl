@@ -33,19 +33,21 @@ sphereobservable2 = buildsurface(lscene2, spherematrix, mask, transparency = tru
 planematrix = makestereographicprojectionplane(M, T = T, segments = segments)
 planeobservable1 = buildsurface(lscene1, planematrix, mask, transparency = true)
 planeobservable2 = buildsurface(lscene2, planematrix, mask, transparency = true)
-# transformingplaneobservable1 = buildsurface(lscene1, planematrix, mask, transparency = true)
-# transformingplaneobservable2 = buildsurface(lscene2, planematrix, mask, transparency = true)
+ϵ = 0.1
+transformation = SpinTransformation(ϵ + rand() * 0.1, ϵ + rand() * 0.1, ϵ + rand() * 0.1)
+# tminuszsection = makespheretminusz(transformation, T = T, segments = segments)
+# tminusz = buildsurface(lscene2, tminuszsection, mask, transparency = true)
+# tminusz = buildsurface(lscene2, tminuszsection, mask, transparency = true)
 
 generate() = 2rand() - 1 + im * (2rand() - 1)
 κ = SpinVector(generate(), generate(), Int(T))
-ϵ = 0.1
 ζ = Complex(κ)
 κ = SpinVector(ζ, Int(T))
 ζ′ = ζ - (1.0 / √2) * ϵ * (1.0 / κ.a[2]^2)
 κ′ = SpinVector(ζ′, Int(T))
 
 ζ″ = ζ′ - (1.0 / √2) * ϵ * (1.0 / κ′.a[2]^2)
-κ″ = SpinVector(ζ″, Int(T))
+κ″ = transformation * SpinVector(ζ″, Int(T))
 κv = 𝕍(κ)
 κ′v = 𝕍(κ′)
 κ″v = 𝕍(κ″)
@@ -87,7 +89,7 @@ ns = GLMakie.@lift([$κobservable, LinearAlgebra.normalize($κ′observable - $�
 colorants = [:red, :green, :blue, :orange]
 GLMakie.arrows!(lscene1,
     ps, ns, fxaa = true, # turn on anti-aliasing
-    color = [colorants..., colorants..., colorants...],
+    color = [colorants[1], colorants[4], colorants[1], colorants[4], colorants[2], colorants[4], colorants[2], colorants[4], colorants[3], colorants[4], colorants[3], colorants[4]],
     linewidth = linewidth, arrowsize = arrowsize,
     align = :origin
 )
@@ -112,7 +114,7 @@ titles = ["O", "N", "P", "P′", "P″", "P", "P′", "P″"]
 GLMakie.text!(lscene1,
     GLMakie.@lift(map(x -> GLMakie.Point3f(isnan(x) ? ẑ : x), [$origin, $northpole, $κobservable, $κ′observable, $κ″observable, $κprojectionobservable, $κ′projectionobservable, $κ″projectionobservable])),
     text = titles,
-    color = [:gold, :black, colorants[1], colorants[1], colorants[1], colorants[3], colorants[3], colorants[3]],
+    color = [:gold, :black, colorants[1], colorants[2], colorants[3], colorants[1], colorants[2], colorants[3]],
     rotation = rotation1,
     align = (:left, :baseline),
     fontsize = 0.25,
@@ -121,17 +123,13 @@ GLMakie.text!(lscene1,
 GLMakie.text!(lscene2,
     GLMakie.@lift(map(x -> GLMakie.Point3f(isnan(x) ? ẑ : x), [$origin, $northpole, $κobservable, $κ′observable, $κ″observable, $κprojectionobservable, $κ′projectionobservable, $κ″projectionobservable])),
     text = titles,
-    color = [:gold, :black, colorants[1], colorants[1], colorants[1], colorants[3], colorants[3], colorants[3]],
+    color = [:gold, :black, colorants[1], colorants[2], colorants[3], colorants[1], colorants[2], colorants[3]],
     rotation = rotation2,
     align = (:left, :baseline),
     fontsize = 0.25,
     markerspace = :data
 )
 
-θ = rand()
-ϕ = rand()
-ψ = rand()
-transformation = SpinTransformation(θ, ϕ, ψ)
 κflagplanematrix = makeflagplane(κv, κ′v - κv, segments = segments)
 κflagplanecolor = GLMakie.Observable(fill(GLMakie.RGBAf(0.5, 0.5, 0.5, 0.5), segments, segments))
 κflagplaneobservable1 = buildsurface(lscene1, κflagplanematrix, κflagplanecolor, transparency = false)
@@ -161,6 +159,9 @@ GLMakie.meshscatter!(lscene2, κ″projectionobservable, markersize = 0.05, colo
 GLMakie.meshscatter!(lscene2, κprojectionobservable, markersize = 0.05, color = colorants[1])
 GLMakie.meshscatter!(lscene2, κ′projectionobservable, markersize = 0.05, color = colorants[2])
 GLMakie.meshscatter!(lscene2, κ″projectionobservable, markersize = 0.05, color = colorants[3])
+GLMakie.meshscatter!(lscene1, κsectional, markersize = 0.05, color = colorants[1])
+GLMakie.meshscatter!(lscene1, κ′sectional, markersize = 0.05, color = colorants[2])
+GLMakie.meshscatter!(lscene1, κ″sectional, markersize = 0.05, color = colorants[3])
 GLMakie.meshscatter!(lscene2, κsectional, markersize = 0.05, color = colorants[1])
 GLMakie.meshscatter!(lscene2, κ′sectional, markersize = 0.05, color = colorants[2])
 GLMakie.meshscatter!(lscene2, κ″sectional, markersize = 0.05, color = colorants[3])
@@ -183,16 +184,18 @@ animate(frame::Int) = begin
     stage = min(totalstages - 1, Int(floor(totalstages * progress))) + 1
     stageprogress = totalstages * (progress - (stage - 1) * 1.0 / totalstages)
     println("Frame: $frame, Stage: $stage, Total Stages: $totalstages, Progress: $stageprogress")
-    θ = sin(progress * 2π)
-    ϕ = progress * 2π
+    θ = progress * 2π
+    ϕ = sin(progress * 2π)
     ψ = cos(progress * 2π)
     spintransform = SpinTransformation(θ, ϕ, ψ)
     spherematrix = makesphere(spintransform, T, segments = segments)
     planematrix = makestereographicprojectionplane(spintransform, T = 1.0, segments = segments)
-    updatesurface!(spherematrix, sphereobservable1)
+    # updatesurface!(spherematrix, sphereobservable1)
     updatesurface!(planematrix, planeobservable1)
     updatesurface!(spherematrix, sphereobservable2)
     updatesurface!(planematrix, planeobservable2)
+    # tminuszsection = makespheretminusz(spintransform, T = T, segments = segments)
+    # updatesurface!(tminuszsection, tminusz)
     κtransformed = 𝕍(spintransform * κ)
     κ′transformed = 𝕍(spintransform * κ′)
     κ″transformed = 𝕍(spintransform * κ″)
@@ -223,11 +226,12 @@ animate(frame::Int) = begin
         GLMakie.notify(κlinepoints[i])
         GLMakie.notify(κlinecolors[i])
     end
-    global lookat = (1.0 / 3.0) * (ℝ³(κobservable[]) + ℝ³(κ′observable[]) + ℝ³(κ″observable[]))
-    global eyeposition = normalize(ℝ³(1.0, 1.0, 1.0)) * float(π)
+    component = normalize(cross(ℝ³(κobservable[]), ℝ³(κprojectionobservable[])))
+    global lookat = (1.0 / 3.0) * (ℝ³(κsectional[]) + ℝ³(κ′sectional[]) + ℝ³(κ″sectional[]) + component)
+    global eyeposition = normalize(lookat) * float(π)
     updatecamera(lscene1, eyeposition, lookat, up)
     global lookat = (1.0 / 3.0) * (ℝ³(κprojectionobservable[]) + ℝ³(κ′projectionobservable[]) + ℝ³(κ″projectionobservable[]))
-    global eyeposition = normalize(ℝ³(0.0, 0.0, 1.0)) * float(π)
+    global eyeposition = normalize(ẑ) * float(π)
     updatecamera(lscene2, eyeposition, lookat, up)
 end
 
