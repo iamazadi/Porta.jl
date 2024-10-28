@@ -19,17 +19,25 @@ Tell us the facts of the story.
 
 ![3](./assets/spinspace/3.PNG)
 
+[Transformations](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/spacetime/fig11transformations.jl)
+
 What is the relation between a spin-frame and a Minkowski tetrad? The spin-frame is denoted by omicron (black) and iota (silver). Omicron and iota serve as two flag poles, where we also show their respective flags. In order to see the flags, find the arcs in the x direction that move with omicron and iota during a series of transformations. The spin-frame is in a vector space over complex numbers. The spin space has the axioms of an abstract vector space. But, we have defined a special inner product for 2-spinors, such that the product of omicron and iota equals unity, whereas the product of iota and omicron equals minus unity. In other words, the inner product eats a pair of spin-vectors in the Hopf bundle and spits out a complex number (a scalar).
 
 ![4](./assets/spinspace/4.PNG)
+
+[Y Negative](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/spacetime/fig12ynegative.jl)
 
 The axes t (red), x (green), y (blue), and z (orange) are parts of a Minkowski tetrad in Minkowski spacetime. Choosing the default Minkowski tetrad, the tetrad aligns with the Cartesian axes of real dimension four. But, when we apply a spin-transformation, the tetrad no longer aligns with Cartesian coordinates, and with it the spin-frame bases omicron and iota change as well. The kinds of spin transformation that we apply are four-screws and null rotations, and so they are restricted transformations. Restricted transformations do not alter the sign of time. Here, the time sign is negative one, which is the same as the wall clock time.
 
 ![5](./assets/spinspace/5.PNG)
 
+[Stereographic Projection](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/spacetime/fig13stereographicprojection.jl)
+
 If you look closely, there are two spheres in the middle that change hue over time. One of them is the past null cone and the other is the sphere S^{-1}. You will recognize the null cone as soon as it turns into a cone momentarily. If a spin-vector is in S^{-1}, then under restricted spin-transformations it does not leave the sphere S^{-1} to S^{+1}. The past null cone is the directions of light that reach our eyes from the past. But, the sphere S^{-1} is the light that we can observe around us in the present moment (assume we’re in deep space and away from heavenly objects). Under spin-transformations the null cone and the sphere S^{-1} change too, because they are embedded in Minkowski spacetime of dimension 4.
 
 ![6](./assets/spinspace/6.PNG)
+
+[Spherical Coordinates](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/spacetime/fig14spherical.jl)
 
 ```julia
 timesign = -1
@@ -40,6 +48,8 @@ timesign = -1
 ```
 
 ![7](./assets/spinspace/7.PNG)
+
+[Stereographic Projection](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/spacetime/fig15stereographicprojection.jl)
 
 ```julia
 generate() = 2rand() - 1 + im * (2rand() - 1)
@@ -62,6 +72,8 @@ generate() = 2rand() - 1 + im * (2rand() - 1)
 
 ![8](./assets/spinspace/8.PNG)
 
+[Four-Screw](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/spacetime/fig1678fourscrew.jl)
+
 ```julia
 t = 𝕍(1.0, 0.0, 0.0, 0.0)
 x = 𝕍(0.0, 1.0, 0.0, 0.0)
@@ -73,17 +85,25 @@ z = 𝕍(0.0, 0.0, 0.0, 1.0)
 
 ![9](./assets/spinspace/9.PNG)
 
+[Null Rotation](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/spacetime/fig19nullrotation.jl)
+
 The phase of the inner product of spin-vectors is shown as a prism arc. In a Minkowski tetrad with bases t, x, y and z, (with signature (+,-,-,-)) there are a pair of basis vectors for spin-vectors: omicron and iota. For example, the spin-vectors kappa and omega, each are linear combinations of omicron and iota. The product of kappa and omega is a complex number that has a magnitude and a phase. Being spin-vectors, the arrows of omicron, iota, kappa and omega represent the flagpoles, and the flag planes are attached to the flagpoles as arcs.
 
 ![10](./assets/spinspace/10.PNG)
+
+[Null Flag](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/spacetime/fig110nullflag.jl)
 
 In order to find the inner product of kappa and omega we make use of both flagpoles and flag planes. First, note that the flagpoles span a 2-plane in the Minkowski vector space. Then, we perform the Gram-Schmidt orthogonalization method to find the orthogonal complement of the 2-plane. Next, find the intersection of the flag planes and the orthogonal complement 2-plane from the previous step. By this step, the flag plane of kappa results in vector U, whereas the flag plane of omega projects to arrow V. Then, we normalize U and V. Finally, the angle that U and V make with each other measure pi plus two times the argument of the inner product of kappa and omega.
 
 ![11](./assets/spinspace/11.PNG)
 
+[Cross-Sections](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/spacetime/fig111crosssections.jl)
+
 Furthermore, the arrow that is denoted by p bisects the angle between U and V, and measures the phase angle minus pi half (modulus two pi). Also, a spatial rotation about the axis p is done for animating the Minkowski vector space so that all of the components of the inner product are visible from a 720-degree view.
 
 ![12](./assets/spinspace/12.PNG)
+
+[Special Orthogonal (3)](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/spacetime/fig112specialorthogonal3.jl)
 
 A spin-vector is named kappa and another spin-vector is named omega. The extra piece of information that makes spinors special is the flagpoles of spin-vectors. Using a differential operator in the plane of complex numbers, starting with zeta complex, the spin counterpart of the spin vector zeta prime equals zeta minus one over the square root of two times a constant named epsilon, over eta (the second component of the spin-vector). Except for this transformation of zeta to zeta prime, which is parameterized by epsilon, the spin-vectors kappa and kappa prime have the same features such as time sign. The same transformation produces the names omega and omega prime. With iota and omicron as the basis vectors of the spin-space G dot, we assert the following propositions:
 

@@ -23,7 +23,7 @@ abstract type VectorSpace end
 
 
 vec(vs::VectorSpace) = Base.vec(vs.a)
-show(io::IO, vs::VectorSpace) = Base.show(io, vec(vs))
+show(io::IO, vs::VectorSpace) = Base.show(io, "$(round.(vec(vs), digits = 4)) ∈ $(typeof(vs))")
 length(vs::VectorSpace) = Base.length(vec(vs))
 transpose(vs::VectorSpace) = Base.transpose(vec(vs))
 I(vs::VectorSpace) = reshape([Float64(i == j) for i in 1:length(vs) for j in 1:length(vs)],

@@ -3,13 +3,16 @@ import GLMakie.Point3f
 import GLMakie.Vec3f
 export convert_hsvtorgb
 export project
-export updatecamera
+export updatecamera!
+export gettextrotation
 export maketwosphere
 export makesphere
 export makespheretminusz
 export makestereographicprojectionplane
 export makeflagplane
 export projectontoplane
+export constructtorus
+export constructsphere
 
 
 """
@@ -48,9 +51,16 @@ end
 Take the given point `q` ∈ S³ ⊂ ℂ² into the Euclidean space E³ ⊂ ℝ³ using stereographic projection.
 """
 function project(q::ℍ)
-    v = ℝ³(vec(q)[2], vec(q)[3], vec(q)[4]) * (1.0 / (1.0 - vec(q)[1]))
-    normalize(v) * tanh(norm(v))
+    if isapprox(norm(q), 0.0)
+        return ℝ³(0.0, 0.0, 0.0)
+    else
+        v = ℝ³(vec(q)[2], vec(q)[3], vec(q)[4]) * (1.0 / (1.0 - vec(q)[1]))
+        return normalize(v) * tanh(norm(v))
+    end
 end
+
+
+project(q::ℝ⁴) = project(ℍ(q))
 
 
 """
@@ -89,12 +99,26 @@ GLMakie.Vec3f(v::ℝ³) = GLMakie.Vec3f(vec(v)...)
 
 
 """
-    updatecamera(lscene, eyeposition, lookat, up)
+    updatecamera!(lscene, eyeposition, lookat, up)
 
 Update the camera of `lscene` with `eyeposition`, `lookat` and `up` vectors in order to change its viewport.
 """
-updatecamera(lscene::GLMakie.LScene, eyeposition::ℝ³, lookat::ℝ³, up::ℝ³) = begin
+updatecamera!(lscene::GLMakie.LScene, eyeposition::ℝ³, lookat::ℝ³, up::ℝ³) = begin
     GLMakie.update_cam!(lscene.scene, GLMakie.Vec3f(eyeposition), GLMakie.Vec3f(lookat), GLMakie.Vec3f(up))
+end
+
+
+"""
+    gettextrotation(scene)
+
+Calculate the orientation of the camera of the given `scene` for rotating text in an automatic way.
+"""
+gettextrotation(scene::GLMakie.LScene) = begin
+    eyeposition_observable = scene.scene.camera.eyeposition
+    lookat_observable = scene.scene.camera.lookat
+    rotationaxis = GLMakie.@lift(normalize(ℝ³(Float64.(vec($eyeposition_observable - $lookat_observable))...)))
+    rotationangle = GLMakie.@lift(Float64(π / 2 + atan(($eyeposition_observable)[2], ($eyeposition_observable)[1])))
+    GLMakie.@lift(GLMakie.Quaternion(ℍ($rotationangle, $rotationaxis) * ℍ(getrotation(ℝ³(0.0, 0.0, 1.0), $rotationaxis)...)))
 end
 
 
@@ -212,4 +236,51 @@ function makeflagplane(u::𝕍, v::𝕍; segments::Int = 60)
     lspace2 = range(0.0, stop = 1.0, length = segments)
     matrix = [f * u + s * v for f in lspace1, s in lspace2]
     map(x -> project(normalize(ℍ(vec(x)))), matrix)
+end
+
+
+"""
+    constructtorus(q, r, R)
+
+Construct a torus of revolution with the given configuration `q`, the smaller radius `r`
+and the bigger radius `R`.
+"""
+function constructtorus(q::Dualquaternion,
+                        r::Real,
+                        R::Real;
+                        segments::Int = 36)
+    array = Array{ℝ³,2}(undef, segments, segments)
+    for i in 1:segments
+        for j in 1:segments
+            ϕ = i * 2pi / (segments - 1)
+            θ = j * 2pi / (segments - 1)
+            x₁ = (R + r * cos(ϕ)) * cos(θ)
+            x₂ = (R + r * cos(ϕ)) * sin(θ)
+            x₃ = r * sin(ϕ)
+            array[i, j] = ℝ³(x₁, x₂, x₃)
+        end
+    end
+    map(x -> x + gettranslation(q), rotate(array, getrotation(q)))
+end
+
+
+"""
+    constructsphere(q, radius)
+
+Construct a sphere with the given configuration `q` and `radius`.
+"""
+function constructsphere(q::Dualquaternion,
+                         radius::Real;
+                         segments::Int = 36)
+    array = Array{ℝ³,2}(undef, segments, segments)
+    lspace = collect(range(float(-pi), stop = float(pi), length = segments))
+    lspace1 = collect(range(float(π / 2), stop = float(-π / 2), length = segments))
+    for i in 1:segments
+        for j in 1:segments
+            ϕ = lspace[i]
+            θ = lspace1[j]
+            array[j, i] = convert_to_cartesian([radius; θ; ϕ])
+        end
+    end
+    map(x -> x + gettranslation(q), rotate(array, getrotation(q)))
 end
