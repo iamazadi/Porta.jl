@@ -27,5 +27,6 @@ include("surface.jl")
 include("whirl.jl")
 include("basemap.jl")
 include("utilities.jl")
+include("clutchingfunction.jl")
 
 end # module
