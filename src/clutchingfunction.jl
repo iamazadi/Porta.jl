@@ -228,12 +228,12 @@ function updateui(chart::Bool, p₁::ℝ⁴,
     end
 
     _v = GLMakie.to_value(tangentvector)
-    # println("_v: ($_v), h: ($h).")
+    # println("_v: ($_v), p₁: ($p₁).")
     if !isapprox(dot(_v, p₁), 0)
         perp = dot(_v, p₁) * p₁
         _v = normalize(_v - perp)
     end
-    # @assert(isapprox(_v, ℝ⁴(h)) && !isapprox(dot(_v, ℝ⁴(h)), 0), "_v ($_v) is not perpendicular to q ($q).")
+    # @assert(isapprox(dot(_v, p₁), 0), "_v ($_v) is not perpendicular to p₁ ($p₁).")
     tangentvector[] = _v
     tail[] = GLMakie.Point3f(r)
     g = ℍ(tangentvector[])
@@ -394,7 +394,6 @@ switchcharts(chart::String, charttoggle::GLMakie.Observable{Any}) = begin
         return "Switched coordinate charts from S to N."
     end
 end
-
 
 
 """

@@ -3,6 +3,7 @@ import GLMakie.Point3f
 import GLMakie.Vec3f
 export convert_hsvtorgb
 export project
+export projectnocompression
 export updatecamera!
 export gettextrotation
 export maketwosphere
@@ -61,6 +62,23 @@ end
 
 
 project(q::ℝ⁴) = project(ℍ(q))
+
+
+"""
+    project(q)
+
+Take the given point `q` ∈ S³ ⊂ ℂ² into the Euclidean space E³ ⊂ ℝ³ using stereographic projection.
+"""
+function projectnocompression(q::ℍ)
+    if isapprox(norm(q), 0.0)
+        return ℝ³(0.0, 0.0, 0.0)
+    else
+        ℝ³(vec(q)[2], vec(q)[3], vec(q)[4]) * (1.0 / (1.0 - vec(q)[1]))
+    end
+end
+
+
+projectnocompression(q::ℝ⁴) = projectnocompression(ℍ(q))
 
 
 """
@@ -149,7 +167,7 @@ function makesphere(transformation::SpinTransformation, T::Float64; segments::In
         surface = map(x -> 𝕍(T, vec(sign(T) * √abs(T) * x)...), sphere)
     end
     surface = map(x -> 𝕍(transformation * SpinVector(x)), surface)
-    return map(x -> project(normalize(ℍ(vec(x)))), surface)
+    return map(x -> projectnocompression(normalize(ℍ(vec(x)))), surface)
 end
 
 
@@ -162,7 +180,7 @@ function makesphere(M::ℍ, T::Float64; segments::Int = 60)
     else
         surface = map(x -> 𝕍(T, vec(sign(T) * √abs(T) * x)...), sphere)
     end
-    return map(x -> project(M * normalize(ℍ(vec(x)))), surface)
+    return map(x -> projectnocompression(M * normalize(ℍ(vec(x)))), surface)
 end
 
 
@@ -175,7 +193,7 @@ function makesphere(M::Matrix{Float64}, T::Float64; segments::Int = 60)
     else
         surface = map(x -> 𝕍(T, vec(sign(T) * √abs(T) * x)...), sphere)
     end
-    return map(x -> project(M * normalize(ℍ(vec(x)))), surface)
+    return map(x -> projectnocompression(M * normalize(ℍ(vec(x)))), surface)
 end
 
 
@@ -185,7 +203,7 @@ function makespheretminusz(transformation::SpinTransformation; T::Float64 = 1.0,
     sphere = [convert_to_cartesian([1.0; θ; ϕ]) for θ in lspace2, ϕ in lspace1]
     surface = map(x -> 𝕍(transformation * SpinVector( 𝕍(T, vec(sign(T) * √abs(T) * x)...))), sphere)
     surface = map(x -> 𝕍(vec(x) .* (1.0 / (1.0 - vec(x)[4]))) , surface)
-    return map(x -> project(ℍ(vec(x))), surface)
+    return map(x -> projectnocompression(ℍ(vec(x))), surface)
 end
 
 
@@ -235,7 +253,7 @@ function makeflagplane(u::𝕍, v::𝕍; segments::Int = 60)
     lspace1 = range(-1.0, stop = 1.0, length = segments)
     lspace2 = range(0.0, stop = 1.0, length = segments)
     matrix = [f * u + s * v for f in lspace1, s in lspace2]
-    map(x -> project(normalize(ℍ(vec(x)))), matrix)
+    map(x -> projectnocompression(normalize(ℍ(vec(x)))), matrix)
 end
 
 

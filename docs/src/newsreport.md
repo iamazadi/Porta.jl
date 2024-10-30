@@ -114,6 +114,8 @@ A spin-vector is named kappa and another spin-vector is named omega. The extra p
 
 ![13](./assets/spinspace/13.PNG)
 
+[Dirac's scissors problem](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/spacetime/fig113diracsscissors.jl)
+
 ```julia
 κ = 𝕍(κ)
 κ′ = 𝕍(κ′)
