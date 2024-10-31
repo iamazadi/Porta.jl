@@ -31,7 +31,7 @@ sphereobservable = buildsurface(lscene, spherematrix, mask, transparency = true)
 planematrix = makestereographicprojectionplane(M, T = T, segments = segments)
 planeobservable = buildsurface(lscene, planematrix, mask, transparency = true)
 ϵ = 0.1
-transformation = SpinTransformation(ϵ + rand() * 0.1, ϵ + rand() * 0.1, ϵ + rand() * 0.1)
+transformation = SpinTransformation(rand() * ϵ, rand() * ϵ, rand() * ϵ)
 
 generate() = 2rand() - 1 + im * (2rand() - 1)
 κ = SpinVector(generate(), generate(), Int(T))
@@ -99,9 +99,9 @@ GLMakie.text!(lscene,
     markerspace = :data
 )
 
-κflagplanematrix = makeflagplane(κv, κ′v - κv, segments = segments)
+κflagplanematrix = makeflagplane(κv, κ′v - κv, T, segments = segments)
 κflagplanecolor = GLMakie.Observable(fill(GLMakie.RGBAf(0.5, 0.5, 0.5, 0.5), segments, segments))
-κflagplaneobservable = buildsurface(lscene, κflagplanematrix, κflagplanecolor, transparency = false)
+κflagplaneobservable = buildsurface(lscene, κflagplanematrix, κflagplanecolor, transparency = true)
 
 κsectional = GLMakie.Observable(GLMakie.Point3f(projectnocompression(normalize(ℍ(vec(κv))))))
 κ′sectional = GLMakie.Observable(GLMakie.Point3f(projectnocompression(normalize(ℍ(vec(κ′v))))))
@@ -142,16 +142,29 @@ animate(frame::Int) = begin
     ϕ = 0.0
     ψ = 0.0
     spintransform = SpinTransformation(θ, ϕ, ψ)
+    transform(κ, spintransform) = begin
+        vector = mat(spintransform) * vec(κ)
+        timesign = κ.timesign
+        result = SpinVector(convert(Vector{Complex}, vector)..., timesign)
+        if isapprox(result, -κ)
+            timesign = -κ.timesign
+            result = SpinVector(convert(Vector{Complex}, vector)..., timesign)
+        end
+        return result
+    end
+    κtransformed = 𝕍(transform(κ, spintransform))
+    κ′transformed = 𝕍(transform(κ′, spintransform))
+    κ″transformed = 𝕍(transform(κ″, spintransform))
+    T = Float64(transform(κ, spintransform).timesign)
+    println("T: $T")
+    northpole[] = GLMakie.Point3f(ℝ³(0.0, 0.0, T))
     spherematrix = makesphere(spintransform, T, segments = segments)
-    planematrix = makestereographicprojectionplane(spintransform, T = 1.0, segments = segments)
+    planematrix = makestereographicprojectionplane(spintransform, T = T, segments = segments)
     updatesurface!(planematrix, planeobservable)
     updatesurface!(spherematrix, sphereobservable)
-    κtransformed = 𝕍(spintransform * κ)
-    κ′transformed = 𝕍(spintransform * κ′)
-    κ″transformed = 𝕍(spintransform * κ″)
-    κflagplanematrix = makeflagplane(κtransformed, 𝕍(LinearAlgebra.normalize(vec(κ′transformed - κtransformed))), segments = segments)
+    κflagplanematrix = makeflagplane(κtransformed, 𝕍(LinearAlgebra.normalize(vec(κ′transformed - κtransformed))), T, segments = segments)
     updatesurface!(κflagplanematrix, κflagplaneobservable)
-    κflagplanecolor[] = [GLMakie.RGBAf(convert_hsvtorgb([360.0 * progress; 1.0; 1.0])..., 1.0) for i in 1:segments, j in 1:segments]
+    κflagplanecolor[] = [GLMakie.RGBAf(convert_hsvtorgb([360.0 * progress; 1.0; 1.0])..., 0.8) for i in 1:segments, j in 1:segments]
     κobservable[] = GLMakie.Point3f(projectnocompression(normalize(ℍ(vec(κtransformed)))))
     κ′observable[] = GLMakie.Point3f(projectnocompression(normalize(ℍ(vec(κ′transformed)))))
     κ″observable[] = GLMakie.Point3f(projectnocompression(normalize(ℍ(vec(κ″transformed)))))
@@ -161,10 +174,10 @@ animate(frame::Int) = begin
     κsectional[] = (κobservable[] + κprojectionobservable[]) * 0.5
     κ′sectional[] = (κ′observable[] + κ′projectionobservable[]) * 0.5
     κ″sectional[] = (κ″observable[] + κ″projectionobservable[]) * 0.5
-    for (i, scale1) in enumerate(collect(range(0.0, stop = 1.0, length = segments)))
+    for (i, scale1) in enumerate(collect(range(0.0, stop = T, length = segments)))
         _κlinepoints = GLMakie.Point3f[]
         _κlinecolors = Int[]
-        for (j, scale2) in enumerate(collect(range(0.0, stop = 1.0, length = segments)))
+        for (j, scale2) in enumerate(collect(range(0.0, stop = T, length = segments)))
             κvector = normalize(ℍ(vec(scale1 * κtransformed + scale2 * 𝕍(LinearAlgebra.normalize(vec(κ′transformed - κtransformed))))))
             κpoint = GLMakie.Point3f(projectnocompression(κvector))
             push!(_κlinepoints, κpoint)

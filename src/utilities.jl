@@ -245,13 +245,13 @@ end
 
 
 """
-    makeflagplane(u, v)
+    makeflagplane(u, v, T)
 
-Make a half plane with the given 4-vectors `u` and `v`.
+Make a half plane with the given 4-vectors `u`, `v` and temporal section `T`.
 """
-function makeflagplane(u::𝕍, v::𝕍; segments::Int = 60)
-    lspace1 = range(-1.0, stop = 1.0, length = segments)
-    lspace2 = range(0.0, stop = 1.0, length = segments)
+function makeflagplane(u::𝕍, v::𝕍, T::Float64; segments::Int = 60)
+    lspace1 = range(-1.0, stop = T, length = segments)
+    lspace2 = range(0.0, stop = T, length = segments)
     matrix = [f * u + s * v for f in lspace1, s in lspace2]
     map(x -> projectnocompression(normalize(ℍ(vec(x)))), matrix)
 end
