@@ -91,12 +91,16 @@ det(a::SpinTransformation) = real(a.α * a.δ - a.β * a.γ)
 
 
 *(a::SpinTransformation, b::SpinVector) = begin
-    if isapprox(b.a[2], Complex(0))
-        SpinVector(a.α * b.a[1] + a.β * b.a[2], a.γ * b.a[1] + a.δ * b.a[2], b.timesign)
-    else
-        ζ = b.a[1] / b.a[2]
-        SpinVector((a.α * ζ + a.β) / (a.γ * ζ + a.δ), b.timesign)
-    end
+    # if isapprox(b.a[2], Complex(0))
+    #     SpinVector(a.α * b.a[1] + a.β * b.a[2], a.γ * b.a[1] + a.δ * b.a[2], b.timesign)
+    # else
+    #     ζ = b.a[1] / b.a[2]
+    #     SpinVector((a.α * ζ + a.β) / (a.γ * ζ + a.δ), b.timesign)
+    # end
+    vector = mat(a) * vec(b)
+    ξ, η = vector
+    timesign = sign(real(ξ * conj(ξ) + η * conj(η))) > 0 ? 1 : -1
+    SpinVector(vector..., timesign)
 end
 
 

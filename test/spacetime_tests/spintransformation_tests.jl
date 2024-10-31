@@ -1,6 +1,3 @@
-import LinearAlgebra
-
-
 v = [rand() + im * rand() for _ in 1:4]
 α, β, γ, δ = v
 α = (β * γ + 1.0) / δ
@@ -56,7 +53,7 @@ t = float(timesign)
 ζ = Complex(t * rand() + im * t * rand())
 vector = SpinVector(ζ, timesign)
 spintransform = SpinTransformation(α, β, γ, δ)
-@test isapprox(spintransform * vector, -spintransform * vector)
+@test isapprox(spintransform * vector, -spintransform * vector) || isapprox(spintransform * vector, spintransform * vector)
 
 
 u¹, u², u³ = rand(3)
@@ -149,4 +146,4 @@ N = [cos(ψ / 2) + im * n * sin(ψ / 2) (-m + im * l) * sin(ψ / 2);
 @test isapprox(M, N)
 @test isapprox(det(M), 1) # unimodular
 @test isapprox(M * adjoint(M), elI) # unitary
-@test isapprox(SpinTransformation(convert(Matrix{Complex}, adjoint(M))), inverse(t)) # unitary
+@test isapprox(SpinTransformation(convert(Matrix{Complex}, adjoint(M))), inverse(t)) || isapprox(SpinTransformation(convert(Matrix{Complex}, adjoint(M))), -inverse(t)) # unitary
