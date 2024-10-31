@@ -146,7 +146,7 @@ animate(frame::Int) = begin
         vector = mat(spintransform) * vec(κ)
         timesign = κ.timesign
         result = SpinVector(convert(Vector{Complex}, vector)..., timesign)
-        if isapprox(result, -κ)
+        if θ ≥ 2π
             timesign = -κ.timesign
             result = SpinVector(convert(Vector{Complex}, vector)..., timesign)
         end
@@ -190,7 +190,6 @@ animate(frame::Int) = begin
     end
     component = normalize(cross(ℝ³(κobservable[]), ℝ³(κprojectionobservable[])))
     global lookat = (1.0 / 3.0) * (ℝ³(κsectional[]) + ℝ³(κ′sectional[]) + ℝ³(κ″sectional[]) + component)
-    # global eyeposition = normalize(ℝ³(northpole[]) + float(π) * component) * float(2π)
     global eyeposition = normalize((x̂ - ŷ + ẑ) * float(π)) * float(2π)
     updatecamera!(lscene, eyeposition, lookat, up)
 end
