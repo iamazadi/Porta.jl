@@ -26,7 +26,7 @@ al = GLMakie.AmbientLight(GLMakie.RGBf(0.9, 0.9, 0.9))
 lscene = GLMakie.LScene(fig[1, 1], show_axis=false, scenekw = (lights = [pl, al], clear=true, backgroundcolor = :white))
 
 T = 1.0
-spherematrix = makesphere(M, T, segments = segments)
+spherematrix = makesphere(M, T, compressedprojection = true, segments = segments)
 sphereobservable = buildsurface(lscene, spherematrix, mask, transparency = true)
 planematrix = makestereographicprojectionplane(M, T = T, segments = segments)
 planeobservable = buildsurface(lscene, planematrix, mask, transparency = true)
@@ -99,7 +99,7 @@ GLMakie.text!(lscene,
     markerspace = :data
 )
 
-κflagplanematrix = makeflagplane(κv, κ′v - κv, T, segments = segments)
+κflagplanematrix = makeflagplane(κv, κ′v - κv, T, compressedprojection = true, segments = segments)
 κflagplanecolor = GLMakie.Observable(fill(GLMakie.RGBAf(0.5, 0.5, 0.5, 0.5), segments, segments))
 κflagplaneobservable = buildsurface(lscene, κflagplanematrix, κflagplanecolor, transparency = true)
 
@@ -138,36 +138,22 @@ animate(frame::Int) = begin
     stage = min(totalstages - 1, Int(floor(totalstages * progress))) + 1
     stageprogress = totalstages * (progress - (stage - 1) * 1.0 / totalstages)
     println("Frame: $frame, Stage: $stage, Total Stages: $totalstages, Progress: $stageprogress")
-    θ = progress * 4π
-    ϕ = 0.0
-    ψ = 0.0
-    spintransform = SpinTransformation(θ, ϕ, ψ)
-    transform(κ, spintransform) = begin
-        vector = mat(spintransform) * vec(κ)
-        timesign = κ.timesign
-        result = SpinVector(convert(Vector{Complex}, vector)..., timesign)
-        if θ ≥ 2π
-            timesign = -κ.timesign
-            result = SpinVector(convert(Vector{Complex}, vector)..., timesign)
-        end
-        return result
-    end
-    κtransformed = 𝕍(transform(κ, spintransform))
-    κ′transformed = 𝕍(transform(κ′, spintransform))
-    κ″transformed = 𝕍(transform(κ″, spintransform))
-    T = Float64(transform(κ, spintransform).timesign)
-    println("T: $T")
-    northpole[] = GLMakie.Point3f(ℝ³(0.0, 0.0, T))
-    spherematrix = makesphere(spintransform, T, segments = segments)
-    planematrix = makestereographicprojectionplane(spintransform, T = T, segments = segments)
+    θ = progress * 2π
+    M = exp(K(3) * θ)
+    κtransformed = 𝕍(vec(M * ℍ(vec(𝕍(κ)))))
+    κ′transformed = 𝕍(vec(M * ℍ(vec(𝕍(κ′)))))
+    κ″transformed = 𝕍(vec(M * ℍ(vec(𝕍(κ″)))))
+    northpole[] = GLMakie.Point3f(project(M * ℍ(0.0, 0.0, 0.0, 1.0)))
+    spherematrix = makesphere(M, T, compressedprojection = true, segments = segments)
+    planematrix = makestereographicprojectionplane(M, T = T, segments = segments)
     updatesurface!(planematrix, planeobservable)
     updatesurface!(spherematrix, sphereobservable)
-    κflagplanematrix = makeflagplane(κtransformed, 𝕍(LinearAlgebra.normalize(vec(κ′transformed - κtransformed))), T, segments = segments)
+    κflagplanematrix = makeflagplane(κtransformed, 𝕍(LinearAlgebra.normalize(vec(κ′transformed - κtransformed))), T, compressedprojection = true, segments = segments)
     updatesurface!(κflagplanematrix, κflagplaneobservable)
     κflagplanecolor[] = [GLMakie.RGBAf(convert_hsvtorgb([360.0 * progress; 1.0; 1.0])..., 0.8) for i in 1:segments, j in 1:segments]
-    κobservable[] = GLMakie.Point3f(projectnocompression(normalize(ℍ(vec(κtransformed)))))
-    κ′observable[] = GLMakie.Point3f(projectnocompression(normalize(ℍ(vec(κ′transformed)))))
-    κ″observable[] = GLMakie.Point3f(projectnocompression(normalize(ℍ(vec(κ″transformed)))))
+    κobservable[] = GLMakie.Point3f(project(normalize(ℍ(vec(κtransformed)))))
+    κ′observable[] = GLMakie.Point3f(project(normalize(ℍ(vec(κ′transformed)))))
+    κ″observable[] = GLMakie.Point3f(project(normalize(ℍ(vec(κ″transformed)))))
     κprojectionobservable[] = GLMakie.Point3f(projectontoplane(κtransformed))
     κ′projectionobservable[] = GLMakie.Point3f(projectontoplane(κ′transformed))
     κ″projectionobservable[] = GLMakie.Point3f(projectontoplane(κ″transformed))
@@ -179,7 +165,7 @@ animate(frame::Int) = begin
         _κlinecolors = Int[]
         for (j, scale2) in enumerate(collect(range(0.0, stop = T, length = segments)))
             κvector = normalize(ℍ(vec(scale1 * κtransformed + scale2 * 𝕍(LinearAlgebra.normalize(vec(κ′transformed - κtransformed))))))
-            κpoint = GLMakie.Point3f(projectnocompression(κvector))
+            κpoint = GLMakie.Point3f(project(κvector))
             push!(_κlinepoints, κpoint)
             push!(_κlinecolors, i + j)
         end
@@ -188,8 +174,7 @@ animate(frame::Int) = begin
         GLMakie.notify(κlinepoints[i])
         GLMakie.notify(κlinecolors[i])
     end
-    component = normalize(cross(ℝ³(κobservable[]), ℝ³(κprojectionobservable[])))
-    global lookat = (1.0 / 3.0) * (ℝ³(κsectional[]) + ℝ³(κ′sectional[]) + ℝ³(κ″sectional[]) + component)
+    global lookat = (1.0 / 3.0) * ℝ³(κobservable[] + κ′observable[] + κ″observable[])
     global eyeposition = normalize((x̂ - ŷ + ẑ) * float(π)) * float(2π)
     updatecamera!(lscene, eyeposition, lookat, up)
 end

@@ -157,7 +157,7 @@ end
 
 Make a cross-section of the null cone with the given spin `transformation`` and temporal section `T`.
 """
-function makesphere(transformation::SpinTransformation, T::Float64; segments::Int = 60)
+function makesphere(transformation::SpinTransformation, T::Float64; compressedprojection::Bool = true, segments::Int = 60)
     lspace1 = range(-π, stop = float(π), length = segments)
     lspace2 = range(-π / 2, stop = π / 2, length = segments)
     sphere = [convert_to_cartesian([1.0; θ; ϕ]) for θ in lspace2, ϕ in lspace1]
@@ -167,11 +167,12 @@ function makesphere(transformation::SpinTransformation, T::Float64; segments::In
         surface = map(x -> 𝕍(T, vec(sign(T) * √abs(T) * x)...), sphere)
     end
     surface = map(x -> 𝕍(transformation * SpinVector(x)), surface)
-    return map(x -> projectnocompression(normalize(ℍ(vec(x)))), surface)
+    projectionmap = compressedprojection ? project : projectnocompression
+    return map(x -> projectionmap(normalize(ℍ(vec(x)))), surface)
 end
 
 
-function makesphere(M::ℍ, T::Float64; segments::Int = 60)
+function makesphere(M::ℍ, T::Float64; compressedprojection::Bool = true, segments::Int = 60)
     lspace1 = range(-π, stop = float(π), length = segments)
     lspace2 = range(-π / 2, stop = π / 2, length = segments)
     sphere = [convert_to_cartesian([1.0; θ; ϕ]) for θ in lspace2, ϕ in lspace1]
@@ -180,11 +181,12 @@ function makesphere(M::ℍ, T::Float64; segments::Int = 60)
     else
         surface = map(x -> 𝕍(T, vec(sign(T) * √abs(T) * x)...), sphere)
     end
-    return map(x -> projectnocompression(M * normalize(ℍ(vec(x)))), surface)
+    projectionmap = compressedprojection ? project : projectnocompression
+    return map(x -> projectionmap(M * normalize(ℍ(vec(x)))), surface)
 end
 
 
-function makesphere(M::Matrix{Float64}, T::Float64; segments::Int = 60)
+function makesphere(M::Matrix{Float64}, T::Float64; compressedprojection::Bool = true, segments::Int = 60)
     lspace1 = range(-π, stop = float(π), length = segments)
     lspace2 = range(-π / 2, stop = π / 2, length = segments)
     sphere = [convert_to_cartesian([1.0; θ; ϕ]) for θ in lspace2, ϕ in lspace1]
@@ -193,17 +195,19 @@ function makesphere(M::Matrix{Float64}, T::Float64; segments::Int = 60)
     else
         surface = map(x -> 𝕍(T, vec(sign(T) * √abs(T) * x)...), sphere)
     end
-    return map(x -> projectnocompression(M * normalize(ℍ(vec(x)))), surface)
+    projectionmap = compressedprojection ? project : projectnocompression
+    return map(x -> projectionmap(M * normalize(ℍ(vec(x)))), surface)
 end
 
 
-function makespheretminusz(transformation::SpinTransformation; T::Float64 = 1.0, segments::Int = 60)
+function makespheretminusz(transformation::SpinTransformation; T::Float64 = 1.0, compressedprojection::Bool = true, segments::Int = 60)
     lspace1 = range(-π, stop = float(π), length = segments)
     lspace2 = range(-π / 2, stop = π / 2, length = segments)
     sphere = [convert_to_cartesian([1.0; θ; ϕ]) for θ in lspace2, ϕ in lspace1]
     surface = map(x -> 𝕍(transformation * SpinVector( 𝕍(T, vec(sign(T) * √abs(T) * x)...))), sphere)
     surface = map(x -> 𝕍(vec(x) .* (1.0 / (1.0 - vec(x)[4]))) , surface)
-    return map(x -> projectnocompression(ℍ(vec(x))), surface)
+    projectionmap = compressedprojection ? project : projectnocompression
+    return map(x -> projectionmap(ℍ(vec(x))), surface)
 end
 
 
@@ -233,6 +237,16 @@ function makestereographicprojectionplane(M::Matrix{Float64}; T::Float64 = 1.0, 
 end
 
 
+function makestereographicprojectionplane(M::ℍ; T::Float64 = 1.0, segments::Int = 60)
+    lspace1 = range(-π, stop = float(π), length = segments)
+    lspace2 = range(-π / 2, stop = (π / 2), length = segments)
+    sphere = [convert_to_cartesian([1.0; θ; ϕ]) for θ in lspace2, ϕ in lspace1]
+    surface = map(x -> 𝕍(vec(M * ℍ(vec(𝕍(SpinVector( 𝕍(T, vec(sign(T) * √abs(T) * x)...))))))), sphere)
+    surface = map(x -> 𝕍(vec(x)[1], vec(x)[2] / (1.0 - vec(x)[4]), vec(x)[3] / (1.0 - vec(x)[4]) , 0.0), surface)
+    return map(x -> ℝ³(vec(x)[2], vec(x)[3], 0.0), surface)
+end
+
+
 """
     projectontoplane(x)
 
@@ -249,11 +263,12 @@ end
 
 Make a half plane with the given 4-vectors `u`, `v` and temporal section `T`.
 """
-function makeflagplane(u::𝕍, v::𝕍, T::Float64; segments::Int = 60)
+function makeflagplane(u::𝕍, v::𝕍, T::Float64; compressedprojection::Bool = true, segments::Int = 60)
     lspace1 = range(min(-T, T), stop = max(-T, T), length = segments)
     lspace2 = range(0.0, stop = T, length = segments)
     matrix = [f * u + s * v for f in lspace1, s in lspace2]
-    map(x -> projectnocompression(normalize(ℍ(vec(x)))), matrix)
+    projectionmap = compressedprojection ? project : projectnocompression
+    map(x -> projectionmap(normalize(ℍ(vec(x)))), matrix)
 end
 
 
