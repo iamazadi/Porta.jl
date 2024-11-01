@@ -143,7 +143,7 @@ animate(frame::Int) = begin
     κtransformed = 𝕍(vec(M * ℍ(vec(𝕍(κ)))))
     κ′transformed = 𝕍(vec(M * ℍ(vec(𝕍(κ′)))))
     κ″transformed = 𝕍(vec(M * ℍ(vec(𝕍(κ″)))))
-    northpole[] = GLMakie.Point3f(project(M * ℍ(0.0, 0.0, 0.0, 1.0)))
+    northpole[] = GLMakie.Point3f(project(M * normalize(ℍ(T, 0.0, 0.0, 1.0))))
     spherematrix = makesphere(M, T, compressedprojection = true, segments = segments)
     planematrix = makestereographicprojectionplane(M, T = T, segments = segments)
     updatesurface!(planematrix, planeobservable)
