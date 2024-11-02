@@ -63,6 +63,8 @@ Tell us the facts of the story.
 
 ![14](./assets/spinspace/14.PNG)
 
+[One-to-two relation between ``O^{\uparrow}_+(1,3)`` and ``SL(2,\mathbb{C})``](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/spacetime/fig114onetotworelation.jl)
+
 ![15](./assets/spinspace/15.PNG)
 
 ![16](./assets/spinspace/16.PNG)
@@ -253,34 +255,13 @@ This is related to the fact that the weak interaction in the Standard Model is n
 
 ![27](./assets/spinspace/27.PNG)
 
-What do the Lie bracket and the Penrose staircase have in common? Every tangent vector in the tangent space of the three-sphere must be a linear combination of these vector fields: ``K_1``, ``K_2`` and ``K_3``. Suppose we have a differential equation where a tangent vector equals the rate of change of a smooth function from the 3-sphere to the real numbers. Then, the solution of the differential equation is called the flow of the vector field.
-
 ![28](./assets/spinspace/28.PNG)
-
-Now, let us define two vector fields ``g_1`` and ``g_2`` in the tangent space of the three-sphere. Let ``g_1`` be in the direction of ``K_1`` and g in the direction of ``K_2``. Note that the ``K_1`` and ``K_2`` directions in the tangent space of the 3-sphere span the horizontal subspace with respect to the natural connection one-form, whereas ``K_3`` passes through the horizontal subspaces and spans the vertical subspace.
 
 ![29](./assets/spinspace/29.PNG)
 
-In order to create a Penrose step, first choose a point in the 3-sphere. Second, travel along the flow of ``g_1`` for a small value called epsilon. Third, travel along the flow of ``g_2`` for epsilon. Fourth, travel along the flow of ``g_1`` for minus epsilon. Finally, travel along the flow of ``g_2`` for minus epsilon. We should make a parallelogram during these five steps and come back to the chosen point. However, the point where we arrive at the end of the fifth step is higher or lower in the ``K_3`` direction, even though none of the vector fields ``g_1`` and ``g_2`` have a vertical component! This is what the Lie bracket measures in the local neighborhood of a point in the three-sphere.
-
 ![30](./assets/spinspace/30.PNG)
 
-Each point in the 3-sphere can be represented by a Quaternions number. Therefore, exponentiating some tangent vector (to get a four by four matrix or another Quaternion) and then multiplying a point on the right by the result, we travel along the flow of a vector field. Repeating the parallelogram thirty times gives us the picture of our path, which resembles the Penrose staircase.
-
 ![31](./assets/spinspace/31.PNG)
-
-```julia
-K₁ = [0 0 0 1;
-      0 0 -1 0;
-      0 1 0 0;
-      -1 0 0 0]
-_q = q * Quaternion(exp(ϵ * K₁))
-_point = GLMakie.Point3f(vec(project(_q)))
-point = GLMakie.Point3f(vec(project(q)))
-p = GLMakie.Point3f(LinearAlgebra.normalize(vec(_point) - vec(point)))
-g1tail[] = point
-g1head[] = p * 0.5
-```
 
 ![32](./assets/spinspace/32.PNG)
 
