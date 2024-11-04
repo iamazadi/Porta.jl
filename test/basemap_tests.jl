@@ -4,7 +4,7 @@ import FileIO
 
 x = ℍ(normalize(ℝ⁴(rand(4))))
 gauge = rand() * 2π
-M = I(4)
+M = Identity(4)
 chart = (-π / 4, π / 4, -π / 4, π / 4)
 matrix = make(x, gauge, M, segments, chart = chart)
 @test size(matrix) == (segments, segments)

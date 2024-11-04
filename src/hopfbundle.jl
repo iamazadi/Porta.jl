@@ -25,8 +25,8 @@ Perform the standard S¹ free group action in complex coordinates z ∈ S³ ⊂ 
 The S¹ group action in real coordinates.
 G_θ: S¹ × S³ → S³
 """
-G(θ::Real, v::ℝ⁴) = ℍ([I(2) .* cos(θ) I(2) .* -sin(θ);
-                                I(2) .* sin(θ) I(2) .* cos(θ)] * vec(v))
+G(θ::Real, v::ℝ⁴) = ℍ([Identity(2) .* cos(θ) Identity(2) .* -sin(θ);
+                                Identity(2) .* sin(θ) Identity(2) .* cos(θ)] * vec(v))
 G(θ::Real, q::ℍ) = G(θ, ℝ⁴(vec(q)))
 
 

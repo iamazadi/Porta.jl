@@ -6,7 +6,7 @@ import Base.transpose
 
 
 export VectorSpace
-export I
+export Identity
 export dot
 export norm
 export outer
@@ -26,12 +26,10 @@ vec(vs::VectorSpace) = Base.vec(vs.a)
 show(io::IO, vs::VectorSpace) = Base.show(io, "$(round.(vec(vs), digits = 4)) ∈ $(typeof(vs))")
 length(vs::VectorSpace) = Base.length(vec(vs))
 transpose(vs::VectorSpace) = Base.transpose(vec(vs))
-I(vs::VectorSpace) = reshape([Float64(i == j) for i in 1:length(vs) for j in 1:length(vs)],
-                             length(vs),
-                             length(vs))
+Identity(vs::VectorSpace) = reshape([Float64(i == j) for i in 1:length(vs) for j in 1:length(vs)], length(vs), length(vs))
 # dot product with a given metric
 dot(vs1::VectorSpace, vs2::VectorSpace, M::Array{Float64}) = transpose(vs1) * M * vec(vs2)
-dot(vs1::VectorSpace, vs2::VectorSpace) = dot(vs1, vs2, I(vs1))
+dot(vs1::VectorSpace, vs2::VectorSpace) = dot(vs1, vs2, Identity(vs1))
 norm(vs::VectorSpace) = sqrt(dot(vs, vs))
 outer(vs1::VectorSpace, vs2::VectorSpace) = vec(vs1) * transpose(vs2)
 normalize(vs::VectorSpace) = vs * (1.0 / norm(vs))

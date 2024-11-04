@@ -6,7 +6,7 @@ x = [ℍ(normalize(ℝ⁴(rand(4)))) for i in 1:N]
 gauge1 = rand()
 gauge2 = rand()
 segments = rand(5:10)
-M = I(4)
+M = Identity(4)
 matrix = make(x, gauge1, gauge2, M, segments)
 @test size(matrix) == (N, segments)
 @test typeof(matrix[1, 1]) <: ℝ³

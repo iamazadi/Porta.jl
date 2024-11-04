@@ -96,7 +96,7 @@ mat(q::ℍ) = [q.a + im * q.d -q.c + im * q.b; q.c + im * q.b q.a - im * q.d]
 
 Represent the number `q` by a quaternionic 4x4 matrix in terms a basis for so(4), the Lie algebra of the Lie group of rotations about a fixed point in ℝ⁴.
 """
-mat4(q::ℍ) = q.a .* I(4) + q.b .* K(2) + q.c .* K(3) + q.d .* K(1)
+mat4(q::ℍ) = q.a .* Identity(4) + q.b .* K(2) + q.c .* K(3) + q.d .* K(1)
 
 
 """
@@ -188,7 +188,7 @@ dot(g::ℍ, q::ℝ⁴) = dot(ℝ⁴(vec(g)), q)
 
 Construct a 4x4 identity matrix with Real elements as a basis for so(4), with the given identifier `n`.
 """
-I(n::Integer) = begin
+Identity(n::Integer) = begin
     if n == 2
         return [1.0 0.0;
                 0.0 1.0]
