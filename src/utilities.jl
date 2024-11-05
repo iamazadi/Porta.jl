@@ -47,35 +47,34 @@ end
 
 
 """
-    project(q)
-
-Take the given point `q` ∈ S³ ⊂ ℂ² into the Euclidean space E³ ⊂ ℝ³ using stereographic projection.
-"""
-function project(q::ℍ)
-    if isapprox(norm(q), 0.0)
-        return ℝ³(0.0, 0.0, 0.0)
-    else
-        v = ℝ³(vec(q)[2], vec(q)[3], vec(q)[4]) * (1.0 / (1.0 - vec(q)[1]))
-        return normalize(v) * tanh(norm(v))
-    end
-end
-
-
-project(q::ℝ⁴) = project(ℍ(q))
-
-
-"""
-    project(q)
+    projectnocompression(q)
 
 Take the given point `q` ∈ S³ ⊂ ℂ² into the Euclidean space E³ ⊂ ℝ³ using stereographic projection.
 """
 function projectnocompression(q::ℍ)
     if isapprox(norm(q), 0.0)
         return ℝ³(0.0, 0.0, 0.0)
+    elseif isapprox(q, ℍ(1.0, 0.0, 0.0, 0.0))
+        return ℝ³(0.0, 0.0, 1.0)
     else
         ℝ³(vec(q)[2], vec(q)[3], vec(q)[4]) * (1.0 / (1.0 - vec(q)[1]))
     end
 end
+
+
+"""
+    project(q)
+
+Take the given point `q` ∈ S³ ⊂ ℂ² into the Euclidean space E³ ⊂ ℝ³ using stereographic projection,
+and then compress it into a closed 3-ball.
+"""
+function project(q::ℍ)
+    v = projectnocompression(q)
+    return normalize(v) * tanh(norm(v))
+end
+
+
+project(q::ℝ⁴) = project(ℍ(q))
 
 
 projectnocompression(q::ℝ⁴) = projectnocompression(ℍ(q))
@@ -183,6 +182,26 @@ function makesphere(M::ℍ, T::Float64; compressedprojection::Bool = true, segme
     end
     projectionmap = compressedprojection ? project : projectnocompression
     return map(x -> projectionmap(M * normalize(ℍ(vec(x)))), surface)
+end
+
+
+"""
+    makesphere(a, b, T)
+
+Make a closed 2-surface in Minkowski vector space at constant time `T` (a section of the null cone),
+and rotate the Minkowski tetrad with the given unit quaternions `a` and `b`, which represent an element of SO(4).
+"""
+function makesphere(a::ℍ, b::ℍ, T::Float64; compressedprojection::Bool = true, segments::Int = 60)
+    lspace1 = range(-π, stop = float(π), length = segments)
+    lspace2 = range(-π / 2, stop = π / 2, length = segments)
+    sphere = [convert_to_cartesian([1.0; θ; ϕ]) for θ in lspace2, ϕ in lspace1]
+    if isapprox(T, 0.0)
+        surface = map(x -> 𝕍(T, vec(x)...), sphere)
+    else
+        surface = map(x -> 𝕍(T, vec(sign(T) * √abs(T) * x)...), sphere)
+    end
+    projectionmap = compressedprojection ? project : projectnocompression
+    return map(x -> projectionmap(a * normalize(ℍ(vec(x))) * b), surface)
 end
 
 

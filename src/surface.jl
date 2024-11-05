@@ -45,6 +45,18 @@ function buildsurface(scene::GLMakie.LScene,
 end
 
 
+function buildsurface(scene::GLMakie.LScene,
+    value::GLMakie.Observable{Matrix{ℝ³}},
+    color::Any;
+    transparency::Bool = false)
+    x = GLMakie.@lift(map(x -> vec(x)[1] , $value))
+    y = GLMakie.@lift(map(x -> vec(x)[2] , $value))
+    z = GLMakie.@lift(map(x -> vec(x)[3] , $value))
+    GLMakie.surface!(scene, x, y, z, color = color, transparency = transparency)
+    x, y, z
+end
+
+
 """
     buildsurface(scene, value, color, visible, transparency)
 
