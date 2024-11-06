@@ -11,6 +11,7 @@ export makesphere
 export makespheretminusz
 export makestereographicprojectionplane
 export makeflagplane
+export makeplane
 export projectontoplane
 export constructtorus
 export constructsphere
@@ -288,6 +289,12 @@ function makeflagplane(u::𝕍, v::𝕍, T::Float64; compressedprojection::Bool 
     matrix = [f * u + s * v for f in lspace1, s in lspace2]
     projectionmap = compressedprojection ? project : projectnocompression
     map(x -> projectionmap(normalize(ℍ(vec(x)))), matrix)
+end
+
+
+function makeplane(u::𝕍, v::𝕍, M::Matrix{Float64}; segments::Int = 60)
+    lspace = range(-1.0, stop = 1.0, length = segments)
+    [project(M * normalize(ℍ((f * u + s * v).a))) for f in lspace, s in lspace]
 end
 
 

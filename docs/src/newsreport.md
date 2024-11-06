@@ -83,6 +83,8 @@ Tell us the facts of the story.
 
 ![19](./assets/spinspace/19.PNG)
 
+[Sum of angles](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/spacetime/fig119sumofangles.jl)
+
 ![20](./assets/spinspace/20.PNG)
 
 ![21](./assets/spinspace/21.PNG)
