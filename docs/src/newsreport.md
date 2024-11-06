@@ -87,7 +87,11 @@ Tell us the facts of the story.
 
 ![20](./assets/spinspace/20.PNG)
 
+[The phase of the inner product](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/spacetime/fig120innerproductphase.jl)
+
 ![21](./assets/spinspace/21.PNG)
+
+[The sum of the spin-vectors in terms of ``S^+``](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/spacetime/fig121spinvectorsum.jl)
 
 ![22](./assets/spinspace/22.PNG)
 
