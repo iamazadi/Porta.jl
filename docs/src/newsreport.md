@@ -75,6 +75,8 @@ Tell us the facts of the story.
 
 ![17](./assets/spinspace/17.PNG)
 
+[A spin-frame](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/spacetime/fig117spinframe.jl)
+
 ![18](./assets/spinspace/18.PNG)
 
 ![19](./assets/spinspace/19.PNG)
