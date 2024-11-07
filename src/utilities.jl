@@ -15,6 +15,7 @@ export makeplane
 export projectontoplane
 export constructtorus
 export constructsphere
+export calculatebasisvectors
 
 
 """
@@ -342,4 +343,35 @@ function constructsphere(q::Dualquaternion,
         end
     end
     map(x -> x + gettranslation(q), rotate(array, getrotation(q)))
+end
+
+
+"""
+    calculatebasisvectors(κ, ω)
+
+Calculate an orthonormal set of basis vectors with the given spin-vectors `κ` and `ω`.
+"""
+function calculatebasisvectors(κ::SpinVector, ω::SpinVector)
+    κv = 𝕍( κ)
+    ωv = 𝕍( ω)
+    zero = 𝕍( 0.0, 0.0, 0.0, 0.0)
+    B = stack([vec(κv), vec(ωv), vec(zero), vec(zero)])
+    N = LinearAlgebra.nullspace(B)
+    a = 𝕍(N[begin:end, 1])
+    b = 𝕍(N[begin:end, 2])
+    a = 𝕍(LinearAlgebra.normalize(vec(a - κv - ωv)))
+    b = 𝕍(LinearAlgebra.normalize(vec(b - κv - ωv)))
+    v₁ = ℝ⁴(κv)
+    v₂ = ℝ⁴(ωv)
+    v₃ = ℝ⁴(a)
+    v₄ = ℝ⁴(b)
+    e₁ = v₁
+    ê₁ = normalize(e₁)
+    e₂ = v₂ - dot(ê₁, v₂) * ê₁
+    ê₂ = normalize(e₂)
+    e₃ = v₃ - dot(ê₁, v₃) * ê₁ - dot(ê₂, v₃) * ê₂
+    ê₃ = normalize(e₃)
+    e₄ = v₄ - dot(ê₁, v₄) * ê₁ - dot(ê₂, v₄) * ê₂ - dot(ê₃, v₄) * ê₃
+    ê₄ = normalize(e₄)
+    ê₁, ê₂, ê₃, ê₄
 end
