@@ -79,11 +79,11 @@ z = 𝕍( 0.0, 0.0, 0.0, 1.0)
 zero = 𝕍( 0.0, 0.0, 0.0, 0.0)
 B = stack([vec(κv), vec(ωv), vec(zero), vec(zero)])
 N = LinearAlgebra.nullspace(B)
-a = 𝕍(N[begin:end, 1])
-b = 𝕍(N[begin:end, 2])
+a = 𝕍( N[begin:end, 1])
+b = 𝕍( N[begin:end, 2])
 
-a = 𝕍(LinearAlgebra.normalize(vec(a - κv - ωv)))
-b = 𝕍(LinearAlgebra.normalize(vec(b - κv - ωv)))
+a = 𝕍( LinearAlgebra.normalize(vec(a - κv - ωv)))
+b = 𝕍( LinearAlgebra.normalize(vec(b - κv - ωv)))
 
 v₁ = κv.a
 v₂ = ωv.a
@@ -99,14 +99,14 @@ ê₃ = normalize(e₃)
 e₄ = v₄ - dot(ê₁, v₄) * ê₁ - dot(ê₂, v₄) * ê₂ - dot(ê₃, v₄) * ê₃
 ê₄ = normalize(e₄)
 
-ê₁ = 𝕍(ê₁)
-ê₂ = 𝕍(ê₂)
-ê₃ = 𝕍(ê₃)
-ê₄ = 𝕍(ê₄)
+ê₁ = 𝕍( ê₁)
+ê₂ = 𝕍( ê₂)
+ê₃ = 𝕍( ê₃)
+ê₄ = 𝕍( ê₄)
 
-u = 𝕍(LinearAlgebra.normalize(rand(4)))
-v = 𝕍(LinearAlgebra.normalize(rand(4)))
-p = 𝕍(LinearAlgebra.normalize(vec(u + v)))
+u = 𝕍( LinearAlgebra.normalize(rand(4)))
+v = 𝕍( LinearAlgebra.normalize(rand(4)))
+p = 𝕍( LinearAlgebra.normalize(vec(u + v)))
 
 arrowsize = Vec3f(0.06, 0.08, 0.1)
 linewidth = 0.04
