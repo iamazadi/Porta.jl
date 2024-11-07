@@ -122,14 +122,6 @@ text!(lscene,
     markerspace = :data
 )
 
-planematrix = makeplane(κv, ωv, M)
-planecolor = Observable(fill(RGBAf(0.5, 0.5, 0.5, 0.5), segments, segments))
-planeobservable = buildsurface(lscene, planematrix, planecolor, transparency = true)
-
-orthogonalplanematrix = makeplane(a, b, M)
-orthogonalplanecolor = Observable(fill(RGBAf(0.5, 0.5, 0.5, 0.5), segments, segments))
-orthogonalplaneobservable = buildsurface(lscene, orthogonalplanematrix, orthogonalplanecolor, transparency = true)
-
 κflagplanematrix = makeflagplane(κv, κv′ - κv, T, segments = segments)
 κflagplanecolor = Observable(fill(RGBAf(0.5, 0.5, 0.5, 0.5), segments, segments))
 κflagplaneobservable = buildsurface(lscene, κflagplanematrix, κflagplanecolor, transparency = false)
@@ -149,8 +141,8 @@ sphereobservable = buildsurface(lscene, spherematrix, mask, transparency = true)
 animate(frame::Int) = begin
     progress = Float64(frame / frames_number)
     println("Frame: $frame, Progress: $progress")
-    κflagplanedirection = 𝕍(LinearAlgebra.normalize(vec(κv′ - κv)))
-    ωflagplanedirection = 𝕍(LinearAlgebra.normalize(vec(ωv′ - ωv)))
+    κflagplanedirection = 𝕍( LinearAlgebra.normalize(vec(κv′ - κv)))
+    ωflagplanedirection = 𝕍( LinearAlgebra.normalize(vec(ωv′ - ωv)))
     global u = LinearAlgebra.normalize(vec((-dot(ê₃, κflagplanedirection) * ê₃ + -dot(ê₄, κflagplanedirection) * ê₄)))
     global v = LinearAlgebra.normalize(vec((-dot(ê₃, ωflagplanedirection) * ê₃ + -dot(ê₄, ωflagplanedirection) * ê₄)))
     p = -𝕍(LinearAlgebra.normalize(u + v))
@@ -162,15 +154,8 @@ animate(frame::Int) = begin
     ω_transformed = M * ℍ(vec(ωv))
     ω′_transformed = M * ℍ(vec(ωv′))
     northpole[] = Point3f(project(M * ℍ(vec(𝕍( SpinVector(Complex(0.0), timesign))))))
-    planematrix = makeplane(ê₁, ê₂, M) # the timelike 2-plane spanned by the flagpoles of κ and ω
-    orthogonalplanematrix = makeplane(ê₃, ê₄, M) # σ, the spacelike 2-plane through O, which is the orthogonal complement of the timelike 2-plane spanned by the flagpoles of κ and ω
     spherematrix = makesphere(M, T, compressedprojection = true, segments = segments)
-    updatesurface!(planematrix, planeobservable)
-    updatesurface!(orthogonalplanematrix, orthogonalplaneobservable)
     updatesurface!(spherematrix, sphereobservable)
-    hue = Float64(frame) / Float64(frames_number) * 360.0
-    planecolor[] = [RGBAf(convert_hsvtorgb([hue; 1.0; 1.0])..., 0.25) for i in 1:segments, j in 1:segments]
-    orthogonalplanecolor[] = [RGBAf(convert_hsvtorgb([360.0 - hue; 1.0; 1.0])..., 0.25) for i in 1:segments, j in 1:segments]
     _κ = 𝕍( vec(κ_transformed))
     _κ′ = 𝕍( vec(κ′_transformed))
     _ω = 𝕍( vec(ω_transformed))
@@ -191,7 +176,7 @@ animate(frame::Int) = begin
         κζ = Complex(κ)
         ωζ = Complex(ω)
         ζ = κζ - ωζ
-        circlevector = M * ℍ(vec(𝕍(SpinVector(κζ + ϕ * ζ, timesign))))
+        circlevector = M * ℍ(vec(𝕍( SpinVector(κζ + ϕ * ζ, timesign))))
         circlepoint = Point3f(vec(project(circlevector))...)
         push!(_circlepoints, circlepoint)
         push!(_circlecolors, i)
