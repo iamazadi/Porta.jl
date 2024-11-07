@@ -241,18 +241,6 @@ animate1(frame::Int) = begin
     ωhead[] = Point3f(vec(project(ℍ(LinearAlgebra.normalize(vec(ω_transformed - ω′_transformed)))))...)
     κtail[] = Point3f(vec(project(κ_transformed))...)
     ωtail[] = Point3f(vec(project(ω_transformed))...)
-    κpoint = project(κ_transformed)
-    ωpoint = project(ω_transformed)
-    npoint = ℝ³(northpole[])
-    center = ℝ³(vec(sum(circlepoints[]) * (1.0 / length(circlepoints[])))...)
-    κpoint = any(isnan.(vec(κpoint))) ? ẑ : normalize(κpoint)
-    ωpoint = any(isnan.(vec(ωpoint))) ? ẑ : normalize(ωpoint)
-    npoint = any(isnan.(vec(npoint))) ? ẑ : normalize(npoint)
-    center = any(isnan.(vec(center))) ? ẑ : normalize(center)
-    point = κpoint + ωpoint + npoint + center
-    ratio = frame == 1 ? 1.0 : 0.01
-    global lookat = ratio * center + (1 - ratio) * lookat
-    global eyeposition = ratio * normalize(point) * float(π) + (1 - ratio) * eyeposition
 end
 
 
