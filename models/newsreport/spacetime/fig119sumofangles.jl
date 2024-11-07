@@ -15,6 +15,11 @@ ẑ = ℝ³([0.0; 0.0; 1.0])
 eyeposition = normalize(ℝ³(1.0, 1.0, 1.0)) * float(π)
 lookat = ℝ³(0.0, 0.0, 0.0)
 up = normalize(ℝ³(0.0, 0.0, 1.0))
+arrowsize = Vec3f(0.06, 0.08, 0.1)
+arrowlinewidth = 0.04
+linewidth = 20
+timesign = 1
+T = Float64(timesign)
 mask = load("data/basemap_mask.png")
 
 makefigure() = Figure(size = figuresize)
@@ -23,8 +28,6 @@ pl = PointLight(Point3f(0), RGBf(0.0862, 0.0862, 0.0862))
 al = AmbientLight(RGBf(0.9, 0.9, 0.9))
 lscene = LScene(fig[1, 1], show_axis=false, scenekw = (lights = [pl, al], clear=true, backgroundcolor = :white))
 
-timesign = -1
-T = Float64(timesign)
 ο = SpinVector([Complex(1.0); Complex(0.0)], timesign)
 ι = SpinVector([Complex(0.0); Complex(1.0)], timesign)
 @assert(isapprox(dot(ο, ι), 1.0), "The inner product of spin vectors $ι and $ο is not unity.")
@@ -42,40 +45,19 @@ generate() = 2rand() - 1 + im * (2rand() - 1)
 ζ′ = ζ - 1.0 / √2 * ϵ / ω.a[2]
 ω = SpinVector(ζ, timesign)
 ω′ = SpinVector(ζ′, timesign)
-ζ = Complex(κ + ω)
-τ = SpinVector(ζ, timesign)
-ζ′ = Complex(κ′ + ω′)
-τ′ = SpinVector(ζ′, timesign)
 @assert(isapprox(dot(κ, ι), vec(κ)[1]), "The first component of the spin vector $κ is not equal to the inner product of $κ and $ι.")
 @assert(isapprox(dot(κ, ο), -vec(κ)[2]), "The second component of the spin vector $κ is not equal to minus the inner product of $κ and $ο.")
 @assert(isapprox(dot(ω, ι), vec(ω)[1]), "The first component of the spin vector $ω is not equal to the inner product of $ω and $ι.")
 @assert(isapprox(dot(ω, ο), -vec(ω)[2]), "The second component of the spin vector $ω is not equal to minus the inner product of $ω and $ο.")
 @assert(isapprox(dot(ω, ι), vec(ω)[1]), "The first component of the spin vector $ω is not equal to the inner product of $ω and $ι.")
-@assert(isapprox(dot(τ, ι), vec(τ)[1]), "The second component of the spin vector $τ  is not equal to minus the inner product of $τ and $ι.")
-@assert(isapprox(dot(τ, ο), -vec(τ)[2]), "The second component of the spin vector $τ is not equal to minus the inner product of $τ and $ο.")
 
 w = (Complex(κ + ω) - Complex(κ)) / (Complex(ω) - Complex(κ))
 @assert(imag(w) ≤ 0 || isapprox(imag(w), 0.0), "The flagpoles are not collinear: $(Complex(κ)), $(Complex(ω)), $(Complex(κ + ω))")
-
-center = (Complex(ω) - Complex(κ)) * (w - abs(w)^2) / (2im * imag(w)) + Complex(κ)  # Simplified denominator
-radius = abs(Complex(κ) - center)
-
-t = 𝕍( 1.0, 0.0, 0.0, 0.0)
-x = 𝕍( 0.0, 1.0, 0.0, 0.0)
-y = 𝕍( 0.0, 0.0, 1.0, 0.0)
-z = 𝕍( 0.0, 0.0, 0.0, 1.0)
-οv = √2 * (t + z)
-ιv = √2 * (t - z)
-
-οv = 𝕍( LinearAlgebra.normalize(vec(𝕍( ο))))
-ιv = 𝕍( LinearAlgebra.normalize(vec(𝕍( ι))))
 
 κv = 𝕍( κ)
 κv′ = 𝕍( κ′)
 ωv = 𝕍( ω)
 ωv′ = 𝕍( ω′)
-τv = 𝕍( τ)
-τv′ = 𝕍( τ′)
 zero = 𝕍( 0.0, 0.0, 0.0, 0.0)
 B = stack([vec(κv), vec(ωv), vec(zero), vec(zero)])
 N = LinearAlgebra.nullspace(B)
@@ -108,8 +90,6 @@ u = 𝕍( LinearAlgebra.normalize(rand(4)))
 v = 𝕍( LinearAlgebra.normalize(rand(4)))
 p = 𝕍( LinearAlgebra.normalize(vec(u + v)))
 
-arrowsize = Vec3f(0.06, 0.08, 0.1)
-linewidth = 0.04
 northpole = Observable(Point3f(0.0, 0.0, 1.0))
 tail = Observable(Point3f(0.0, 0.0, 0.0))
 κtail = Observable(Point3f(0.0, 0.0, 0.0))
@@ -122,46 +102,9 @@ colorants = [:red, :green]
 arrows!(lscene,
     ps, ns, fxaa = true, # turn on anti-aliasing
     color = colorants,
-    linewidth = linewidth, arrowsize = arrowsize,
+    linewidth = arrowlinewidth, arrowsize = arrowsize,
     align = :origin
 )
-
-linewidth = 20
-collection = collect(range(0.0, stop = 1.0, length = segments))
-κlinepoints = []
-ωlinepoints = []
-κlinecolors = []
-ωlinecolors = []
-κlines = []
-ωlines = []
-for (i, scale1) in enumerate(collection)
-    _κlinepoints = Observable(Point3f[])
-    _ωlinepoints = Observable(Point3f[])
-    _κlinecolors = Observable(Int[])
-    _ωlinecolors = Observable(Int[])
-    for (j, scale2) in enumerate(collection)
-        κvector = LinearAlgebra.normalize(vec(scale1 * κv + scale2 * κv′))
-        ωvector = LinearAlgebra.normalize(vec(scale1 * ωv + scale2 * ωv′))
-        κpoint = Point3f(vec(project(ℍ(κvector)))...)
-        ωpoint = Point3f(vec(project(ℍ(ωvector)))...)
-        push!(_κlinepoints[], κpoint)
-        push!(_ωlinepoints[], ωpoint)
-        push!(_κlinecolors[], i + j)
-        push!(_ωlinecolors[], i + j)
-    end
-    push!(κlinepoints, _κlinepoints)
-    push!(ωlinepoints, _ωlinepoints)
-    push!(κlinecolors, _κlinecolors)
-    push!(ωlinecolors, _ωlinecolors)
-    κline = lines!(lscene, κlinepoints[i], color = κlinecolors[i], linewidth = linewidth, colorrange = (1, 2segments), colormap = :fall)
-    ωline = lines!(lscene, ωlinepoints[i], color = ωlinecolors[i], linewidth = linewidth, colorrange = (1, 2segments), colormap = :winter)
-    push!(κlines, κline)
-    push!(ωlines, ωline)
-end
-
-arcpoints = Observable(Point3f[])
-arccolors = Observable(Int[])
-arc = lines!(lscene, arcpoints, color = arccolors, linewidth = 3linewidth, colorrange = (1, segments), colormap = :prism)
 
 circlepoints = Observable(Point3f[])
 circlecolors = Observable(Int[])
@@ -203,7 +146,9 @@ spherematrix = makesphere(M, T, compressedprojection = true, segments = segments
 sphereobservable = buildsurface(lscene, spherematrix, mask, transparency = true)
 
 
-animate1(frame::Int) = begin
+animate(frame::Int) = begin
+    progress = Float64(frame / frames_number)
+    println("Frame: $frame, Progress: $progress")
     κflagplanedirection = 𝕍(LinearAlgebra.normalize(vec(κv′ - κv)))
     ωflagplanedirection = 𝕍(LinearAlgebra.normalize(vec(ωv′ - ωv)))
     global u = LinearAlgebra.normalize(vec((-dot(ê₃, κflagplanedirection) * ê₃ + -dot(ê₄, κflagplanedirection) * ê₄)))
@@ -211,7 +156,6 @@ animate1(frame::Int) = begin
     p = -𝕍(LinearAlgebra.normalize(u + v))
     global p = dot(ê₃, p) * ê₃ + dot(ê₄, p) * ê₄
     axis = normalize(ℝ³(vec(p)[2:4]))
-    progress = Float64(frame / frames_number)
     M = mat4(ℍ(progress * 4π, axis))
     κ_transformed = M * ℍ(vec(κv))
     κ′_transformed = M * ℍ(vec(κv′))
@@ -231,43 +175,16 @@ animate1(frame::Int) = begin
     _κ′ = 𝕍( vec(κ′_transformed))
     _ω = 𝕍( vec(ω_transformed))
     _ω′ = 𝕍( vec(ω′_transformed))
-    κflagplanematrix = makeflagplane(𝕍(vec(_κ)), 𝕍(LinearAlgebra.normalize(vec(_κ′ - _κ))), T, segments = segments)
-    ωflagplanematrix = makeflagplane(𝕍(vec(_ω)), 𝕍(LinearAlgebra.normalize(vec(_ω′ - _ω))), T, segments = segments)
+    κflagplanematrix = makeflagplane(_κ, 𝕍(LinearAlgebra.normalize(vec(_κ′ - _κ))), T, segments = segments)
+    ωflagplanematrix = makeflagplane(_ω, 𝕍(LinearAlgebra.normalize(vec(_ω′ - _ω))), T, segments = segments)
     updatesurface!(κflagplanematrix, κflagplaneobservable)
     updatesurface!(ωflagplanematrix, ωflagplaneobservable)
-    κflagplanecolor[] = [RGBAf(convert_hsvtorgb([277.0; 0.87; 0.94])..., 0.8) for i in 1:segments, j in 1:segments]
-    ωflagplanecolor[] = [RGBAf(convert_hsvtorgb([240.0; 1.0; 0.5])..., 0.8) for i in 1:segments, j in 1:segments]
-    κhead[] = Point3f(vec(project(ℍ(LinearAlgebra.normalize(vec(κ_transformed - κ′_transformed)))))...)
-    ωhead[] = Point3f(vec(project(ℍ(LinearAlgebra.normalize(vec(ω_transformed - ω′_transformed)))))...)
-    κtail[] = Point3f(vec(project(κ_transformed))...)
-    ωtail[] = Point3f(vec(project(ω_transformed))...)
-end
-
-
-animate(frame::Int) = begin
-    animate1(frame)
-    progress = Float64(frame / frames_number)
-    println("Frame: $frame, Progress: $progress")
-    κflagplanedirection = 𝕍(LinearAlgebra.normalize(vec(κv′ - κv)))
-    ωflagplanedirection = 𝕍(LinearAlgebra.normalize(vec(ωv′ - ωv)))
-    global u = LinearAlgebra.normalize(vec((-dot(ê₃, κflagplanedirection) * ê₃ + -dot(ê₄, κflagplanedirection) * ê₄)))
-    global v = LinearAlgebra.normalize(vec((-dot(ê₃, ωflagplanedirection) * ê₃ + -dot(ê₄, ωflagplanedirection) * ê₄)))
-    p = -𝕍(LinearAlgebra.normalize(u + v))
-    global p = dot(ê₃, p) * ê₃ + dot(ê₄, p) * ê₄
-    axis = normalize(ℝ³(vec(p)[2:4]))
-    M = mat4(ℍ(progress * 4π, axis))
-    _arcpoints = Point3f[]
-    _arccolors = Int[]
-    for (i, scale) in enumerate(collection)
-        vector = M * normalize(ℍ(vec(scale * u + (1.0 - scale) * v)))
-        point = Point3f(vec(project(vector))...)
-        push!(_arcpoints, point)
-        push!(_arccolors, i)
-    end
-    arcpoints[] = _arcpoints
-    arccolors[] = _arccolors
-    notify(arcpoints)
-    notify(arccolors)
+    κflagplanecolor[] = [RGBAf(1.0, 0.0, 0.0, 0.8) for i in 1:segments, j in 1:segments]
+    ωflagplanecolor[] = [RGBAf(0.0, 1.0, 0.0, 0.8) for i in 1:segments, j in 1:segments]
+    κhead[] = Point3f(project(ℍ(LinearAlgebra.normalize(vec(κ_transformed - κ′_transformed)))))
+    ωhead[] = Point3f(project(ℍ(LinearAlgebra.normalize(vec(ω_transformed - ω′_transformed)))))
+    κtail[] = Point3f(project(κ_transformed))
+    ωtail[] = Point3f(project(ω_transformed))
     _circlepoints = Point3f[]
     _circlecolors = Int[]
     for (i, ϕ) in enumerate(collect(range(-4π, stop = 4π, length = segments)))
@@ -283,31 +200,6 @@ animate(frame::Int) = begin
     circlecolors[] = _circlecolors
     notify(circlepoints)
     notify(circlecolors)
-    # the flag planes
-    for (i, scale1) in enumerate(collection)
-        _κlinepoints = Point3f[]
-        _ωlinepoints = Point3f[]
-        _κlinecolors = Int[]
-        _ωlinecolors = Int[]
-        for (j, scale2) in enumerate(collection)
-            κvector = M * normalize(ℍ(vec(scale1 * κv + scale2 * 𝕍(LinearAlgebra.normalize(vec(κv - κv′))))))
-            ωvector = M * normalize(ℍ(vec(scale1 * ωv + scale2 * 𝕍(LinearAlgebra.normalize(vec(ωv - ωv′))))))
-            κpoint = Point3f(vec(project(κvector))...)
-            ωpoint = Point3f(vec(project(ωvector))...)
-            push!(_κlinepoints, κpoint)
-            push!(_ωlinepoints, ωpoint)
-            push!(_κlinecolors, i + j)
-            push!(_ωlinecolors, i + j)
-        end
-        κlinepoints[i][] = _κlinepoints
-        ωlinepoints[i][] = _ωlinepoints
-        κlinecolors[i][] = _κlinecolors
-        ωlinecolors[i][] = _ωlinecolors
-        notify(κlinepoints[i])
-        notify(ωlinepoints[i])
-        notify(κlinecolors[i])
-        notify(ωlinecolors[i])
-    end
     updatecamera!(lscene, eyeposition, lookat, up)
 end
 
