@@ -16,6 +16,7 @@ export projectontoplane
 export constructtorus
 export constructsphere
 export calculatebasisvectors
+export calculatetransformation
 
 
 """
@@ -168,6 +169,22 @@ function makesphere(transformation::SpinTransformation, T::Float64; compressedpr
         surface = map(x -> 𝕍(T, vec(sign(T) * √abs(T) * x)...), sphere)
     end
     surface = map(x -> 𝕍(transformation * SpinVector(x)), surface)
+    projectionmap = compressedprojection ? project : projectnocompression
+    return map(x -> projectionmap(normalize(ℍ(vec(x)))), surface)
+end
+
+
+function makesphere(transformation::Any, T::Float64; compressedprojection::Bool = true, segments::Int = 60)
+    lspace1 = range(-π, stop = float(π), length = segments)
+    lspace2 = range(-π / 2, stop = π / 2 * 0.99, length = segments)
+    sphere = [convert_to_cartesian([1.0; θ; ϕ]) for θ in lspace2, ϕ in lspace1]
+    timesign = T ≥ 0 ? 1 : -1
+    if isapprox(T, 0.0)
+        surface = map(x -> 𝕍(T, vec(x)...), sphere)
+    else
+        surface = map(x -> 𝕍(T, vec(sign(T) * √abs(T) * x)...), sphere)
+    end
+    surface = map(x -> 𝕍(SpinVector(transformation(Complex(SpinVector(x))), timesign)), surface)
     projectionmap = compressedprojection ? project : projectnocompression
     return map(x -> projectionmap(normalize(ℍ(vec(x)))), surface)
 end
@@ -374,4 +391,18 @@ function calculatebasisvectors(κ::SpinVector, ω::SpinVector)
     e₄ = v₄ - dot(ê₁, v₄) * ê₁ - dot(ê₂, v₄) * ê₂ - dot(ê₃, v₄) * ê₃
     ê₄ = normalize(e₄)
     ê₁, ê₂, ê₃, ê₄
+end
+
+
+"""
+    calculatetransformation(z₁, z₂, z₃, w₁, w₂, w₃)
+
+Calculate the spin transformation that takes the given three points `z₁`, `z₂` and `z₃` to three points `w₁`, `w₂` and `w₃`.
+"""
+function calculatetransformation(z₁::Complex, z₂::Complex, z₃::Complex, w₁::Complex, w₂::Complex, w₃::Complex)
+    f(z::Complex) = begin
+        A = (w₁ - w₂) * (z - z₂) * (z₁ - z₃)
+        B = (w₁ - w₃) * (z₁ - z₂) * (z - z₃)
+        (w₃ * A - w₂ * B) / (A - B)
+    end
 end

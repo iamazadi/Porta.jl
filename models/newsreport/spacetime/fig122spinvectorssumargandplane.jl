@@ -7,7 +7,7 @@ using Porta
 figuresize = (4096, 2160)
 segments = 360
 frames_number = 360
-modelname = "fig121spinvectorsum"
+modelname = "fig122spinvectorssumargandplane"
 M = Identity(4)
 x̂ = ℝ³([1.0; 0.0; 0.0])
 ŷ = ℝ³([0.0; 1.0; 0.0])
@@ -30,12 +30,7 @@ pl = PointLight(Point3f(0), RGBf(0.0862, 0.0862, 0.0862))
 al = AmbientLight(RGBf(0.9, 0.9, 0.9))
 lscene = LScene(fig[1, 1], show_axis=false, scenekw = (lights = [pl, al], clear=true, backgroundcolor = :white))
 
-ο = SpinVector([Complex(1.0); Complex(0.0)], timesign)
-ι = SpinVector([Complex(0.0); Complex(1.0)], timesign)
-@assert(isapprox(dot(ο, ι), 1.0), "The inner product of spin vectors $ι and $ο is not unity.")
-@assert(isapprox(dot(ι, ο), -1.0), "The inner product of spin vectors $ι and $ο is not unity.")
-
-generate() = 2rand() - 1 + im * (2rand() - 1)
+generate() = 10rand() - 5 + im * (10rand() - 5)
 κ = SpinVector(generate(), generate(), timesign)
 ω = SpinVector(generate(), generate(), timesign)
 ζ = Complex(κ)
@@ -50,13 +45,6 @@ generate() = 2rand() - 1 + im * (2rand() - 1)
 τ = SpinVector(ζ, timesign)
 ζ′ = ζ - 1.0 / √2 * ϵ / τ.a[2]
 τ′ = SpinVector(ζ′, timesign)
-@assert(isapprox(dot(κ, ι), vec(κ)[1]), "The first component of the spin vector $κ is not equal to the inner product of $κ and $ι.")
-@assert(isapprox(dot(κ, ο), -vec(κ)[2]), "The second component of the spin vector $κ is not equal to minus the inner product of $κ and $ο.")
-@assert(isapprox(dot(ω, ι), vec(ω)[1]), "The first component of the spin vector $ω is not equal to the inner product of $ω and $ι.")
-@assert(isapprox(dot(ω, ο), -vec(ω)[2]), "The second component of the spin vector $ω is not equal to minus the inner product of $ω and $ο.")
-@assert(isapprox(dot(ω, ι), vec(ω)[1]), "The first component of the spin vector $ω is not equal to the inner product of $ω and $ι.")
-@assert(isapprox(dot(τ, ι), vec(τ)[1]), "The second component of the spin vector $τ  is not equal to minus the inner product of $τ and $ι.")
-@assert(isapprox(dot(τ, ο), -vec(τ)[2]), "The second component of the spin vector $τ is not equal to minus the inner product of $τ and $ο.")
 
 w = (Complex(κ + ω) - Complex(κ)) / (Complex(ω) - Complex(κ))
 @assert(imag(w) ≤ 0 || isapprox(imag(w), 0.0), "The flagpoles are not collinear: $(Complex(κ)), $(Complex(ω)), $(Complex(κ + ω))")
@@ -88,7 +76,7 @@ circlepoints = Observable(Point3f[])
 circlecolors = Observable(Int[])
 circle = lines!(lscene, circlepoints, color = circlecolors, linewidth = 2linewidth, colorrange = (1, segments), colormap = :rainbow)
 
-titles = ["L", "M", "N", "P", "Q", "R"]
+titles = ["κ", "ω", "κ+ω", "P", "Q", "R"]
 rotation = gettextrotation(lscene)
 text!(lscene,
     @lift(map(x -> Point3f(vec((isnan(x) ? ẑ : x))), [$κhead + $κtail, $ωhead + $ωtail, $τhead + $τtail, $κtail, $ωtail, $τtail])),
@@ -121,33 +109,36 @@ meshscatter!(lscene, τtail, markersize = markersize, color = colorants[3])
 animate(frame::Int) = begin
     progress = Float64(frame / frames_number)
     println("Frame: $frame, Progress: $progress")
-    spintransform = SpinTransformation(progress * 2π, progress * 2π, progress * 2π)
-    _κ = spintransform * κ
-    _ω = spintransform * ω
-    _κ′ = spintransform * κ′
-    _ω′ = spintransform * ω′
+    z₁ = Complex(κ)
+    z₂ = Complex(ω)
+    z₃ = Complex(κ + ω)
+    w₁ = progress * exp(im * 0.0) + (1 - progress) * z₁
+    w₂ = progress * exp(im * 2π / 3.0) + (1 - progress) * z₂
+    w₃ = progress * exp(im * 4π / 3.0) + (1 - progress) * z₃
+    f = calculatetransformation(z₁, z₂, z₃, w₁, w₂, w₃)
+    _κ = SpinVector(f(Complex(κ)), timesign)
+    _ω = SpinVector(f(Complex(-ω)), timesign)
+    _κ′ = SpinVector(f(Complex(κ′)), timesign)
+    _ω′ = SpinVector(f(Complex(ω′)), timesign)
     _κv = 𝕍( normalize(ℝ⁴(𝕍( _κ))))
     _κ′v = 𝕍( normalize(ℝ⁴(𝕍( _κ′))))
     _ωv = 𝕍( normalize(ℝ⁴(𝕍( _ω))))
     _ω′v = 𝕍( normalize(ℝ⁴(𝕍( _ω′))))
+    
     _τ = _κ + _ω
     _τ′ = SpinVector(Complex(_τ) - 1.0 / √2 * ϵ / _τ.a[2], timesign)
-    _τv = 𝕍( normalize(ℝ⁴(𝕍( _τ))))
-    _τ′v = 𝕍( normalize(ℝ⁴(𝕍( _τ′))))
+    _τv = 𝕍( normalize( ℝ⁴( 𝕍( _τ))))
+    _τ′v = 𝕍( normalize( ℝ⁴( 𝕍( _τ′))))
     κflagplane1 = _κv
-    κflagplane2 = 𝕍(normalize(ℝ⁴(_κ′v - _κv)))
+    κflagplane2 = 𝕍( normalize( ℝ⁴( _κ′v - _κv)))
     ωflagplane1 = _ωv
-    ωflagplane2 = 𝕍(normalize(ℝ⁴(_ω′v - _ωv)))
+    ωflagplane2 = 𝕍( normalize( ℝ⁴( _ω′v - _ωv)))
     τflagplane1 = _τv
-    τflagplane2 = 𝕍(normalize(ℝ⁴(_τ′v - _τv)))
-    spherematrix = makesphere(spintransform, T, compressedprojection = true, segments = segments)
-    updatesurface!(spherematrix, sphereobservable)
-    κflagplanematrix = makeflagplane(κflagplane1, κflagplane2, T, segments = segments)
-    ωflagplanematrix = makeflagplane(ωflagplane1, ωflagplane2, T, segments = segments)
-    τflagplanematrix = makeflagplane(τflagplane1, τflagplane2, T, segments = segments)
-    updatesurface!(κflagplanematrix, κflagplaneobservable)
-    updatesurface!(ωflagplanematrix, ωflagplaneobservable)
-    updatesurface!(τflagplanematrix, τflagplaneobservable)
+    τflagplane2 = 𝕍( normalize( ℝ⁴( _τ′v - _τv)))
+    updatesurface!(makesphere(f, T, compressedprojection = true, segments = segments), sphereobservable)
+    updatesurface!(makeflagplane(κflagplane1, κflagplane2, T, segments = segments), κflagplaneobservable)
+    updatesurface!(makeflagplane(ωflagplane1, ωflagplane2, T, segments = segments), ωflagplaneobservable)
+    updatesurface!(makeflagplane(τflagplane1, τflagplane2, T, segments = segments), τflagplaneobservable)
     κtail[] = Point3f(project(ℝ⁴(_κv)))
     ωtail[] = Point3f(project(ℝ⁴(_ωv)))
     τtail[] = Point3f(project(ℝ⁴(_τv)))
@@ -174,7 +165,6 @@ end
 
 
 animate(1)
-
 
 record(fig, joinpath("gallery", "$modelname.mp4"), 1:frames_number) do frame
     animate(frame)
