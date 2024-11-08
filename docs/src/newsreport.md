@@ -79,7 +79,7 @@ Tell us the facts of the story.
 
 ![18](./assets/spinspace/18.PNG)
 
-[A spin-frame](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/spacetime/fig118spinvectorssplus.jl)
+[Spin-vectors in terms of ``S^+``](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/spacetime/fig118spinvectorssplus.jl)
 
 ![19](./assets/spinspace/19.PNG)
 
