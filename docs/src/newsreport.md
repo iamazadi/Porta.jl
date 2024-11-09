@@ -63,7 +63,7 @@ Tell us the facts of the story.
 
 ![14](./assets/spinspace/14.PNG)
 
-[One-to-two relation between ``O^{\uparrow}_+(1,3)`` and ``SL(2,\mathbb{C})``](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/spacetime/fig114onetotworelation.jl)
+[Spin structure: one-to-two relation between ``O^{\uparrow}_+(1,3)`` and ``SL(2,\mathbb{C})``](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/spacetime/fig114onetotworelation.jl)
 
 ![15](./assets/spinspace/15.PNG)
 
@@ -98,6 +98,8 @@ Tell us the facts of the story.
 [Sum of spin-vectors in terms of the Argand plane](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/spacetime/fig122spinvectorssumargandplane.jl)
 
 ![23](./assets/spinspace/23.PNG)
+
+[A special frame that brings out the symmetry of spin-vector sum](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/spacetime/fig123specialframe.jl)
 
 For example, the Standard Model is formulated on 4-dimensional Minkowski spacetime, over which all fiber bundles can be trivialized and spinors have a simple explicit description.
 For the Symmetries relevant in field theories, the groups act on fields and leave the Lagrangian or the action (the spacetime integral over the Lagrangian) invariant.
