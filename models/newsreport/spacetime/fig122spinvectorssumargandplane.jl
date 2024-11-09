@@ -31,20 +31,13 @@ al = AmbientLight(RGBf(0.9, 0.9, 0.9))
 lscene = LScene(fig[1, 1], show_axis=false, scenekw = (lights = [pl, al], clear=true, backgroundcolor = :white))
 
 generate() = 10rand() - 5 + im * (10rand() - 5)
-κ = SpinVector(generate(), generate(), timesign)
+scalar = exp(im * rand())
+κ = scalar * SpinVector(generate(), generate(), timesign)
 ω = SpinVector(generate(), generate(), timesign)
-ζ = Complex(κ)
-ζ′ = ζ - 1.0 / √2 * ϵ / κ.a[2]
-κ = SpinVector(ζ, timesign)
-κ′ = SpinVector(ζ′, timesign)
-ζ = Complex(ω)
-ζ′ = ζ - 1.0 / √2 * ϵ / ω.a[2]
-ω = SpinVector(ζ, timesign)
-ω′ = SpinVector(ζ′, timesign)
-ζ = Complex(κ + ω)
-τ = SpinVector(ζ, timesign)
-ζ′ = ζ - 1.0 / √2 * ϵ / τ.a[2]
-τ′ = SpinVector(ζ′, timesign)
+κ′ = SpinVector(Complex(κ) - 1.0 / √2 * ϵ / κ.a[2], timesign)
+ω′ = SpinVector(Complex(ω) - 1.0 / √2 * ϵ / ω.a[2], timesign)
+τ = κ + ω
+τ′ = SpinVector(Complex(τ) - 1.0 / √2 * ϵ / τ.a[2], timesign)
 
 w = (Complex(κ + ω) - Complex(κ)) / (Complex(ω) - Complex(κ))
 @assert(imag(w) ≤ 0 || isapprox(imag(w), 0.0), "The flagpoles are not collinear: $(Complex(κ)), $(Complex(ω)), $(Complex(κ + ω))")
@@ -76,7 +69,7 @@ circlepoints = Observable(Point3f[])
 circlecolors = Observable(Int[])
 circle = lines!(lscene, circlepoints, color = circlecolors, linewidth = 2linewidth, colorrange = (1, segments), colormap = :rainbow)
 
-titles = ["κ", "ω", "κ+ω", "P", "Q", "R"]
+titles = ["κ", "-ω", "κ+ω", "P", "Q", "R"]
 rotation = gettextrotation(lscene)
 text!(lscene,
     @lift(map(x -> Point3f(vec((isnan(x) ? ẑ : x))), [$κhead + $κtail, $ωhead + $ωtail, $τhead + $τtail, $κtail, $ωtail, $τtail])),
@@ -93,13 +86,13 @@ sphereobservable = buildsurface(lscene, spherematrix, mask, transparency = true)
 
 κflagplanematrix = makeflagplane(κv, κ′v - κv, T, segments = segments)
 κflagplanecolor = Observable(fill(RGBAf(1.0, 0.0, 0.0, 0.8), segments, segments))
-κflagplaneobservable = buildsurface(lscene, κflagplanematrix, κflagplanecolor, transparency = false)
+κflagplaneobservable = buildsurface(lscene, κflagplanematrix, κflagplanecolor, transparency = true)
 ωflagplanematrix = makeflagplane(ωv, ω′v - ωv, T, segments = segments)
 ωflagplanecolor = Observable(fill(RGBAf(0.0, 1.0, 0.0, 0.8), segments, segments))
-ωflagplaneobservable = buildsurface(lscene, ωflagplanematrix, ωflagplanecolor, transparency = false)
+ωflagplaneobservable = buildsurface(lscene, ωflagplanematrix, ωflagplanecolor, transparency = true)
 τflagplanematrix = makeflagplane(τv, τ′v - τv, T, segments = segments)
 τflagplanecolor = Observable(fill(RGBAf(0.0, 0.0, 1.0, 0.8), segments, segments))
-τflagplaneobservable = buildsurface(lscene, τflagplanematrix, τflagplanecolor, transparency = false)
+τflagplaneobservable = buildsurface(lscene, τflagplanematrix, τflagplanecolor, transparency = true)
 
 meshscatter!(lscene, κtail, markersize = markersize, color = colorants[1])
 meshscatter!(lscene, ωtail, markersize = markersize, color = colorants[2])
@@ -110,48 +103,74 @@ animate(frame::Int) = begin
     progress = Float64(frame / frames_number)
     println("Frame: $frame, Progress: $progress")
     z₁ = Complex(κ)
-    z₂ = Complex(ω)
+    z₂ = Complex(-ω)
     z₃ = Complex(κ + ω)
-    w₁ = progress * exp(im * 0.0) + (1 - progress) * z₁
-    w₂ = progress * exp(im * 2π / 3.0) + (1 - progress) * z₂
-    w₃ = progress * exp(im * 4π / 3.0) + (1 - progress) * z₃
+    if progress ≤ 0.5
+        α = min(2progress, 1.0)
+        w₁ = α * exp(im * 0.0) + (1 - α) * z₁
+        w₂ = α * exp(im * 2π / 3.0) + (1 - α) * z₂
+        w₃ = α * exp(im * 4π / 3.0) + (1 - α) * z₃
+    else
+        α = 2(progress - 0.5) * 2π
+        w₁ = exp(im * α)
+        w₂ = exp(im * (2π / 3.0 + α))
+        w₃ = exp(im * (4π / 3.0 + α))
+    end
     f = calculatetransformation(z₁, z₂, z₃, w₁, w₂, w₃)
-    _κ = SpinVector(f(Complex(κ)), timesign)
+
+    _κ = scalar * SpinVector(f(Complex(κ)), timesign)
+
+    _κ′ = SpinVector(Complex(_κ) - 1.0 / √2 * ϵ / _κ.a[2], timesign)
+
     _ω = SpinVector(f(Complex(-ω)), timesign)
-    _κ′ = SpinVector(f(Complex(κ′)), timesign)
-    _ω′ = SpinVector(f(Complex(ω′)), timesign)
+
+    _ω′ = SpinVector(Complex(_ω) - 1.0 / √2 * ϵ / _ω.a[2], timesign)
+
     _κv = 𝕍( normalize(ℝ⁴(𝕍( _κ))))
     _κ′v = 𝕍( normalize(ℝ⁴(𝕍( _κ′))))
     _ωv = 𝕍( normalize(ℝ⁴(𝕍( _ω))))
     _ω′v = 𝕍( normalize(ℝ⁴(𝕍( _ω′))))
     
+    _κv = 𝕍( _κ)
+    _κ′v = 𝕍( _κ′)
+    _ωv = 𝕍( _ω)
+    _ω′v = 𝕍( _ω′)
+
     _τ = _κ + _ω
+
     _τ′ = SpinVector(Complex(_τ) - 1.0 / √2 * ϵ / _τ.a[2], timesign)
+
     _τv = 𝕍( normalize( ℝ⁴( 𝕍( _τ))))
+
     _τ′v = 𝕍( normalize( ℝ⁴( 𝕍( _τ′))))
+
+
     κflagplane1 = _κv
     κflagplane2 = 𝕍( normalize( ℝ⁴( _κ′v - _κv)))
     ωflagplane1 = _ωv
     ωflagplane2 = 𝕍( normalize( ℝ⁴( _ω′v - _ωv)))
     τflagplane1 = _τv
     τflagplane2 = 𝕍( normalize( ℝ⁴( _τ′v - _τv)))
+
     updatesurface!(makesphere(f, T, compressedprojection = true, segments = segments), sphereobservable)
     updatesurface!(makeflagplane(κflagplane1, κflagplane2, T, segments = segments), κflagplaneobservable)
     updatesurface!(makeflagplane(ωflagplane1, ωflagplane2, T, segments = segments), ωflagplaneobservable)
     updatesurface!(makeflagplane(τflagplane1, τflagplane2, T, segments = segments), τflagplaneobservable)
-    κtail[] = Point3f(project(ℝ⁴(_κv)))
-    ωtail[] = Point3f(project(ℝ⁴(_ωv)))
-    τtail[] = Point3f(project(ℝ⁴(_τv)))
+
+    κtail[] = Point3f(project(normalize(ℝ⁴(_κv))))
+    ωtail[] = Point3f(project(normalize(ℝ⁴(_ωv))))
+    τtail[] = Point3f(project(normalize(ℝ⁴(_τv))))
     κhead[] = Point3f(project(normalize(ℝ⁴(_κ′v - _κv))))
     ωhead[] = Point3f(project(normalize(ℝ⁴(_ω′v - _ωv))))
     τhead[] = Point3f(project(normalize(ℝ⁴(_τ′v - _τv))))
+
     _circlepoints = Point3f[]
     _circlecolors = Int[]
     for (i, ϕ) in enumerate(collect(range(-4π, stop = 4π, length = segments)))
         κζ = Complex(_κ)
         ωζ = Complex(_ω)
         ζ = κζ - ωζ
-        circlevector = normalize(ℝ⁴(𝕍( SpinVector(κζ + ϕ * ζ, timesign))))
+        circlevector = normalize(ℝ⁴(𝕍( SpinVector(ωζ + ϕ * ζ, timesign))))
         circlepoint = Point3f(project(circlevector))
         push!(_circlepoints, circlepoint)
         push!(_circlecolors, i)

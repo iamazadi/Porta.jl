@@ -32,26 +32,14 @@ lscene = LScene(fig[1, 1], show_axis=false, scenekw = (lights = [pl, al], clear=
 
 generate() = 10rand() - 5 + im * (10rand() - 5)
 scalar = exp(im * rand())
-κ = SpinVector(generate(), generate(), timesign)
+κ = scalar * SpinVector(generate(), generate(), timesign)
 ω = SpinVector(generate(), generate(), timesign)
-ζ = Complex(κ)
-ζ′ = ζ - 1.0 / √2 * ϵ / κ.a[2]
-κ = scalar * SpinVector(ζ, timesign)
-κ′ = scalar * SpinVector(ζ′, timesign)
-ζ = Complex(ω)
-ζ′ = ζ - 1.0 / √2 * ϵ / ω.a[2]
-ω = SpinVector(ζ, timesign)
-ω′ = SpinVector(ζ′, timesign)
+κ′ = SpinVector(Complex(κ) - 1.0 / √2 * ϵ / κ.a[2], timesign)
+ω′ = SpinVector(Complex(ω) - 1.0 / √2 * ϵ / ω.a[2], timesign)
 τ = κ + ω
-ζ = Complex(τ)
-ζ′ = ζ - 1.0 / √2 * ϵ / τ.a[2]
-τ = SpinVector(ζ, timesign)
-τ′ = SpinVector(ζ′, timesign)
+τ′ = SpinVector(Complex(τ) - 1.0 / √2 * ϵ / τ.a[2], timesign)
 ψ = κ + -ω
-ζ = Complex(ψ)
-ψ = SpinVector(ζ, timesign)
-ζ′ = ζ - 1.0 / √2 * ϵ / ψ.a[2]
-ψ′ = SpinVector(ζ′, timesign)
+ψ′ = SpinVector(Complex(ψ) - 1.0 / √2 * ϵ / ψ.a[2], timesign)
 
 w = (Complex(κ + ω) - Complex(κ)) / (Complex(ω) - Complex(κ))
 @assert(imag(w) ≤ 0 || isapprox(imag(w), 0.0), "The flagpoles are not collinear: $(Complex(κ)), $(Complex(ω)), $(Complex(κ + ω))")
@@ -141,16 +129,16 @@ animate(frame::Int) = begin
     f = calculatetransformation(z₁, z₂, z₃, w₁, w₂, w₃)
 
     _κ = scalar * SpinVector(f(Complex(κ)), timesign)
-    _κ′ = scalar * SpinVector(Complex(_κ) - 1.0 / √2 * ϵ / _κ.a[2], timesign)
+    _κ′ = SpinVector(Complex(_κ) - 1.0 / √2 * ϵ / _κ.a[2], timesign)
     _ω = SpinVector(f(Complex(ω)), timesign)
-    _ω′ = scalar * SpinVector(Complex(_ω) - 1.0 / √2 * ϵ / _ω.a[2], timesign)
+    _ω′ = SpinVector(Complex(_ω) - 1.0 / √2 * ϵ / _ω.a[2], timesign)
 
     _κv = 𝕍( normalize(ℝ⁴(𝕍( _κ))))
     _κ′v = 𝕍( normalize(ℝ⁴(𝕍( _κ′))))
     _ωv = 𝕍( normalize(ℝ⁴(𝕍( _ω))))
     _ω′v = 𝕍( normalize(ℝ⁴(𝕍( _ω′))))
     
-    _τ = _κ + _ω
+    _τ = (1 / √2) * (_κ + _ω)
 
     _τ′ = SpinVector(Complex(_τ) - 1.0 / √2 * ϵ / _τ.a[2], timesign)
 
@@ -158,7 +146,7 @@ animate(frame::Int) = begin
 
     _τ′v = 𝕍( normalize( ℝ⁴( 𝕍( _τ′))))
 
-    _ψ = _κ + -_ω
+    _ψ = (1 / √2) * (_κ + -_ω)
 
     _ψ′ = SpinVector(Complex(_ψ) - 1.0 / √2 * ϵ / _ψ.a[2], timesign)
 
@@ -181,10 +169,10 @@ animate(frame::Int) = begin
     updatesurface!(makeflagplane(τflagplane1, τflagplane2, T, segments = segments), τflagplaneobservable)
     updatesurface!(makeflagplane(ψflagplane1, ψflagplane2, T, segments = segments), ψflagplaneobservable)
 
-    κtail[] = Point3f(project(ℝ⁴(_κv)))
-    ωtail[] = Point3f(project(ℝ⁴(_ωv)))
-    τtail[] = Point3f(project(ℝ⁴(_τv)))
-    ψtail[] = Point3f(project(ℝ⁴(_ψv)))
+    κtail[] = Point3f(project(normalize(ℝ⁴(_κv))))
+    ωtail[] = Point3f(project(normalize(ℝ⁴(_ωv))))
+    τtail[] = Point3f(project(normalize(ℝ⁴(_τv))))
+    ψtail[] = Point3f(project(normalize(ℝ⁴(_ψv))))
     κhead[] = Point3f(project(normalize(ℝ⁴(_κ′v - _κv))))
     ωhead[] = Point3f(project(normalize(ℝ⁴(_ω′v - _ωv))))
     τhead[] = Point3f(project(normalize(ℝ⁴(_τ′v - _τv))))
