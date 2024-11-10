@@ -113,8 +113,8 @@ animate(frame::Int) = begin
     progress = Float64(frame / frames_number)
     println("Frame: $frame, Progress: $progress")
     z₁ = Complex(κ)
-        z₂ = Complex(ω)
-        z₃ = Complex(κ + ω)
+    z₂ = Complex(-ω)
+    z₃ = Complex((1 / √2) * (κ + ω))
     if progress ≤ 0.5
         α = min(2progress, 1.0)
         w₁ = α * exp(im * 0.0) + (1 - α) * z₁
@@ -133,10 +133,13 @@ animate(frame::Int) = begin
     _ω = SpinVector(f(Complex(ω)), timesign)
     _ω′ = SpinVector(Complex(_ω) - 1.0 / √2 * ϵ / _ω.a[2], timesign)
 
-    _κv = 𝕍( normalize(ℝ⁴(𝕍( _κ))))
-    _κ′v = 𝕍( normalize(ℝ⁴(𝕍( _κ′))))
-    _ωv = 𝕍( normalize(ℝ⁴(𝕍( _ω))))
-    _ω′v = 𝕍( normalize(ℝ⁴(𝕍( _ω′))))
+    _κv = 𝕍( normalize( ℝ⁴( 𝕍( _κ))))
+
+    _κ′v = 𝕍( normalize( ℝ⁴( 𝕍( _κ′))))
+
+    _ωv = 𝕍( normalize( ℝ⁴( 𝕍( _ω))))
+
+    _ω′v = 𝕍( normalize( ℝ⁴( 𝕍( _ω′))))
     
     _τ = (1 / √2) * (_κ + _ω)
 
@@ -162,13 +165,11 @@ animate(frame::Int) = begin
     τflagplane2 = 𝕍( normalize( ℝ⁴( _τ′v - _τv)))
     ψflagplane1 = _ψv
     ψflagplane2 = 𝕍( normalize( ℝ⁴( _ψ′v - _ψv)))
-
     updatesurface!(makesphere(f, T, compressedprojection = true, segments = segments), sphereobservable)
     updatesurface!(makeflagplane(κflagplane1, κflagplane2, T, segments = segments), κflagplaneobservable)
     updatesurface!(makeflagplane(ωflagplane1, ωflagplane2, T, segments = segments), ωflagplaneobservable)
     updatesurface!(makeflagplane(τflagplane1, τflagplane2, T, segments = segments), τflagplaneobservable)
     updatesurface!(makeflagplane(ψflagplane1, ψflagplane2, T, segments = segments), ψflagplaneobservable)
-
     κtail[] = Point3f(project(normalize(ℝ⁴(_κv))))
     ωtail[] = Point3f(project(normalize(ℝ⁴(_ωv))))
     τtail[] = Point3f(project(normalize(ℝ⁴(_τv))))
@@ -177,13 +178,12 @@ animate(frame::Int) = begin
     ωhead[] = Point3f(project(normalize(ℝ⁴(_ω′v - _ωv))))
     τhead[] = Point3f(project(normalize(ℝ⁴(_τ′v - _τv))))
     ψhead[] = Point3f(project(normalize(ℝ⁴(_ψ′v - _ψv))))
-
     _circlepoints = Point3f[]
     _circlecolors = Int[]
     for (i, ϕ) in enumerate(collect(range(-4π, stop = 4π, length = segments)))
         κζ = Complex(_κ)
         ωζ = Complex(_ω)
-        ζ = κζ - ωζ
+        ζ = ωζ - κζ
         circlevector = normalize(ℝ⁴(𝕍( SpinVector(κζ + ϕ * ζ, timesign))))
         circlepoint = Point3f(project(circlevector))
         push!(_circlepoints, circlepoint)
