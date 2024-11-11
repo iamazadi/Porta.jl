@@ -397,7 +397,7 @@ end
 """
     calculatetransformation(z₁, z₂, z₃, w₁, w₂, w₃)
 
-Calculate the spin transformation that takes the given three points `z₁`, `z₂` and `z₃` to three points `w₁`, `w₂` and `w₃`.
+Calculate the bilinear transformation that takes the given three points `z₁`, `z₂` and `z₃` to three points `w₁`, `w₂` and `w₃`.
 """
 function calculatetransformation(z₁::Complex, z₂::Complex, z₃::Complex, w₁::Complex, w₂::Complex, w₃::Complex)
     f(z::Complex) = begin
