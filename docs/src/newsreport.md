@@ -5,7 +5,7 @@ Description = "News Report"
 # Lede
 
 Show a small piece of the story.
-![1](./assets/spinspace/1.PNG)
+![1](./assets/newsreport/1.PNG)
 
 # Context
 
@@ -13,91 +13,91 @@ Show a small piece of the story.
 
 Tell us the facts of the story.
 
-![2](./assets/spinspace/2.PNG)
+![2](./assets/newsreport/2.PNG)
 
 ## Where and When
 
-![3](./assets/spinspace/3.PNG)
+![3](./assets/newsreport/3.PNG)
 
 [Transformations](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/spacetime/fig11transformations.jl)
 
-![4](./assets/spinspace/4.PNG)
+![4](./assets/newsreport/4.PNG)
 
 [Y Negative](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/spacetime/fig12ynegative.jl)
 
-![5](./assets/spinspace/5.PNG)
+![5](./assets/newsreport/5.PNG)
 
 [Stereographic Projection](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/spacetime/fig13stereographicprojection.jl)
 
-![6](./assets/spinspace/6.PNG)
+![6](./assets/newsreport/6.PNG)
 
 [Spherical Coordinates](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/spacetime/fig14spherical.jl)
 
-![7](./assets/spinspace/7.PNG)
+![7](./assets/newsreport/7.PNG)
 
 [Stereographic Projection](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/spacetime/fig15stereographicprojection.jl)
 
-![8](./assets/spinspace/8.PNG)
+![8](./assets/newsreport/8.PNG)
 
 [Four-Screw](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/spacetime/fig1678fourscrew.jl)
 
-![9](./assets/spinspace/9.PNG)
+![9](./assets/newsreport/9.PNG)
 
 [Null Rotation](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/spacetime/fig19nullrotation.jl)
 
-![10](./assets/spinspace/10.PNG)
+![10](./assets/newsreport/10.PNG)
 
 [Null Flag](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/spacetime/fig110nullflag.jl)
 
-![11](./assets/spinspace/11.PNG)
+![11](./assets/newsreport/11.PNG)
 
 [Cross-Sections](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/spacetime/fig111crosssections.jl)
 
-![12](./assets/spinspace/12.PNG)
+![12](./assets/newsreport/12.PNG)
 
 [Special Orthogonal (3)](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/spacetime/fig112specialorthogonal3.jl)
 
-![13](./assets/spinspace/13.PNG)
+![13](./assets/newsreport/13.PNG)
 
 [Dirac's scissors problem](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/spacetime/fig113diracsscissors.jl)
 
-![14](./assets/spinspace/14.PNG)
+![14](./assets/newsreport/14.PNG)
 
 [Spin structure: one-to-two relation between ``O^{\uparrow}_+(1,3)`` and ``SL(2,\mathbb{C})``](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/spacetime/fig114onetotworelation.jl)
 
-![15](./assets/spinspace/15.PNG)
+![15](./assets/newsreport/15.PNG)
 
 [A null flag bundle](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/spacetime/fig115nullflagbundle.jl)
 
-![16](./assets/spinspace/16.PNG)
+![16](./assets/newsreport/16.PNG)
 
 [A unique frame ``ABCD``](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/spacetime/fig116uniqueframe.jl)
 
-![17](./assets/spinspace/17.PNG)
+![17](./assets/newsreport/17.PNG)
 
 [A spin-frame](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/spacetime/fig117spinframe.jl)
 
-![18](./assets/spinspace/18.PNG)
+![18](./assets/newsreport/18.PNG)
 
 [Spin-vectors in terms of ``S^+``](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/spacetime/fig118spinvectorssplus.jl)
 
-![19](./assets/spinspace/19.PNG)
+![19](./assets/newsreport/19.PNG)
 
 [Sum of angles](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/spacetime/fig119sumofangles.jl)
 
-![20](./assets/spinspace/20.PNG)
+![20](./assets/newsreport/20.PNG)
 
 [Argument of the inner product](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/spacetime/fig120innerproductphase.jl)
 
-![21](./assets/spinspace/21.PNG)
+![21](./assets/newsreport/21.PNG)
 
 [Sum of spin-vectors in terms of ``S^+``](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/spacetime/fig121spinvectorsum.jl)
 
-![22](./assets/spinspace/22.PNG)
+![22](./assets/newsreport/22.PNG)
 
 [Sum of spin-vectors in terms of the Argand plane](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/spacetime/fig122spinvectorssumargandplane.jl)
 
-![23](./assets/spinspace/23.PNG)
+![23](./assets/newsreport/23.PNG)
 
 [A special frame that brings out the symmetry of spin-vector sum](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/spacetime/fig123specialframe.jl)
 
@@ -203,7 +203,7 @@ Our aim in this subsection is to prove that the orthochronous spin group ``Spin^
 
 ## Who
 
-![24](./assets/spinspace/24.PNG)
+![24](./assets/newsreport/24.PNG)
 
 With the discovery of a new particle, announced on 4 July 2012 at CERN, whose properties are "consistent with the long-sought Higgs boson" [31], the final elementary particle predicted by the classical Standard Model of particle physics has been found.
 Interactions between fields corresponding to elementary particles (quarks, leptons, gauge bosons, Higgs bosons), determined by the Lagrangian.
@@ -236,7 +236,7 @@ The existence of **gauge symmetries** is particularly important: it can be shown
 
 ### Graph
 
-![25](./assets/spinspace/25.PNG)
+![25](./assets/newsreport/25.PNG)
 
 **Edward Witten** *(1987)*:
 
@@ -252,7 +252,7 @@ All of this must be supplemented with the understanding that the geometrical law
 
 ## What
 
-![26](./assets/spinspace/26.PNG)
+![26](./assets/newsreport/26.PNG)
 
 The Higgs mechanism of mass generation for gauge bosons as well as the mass generation for fermions via Yukawa couplings.
 Spin groups such as the universal covering of the Lorentz group and its higher dimesnional analogues, are also important in physics, because they are involved in the mathematical description of fermions.
@@ -271,37 +271,39 @@ This is related to the fact that the weak interaction in the Standard Model is n
 
 ## How
 
-![27](./assets/spinspace/27.PNG)
+![27](./assets/newsreport/27.PNG)
 
-[The particular case of a *trivial* bundle and the general case of a *twisted* bundle](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/spacetime/fig153bundle.jl)
+[The particular case of a *trivial* bundle and the general case of a *twisted* bundle](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/gaugeconnections/fig153bundle.jl)
 
-![28](./assets/spinspace/28.PNG)
+![28](./assets/newsreport/28.PNG)
 
-![29](./assets/spinspace/29.PNG)
+[How twisting in a fiber bundle occurs.](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/gaugeconnections/fig154twisting.jl)
 
-![30](./assets/spinspace/30.PNG)
+![29](./assets/newsreport/29.PNG)
 
-![31](./assets/spinspace/31.PNG)
+![30](./assets/newsreport/30.PNG)
 
-![32](./assets/spinspace/32.PNG)
+![31](./assets/newsreport/31.PNG)
 
-![33](./assets/spinspace/33.PNG)
+![32](./assets/newsreport/32.PNG)
 
-![34](./assets/spinspace/34.PNG)
+![33](./assets/newsreport/33.PNG)
 
-![35](./assets/spinspace/35.PNG)
+![34](./assets/newsreport/34.PNG)
 
-![36](./assets/spinspace/36.PNG)
+![35](./assets/newsreport/35.PNG)
 
-![37](./assets/spinspace/37.PNG)
+![36](./assets/newsreport/36.PNG)
 
-![38](./assets/spinspace/38.PNG)
+![37](./assets/newsreport/37.PNG)
 
-![39](./assets/spinspace/39.PNG)
+![38](./assets/newsreport/38.PNG)
 
-![40](./assets/spinspace/40.PNG)
+![39](./assets/newsreport/39.PNG)
 
-![41](./assets/spinspace/41.PNG)
+![40](./assets/newsreport/40.PNG)
+
+![41](./assets/newsreport/41.PNG)
 
 Hence, by the uniqueness of integral curves (which is a theorem about the uniqueness of solutions to odrinary differential equations) we have ``\phi_X(s) \cdot \phi_X(t) = \phi_X(s + t) \ \forall t \in I \cap (t_{min} - s, t_{max} - s)``.
 This implies the claim by uniqueness of solutions of ordinary differential equations.
@@ -426,37 +428,37 @@ Given a spin structure on a pseudo-Riemannian manifold and the spinor bundle ``S
 
 ### The Iconic Wall
 
-![42](./assets/spinspace/42.PNG)
+![42](./assets/newsreport/42.PNG)
 
 ### Tome
 
-![43](./assets/spinspace/43.PNG)
+![43](./assets/newsreport/43.PNG)
 
 # Wrap Up
 
 ## Why
 
-![44](./assets/spinspace/44.PNG)
+![44](./assets/newsreport/44.PNG)
 
-![45](./assets/spinspace/45.PNG)
+![45](./assets/newsreport/45.PNG)
 
-![46](./assets/spinspace/46.PNG)
+![46](./assets/newsreport/46.PNG)
 
-![47](./assets/spinspace/47.PNG)
+![47](./assets/newsreport/47.PNG)
 
-![48](./assets/spinspace/48.PNG)
+![48](./assets/newsreport/48.PNG)
 
-![49](./assets/spinspace/49.PNG)
+![49](./assets/newsreport/49.PNG)
 
-![50](./assets/spinspace/50.PNG)
+![50](./assets/newsreport/50.PNG)
 
-![51](./assets/spinspace/51.PNG)
+![51](./assets/newsreport/51.PNG)
 
-![52](./assets/spinspace/52.PNG)
+![52](./assets/newsreport/52.PNG)
 
-![53](./assets/spinspace/53.PNG)
+![53](./assets/newsreport/53.PNG)
 
-![54](./assets/spinspace/54.PNG)
+![54](./assets/newsreport/54.PNG)
 
 The following three chapters discuss applications in physics: the Lagrangians and interactions in the Standard Model, spontaneous symmetry breaking, the Higgs mechanism of mass generation, and some more advanced and modern topics like neutrino masses and CP violation.
 Depending on the time, the interests and the prior knowledge of the reader, he or she can take a shortcut and immediately start at the chapters on connections, spinors or Lagrangians, and then go back if more detailed mathematical knowledge is required at some point.
@@ -490,7 +492,7 @@ Dirac forms are used in the Standard Model to define a *Dirac mass term* in the 
 
 ### Porta.jl
 
-![55](./assets/spinspace/55.PNG)
+![55](./assets/newsreport/55.PNG)
 
 # References
 
