@@ -281,6 +281,8 @@ This is related to the fact that the weak interaction in the Standard Model is n
 
 ![29](./assets/newsreport/29.PNG)
 
+[How to glue two copies of the Riemann sphere (closed complex plane) together for clutching construction.](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/gaugeconnections/fig155gluingspheres.jl)
+
 ![30](./assets/newsreport/30.PNG)
 
 ![31](./assets/newsreport/31.PNG)
