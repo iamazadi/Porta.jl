@@ -281,9 +281,11 @@ This is related to the fact that the weak interaction in the Standard Model is n
 
 ![29](./assets/newsreport/29.PNG)
 
-[How to glue two copies of the Riemann sphere (closed complex plane) together for clutching construction.](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/gaugeconnections/fig155gluingspheres.jl)
+[How to glue two copies of the Riemann sphere for constructing a vector bundle.](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/gaugeconnections/fig155gluingspheres.jl)
 
 ![30](./assets/newsreport/30.PNG)
+
+[A cross-section of a fiber bundle](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/gaugeconnections/fig156crosssection.jl)
 
 ![31](./assets/newsreport/31.PNG)
 

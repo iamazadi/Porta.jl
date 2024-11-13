@@ -1,6 +1,5 @@
 using FileIO
 using GLMakie
-import LinearAlgebra
 using Porta
 
 
@@ -16,12 +15,6 @@ eyeposition = normalize(ℝ³(1.0, 0.0, 1.0)) * float(π)
 lookat = ℝ³(0.0, 0.0, 0.0)
 up = normalize(ℝ³(0.0, 0.0, 1.0))
 sphereradius = 1.0
-attributespath = "data/naturalearth/geometry-attributes.csv"
-nodespath = "data/naturalearth/geometry-nodes.csv"
-boundary_names = Set{String}()
-boundary_nodes = Vector{Vector{ℝ³}}()
-indices = Dict{String,Int}()
-reference = load("data/basemap_color.png")
 mask = load("data/basemap_mask.png")
 
 makefigure() = Figure(size = figuresize)
@@ -29,21 +22,6 @@ fig = with_theme(makefigure, theme_black())
 pl = PointLight(Point3f(0), RGBf(0.0862, 0.0862, 0.0862))
 al = AmbientLight(RGBf(0.9, 0.9, 0.9))
 lscene = LScene(fig[1, 1], show_axis=false, scenekw = (lights = [pl, al], clear=true, backgroundcolor = :white))
-
-## Load the Natural Earth data
-countries = loadcountries(attributespath, nodespath)
-while length(boundary_names) < 10
-    push!(boundary_names, rand(countries["name"]))
-end
-for i in eachindex(countries["name"])
-    for name in boundary_names
-        if countries["name"][i] == name
-            push!(boundary_nodes, countries["nodes"][i])
-            println(name)
-            indices[name] = length(boundary_nodes)
-        end
-    end
-end
 
 lspace1 = range(-π, stop = float(π), length = segments)
 lspace2 = range(-π / 2, stop = π / 2, length = segments)
