@@ -289,7 +289,7 @@ This is related to the fact that the weak interaction in the Standard Model is n
 
 ![31](./assets/newsreport/31.PNG)
 
-[A cross-section of a fiber bundle](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/gaugeconnections/fig157crosssection.jl)
+[Compare a cross-section of a fiber bundle with the zero section.](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/gaugeconnections/fig157zerosection.jl)
 
 ![32](./assets/newsreport/32.PNG)
 
