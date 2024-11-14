@@ -293,6 +293,8 @@ This is related to the fact that the weak interaction in the Standard Model is n
 
 ![32](./assets/newsreport/32.PNG)
 
+[The Clifford bundle](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/gaugeconnections/fig158cliffordbundle.jl)
+
 ![33](./assets/newsreport/33.PNG)
 
 ![34](./assets/newsreport/34.PNG)
