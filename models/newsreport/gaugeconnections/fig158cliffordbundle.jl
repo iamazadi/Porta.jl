@@ -11,7 +11,7 @@ x̂ = ℝ³([1.0; 0.0; 0.0])
 ŷ = ℝ³([0.0; 1.0; 0.0])
 ẑ = ℝ³([0.0; 0.0; 1.0])
 eyeposition1 = normalize(ℝ³(1.0, 1.0, 1.0)) * float(2π)
-eyeposition2 = normalize(ℝ³(1.0, 1.0, 1.0)) * float(π)
+eyeposition2 = normalize(ℝ³(1.0, 1.0, 1.0)) * float(2π)
 lookat = ℝ³(0.0, 0.0, 0.0)
 up = normalize(ℝ³(0.0, 0.0, 1.0))
 sphereradius = 1.0
@@ -53,7 +53,7 @@ lscene2 = LScene(fig[1, 2], show_axis=true, scenekw = (lights = [pl, al], clear=
 
 ## Load the Natural Earth data
 countries = loadcountries(attributespath, nodespath)
-while length(boundary_names) < 10
+while length(boundary_names) < 30
     push!(boundary_names, rand(countries["name"]))
 end
 for i in eachindex(countries["name"])
@@ -121,6 +121,8 @@ lines!(lscene1, linepoints1, color = linecolors, linewidth = linewidth, colorran
 lines!(lscene1, linepoints2, color = linecolors, linewidth = linewidth, colorrange = (1, segments), colormap = :plasma)
 lines!(lscene1, linepoints3, color = linecolors, linewidth = linewidth, colorrange = (1, segments), colormap = :plasma)
 lines!(lscene1, linepoints4, color = linecolors, linewidth = linewidth, colorrange = (1, segments), colormap = :plasma)
+fiber = Observable([Point3f(ℝ³(real(exp(im * α)), imag(exp(im * α)), 0.0)) for α in range(0, stop = 2π, length = segments)])
+lines!(lscene1, fiber, color = linecolors, linewidth = linewidth, colorrange = (1, segments), colormap = :inferno)
 
 origin = Observable(Point3f(ℝ³(0.0, 0.0, 0.0)))
 c2point = Observable(Point3f(normalize(x̂ + ŷ)))
@@ -141,7 +143,7 @@ arrows!(lscene2,
     linewidth = arrowlinewidth, arrowsize = arrowsize,
     align = :origin
 )
-titles = ["w ∈ ℂ²", "z ∈ ℂ²", "point", "antipode"]
+titles = ["w ∈ ℂ", "z ∈ ℂ", "q ∈ ℂ²", "-q ∈ ℂ²"]
 rotation = gettextrotation(lscene2)
 text!(lscene2,
     @lift(map(x -> Point3f(vec((isnan(x) ? ẑ : x))), [$whead, $zhead, $c2point, $antipode])),
@@ -163,7 +165,7 @@ animate(frame::Int) = begin
     # index2 = max(1, Int(floor(progress * number)))
     # node = boundary_nodes[index1][index2]
     ψ = progress * 2π
-    θ, ϕ = cos(ψ) * π / 2, sin(ψ) * π
+    θ, ϕ = cos(2ψ) * π / 2, sin(3ψ) * π
     planepoint[] = Point3f(ℝ³(θ, ϕ, -1.0))
     _q = q * ℍ(exp(ϕ * longitudescale * K(1) + θ * latitudescale * K(2)))
     a, b, c, d = vec(_q)
@@ -176,6 +178,7 @@ animate(frame::Int) = begin
     point2[] = Point3f(project(normalize(M * (_q * ℍ(exp(K(3) * gauge2))))))
     point3[] = Point3f(project(normalize(M * (_q * ℍ(exp(K(3) * gauge3))))))
     point4[] = Point3f(project(normalize(M * (_q * ℍ(exp(K(3) * gauge4))))))
+    fiber[] = [Point3f(project(normalize(M * (_q * ℍ(exp(K(3) * α)))))) for α in range(0, stop = 2π, length = segments)]
     lookat1 = ℝ³(planepoint[] + point1[] + point2[] + point3[] + point4[]) * (1 / 5)
     lookat2 = ℝ³(c2point[] + antipode[]) * (1 / 2)
     eyeposition1 = normalize(cross(ℝ³(point1[]), ℝ³(point2[])) + cross(ℝ³(point3[]), ℝ³(point4[]))) * float(π) + 2ẑ
