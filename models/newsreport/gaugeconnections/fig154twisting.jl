@@ -1,6 +1,5 @@
 using FileIO
 using GLMakie
-import LinearAlgebra
 using Porta
 
 
@@ -56,7 +55,7 @@ fibersobservable2 = Tuple{Observable{Matrix{Float64}}, Observable{Matrix{Float64
 for index in 1:length(boundary_names)
     boundary = convert_to_geographic.(boundary_nodes[index])
     lspace = range(0.0, stop = 1.0, length = segments)
-    fiber = [ℝ³(vec(boundary[i])[2:3]..., height) for i in eachindex(boundary), height in lspace]
+    fiber = [ℝ³(vec(boundary[i])[2:3]..., distance) for i in eachindex(boundary), distance in lspace]
     color = fill(getcolor(boundary_nodes[index], reference, 0.5), length(boundary), segments)
     push!(fibersobservable1, buildsurface(lscene1, fiber, color, transparency = true))
     push!(fibersobservable2, buildsurface(lscene2, fiber, color, transparency = true))
@@ -66,20 +65,18 @@ end
 animate(frame::Int) = begin
     progress = Float64(frame / frames_number)
     println("Frame: $frame, Progress: $progress")
-    height = progress * float(2π)
-    lspace = range(0.0, stop = height, length = segments)
-    z = float(π) * exp(-im * progress * 2π)
-    x, y = real(z), imag(z)
-    R = normalize(ℝ³(1.0, 1.0, 0.0)) * float(π)
-    section1 = [rotate(R + rotate(ℝ³([-θ; ϕ; 0.0]), ℍ(π / 2, x̂)), ℍ(height, ẑ)) for θ in lspace2, ϕ in lspace1]
-    section2 = [rotate(R + rotate(ℝ³([-θ; ϕ; 0.0]), ℍ(π / 2, x̂) * ℍ(height, ẑ)), ℍ(height, ẑ)) for θ in lspace2, ϕ in lspace1]
+    distance = progress * float(2π)
+    lspace = range(0.0, stop = distance, length = segments)
+    radius = x̂ * float(π)
+    section1 = [rotate(radius + rotate(ℝ³([-θ; ϕ; 0.0]), ℍ(π / 2, x̂)), ℍ(distance, ẑ)) for θ in lspace2, ϕ in lspace1]
+    section2 = [rotate(radius + rotate(ℝ³([-θ; ϕ; 0.0]), ℍ(π / 2, x̂) * ℍ(distance, ẑ)), ℍ(distance, ẑ)) for θ in lspace2, ϕ in lspace1]
     updatesurface!(section1, sectionobservable1)
     updatesurface!(section2, sectionobservable2)
 
     for index in 1:length(boundary_names)
         boundary = convert_to_geographic.(boundary_nodes[index])
-        fiber1 = [rotate(R + rotate(ℝ³(vec(boundary[i])[2], vec(boundary[i])[3], 0.0), ℍ(π / 2, x̂)), ℍ(_height, ẑ)) for i in eachindex(boundary), _height in lspace]
-        fiber2 = [rotate(R + rotate(ℝ³(vec(boundary[i])[2], vec(boundary[i])[3], 0.0), ℍ(π / 2, x̂) * ℍ(_height, ẑ)), ℍ(_height, ẑ)) for i in eachindex(boundary), _height in lspace]
+        fiber1 = [rotate(radius + rotate(ℝ³(vec(boundary[i])[2], vec(boundary[i])[3], 0.0), ℍ(π / 2, x̂)), ℍ(_distance, ẑ)) for i in eachindex(boundary), _distance in lspace]
+        fiber2 = [rotate(radius + rotate(ℝ³(vec(boundary[i])[2], vec(boundary[i])[3], 0.0), ℍ(π / 2, x̂) * ℍ(_distance, ẑ)), ℍ(_distance, ẑ)) for i in eachindex(boundary), _distance in lspace]
         updatesurface!(fiber1, fibersobservable1[index])
         updatesurface!(fiber2, fibersobservable2[index])
     end
