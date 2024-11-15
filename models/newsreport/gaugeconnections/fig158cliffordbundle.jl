@@ -11,8 +11,9 @@ x̂ = ℝ³([1.0; 0.0; 0.0])
 ŷ = ℝ³([0.0; 1.0; 0.0])
 ẑ = ℝ³([0.0; 0.0; 1.0])
 eyeposition1 = normalize(ℝ³(1.0, 1.0, 1.0)) * float(2π)
-eyeposition2 = normalize(ℝ³(1.0, 1.0, 1.0)) * float(2π)
-lookat = ℝ³(0.0, 0.0, 0.0)
+eyeposition2 = normalize(ℝ³(1.0, 1.0, 1.0)) * float(π)
+lookat1 = ℝ³(0.0, 0.0, 0.0)
+lookat2 = ℝ³(0.0, 0.0, 0.0)
 up = normalize(ℝ³(0.0, 0.0, 1.0))
 sphereradius = 1.0
 mask = load("data/basemap_mask.png")
@@ -123,6 +124,9 @@ lines!(lscene1, linepoints3, color = linecolors, linewidth = linewidth, colorran
 lines!(lscene1, linepoints4, color = linecolors, linewidth = linewidth, colorrange = (1, segments), colormap = :plasma)
 fiber = Observable([Point3f(ℝ³(real(exp(im * α)), imag(exp(im * α)), 0.0)) for α in range(0, stop = 2π, length = segments)])
 lines!(lscene1, fiber, color = linecolors, linewidth = linewidth, colorrange = (1, segments), colormap = :inferno)
+basepath = Observable(Point3f[])
+pathcolors = collect(1:frames_number)
+lines!(lscene1, basepath, color = pathcolors, linewidth = linewidth / 4, colorrange = (1, frames_number), colormap = :magma)
 
 origin = Observable(Point3f(ℝ³(0.0, 0.0, 0.0)))
 c2point = Observable(Point3f(normalize(x̂ + ŷ)))
@@ -136,20 +140,32 @@ whead = Observable(Point3f(x̂))
 zhead = Observable(Point3f(ŷ))
 ps = @lift([$origin, $origin, $origin, $origin])
 ns = @lift([$whead, $zhead, $c2point, $antipode])
-colorants = [:black, :black, :red, :red]
+colorants1 = [:red, :red, :red]
+colorants2 = [:black, :black, :red, :red]
 arrows!(lscene2,
     ps, ns, fxaa = true, # turn on anti-aliasing
-    color = colorants,
+    color = colorants2,
     linewidth = arrowlinewidth, arrowsize = arrowsize,
     align = :origin
 )
-titles = ["w ∈ ℂ", "z ∈ ℂ", "q ∈ ℂ²", "-q ∈ ℂ²"]
-rotation = gettextrotation(lscene2)
+titles1 = ["q ∈ ℂ²", "-q ∈ ℂ²", "π(q)"]
+titles2 = ["w ∈ ℂ", "z ∈ ℂ", "q ∈ ℂ²", "-q ∈ ℂ²"]
+rotation1 = gettextrotation(lscene1)
+rotation2 = gettextrotation(lscene2)
+text!(lscene1,
+    @lift(map(x -> Point3f(vec((isnan(x) ? ẑ : x))), [$point1, $point3, $planepoint])),
+    text = titles1,
+    color = colorants1,
+    rotation = rotation1,
+    align = (:left, :baseline),
+    fontsize = fontsize,
+    markerspace = :data
+)
 text!(lscene2,
     @lift(map(x -> Point3f(vec((isnan(x) ? ẑ : x))), [$whead, $zhead, $c2point, $antipode])),
-    text = titles,
-    color = colorants,
-    rotation = rotation,
+    text = titles2,
+    color = colorants2,
+    rotation = rotation2,
     align = (:left, :baseline),
     fontsize = fontsize,
     markerspace = :data
@@ -159,14 +175,11 @@ text!(lscene2,
 animate(frame::Int) = begin
     progress = Float64(frame / frames_number)
     println("Frame: $frame, Progress: $progress")
-    # find the largest boundary
-    # index1 = findmax(length, boundary_nodes)[2]
-    # number = length(boundary_nodes[index1])
-    # index2 = max(1, Int(floor(progress * number)))
-    # node = boundary_nodes[index1][index2]
     ψ = progress * 2π
-    θ, ϕ = cos(2ψ) * π / 2, sin(3ψ) * π
+    θ, ϕ = cos(2ψ) * π / 2, sin(4ψ) * π
     planepoint[] = Point3f(ℝ³(θ, ϕ, -1.0))
+    push!(basepath[], planepoint[])
+    notify(basepath)
     _q = q * ℍ(exp(ϕ * longitudescale * K(1) + θ * latitudescale * K(2)))
     a, b, c, d = vec(_q)
     w = a + im * b
@@ -179,9 +192,11 @@ animate(frame::Int) = begin
     point3[] = Point3f(project(normalize(M * (_q * ℍ(exp(K(3) * gauge3))))))
     point4[] = Point3f(project(normalize(M * (_q * ℍ(exp(K(3) * gauge4))))))
     fiber[] = [Point3f(project(normalize(M * (_q * ℍ(exp(K(3) * α)))))) for α in range(0, stop = 2π, length = segments)]
-    lookat1 = ℝ³(planepoint[] + point1[] + point2[] + point3[] + point4[]) * (1 / 5)
-    lookat2 = ℝ³(c2point[] + antipode[]) * (1 / 2)
-    eyeposition1 = normalize(cross(ℝ³(point1[]), ℝ³(point2[])) + cross(ℝ³(point3[]), ℝ³(point4[]))) * float(π) + 2ẑ
+    if frame == 1
+        global eyeposition1 = float(π) * (x̂ + ẑ)
+    end
+    global lookat1 = ℝ³(planepoint[] + point1[] + point2[] + point3[] + point4[]) * (1 / 5)
+    global lookat2 = ℝ³(c2point[] + antipode[]) * (1 / 2)
     updatecamera!(lscene1, eyeposition1, lookat1, up)
     updatecamera!(lscene2, eyeposition2, lookat2, up)
 end
@@ -189,6 +204,7 @@ end
 
 animate(1)
 
+basepath[] = Point3f[]
 record(fig, joinpath("gallery", "$modelname.mp4"), 1:frames_number) do frame
     animate(frame)
 end
