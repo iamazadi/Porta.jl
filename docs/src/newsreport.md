@@ -301,6 +301,8 @@ This is related to the fact that the weak interaction in the Standard Model is n
 
 ![34](./assets/newsreport/34.PNG)
 
+[An example of a complex line bundle](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/gaugeconnections/fig1511complexlinebundle.jl)
+
 ![35](./assets/newsreport/35.PNG)
 
 ![36](./assets/newsreport/36.PNG)
