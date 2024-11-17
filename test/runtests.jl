@@ -35,6 +35,7 @@ end
     include("whirl_tests.jl")
     include("basemap_tests.jl")
     include("utilities_tests.jl")
+    include("tangentbundle_tests.jl")
 end
 
 elapsed = time() - start

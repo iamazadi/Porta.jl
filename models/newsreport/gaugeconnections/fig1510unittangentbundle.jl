@@ -6,7 +6,7 @@ using Porta
 figuresize = (4096, 2160)
 segments = 360
 frames_number = 360
-modelname = "fig1511complexlinebundle.jl"
+modelname = "fig1510unittangentbundle"
 x̂ = ℝ³([1.0; 0.0; 0.0])
 ŷ = ℝ³([0.0; 1.0; 0.0])
 ẑ = ℝ³([0.0; 0.0; 1.0])
@@ -48,7 +48,7 @@ fontsize = 0.25
 zero = Point3f(0.0, 0.0, 0.0)
 lspace1 = range(-π, stop = float(π), length = segments)
 lspace2 = range(-π / 2, stop = π / 2, length = segments)
-names = ["q₁", "q₂", "q₃", "q₄", "q₅", "q₆"]
+names = ["q₁"]
 colorants = [:black for _ in eachindex(names)]
 colormaps = [:rainbow for _ in eachindex(names)]
 number = length(names) # the number of tangent bundles
@@ -167,6 +167,7 @@ animate(frame::Int) = begin
     end
     global lookat =  ℝ³(tangentbundles[1].tangenttail[] + (tangentbundles[1].tangenttail[] + tangentbundles[1].tangenthead[]) +
         tangentbundles[1].a[] + tangentbundles[1].b[] + tangentbundles[1].c[] + tangentbundles[1].d[]) * (1 / 6)
+    global eyeposition = normalize(ℝ³(tangentbundles[1].tangenttail[])) * float(π)
     updatecamera!(lscene, eyeposition, lookat, up)
 end
 
