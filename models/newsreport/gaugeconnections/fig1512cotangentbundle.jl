@@ -44,7 +44,7 @@ markersize = 0.05
 linewidth = 20
 arrowsize = Vec3f(0.06, 0.08, 0.1)
 arrowlinewidth = 0.04
-arrowscale = 0.33
+arrowscale = 0.5
 fontsize = 0.25
 zero = Point3f(0.0, 0.0, 0.0)
 lspace1 = range(-π, stop = float(π), length = segments)
@@ -52,7 +52,7 @@ lspace2 = range(-π / 2, stop = π / 2, length = segments)
 names1 = ["q₁", "q₂", "q₃", "q₄", "q₅", "q₆"]
 names2 = ["q"]
 colorants1 = [:black for _ in eachindex(names1)]
-colorants2 = [:silver for _ in eachindex(names2)]
+colorants2 = [:black for _ in eachindex(names2)]
 colormaps1 = [:rainbow for _ in eachindex(names1)]
 colormaps2 = [:lightrainbow for _ in eachindex(names2)]
 number1 = length(names1) # the number of tangent bundles
@@ -193,13 +193,13 @@ arrows!(lscene2,
     align = :origin, transparency = true
 )
 
-titles = @lift(["u", "v", $aobservable, "a"])
+titles = @lift(["u", "v", $aobservable, "a = " * $aobservable])
 rotation = gettextrotation(lscene2)
 
 text!(lscene2,
     @lift([$zobservable + $uobservable, $zobservable + $vobservable,
         $zobservable + Point3f(normalize(ℝ³($uobservable + $vobservable))),
-        $(tangentbundles2[1].tangenttail) + $head]),
+        $(tangentbundles2[1].tangenttail) + Point3f(normalize(ℝ³($(tangentbundles2[1].tangenthead) + $head)))]),
     text = titles,
     color = [colorants..., :blue],
     rotation = rotation,
