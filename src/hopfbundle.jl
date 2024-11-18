@@ -6,6 +6,7 @@ export ver
 export σmap
 export τmap
 export πmap
+export calculateconnection
 
 
 """
@@ -114,4 +115,30 @@ Apply the Hopf map to the given point `q`.
     w₂ = im * (conj(z₁) * z₂ - z₁ * conj(z₂))
     w₁ = abs(z₁)^2 - abs(z₂)^2
     ℝ³(real.([w₁; w₂; w₃]))
+end
+
+
+"""
+    calculateconnection(q)
+
+Calculate a unique connection one-form on the Clifford bundle with the given point `q`,
+and return the tangent vector, the infinitesimal action of U(1) on S³ along with the connection.
+"""
+function calculateconnection(q::ℍ, ϵ::Float64 = 1e-5)
+    x₁, x₂, x₃, x₄ = vec(q)
+    z₀ = x₁ + im * x₂
+    z₁ = x₃ + im * x₄
+    @assert(isapprox(abs(z₀)^2 + abs(z₁)^2, 1), "The point $_q is not in S³, in other words: |z₀|² + |z₁|² ≠ 1.")
+    # z ∈ ℂ²
+    z = ℝ⁴(x₁, x₂, x₃, x₄)
+    # the infinitestimal action of U(1) on S³
+    # v = ℝ⁴(vec(ℍ([im * z₀; im * z₁])))
+    v = ℝ⁴(vec(normalize(q * ℍ(exp(K(3) * ϵ)) - q)))
+    @assert(isapprox(dot(z, v), 0, atol = ϵ), "The vector $v as an infinitesimal action of U(1) is not tangent to S³ at point $z. in other words: <z, v> ≠ 0.")
+    # u ∈ TS³
+    u = ℝ⁴(-x₂, x₁, -x₄, x₃)
+    @assert(isapprox(dot(z, u), 0), "The vector $u is not tangent to S³ at point $z. in other words: <z, u> ≠ 0.")
+    # a unique connection one-form on S³ with values in ℝ𝑖 such that ker a = v⟂
+    a = dot(v, u) * im
+    u, v, a
 end

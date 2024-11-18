@@ -10,7 +10,7 @@ modelname = "fig1512cotangentbundle"
 x̂ = ℝ³([1.0; 0.0; 0.0])
 ŷ = ℝ³([0.0; 1.0; 0.0])
 ẑ = ℝ³([0.0; 0.0; 1.0])
-eyeposition = normalize(ℝ³(1.0, 1.0, 1.0)) * float(π)
+eyeposition = normalize(ℝ³(1.0, 1.0, 1.0)) * float(2π)
 lookat = ℝ³(0.0, 0.0, 0.0)
 up = normalize(ℝ³(0.0, 0.0, 1.0))
 sphereradius = 1.0
@@ -28,7 +28,7 @@ q = ℍ(T, X, Y, Z)
 tolerance = 1e-3
 @assert(isnull(u, atol = tolerance), "u in not a null vector, $u.")
 @assert(isapprox(norm(q), 1, atol = tolerance), "q in not a unit quaternion, $(norm(q)).")
-ϵ = 0.1
+ϵ = 1e-3
 timesign = 1
 T = float(timesign)
 gauge1 = 0.0
@@ -44,7 +44,7 @@ markersize = 0.05
 linewidth = 20
 arrowsize = Vec3f(0.06, 0.08, 0.1)
 arrowlinewidth = 0.04
-arrowscale = 0.5
+arrowscale = 0.33
 fontsize = 0.25
 zero = Point3f(0.0, 0.0, 0.0)
 lspace1 = range(-π, stop = float(π), length = segments)
@@ -52,14 +52,15 @@ lspace2 = range(-π / 2, stop = π / 2, length = segments)
 names1 = ["q₁", "q₂", "q₃", "q₄", "q₅", "q₆"]
 names2 = ["q"]
 colorants1 = [:black for _ in eachindex(names1)]
-colorants2 = [:black for _ in eachindex(names2)]
+colorants2 = [:silver for _ in eachindex(names2)]
 colormaps1 = [:rainbow for _ in eachindex(names1)]
-colormaps2 = [:rainbow for _ in eachindex(names2)]
+colormaps2 = [:lightrainbow for _ in eachindex(names2)]
 number1 = length(names1) # the number of tangent bundles
 number2 = length(names2) # the number of tangent bundles
 tangentbundles1 = TangentBundle[]
 tangentbundles2 = TangentBundle[]
 pathsegments = frames_number
+N = 15
 
 makefigure() = Figure(size = figuresize)
 fig = with_theme(makefigure, theme_black())
@@ -171,7 +172,6 @@ arrows!(lscene2,
 znobservables = Observable(Point3f[])
 vnobservables = Observable(Point3f[])
 unobservables = Observable(Point3f[])
-N = 30
 for i in 1:N
     push!(znobservables[], Point3f(ẑ))
     push!(vnobservables[], Point3f(ẑ))
@@ -233,27 +233,16 @@ lines!(lscene2, arcpoints2, color = arccolors, linewidth = 2linewidth, colorrang
 lines!(lscene2, arcpoints3, color = arccolors, linewidth = 2linewidth, colorrange = (1, segments), colormap = :prism, transparency = true)
 lines!(lscene2, arcpoints4, color = arccolors, linewidth = 2linewidth, colorrange = (1, segments), colormap = :prism, transparency = true)
 
+arcpointsn = []
+for i in 1:N
+    __arcpoints = Observable(Point3f[])
+    lines!(lscene2, __arcpoints, color = arccolors, linewidth = linewidth / 2, colorrange = (1, segments), colormap = :prism, transparency = true)
+    push!(arcpointsn, __arcpoints)
+end
+
 sectionalpath = Observable(Point3f[])
 sectionalpathcolors = collect(1:pathsegments)
-lines!(lscene2, sectionalpath, color = sectionalpathcolors, linewidth = linewidth / 2, colorrange = (1, pathsegments), colormap = :lightrainbow)
-
-
-getconnection(q::ℍ) = begin
-    x₁, x₂, x₃, x₄ = vec(q)
-    z₀ = x₁ + im * x₂
-    z₁ = x₃ + im * x₄
-    @assert(isapprox(abs(z₀)^2 + abs(z₁)^2, 1), "The point $_q is not in S³, in other words: |z₀|² + |z₁|² ≠ 1.")
-    # the infinitestimal action of U(1) on S³
-    v = ℝ⁴(vec(ℍ([im * z₀; im * z₁])))
-    # z ∈ ℂ²
-    z = ℝ⁴(x₁, x₂, x₃, x₄)
-    # u ∈ TS³
-    u = ℝ⁴(-x₂, x₁, -x₄, x₃)
-    @assert(isapprox(dot(z, u), 0), "The vector $u is not tangent to S³ at point $z. in other words: <z, u> ≠ 0.")
-    # a unique connection one-form on S³ with values in ℝ𝑖 such that ker a = v⟂
-    a = dot(v, u) * im
-    u, v, a
-end
+lines!(lscene2, sectionalpath, color = sectionalpathcolors, linewidth = linewidth / 2, colorrange = (1, pathsegments), colormap = :darkrainbow)
 
 
 animate(frame::Int) = begin
@@ -266,7 +255,7 @@ animate(frame::Int) = begin
     z₀ = x₁ + im * x₂
     z₁ = x₃ + im * x₄
     z = ℝ⁴(x₁, x₂, x₃, x₄)
-    u, v, a = getconnection(_q)
+    u, v, a = calculateconnection(_q)
     
     zobservable[] = Point3f(project(z))
     uobservable[] = Point3f(normalize(project(u)))
@@ -279,9 +268,9 @@ animate(frame::Int) = begin
     z2observable[] = Point3f(project(normalize(M * (q2))))
     z3observable[] = Point3f(project(normalize(M * (q3))))
     z4observable[] = Point3f(project(normalize(M * (q4))))
-    u2, v2, a2 = getconnection(q2)
-    u3, v3, a3 = getconnection(q3)
-    u4, v4, a4 = getconnection(q4)
+    u2, v2, a2 = calculateconnection(q2)
+    u3, v3, a3 = calculateconnection(q3)
+    u4, v4, a4 = calculateconnection(q4)
     u2observable[] = Point3f(normalize(project(u2)))
     u3observable[] = Point3f(normalize(project(u3)))
     u4observable[] = Point3f(normalize(project(u4)))
@@ -296,7 +285,7 @@ animate(frame::Int) = begin
         gauge = i / N * 2π
         qn = _q * ℍ(exp(K(3) * gauge))
         znobservables[][i] = Point3f(project(normalize(M * (qn))))
-        un, vn, an = getconnection(qn)
+        un, vn, an = calculateconnection(qn)
         unobservables[][i] = Point3f(normalize(project(un)) * arrowscale)
         vnobservables[][i] = Point3f(normalize(project(vn)) * arrowscale)
     end
@@ -376,6 +365,10 @@ animate(frame::Int) = begin
     arcpoints4[] = [z4observable[] + Point3f(normalize(α * ℝ³(u4observable[]) + (1 - α) * ℝ³(v4observable[]))) for α in range(0, stop = 1, length = segments)]
     _arcpoints[] = [tangentbundles2[1].tangenttail[] + Point3f(normalize(α * ℝ³(tangentbundles2[1].tangenthead[])+ (1 - α) * ℝ³(head[]))) for α in range(0, stop = 1, length = segments)]
     push!(sectionalpath[], zobservable[])
+    for i in 1:N
+        arcpointsn[i][] = [znobservables[][i] + arrowscale .* Point3f(normalize(α * ℝ³(unobservables[][i]) + (1 - α) * ℝ³(vnobservables[][i]))) for α in range(0, stop = 1, length = segments)]
+        notify(arcpointsn[i])
+    end
     notify(arcpoints)
     notify(arcpoints2)
     notify(arcpoints3)
