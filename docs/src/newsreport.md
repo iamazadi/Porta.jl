@@ -305,6 +305,8 @@ This is related to the fact that the weak interaction in the Standard Model is n
 
 ![35](./assets/newsreport/35.PNG)
 
+[The tangent bundle and the cotangent bundle](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/gaugeconnections/fig1512cotangentbundle.jl)
+
 ![36](./assets/newsreport/36.PNG)
 
 ![37](./assets/newsreport/37.PNG)
