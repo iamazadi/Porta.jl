@@ -309,6 +309,8 @@ This is related to the fact that the weak interaction in the Standard Model is n
 
 ![36](./assets/newsreport/36.PNG)
 
+[A strained line bundle over ``S^1`` with a stretch by a positive factor](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/gaugeconnections/fig1516strainedlinebundle.jl)
+
 ![37](./assets/newsreport/37.PNG)
 
 ![38](./assets/newsreport/38.PNG)
