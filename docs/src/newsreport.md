@@ -313,6 +313,8 @@ This is related to the fact that the weak interaction in the Standard Model is n
 
 ![37](./assets/newsreport/37.PNG)
 
+[Types of connection on a manifold](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/gaugeconnections/fig1517typesofconnection.jl)
+
 ![38](./assets/newsreport/38.PNG)
 
 ![39](./assets/newsreport/39.PNG)
