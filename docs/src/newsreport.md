@@ -317,7 +317,7 @@ This is related to the fact that the weak interaction in the Standard Model is n
 
 ![38](./assets/newsreport/38.PNG)
 
-[How to make the connection of a strained line bndle over ``S\^1``](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/gaugeconnections/fig1518gluingforconnection.jl)
+[How to make the connection of a strained line bndle over ``S^1``](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/gaugeconnections/fig1518gluingforconnection.jl)
 
 ![39](./assets/newsreport/39.PNG)
 
