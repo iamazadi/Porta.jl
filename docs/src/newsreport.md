@@ -321,6 +321,8 @@ This is related to the fact that the weak interaction in the Standard Model is n
 
 ![39](./assets/newsreport/39.PNG)
 
+[A local path dependence with curvature](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/gaugeconnections/fig1519localpathdependence.jl)
+
 ![40](./assets/newsreport/40.PNG)
 
 ![41](./assets/newsreport/41.PNG)
