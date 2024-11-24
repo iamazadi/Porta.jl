@@ -3,10 +3,7 @@ using GLMakie
 using Porta
 
 
-scalarfield(z::Float64, z̅::Float64) = begin
-    p = convert_to_cartesian([1.0; (z + π / 2) / 2; z̅])
-    vec(p)[3]
-end
+scalarfield(x::Float64, y::Float64) = vec(convert_to_cartesian([1.0; (x + π / 2) / 2; y]))[3]
 
 
 f(θ::Float64, ϕ::Float64, k::Float64) = begin
@@ -92,13 +89,11 @@ for index in 1:length(boundary_names)
     push!(fibersobservables, buildsurface(lscene, fiber, color, transparency = true))
 end
 
-unitcircle = [Point3f(cos(α), sin(α), -0.5) for α in range(0, stop = 2π, length = segments)]
 path = Observable(Point3f[])
 basepath = Observable(Point3f[])
 colors = Observable(Int[])
 lines!(lscene, path, color = colors, linewidth = linewidth, colorrange = (1, colorrange), colormap = :rainbow)
 lines!(lscene, basepath, color = colors, linewidth = linewidth, colorrange = (1, colorrange), colormap = :darkrainbow)
-lines!(lscene, unitcircle, color = colors, linewidth = linewidth, colorrange = (1, colorrange), colormap = :lightrainbow)
 
 uptail = Observable(Point3f(x̂))
 upheadx = Observable(Point3f(x̂))
@@ -127,20 +122,18 @@ animate(frame::Int) = begin
     if stage < totalstages
         α = progress * 2π * totalstages
         p = exp(im * α)
-        z = real(p)
-        z̅ = imag(p)
-        basepoint = ℝ³(z, z̅, 0.0)
-        phase = (stage - 1) + stageprogress * vec(f(z, z̅, k))[3]
-        uppoint = f(z, z̅, k) + k * ℝ³(0.0, 0.0, phase)
+        x = real(p)
+        y = imag(p)
+        basepoint = ℝ³(x, y, 0.0)
+        phase = (stage - 1) + stageprogress * vec(f(x, y, k))[3]
+        uppoint = f(x, y, k) + k * ℝ³(0.0, 0.0, phase)
         uptail[] = Point3f(uppoint)
         basetail[] = Point3f(basepoint)
         baseheadx[] = Point3f(x̂)
         baseheady[] = Point3f(ŷ)
 
-        x = (f(z + ϵ, z̅, k) - f(z, z̅, k)) * (1 / ϵ)
-        y = (f(z, z̅ + ϵ, k) - f(z, z̅, k)) * (1 / ϵ)
-        upheadx[] = Point3f(x)
-        upheady[] = Point3f(y)
+        upheadx[] = Point3f((f(x + ϵ, y, k) - f(x, y, k)) * (1 / ϵ))
+        upheady[] = Point3f((f(x, y + ϵ, k) - f(x, y, k)) * (1 / ϵ))
         spawn = true
         if spawn && frame % 5 == 0
             _ps = [uptail[], uptail[], basetail[], basetail[]]
