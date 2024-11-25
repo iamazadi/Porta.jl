@@ -325,7 +325,11 @@ This is related to the fact that the weak interaction in the Standard Model is n
 
 ![40](./assets/newsreport/40.PNG)
 
+[A complex 1-dimensional vector space as the fiber space, where the *stretch* corresponds to multiplication by a real number.](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/gaugeconnections/fig1520stretchbyrealnumbers.jl)
+
 ![41](./assets/newsreport/41.PNG)
+
+[A complex 1-dimensional vector space as the fiber space, where the *stretch* corresponds to multiplication by a complex number.](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/gaugeconnections/fig1521stretchbycomplexnumbers.jl)
 
 Hence, by the uniqueness of integral curves (which is a theorem about the uniqueness of solutions to odrinary differential equations) we have ``\phi_X(s) \cdot \phi_X(t) = \phi_X(s + t) \ \forall t \in I \cap (t_{min} - s, t_{max} - s)``.
 This implies the claim by uniqueness of solutions of ordinary differential equations.
