@@ -37,7 +37,7 @@ markersize = 0.05
 arrowsize = Vec3f(0.06, 0.08, 0.1)
 arrowlinewidth = 0.04
 arrowscale = 0.5
-k = 0.2
+k = 1.0
 ϵ = 1e-3
 totalstages = 6
 colorrange = frames_number / totalstages
@@ -163,16 +163,18 @@ animate(frame::Int) = begin
 end
 
 
-animate(1)
+# animate(1)
+
+# path[] = Point3f[]
+# basepath[] = Point3f[]
+# colors[] = Int[]
+# for i in 1:frames_number
+#     animate(i)
+# end
 
 path[] = Point3f[]
 basepath[] = Point3f[]
-for i in 1:frames_number
-    animate(i)
-end
-
-path[] = Point3f[]
-basepath[] = Point3f[]
+colors[] = Int[]
 record(fig, joinpath("gallery", "$modelname.mp4"), 1:frames_number) do frame
     animate(frame)
 end
