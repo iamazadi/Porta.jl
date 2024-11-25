@@ -9,7 +9,7 @@ scalarfield(x::Float64, y::Float64) = vec(convert_to_cartesian([1.0; (x + π / 2
 f(θ::Float64, ϕ::Float64, k::Float64) = begin
     z = θ + ϕ * im
     A = im * k * z
-    ℝ³([θ; ϕ; scalarfield(real(z - A), imag(z - A))])
+    ℝ³([θ; ϕ; k * scalarfield(real(z - A), imag(z - A))])
 end
 
 
@@ -37,7 +37,7 @@ markersize = 0.05
 arrowsize = Vec3f(0.06, 0.08, 0.1)
 arrowlinewidth = 0.04
 arrowscale = 0.5
-k = 1.0
+k = 0.2
 ϵ = 1e-3
 totalstages = 6
 colorrange = frames_number / totalstages
@@ -68,11 +68,11 @@ end
 lspace1 = range(-π, stop = float(π), length = segments)
 lspace2 = range(-π / 2, stop = π / 2, length = segments)
 section1 = [ℝ³([-θ; ϕ; 0.0]) for θ in lspace2, ϕ in lspace1]
-section2 = [f(-θ, ϕ, k) + ẑ for θ in lspace2, ϕ in lspace1]
-section3 = [f(-θ, ϕ, k) + 2ẑ for θ in lspace2, ϕ in lspace1]
-section4 = [f(-θ, ϕ, k) + 3ẑ for θ in lspace2, ϕ in lspace1]
-section5 = [f(-θ, ϕ, k) + 4ẑ for θ in lspace2, ϕ in lspace1]
-section6 = [f(-θ, ϕ, k) + 5ẑ for θ in lspace2, ϕ in lspace1]
+section2 = [f(-θ, ϕ, k) + k * ẑ for θ in lspace2, ϕ in lspace1]
+section3 = [f(-θ, ϕ, k) + 2k * ẑ for θ in lspace2, ϕ in lspace1]
+section4 = [f(-θ, ϕ, k) + 3k * ẑ for θ in lspace2, ϕ in lspace1]
+section5 = [f(-θ, ϕ, k) + 4k * ẑ for θ in lspace2, ϕ in lspace1]
+section6 = [f(-θ, ϕ, k) + 5k * ẑ for θ in lspace2, ϕ in lspace1]
 sectionobservable1 = buildsurface(lscene, section1, mask, transparency = true)
 sectionobservable2 = buildsurface(lscene, section2, mask, transparency = true)
 sectionobservable3 = buildsurface(lscene, section3, mask, transparency = true)
@@ -125,8 +125,8 @@ animate(frame::Int) = begin
         x = real(p)
         y = imag(p)
         basepoint = ℝ³(x, y, 0.0)
-        phase = (stage - 1) + stageprogress * vec(f(x, y, k))[3]
-        uppoint = f(x, y, k) + k * ℝ³(0.0, 0.0, phase)
+        height = k * (stage - 1) + stageprogress * vec(f(x, y, k))[3]
+        uppoint = f(x, y, k) + ℝ³(0.0, 0.0, height)
         uptail[] = Point3f(uppoint)
         basetail[] = Point3f(basepoint)
         baseheadx[] = Point3f(x̂)
@@ -155,7 +155,7 @@ animate(frame::Int) = begin
         notify(path)
         notify(colors)
         lookat = ℝ³(uptail[])
-        updatecamera!(lscene, eyeposition + ℝ³(0.0, 0.0, phase), lookat, up)
+        updatecamera!(lscene, eyeposition + ℝ³(0.0, 0.0, height), lookat, up)
     else
         lookat = (1 - stageprogress) * ℝ³(0.0, 0.0, vec(ℝ³(uptail[]))[3])
         updatecamera!(lscene, -2ẑ * stageprogress + rotate(eyeposition + (1 - stageprogress) * ℝ³(0.0, 0.0, vec(ℝ³(uptail[]))[3]), ℍ(stageprogress * -π, ẑ)), lookat, up)
@@ -163,13 +163,13 @@ animate(frame::Int) = begin
 end
 
 
-# animate(1)
+animate(1)
 
-# path[] = Point3f[]
-# basepath[] = Point3f[]
-# for i in 1:frames_number
-#     animate(i)
-# end
+path[] = Point3f[]
+basepath[] = Point3f[]
+for i in 1:frames_number
+    animate(i)
+end
 
 path[] = Point3f[]
 basepath[] = Point3f[]
