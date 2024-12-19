@@ -14,6 +14,7 @@ export eli
 export elj
 export elk
 export mat
+export mat3
 export mat4
 export det
 export K
@@ -97,6 +98,19 @@ mat(q::ℍ) = [q.a + im * q.d -q.c + im * q.b; q.c + im * q.b q.a - im * q.d]
 Represent the number `q` by a quaternionic 4x4 matrix in terms a basis for so(4), the Lie algebra of the Lie group of rotations about a fixed point in ℝ⁴.
 """
 mat4(q::ℍ) = q.a .* Identity(4) + q.b .* K(2) + q.c .* K(3) + q.d .* K(1)
+
+
+"""
+    mat3(q)
+
+Convert the given quaternion number `q` to a 3 by 3 square matrix of real numbers.
+"""
+mat3(q::ℍ) = begin
+    qw, qx, qy, qz = vec(q)
+    [1.0 - 2(qy^2) - 2(qz^2) 	2qx * qy - 2qz * qw 	2qx * qz + 2qy * qw;
+     2qx * qy + 2qz * qw 	1.0 - 2(qx^2) - 2(qz^2) 	2qy * qz - 2qx * qw;
+     2qx * qz - 2qy * qw 	2qy * qz + 2qx * qw 	1.0 - 2(qx^2) - 2(qy^2)]
+end
 
 
 """

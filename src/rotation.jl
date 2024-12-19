@@ -20,4 +20,5 @@ end
 rotate(g::ℍ, q::ℍ) = g * q
 rotate(M::Matrix{<:Complex}, q::ℍ) = ℍ(M * mat(q))
 rotate(p::ℝ³, q::ℍ) = ℝ³(vec(q * ℍ([0; vec(p)]) * conj(q))[2:4])
+rotate(point::Vector{Float64}, q::ℍ) = rotate(ℝ³(point), q)
 rotate(p::Matrix{ℝ³}, q::ℍ) = map(x -> rotate(x, q), p)
