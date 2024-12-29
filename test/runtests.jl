@@ -25,7 +25,7 @@ end
 end
 
 @time @testset "The Bundles Tests" begin
-    include("hopfbundle_tests.jl")
+    include("cliffordbundle_tests.jl")
 end
 
 @time @testset "The Graphics Tests" begin
