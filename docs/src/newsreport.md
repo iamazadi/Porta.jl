@@ -476,6 +476,8 @@ Given a spin structure on a pseudo-Riemannian manifold and the spinor bundle ``S
 
 ![47](./assets/newsreport/47.PNG)
 
+[Hamilton's principle.](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/lagrangians/fig203hamiltonprinciple.jl)
+
 ![48](./assets/newsreport/48.PNG)
 
 ![49](./assets/newsreport/49.PNG)
