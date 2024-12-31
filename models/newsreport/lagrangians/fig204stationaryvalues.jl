@@ -205,8 +205,8 @@ animate(frame::Int) = begin
     end
     if stage == 3
         ξ_observable[] = stageprogress * 2pi # animate scene
-        u_observable[] = (1 - stageprogress) * scale
-        v_observable[] = (1 - stageprogress) * scale
+        u_observable[] = (1 - stageprogress) * cos(2π) * scale
+        v_observable[] = (1 - stageprogress) * sin(2π) * scale
     end
     if stage == 4
         ξ_observable[] = stageprogress * 2pi # animate scene
