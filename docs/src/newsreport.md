@@ -480,6 +480,8 @@ Given a spin structure on a pseudo-Riemannian manifold and the spinor bundle ``S
 
 ![48](./assets/newsreport/48.PNG)
 
+[Staitionary values of a smooth real-valued function ``f`` of several variables](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/lagrangians/fig204stationaryvalues.jl)
+
 ![49](./assets/newsreport/49.PNG)
 
 ![50](./assets/newsreport/50.PNG)
