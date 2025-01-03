@@ -6,8 +6,8 @@ using OrdinaryDiffEq, ForwardDiff, NonlinearSolve
 
 
 figuresize = (4096, 2160)
-segments = 60
-segments2 = 10
+segments = 90
+segments2 = 5
 frames_number = 360
 modelname = "fig205hamiltonianflow"
 totalstages = 6
@@ -258,9 +258,9 @@ animate(frame::Int) = begin
         particle_ns[] = stageprogress .* ns2 + (1.0 - stageprogress) .* ns1
         tail1 = Point3f(convert_to_cartesian(center))
         tail2 = Point3f(ℝ³(convert_to_geographic(ℝ³(tail1))[2], convert_to_geographic(ℝ³(tail1))[3], spacing))
-        v₁tail[] = stageprogress * tail2 + stageprogress * tail1
+        v₁tail[] = stageprogress * tail2 + (1.0 - stageprogress) * tail1
         v₂tail[] = (boundarypoints_observables[10][])[tailindex]
-        v₁head[] = v₂tail[] - v₁tail[] 
+        v₁head[] = v₂tail[] - v₁tail[]
         v₂head[] = Point3f(convert_to_cartesian(sum([convert_to_geographic(ℝ³(vec(x)...)) for x in boundarypoints_observables[10][]]) * (1.0 / length(boundarypoints_observables[10][])))) - v₂tail[]
     end
     if stage == 4
