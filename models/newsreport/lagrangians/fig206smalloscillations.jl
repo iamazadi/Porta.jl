@@ -20,6 +20,7 @@ markersize = 0.07
 arrowlinewidth = 0.06
 arrowsize = Vec3f(0.08, 0.08, 0.1)
 pathlinewidth = 10
+fontsize = 0.3
 
 makefigure() = Figure(size = figuresize)
 fig = with_theme(makefigure, theme_black())
@@ -52,6 +53,19 @@ lines!(lscene, originpoints, color = pathcolors, linewidth = pathlinewidth, colo
 lpoints = Observable([α * Point3f(ẑ) for α in range(0.0, stop = 1.0, length = segments)])
 lcolors = collect(1:segments)
 lines!(lscene, lpoints, color = lcolors, linewidth = 2pathlinewidth, colorrange = (1, segments), colormap = :plasma, linestyle = :solid)
+
+
+titles = ["o", "q", "p"]
+rotation = gettextrotation(lscene)
+text!(lscene,
+    @lift([$basepoint, ($particle_ps)[1], ($particle_ps)[1] + ($particle_ns)[1]]),
+    text = titles,
+    color = [:red, :gold, :black],
+    rotation = rotation,
+    align = (:left, :baseline),
+    fontsize = fontsize,
+    markerspace = :data, transparency = false
+)
 
 q₀ = ℝ³(0.0, 0.0, 0.0)
 
@@ -119,6 +133,7 @@ pathpoints[] = Point3f[]
 headpoints[] = Point3f[]
 originpoints[] = Point3f[]
 pathcolors[] = Int[]
+
 record(fig, joinpath("gallery", "$modelname.mp4"), 1:frames_number) do frame
     animate(frame)
 end
