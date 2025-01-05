@@ -9,11 +9,11 @@ figuresize = (4096, 2160)
 segments = 360
 frames_number = 360
 modelname = "fig206smalloscillations"
-totalstages = 1
+totalstages = 4
 x̂ = ℝ³([1.0; 0.0; 0.0])
 ŷ = ℝ³([0.0; 1.0; 0.0])
 ẑ = ℝ³([0.0; 0.0; 1.0])
-eyeposition = normalize(ℝ³(1.0, 0.0, -1.0)) * float(π)
+eyeposition = normalize(ℝ³(1.0, 0.0, 1.0)) * float(π)
 lookat = ℝ³(0.0, 0.0, 0.0)
 up = normalize(ℝ³(0.0, 0.0, 1.0))
 markersize = 0.07
@@ -81,11 +81,11 @@ L(q, p, dq, dp) = (1.0 / 2.0) * m * l^2 * LinearAlgebra.norm(dp)^2 - m * g * l *
 pdot(dp, p, q, params, t) = ForwardDiff.gradient!(dp, q -> -H(q, p), q)
 qdot(dq, p, q, params, t) = ForwardDiff.gradient!(dq, p -> H(q, p), p)
 
-initial_position = [0.0, 0.0, 1.0]
+initial_position = [0.0, 0.0, 0.1]
 initial_velocity = [0.0, 0.0, 0.0]
 initial_cond = (initial_position, initial_velocity)
 initial_first_integrals = (H(initial_cond...), L(initial_cond..., 0.0, 0.0))
-tspan = (0, 15.0)
+tspan = (0, 30.0)
 prob = DynamicalODEProblem(pdot, qdot, initial_velocity, initial_position, tspan)
 sol = solve(prob, KahanLi6(), dt = 1 // 100);
 solutionnumber = length(sol.u)
@@ -119,11 +119,32 @@ animate(frame::Int) = begin
 
     lpoints[] = [Point3f(q₀) + (1 - α) * Point3f(x̂) + α * Point3f(q₁) for α in range(0.0, stop = 1.0, length = segments)]
     notify(lpoints)
-
+    try
+        lines!(lscene, lpoints[], color = lcolors, linewidth = pathlinewidth / 4, colorrange = (1, segments), colormap = :magma, linestyle = :solid)
+    catch e
+        println(e)
+    end
+    
     global lookat = q₁
     global up = x̂
 
-    updatecamera!(lscene, eyeposition, lookat, up)
+    if stage == 1
+        global eyeposition = normalize(ℝ³(1.0, 0.0, -1.0)) * float(π - stageprogress * π / 2)
+    end
+    if stage == 2
+        global eyeposition = normalize(ℝ³(1.0 - stageprogress, 0.0, -1.0)) * float(π / 2)
+    end
+    if stage == 3
+        global eyeposition = rotate(normalize(ℝ³(0.0, stageprogress, -1.0)), ℍ(stageprogress * 2π, x̂)) * float(π / 2)
+    end
+    if stage == 4
+        global eyeposition = normalize(ℝ³(stageprogress, 1.0 - stageprogress, -1.0)) * float(π / 2 + stageprogress * π / 2)
+    end
+    try
+        updatecamera!(lscene, eyeposition, lookat, up)
+    catch e
+        println(e)
+    end
 end
 
 
