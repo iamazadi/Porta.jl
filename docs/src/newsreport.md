@@ -488,6 +488,8 @@ Given a spin structure on a pseudo-Riemannian manifold and the spinor bundle ``S
 
 ![50](./assets/newsreport/50.PNG)
 
+[Small oscillations](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/lagrangians/fig206smalloscillations.jl)
+
 ![51](./assets/newsreport/51.PNG)
 
 ![52](./assets/newsreport/52.PNG)
