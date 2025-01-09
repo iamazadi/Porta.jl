@@ -130,14 +130,14 @@ plane = [ℝ³([θ; ϕ; 0.0]) for θ in patchlspaceθ, ϕ in patchlspaceϕ]
 plane_color = fill(getcolor(nodes, reference, 0.5), segments2, segments2)
 plane_observables = buildsurface(lscene2, plane, plane_color, transparency = true)
 balls_observable = Observable(map(x -> Point3f(convert_to_geographic(x)[2], convert_to_geographic(x)[3], 0.0), nodes))
-lines!(lscene2, balls_observable, color = collect(1:length(nodes)), linewidth = boundarylinewidth, colorrange = (1, length(nodes)), colormap = :rainbow, transparency = true)
+lines!(lscene2, balls_observable, color = collect(1:length(nodes)), linewidth = boundarylinewidth, colorrange = (1, length(nodes)), colormap = :darkrainbow, transparency = false)
 colors = [GLMakie.RGBAf(convert_hsvtorgb([359.0 * float(i) / float(length(nodes)); 1.0; 1.0])..., 0.5) for i in eachindex(nodes)]
 meshscatter!(lscene2, balls_observable, markersize = markersize, color = colors, transparency = true)
 ns2 = Observable(ns[])
 arrows!(lscene2,
     balls_observable, ns2, fxaa = true, # turn on anti-aliasing
     color = colors,
-    linewidth = arrowlinewidth, arrowsize = arrowsize,
+    linewidth = arrowlinewidth / 2, arrowsize = arrowsize .* 0.5,
     align = :origin,
     transparency = true)
 
@@ -152,10 +152,14 @@ animate(frame::Int) = begin
     _ns = Point3f[]
     _ns2 = Point3f[]
 
+    transformed_nodes = []
+
     for (index, node) in enumerate(nodes)
         solution = solutions[index]
         timeindex = max(1, Int(floor(progress * length(solution))))
+        timeindex0 = max(1, timeindex - 1)
         q = ℝ³(vec(solution[timeindex])[4:6]...)
+        q0 = ℝ³(vec(solution[timeindex0])[4:6]...)
         p = ℝ³(vec(solution[timeindex])[1:3]...)
         balls[index][] = Point3f(q)
         push!(_ps, Point3f(q))
@@ -165,10 +169,12 @@ animate(frame::Int) = begin
         geographic = convert_to_geographic(q)
         balls_observable[][index] = Point3f(geographic[2], geographic[3], 0.0)
         # remove the radial partial component in order to reduce the phase space
-        _p = p - dot(p, normalize(q)) * normalize(q)
-        α, axis = getrotation(normalize(q), ẑ)
+        tangent = timeindex == 1 ? normalize(q) : normalize(q - q0)
+        _p = p - dot(p, tangent) * tangent
+        α, axis = getrotation(tangent, ẑ)
         _p = Point3f(rotate(_p, ℍ(α, axis)))
-        push!(_ns2, _p)
+        push!(_ns2, Point3f(_p))
+        push!(transformed_nodes, q)
     end
     notify(balls_observable)
 
@@ -178,6 +184,15 @@ animate(frame::Int) = begin
     notify(ps)
     notify(ns)
     notify(ns2)
+
+    _maxθ = max(map(x -> convert_to_geographic(x)[2], transformed_nodes)...)
+    _minθ = min(map(x -> convert_to_geographic(x)[2], transformed_nodes)...)
+    _maxϕ = max(map(x -> convert_to_geographic(x)[3], transformed_nodes)...)
+    _minϕ = min(map(x -> convert_to_geographic(x)[3], transformed_nodes)...)
+    _patchlspaceϕ = range(_minϕ, stop = _maxϕ, length = segments2)
+    _patchlspaceθ = range(_maxθ, stop = _minθ, length = segments2)
+    plane = [ℝ³([θ; ϕ; 0.0]) for θ in _patchlspaceθ, ϕ in _patchlspaceϕ]
+    updatesurface!(plane, plane_observables)
 
     _altitude = LinearAlgebra.norm(ps[][1])
     sphere1 = [convert_to_cartesian([_altitude; θ; ϕ]) for θ in lspaceθ, ϕ in lspaceϕ]
@@ -200,9 +215,6 @@ animate(frame::Int) = begin
         patchcolor1 = fill(GLMakie.RGBAf(convert_hsvtorgb([progress * 359.0; 1.0; 1.0])..., 0.5), segments2, segments2)
         patch1 = [convert_to_cartesian([_altitude; θ; ϕ]) for θ in patchlspaceθ, ϕ in patchlspaceϕ]
         buildsurface(lscene1, patch1, patchcolor1, transparency = true)
-        # timeindex = max(1, Int(floor(progress * min(length.(solutions)...))))
-        # transformed_nodes = [ℝ³(vec(solutions[i][timeindex])[4:6]...) for i in eachindex(solutions)]
-        # lines!(lscene1, Point3f.(transformed_nodes), color = collect(1:length(solutions)), linewidth = boundarylinewidth, colorrange = (1, length(solutions)), colormap = :darkrainbow)
     end
     global up = q₁ + q₂
     global lookat = q₁
