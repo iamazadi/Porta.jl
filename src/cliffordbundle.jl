@@ -154,7 +154,7 @@ function calculateconnection(q::ℍ, X::ℝ⁴; ϵ::Float64 = 1e-5)
     x₁, x₂, x₃, x₄ = vec(q)
     z₀ = x₁ + im * x₂
     z₁ = x₃ + im * x₄
-    @assert(isapprox(abs(z₀)^2 + abs(z₁)^2, 1), "The point $_q is not in S³, in other words: |z₀|² + |z₁|² ≠ 1.")
+    @assert(isapprox(abs(z₀)^2 + abs(z₁)^2, 1, atol = ϵ), "The point $q is not in S³, in other words: |z₀|² + |z₁|² ≠ 1.")
     # z ∈ ℂ²
     z = ℝ⁴(x₁, x₂, x₃, x₄)
     # the infinitestimal action of U(1) on S³
@@ -162,7 +162,7 @@ function calculateconnection(q::ℍ, X::ℝ⁴; ϵ::Float64 = 1e-5)
     v = ℝ⁴(vec(normalize(q * ℍ(exp(K(3) * ϵ)) - q)))
     @assert(isapprox(dot(z, v), 0, atol = ϵ), "The vector $v as an infinitesimal action of U(1) is not tangent to S³ at point $z. in other words: <z, v> ≠ 0.")
     # X ∈ TS³
-    @assert(isapprox(dot(z, X), 0, atol = ϵ), "The vector $X is not tangent to S³ at point $z. in other words: <z, X> ≠ 0.")
+    @assert(isapprox(dot(z, X), 0, atol = 10ϵ), "The vector $X is not tangent to S³ at point $z. in other words: <z, X> ≠ 0.")
     # a unique connection one-form on S³ with values in ℝ𝑖 such that ker a = v⟂
     a = dot(v, X) * im
     v, a

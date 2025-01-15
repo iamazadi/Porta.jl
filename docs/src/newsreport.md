@@ -500,6 +500,8 @@ Given a spin structure on a pseudo-Riemannian manifold and the spinor bundle ``S
 
 ![53](./assets/newsreport/53.PNG)
 
+[Hamilton's principle for field Lagrangians](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/lagrangians/fig209fieldlagrangians.jl)
+
 ![54](./assets/newsreport/54.PNG)
 
 The following three chapters discuss applications in physics: the Lagrangians and interactions in the Standard Model, spontaneous symmetry breaking, the Higgs mechanism of mass generation, and some more advanced and modern topics like neutrino masses and CP violation.
