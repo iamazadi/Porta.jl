@@ -54,6 +54,21 @@ end
 
 
 """
+    update!(basemap, x, gauge, M, chart)
+
+Switch to the right horizontal section with the given point `x`, `gauge`, transformation `M` and coordinate `chart`.
+"""
+function update!(basemap::Basemap, x::ℍ, gauge::Float64, M::Matrix{Float64}, chart::NTuple{4, Float64})
+    basemap.x = x
+    basemap.gauge = gauge
+    basemap.M = M
+    basemap.chart = chart
+    matrix = make(x, gauge, M, basemap.segments, chart = basemap.chart)
+    updatesurface!(matrix, basemap.observable)
+end
+
+
+"""
     update!(basemap, chart)
 
 Update the bundle chart in the horizontal subspace with the given 'chart.
