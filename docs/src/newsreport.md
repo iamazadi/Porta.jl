@@ -553,3 +553,5 @@ Dirac forms are used in the Standard Model to define a *Dirac mass term* in the 
 5. [Edward Witten](https://cds.cern.ch/record/181783/files/cer-000093203.pdf), Physics and Geometry, (1987).
 
 6. The iconic [Wall](https://scgp.stonybrook.edu/archives/6264) of Stony Brook University.
+
+7. Tristan Needham, Visual Differential Geometry and Forms: A Mathematical Drama in Five Acts, Princeton University Press, 2021.
