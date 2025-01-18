@@ -504,6 +504,8 @@ Given a spin structure on a pseudo-Riemannian manifold and the spinor bundle ``S
 
 ![54](./assets/newsreport/54.PNG)
 
+[Hamilton's principle for field Lagrangians](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/lagrangians/fig2010fieldlagrangians.jl)
+
 The following three chapters discuss applications in physics: the Lagrangians and interactions in the Standard Model, spontaneous symmetry breaking, the Higgs mechanism of mass generation, and some more advanced and modern topics like neutrino masses and CP violation.
 Depending on the time, the interests and the prior knowledge of the reader, he or she can take a shortcut and immediately start at the chapters on connections, spinors or Lagrangians, and then go back if more detailed mathematical knowledge is required at some point.
 An interesting and perhaps underappreciated fact is that a substantial number of phenomena in particle physics can be understood by analysing representations of Lie groups and by rewriting or rearranging Lagrangians.
