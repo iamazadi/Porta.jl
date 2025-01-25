@@ -46,7 +46,7 @@ Then, the union of the plane and the point at infinity yields the Riemann sphere
 
 Light rays reaching the eyes of an observer pierce a sphere centered at the observer's position.
 Specify a point in the celectial sphere with a latitude and a longitude.
-The geometry of the equation ``\zeta = e^{i * \phi} cot(\theta / 2)`` relates the spherical polar angles ``\theta`` and ``\phi`` to the complex stereographic coordinate ``\zeta``.
+The geometry of the equation ``\zeta = e^{i \phi} cot(\theta / 2)`` relates the spherical polar angles ``\theta`` and ``\phi`` to the complex stereographic coordinate ``\zeta``.
 
 ![7](./assets/newsreport/7.PNG)
 
@@ -54,7 +54,7 @@ The geometry of the equation ``\zeta = e^{i * \phi} cot(\theta / 2)`` relates th
 
 In Minkowski space-time, the intersection of the null cone with a plane yields a sphere.
 As the plane through curve segment ``ON`` varies it provides the stereographic projection.
-The point ``P`` maps to point ``P\prime``.
+The point ``P`` maps to point ``P^\prime``.
 The parabolic intersection of the sectional plane with the cone has the same intrinsic Euclidean metric as the Argand plane.
 
 ![8](./assets/newsreport/8.PNG)
@@ -79,7 +79,7 @@ For the Riemann sphere, the points are displaced along circles through the south
 
 A null cone is in the tangent space of spacetime at point ``O``.
 The representation of a spin-vector requires a pair of infinitesimally separated points on ``\mathcal{y}^+``.
-A spin-vector is shown in terms of points ``P`` and ``P\prime`` of a null flag.
+A spin-vector is shown in terms of points ``P`` and ``P^\prime`` of a null flag.
 
 ![11](./assets/newsreport/11.PNG)
 
@@ -123,8 +123,8 @@ It does so by producing an image elements in ``SO(3)`` given an element in ``SO(
 
 A line passing through the North Pole intersects a section at point ``P`` and makes a corresponding intersection on the other section.
 For showing the metric structure of the sections we choose three points close to each other such that they make similar triangles in every section.
-Dirac’s scissors problem says that a continuous rotation of the structure through 2pi toggles the sign of the half plane that is attached to it.
-For toggling back the sign of the half plane, another rotation through 2pi is needed.
+Dirac’s scissors problem says that a continuous rotation of the structure through ``2\pi`` toggles the sign of the half plane that is attached to it.
+For toggling back the sign of the half plane, another rotation through ``2\pi`` is needed.
 
 ![14](./assets/newsreport/14.PNG)
 
@@ -132,13 +132,13 @@ For toggling back the sign of the half plane, another rotation through 2pi is ne
 
 This is a one-to-two relation between a restricted Lorentz transformation and the special linear group of complex dimension two, up to a boost.
 The topology of the relation is like the one-to-two relation between the special orthogonal group of real dimension three and the special unitary group of complex dimension two.
-The geometric structure of similar triangles with vertices: ``P``, ``P\prime`` and ``P\prime\prime``, undergoes unrestricted spin transformations.
+The geometric structure of similar triangles with vertices: ``P``, ``P^\prime`` and ``P^{\prime\prime}``, undergoes unrestricted spin transformations.
 
 ![15](./assets/newsreport/15.PNG)
 
 [A null flag bundle](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/spacetime/fig115nullflagbundle.jl)
 
-The null-flag bundle ``F`` of ``M``, and its twofold covering space, the spin-vector bundle ``F\prime`` are shown.
+The null-flag bundle ``F`` of ``M``, and its twofold covering space, the spin-vector bundle ``F^\prime`` are shown.
 The bundle projection map sends a null-flag to an event in space-time M.
 Null-flags in the fiber space are 4-dimensional, which make the total space of the null-flag bundle 8-dimensional.
 
@@ -192,7 +192,7 @@ Perform these 4 steps in order to calculate the argument of the scalar product.
 1. Use the Gram-Schmidt orthogonalization method to find the orthogonal complement of the 2-plane.
 2. Find the intersection of the flagplanes of ``\kappa`` and ``\omega`` with the orthogonal complement 2-plane from the previous step.
 3. The flagplane of ``\kappa`` intersects along the line ``U``, whereas the flagplane of ``\omega`` intersects along the line ``V``.
-4. Find the angle between ``U`` and ``V`` to measure the argument of the inner product: ``\pi + 2 arg\{\kappa, \omega\}`` (mod ``\2\pi``).
+4. Find the angle between ``U`` and ``V`` to measure the argument of the inner product: ``\pi + 2 arg\{\kappa, \omega\}`` (mod ``2\pi``).
 
 ![21](./assets/newsreport/21.PNG)
 
@@ -396,116 +396,129 @@ This is related to the fact that the weak interaction in the Standard Model is n
 
 [The particular case of a *trivial* bundle and the general case of a *twisted* bundle](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/gaugeconnections/fig153bundle.jl)
 
-The particular case of a “trivial” bundle is shown on the left and the general case of a “twisted” bundle on the right. Above a local open region of the base manifold we have a Cartesian product M cross V. In a trivial bundle, the points of the fiber bundle are tuples in the form of (a, b), where a denotes coordinates in the base space M and b coordinates of the fiber space V above it. Even though in the case of a non-trivial fiber bundle there’re the same tuple of coordinates for each point, the global structure of the bundle is not as simple as a cross product. But, one usually applies two or more coordinate charts in the base manifold, such that it can cover the total space appropriately.
+There is a Cartesian product ``M \times V``, above a local open region of the base manifold.
+In a trivial bundle, the points of the fiber bundle are tuples of elements in base ``M`` and fiber ``V``.
+In the case of a nontrivial fiber bundle, use multiple coordinate charts to cover the base manifold ``M``.
 
 ![28](./assets/newsreport/28.PNG)
 
 [How twisting in a fiber bundle occurs.](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/gaugeconnections/fig154twisting.jl)
 
-A trivial fiber bundle (M cross V) versus a non-trivial one is shown. To understand how the twisting in the non-trivial case occurs, suppose that the base manifold M is the two-dimensional skin of the globe, and the fiber manifold V is a one-dimensional vector space. Then, the total space of the trivial case becomes a torus of revolution (doughnuts), whereas the twisted case becomes like the Mobius strip in topological terms. In the twisted fiber bundle, the vector space of the fiber is the product M cross V whenever we select a sufficiently small subset of the base manifold, the interior of the boundary of a small country for example.
+Suppose that the base manifold ``M`` is the skin of the globe.
+Further, suppose that the fiber manifold ``V`` is a one-dimensional vector space.
+Then, the total space of the trivial bundle is like a torus of revolution, whereas the twisted bundle is like the Mobius strip.
 
 ![29](./assets/newsreport/29.PNG)
 
 [How to glue two copies of the Riemann sphere for constructing a vector bundle.](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/gaugeconnections/fig155gluingspheres.jl)
 
-How to glue two copies of the Riemann sphere together for clutching construction. The clutching construction makes a vector bundle over the sphere. But we need two coordinate charts because the vector bundle is non-trivial. The twist occurs at the boundary of the two charts (the equator), where the boundaries of two open complex planes meet and form an equivalence class of tangent vectors with the symmetry group SO(2). The clutching function takes tangent frames from one chart to the other by rotating them in order to resolve conflicts when crossing. Clutching construction gives a continuous vector field globally.
+The clutching construction makes a vector bundle over the sphere.
+The twist occurs at the boundary of the two charts.
+Clutching construction gives a continuous vector field globally.
 
-First, bring two copies of a two-dimensional sphere (closed complex planes) side by side. Second, remove the South Pole as a point from the Riemann sphere in order to make an open complex plane. Third, transform each copy of the complex plane into an open disk using azimuthal equidistant projection. Fourth, put the two open disks on top of each other and identify the corresponding points across the boundaries such that they make a closed two-surface with the identification. Fifth, toggle the sign of latitude coordinates in one of the disks and then glue the boundaries. Finally, inflate the resulting closed two-surface for making a unit two-sphere. See that both hemispheres meet each other along the boundary where the South Pole is removed. Now, using parallel transport and orthonormal tangent frames one can construct a smooth tangent bundle on the sphere. The same idea works for constructing the tangent bundle over three-sphere by removing a point from the three-sphere and repeating the steps. In the higher dimensional case, two copies of SO(3) (3D rotations) are glued together to make the symmetry group SU(2), which are unit quaternions.
-
+1. Bring two copies of a 2-dimensional sphere side by side.
+2. Remove the south pole as a point from the Riemann sphere in order to make an open complex plane.
+3. Transform each copy of the complex plane into an open disk using azimuthal equidistant projection.
+4. Put the two open disks on top of each other and identify the corresponding points across the boundaries such that they make a closed two-surface with the identification.
+5. Change the sign of latitude coordinates in one of the disks and then glue them along their boundaries.
+6. Inflate the resulting closed two-surface after gluing for making a unit two-sphere.
 
 ![30](./assets/newsreport/30.PNG)
 
 [A cross-section of a fiber bundle](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/gaugeconnections/fig156crosssection.jl)
 
-A cross section of a bundle is a continuous image of the base manifold, which is the skin of the globe in this particular case. A section intersects each individual fiber in a single point. The fiber bundle on the left is the Clifford parallels with four sections, whereas the fiber bundle on the right is a scalar field over the X-Y plane. For the purpose of this animation we have shown horizontal sections only. Whenever we push forward a section by the canonical projection, we get the base map image in an identical way.
+A cross section of a bundle is a continuous image of the base manifold.
+A section intersects each individual fiber in a single point.
+The bundle projection map of a section gives the identity.
 
 ![31](./assets/newsreport/31.PNG)
 
 [Compare a cross-section of a fiber bundle with the zero section.](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/gaugeconnections/fig157zerosection.jl)
 
-A cross section of a line bundle over the complex plane is shown. One of the bundles is the product bundle, and the other one is a twisted vector bundle. Note that a section intersects each fiber once. The fiber of the North Pole is colored as a prism. But a fiber above another point is also shown for comparison. The line bundle can have a global section, where in fact the Clifford bundle can’t have a global section. When you apply a section to a local region of the base space followed by the canonical projection, you get the same region back identically.
-
-In order to understand the reason, recall that the base manifold of the Clifford bundle is a sphere, whereas the base manifold of a line bundle is the complex plane. The complex plane extends to infinity in every direction from the origin, but in the case of the Riemann sphere all directions from the North Pole end up at the South Pole in Antarctica. By the time you try to resolve the conflict in the degree of fiber twist at the South Pole, you’re talking about the clutching function. In that situation the base space is extended with a copy of itself (to make a covering space), and thus the base space is no longer a sphere and the in consequence bundle is no longer the Clifford bundle. Therefore we say that the Clifford bundle doesn’t possess a “global” section. However, “local” sections such as the boundary of a country exist without any obstruction, in both the Clifford bundle and the line bundle over the complex plane.
-
+The complex plane extends to infinity in every direction from the origin.
+But in the Riemann sphere, all directions from the north pole end up at the south pole in Antarctica.
+The line bundle can have a global section, where in fact the Clifford bundle can’t have a global section.
 
 ![32](./assets/newsreport/32.PNG)
 
 [The Clifford bundle](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/gaugeconnections/fig158cliffordbundle.jl)
 
-The Clifford bundle. Let q be a unit quaternion number and its antipodal point -q is its negative. In the two-complex-dimensional plane spanned by the orthonormal vectors w and z we find q in the unit circle. In the complex plane C^2 the unit three-sphere coordinates assert that |w|^2 + |z|^2 = 1. The coordinates are denoted by (A, B) where both numbers A and B are complex numbers as well. The coordinates of a point in the Clifford bundle is a linear combination of w and z, for example Aw + Bz = 0, where q = (A, B). But, the point (A, B) has a canonical projection in the Riemann sphere where the ratio A : B represents a unique complex number in the Argand plane. A fiber of the Clifford bundle is above a point in the Argand plane. You can see that multiplication by a unit complex number leaves the equation Ax + Bz = 0 invariant. It means that the fibers are unit circles at a given point in the w-z complex C^2 plane.
-
+Let ``q`` be a unit quaternion number and its antipodal point ``-q`` is its negative.
+The point``q`` is in the unit circle, which is embedded in the two-complex-dimensional plane.
+In the plane ``\mathbb{C}^2`` the unit 3-sphere coordinates assert that ``|w|^2 + |z|^2 = 1``.
 
 ![33](./assets/newsreport/33.PNG)
 
 [The bundle of unit tangent vectors to ``S^2``](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/gaugeconnections/fig1510unittangentbundle.jl)
 
-The bundle of unit tangent vectors to the sphere is a slight modification of the Clifford bundle. In the Clifford bundle, a unit quaternion number q and its antipodal point in the three-sphere -q are labeled with markers. However, when we choose a positive time sign and treat them as individual points, the tangent vectors to the two-sphere are spinorial. Two complex numbers coordinatize a quaternion number as well as a spin-vector up to a time sign. The fibers of the tangent bundle to S^2 are circles too. But, each circle-fiber of the Clifford bundle wraps twice around each circle-fiber of the tangent bundle to S^2. Because, after wrapping around each circle-fiber of the tangent bundle we return to the original phase. Then again, wrapping around each circle-fiber of the Clifford bundle once changes the sign of the point from q to -q. Therefore the number q and its negative -q are connected in the Clifford bundle, and are treated as one number in the tangent bundle.
-
+The fibers of the tangent bundle to ``S^2`` are circles.
+But, each circle-fiber of the Clifford bundle wraps twice around each circle-fiber of the tangent bundle to ``S^2``.
+Wrapping around each circle-fiber of the Clifford bundle once yields the antipodal point in the 3-sphere.
 
 ![34](./assets/newsreport/34.PNG)
 
 [An example of a complex line bundle](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/gaugeconnections/fig1511complexlinebundle.jl)
 
-In the complex two dimensional plane w-z, the unit circle is given by the equation |w|^2 + |z|^2 = 1. The complex line bundle is the entire complex line, given by Aw + Bz = 0, where A and B are complex numbers. For a straight line that crosses the origin of w-z plane, intersections with the unit circle occurs at exactly two points with antipodal configuration (namely points q and -q). However, projective complex lines from the origin all share the origin point. Compared to the bundle of unit tangent vectors, the projective lines are not disjoint because they all intersect at the origin. Unless we consider one distinct copy of the origin, with coordinates (0, 0), for each line. Unlike the unit tangent vector bundle, the complex line bundle has a complex one-dimensional space as the fiber space V. In the fiber space, tangent vectors can also grow and shrink in terms of length, as well as phase angle. In the complex line bundle, the base space is the ratio A : B, which is proportional to the slope of the line. Since the projective line is isomorphic to the complex projective line of dimension one, we have the two-sphere as the base space M of the complex line bundle. Earlier we required that each fiber gets its own origin point zero for all fibers to become disjoint. Therefore, the distinct copies of the origin per circle-fiber that we add, make a Riemann sphere in total, in order to match the base manifold of the complex vector bundle as required.
-
+In the complex 2-plane ``w-z``, the unit circle is given by the equation ``|w|^2 + |z|^2 = 1``.
+The complex line bundle is the entire complex line, given by ``Aw + Bz = 0``, where ``A`` and ``B`` are complex numbers.
+In the complex line bundle, the base space is the ratio ``A : B``, which is proportional to the slope of the line.
 
 ![35](./assets/newsreport/35.PNG)
 
 [The tangent bundle and the cotangent bundle](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/gaugeconnections/fig1512cotangentbundle.jl)
 
-For the 3-dimensional sphere S³, each point of its tangent bundle TS³ represents a point of S³, which is denoted by q, together with a tangent vector to S³ there. A cross-section of TS³ represents a vector field on S³. The cotangent bundle T*S³ is similar, but with covectors instead of vectors. Contangent bundles are always symplectic manifolds. In the following we describe the construction of the cotangent bundle in detail.
-
-The symmetry group U(1) acts freely on a 3-dimensional sphere. 3-sphere is defined as the tuple (z₀, z₁) ∈ ℂ² in the complex-two-dimensional plane, such that |z₀|² + |z₁|² = 1. The squared absolute value of z sub zero plus the squared absolute value of z sub one equals unity. The free action makes the three-sphere a U(1) bundle over S² with the canonical projection π: S³ → ℂP¹, and the equivalence class of fibers over the complex projective line is mapped by z ↦ [z].
-
-If we let q ∈ S³ be a point in 3-sphere and then use the exponential function in order to translate it in an infinitesimal way in the vertical direction (the same as U(1) action), we get a tangent vector at q. The infinitesimal action of U(1) on 3-sphere looks like v = (q * ℍ(exp(K(3) * ϵ)) - q) ∈ TS³, before normalization into a unit tangent vector at q. Assert that (q, v) = 0 to make sure that v is tangent to 3-sphere at q, where dot(.,.) denotes the standard inner product of ℝ⁴. Since q can be any point on S³ as a general point, the infinitesimal action of U(1), which is called v, is a vector field on the 3-sphere.
-
-There is a unique connection 1-form on the U(1) bundle, given by a ∈ Ω¹(S³, ℝ𝑖) such that the ker a = v⟂. First, it means that the connection is defined on vector fields on the 3-sphere and has values in the Lie algebra of u(1). Second, the connection ‘a’ sends to zero any vector in the perpendicular subspace with respect to vector v, because infinitesimal horizontal translations of q in the base space S² result in tangent vectors that are perpendicular to v. Suppose q ∈ S³ is given by the vector q = ℝ⁴(x₁, x₂, x₃, x₄). A nowhere vanishing tangent vector at q would be u = ℝ⁴(-x₂, x₁, -x₄, x₃) ∈ TS³. Again, as a tangent vector at point q we can assert that dot(q, u) = 0. Now that we have vector v ∈ TS³ as the infinitesimal action of U(1) at q, and having established that u ∈ TS³, the inner product of u and v multiplied by the complex number 𝑖 yields the value of the connection a(u) = dot(v(q), u) 𝑖.
-
-When we look at circle-fibers in the U(1)-bundle, we see v tangent to the fiber at each point along the circle as a vector field. Then, u and v make an angle with each other that is measured with the dot product of the connection. A bundle of such covectors on 3-sphere is called the cotangent bundle T*S³. If we push forward these covectors by the bundle projection π, then the tangent bundle of the 2-sphere is augmented with a certain phase quantity that varies depending on which element of the equivalence class is to be projected to S².
-
+Use the exponential function for translation along a direction in the tangent space to get a tangent vector at ``q``.
+Specify a cross-section of the tangent bundle in order to have a nowhere vanishing vector field.
+Define a 1-form by fixing one of the arguments of a scalar product, using elements from the nowhere vanishing vector field.
 
 ![36](./assets/newsreport/36.PNG)
 
 [A strained line bundle over ``S^1`` with a stretch by a positive factor](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/gaugeconnections/fig1516strainedlinebundle.jl)
 
-The topology of a strained plane bundle S¹ × ℝ² is the same as that of a solid torus of revolution T³. However, the second factor in the cross product, with the name ℝ², is mapped to a strained version of itself. The strain in the plane-fibers of the bundle can be measured with a connection on the bundle. Let a local section of the bundle be coordinatized with latitudes and longitudes in a region containing the origin of ℝ². In the case of torus, T³, horizontal curves have constant latitudes and longitudes above all points of S¹. Whereas in the case of the strained bundle, latitudes and longitudes are scaled given the base point that is obtained by projection on the first factor S¹. In order to go from point ‘a’ in S¹ to point ‘b’ in S¹, two different paths are possible. Going horizontally along one of the paths takes less distance to travel in the total space than the other path. This difference in the distance implies that moving in a horizontal way with respect to the connection depends on the path.
-
+In order to go from a fixed point to another fixed point along the circle, two paths of different lengths are possible.
+In the strained bundle, two horizontal flows are combined with a third flow in the vertical direction.
+Measure the strain in the plane-fibers with a connection on the fiber bundle.
 
 ![37](./assets/newsreport/37.PNG)
 
 [Types of connection on a manifold](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/gaugeconnections/fig1517typesofconnection.jl)
 
-Types of connection on a manifold ℝ² compared. The idea of parallel transport for tangent vectors is shown, in terms of the tangent bundle T(ℝ²) of ℝ². A particular tangent vector at a point of ℝ² is represented in T(ℝ²) by a particular point of the fiber above. A horizontal curve in T(ℝ²) from this point represents the parallel transport of the tangent vector along a curve in ℝ². The same idea applies to a bundle ℝ² × S¹ over plane ℝ², other than the tangent bundle T(ℝ²), where “constant transport” in ℝ² is defined from a notion of “horizontal” in plane bundle ℝ² × S¹. 
+A tangent vector at a point in the base manifold ``\mathbb{R}^2`` is represented by a particular point in the fiber manifold ``S^1`` above it.
+A horizontal curve in the tangent bundle ``T(\mathbb{R}^2)`` represents the parallel transportation of some vector along a curve in ``\mathbb{R}^2``.
+*Constant transport* in the base ``\mathbb{R}^2`` is defined from a notion of *horizontal* in the circle-bundle ``\mathbb{R}^2 \times S^1``.
 
 ![38](./assets/newsreport/38.PNG)
 
 [How to make the connection of a strained line bundle over ``S^1``](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/gaugeconnections/fig1518gluingforconnection.jl)
 
-Consider the plane bundle S¹ × ℝ² over circle S¹. The canonical projection sends each plane-fiber ℝ² to single point in circle-base S¹. As different symmetries of the fiber space, planes can stretch/shrink along a linear combination of x-y directions, and rotate about the origin in ℝ². In the total space S¹ × ℝ², a horizontal curve with respect to flat connection is shown first. Second, by removing a point from S¹, the base space turns into a trivial region of S¹. Third, repeat the process by removing a different point of circle to give another trivial region. Fourth, identify the end points of the circular arcs after splitting, such that the two end points of one region glues to the pair of endpoints of its counterpart for making the base circle whole again. Finally, when we rescale one of the bundle parts using a symmetry of the fiber space, we get a different connection on the bundle other than the flat connection. Sections of the bundle above one region in S¹ become different in terms of scale, compared to sections above the other region. This difference in scaling between regions of S¹ comes with a connection in order to maintain a state of being horizontal along a curve.
-
-All sections of both regions project to base manifold with the bundle projection map. But, the new connection defines a section, such that horizontal curves in the original bundle S¹ × ℝ² remain horizontal after splitting, rescaling and gluing of bundle parts. For example, in the original bundle of S¹ × ℝ², to parallel transport from point ‘a’ in S¹ to point ‘b’ in S¹ there are two curves (a clockwise/anti-clockwise rotation in S¹). In the case of flat connection, whichever curve we take the results will be the same (to end up at the same coordinates in the plane). Then again, in the modified bundle with its curved connection we arrive at different coordinates at point ‘b’, starting from point ‘a’, depending on the curve that we take. So the curved connection makes a distance function dependent on a path.
-
+1. Remove a point from circle ``S^1`` to get a trivial region above it.
+2. Apply a linear transformation to the fibers of a copy of the trivial region.
+3. Identify the endpoints of the two trivial regions after splitting, such that they make the circle whole again.
+A connection measures the scale difference in fibers above one of the regions compared with sections above the other region.
 
 ![39](./assets/newsreport/39.PNG)
 
 [A local path dependence with curvature](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/gaugeconnections/fig1519localpathdependence.jl)
 
-The bundle curvature is shown, as a horizontal loop fails to close above the unit circle. In order to show a local path dependence (with bundle curvature), we need at least two dimensions in the base space of the fiber bundle. Let the base manifold be complex plane ℂ with a representation in ℝ² as well. The unit circle S¹ ∈ ℂ is parameterized with the exponent of α times the imaginary number 𝑖, where α ranges from zero to 2π. The fibers V¹ are one-dimensional and are modelled on the real line ℝ. Using 'z' as a complex number to set coordinates in the base space ℂ = M, we use the explicit connection ∇ = ∂/∂z - A, where A is a complex smooth function of z. If A is complex differentiable in a neighborhood of z, then the bundle curvature vanishes. But, if A = 𝑖 × k × z then for the part of the bundle above the unit circle S¹ we get a strained bundle with a given value of k (k = 1.0).
-
-For this construction, first let p = exp(𝑖 × α) be a point in circle-base S¹. Second, the real and imaginary parts of p ∈ S¹ are denoted by x and y respectively. Third, we have the base point with coordinates p = ℝ³(x, y, 0.0) in the ambient space for illustration. The bundle projection maps each point to the first component of M × V¹, and that is the reason for the base point to have constant zero as the third coordinate function. However, points in the total space ℝ² × ℝ are assigned a certain "height" equal to (α / 2π) × vec(f(x, y, k))[3]. Fourth, define the function f(x, y, k) = ℝ³(x, y, k * scalarfield(real(z - A), imag(z - A))). The “scalar field” over the plane ℝ² is just the third coordinate function of the unit sphere in ℝ³, with latitude and longitude given by θ = (x + π / 2) / 2 and ϕ = y, respectively. Finally, lift a point above z = θ + ϕ × 𝑖 in base space S¹ with section f(x, y, k) + ℝ³(0.0, 0.0, height). The strain in the fiber bundle is a function of the parameter k, which is equal to 1.0 in this case. As α ranges over the closed interval with end points zero and 2π, the height of the point above z changes depending on whether the transport along S¹ is clockwise or anti-clockwise. After the curve in the base space S¹ is circumnavigated once, a winding number is added to the height value for correct coordinates in subsequent turns.
-
+A complex number, denoted by ``z``, sets the coordinate of a point in the base space ``\mathbb{C}``.
+The unit circle ``S^1 \in \mathbb{C}`` is parameterized with ``z = e^{i \theta}``.
+The fibers are 1-dimensional and are modelled on the real line ``\mathbb{R}``.
 
 ![40](./assets/newsreport/40.PNG)
 
 [A complex 1-dimensional vector space as the fiber space, where the *stretch* corresponds to multiplication by a real number.](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/gaugeconnections/fig1520stretchbyrealnumbers.jl)
 
-Whenever the fiber space is a complex one-dimensional vector space ℂ, a ‘real stretch’ in fibers corresponds to multiplication by a real number ℝ. See figure 15-20 in Penrose 2004.
+We use the explicit connection ``\nabla = \frac{\partial}{\partial z} - A``, where ``A`` is a complex smooth function of ``z``.
+The bundle curvature is shown, as a horizontal loop fails to close above the unit circle.
+A **real stretch** corresponds to the multiplication of ``A`` with a real number ``\mathbb{R}``.
 
 ![41](./assets/newsreport/41.PNG)
 
 [A complex 1-dimensional vector space as the fiber space, where the *stretch* corresponds to multiplication by a complex number.](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/gaugeconnections/fig1521stretchbycomplexnumbers.jl)
 
-A ‘complex stretch’ in the fiber space is shown. For example, the linear right action by scalar multiplication Φ on a principal U(1)-bundle Φ: S¹ × S³ → S³ given by (ℯⁱᶿ,z) ↦ ℯⁱᶿz imposes such a complex stretch. The stretch is seen as a twist of the unit circle in the complex plane ℂ. See figure 15-21 in Penrose 2004.
+If function ``A`` is complex differentiable in a neighborhood of point ``z``, then the bundle curvature vanishes.
+But, if ``A = 𝑖 × k × z``, then for the part of the bundle above the unit circle ``S^1`` we get a strained bundle with a given value of ``k``.
+A **complex stretch** scales the connection ``\nabla`` with a complex number ``\mathbb{C}``.
 
 Hence, by the uniqueness of integral curves (which is a theorem about the uniqueness of solutions to ordinary differential equations) we have ``\phi_X(s) \cdot \phi_X(t) = \phi_X(s + t) \ \forall t \in I \cap (t_{min} - s, t_{max} - s)``.
 This implies the claim by uniqueness of solutions of ordinary differential equations.
@@ -632,15 +645,22 @@ Given a spin structure on a pseudo-Riemannian manifold and the spinor bundle ``S
 
 ![42](./assets/newsreport/42.PNG)
 
-What is F_A geometrically?
+#### What is F_A geometrically?
+
 The loop integral of a connection at a point q along the edges of a parallelogram with infinitesimal edges is equal to the exterior derivative of the connection A, which in turn equals F. The exterior derivative of the connection 1-form A is a 2-form F, which has two indices downstairs in order to denote two inputs. The point q is a vertex of the infinitesimal parallelogram where two of the edges intersect. These edges are inputs to the 2-form F.
-What are R_munu and R geometrically?
-Whenever matter is not present, like inside vacuum, spacetime curves under tidal force fields that deform a sphere of test particles into an egg-shaped surface. However, when matter is present, then a volume-reducing force field deforms spacetime too. From the inverse-square law of Newtonian physics we understand gravity as the volume-preservation of the Ricci component of the Riemann curvature tensor. The Riemann curvature tensor is a three-piece object, two of whose components are denoted by R_munu and R. Einstein’s spacetime discards the Weyl component of the curvature tensor and calculates the scalar curvature component R by taking the trace of the Ricci curvature component. 
-How do they relate?
+
+#### What are R_munu and R geometrically?
+
+Whenever matter is not present, like inside vacuum, spacetime curves under tidal force fields that deform a sphere of test particles into an egg-shaped surface. However, when matter is present, then a volume-reducing force field deforms spacetime too. From the inverse-square law of Newtonian physics we understand gravity as the volume-preservation of the Ricci component of the Riemann curvature tensor. The Riemann curvature tensor is a three-piece object, two of whose components are denoted by R_munu and R. Einstein’s spacetime discards the Weyl component of the curvature tensor and calculates the scalar curvature component R by taking the trace of the Ricci curvature component.
+
+#### How do they relate?
+
 The role of the Weyl curvature is not explained by Einstein’s field equation, even though cosmological observations suggest a role for it on a large scale. Einstein’s field equation combines the tidal effects of preserving the volume of spatial planes with respect to time, R_munu, and changes in matter density which turn out to be the curvature scalar R.
 What does this have to do with Penrose steps?
-When the Riemann curvature tensor in the presence of matter shows R_munu not equal to zero, the vector fields that flow along spatial and temporal directions deviate from their orthogonal geodesics. The Ricci curvature takes two vectors as input and outputs a scalar number. For an infinitesimal parallelogram at a spacetime event, the Ricci scalar is just the integral of a 1-form along the edges of the infinitesimal parallelogram. The exterior derivative of the 1-from becomes nonzero and so parallel transport stretches the path of a tangent vector with multiplication by either a scalar or a complex number. In a principal U(1)-bundle, a circular path in the base space forms a stack of circles in the total space as a result of the stretch with multiplication (in the presence of matter.) Therefore, the trajectory of a tangent vector along a circular path on the base space forms a spiral in the total space, which resembles the shape of Penrose steps or the Escher staircase. 
-What are “horizontal subspaces” and what do they have to do with vector potentials and gauge fields?
+When the Riemann curvature tensor in the presence of matter shows R_munu not equal to zero, the vector fields that flow along spatial and temporal directions deviate from their orthogonal geodesics. The Ricci curvature takes two vectors as input and outputs a scalar number. For an infinitesimal parallelogram at a spacetime event, the Ricci scalar is just the integral of a 1-form along the edges of the infinitesimal parallelogram. The exterior derivative of the 1-from becomes nonzero and so parallel transport stretches the path of a tangent vector with multiplication by either a scalar or a complex number. In a principal U(1)-bundle, a circular path in the base space forms a stack of circles in the total space as a result of the stretch with multiplication (in the presence of matter.) Therefore, the trajectory of a tangent vector along a circular path on the base space forms a spiral in the total space, which resembles the shape of Penrose steps or the Escher staircase.
+
+#### What are “horizontal subspaces” and what do they have to do with vector potentials and gauge fields?
+
 A connection (denoted by A) on a principal G-bundle P assigns a horizontal subspace of the tangent space to each point q in P, in a smooth way. First, the tangent space of a principal bundle P at point q is equal to the direct sum of the vertical subspace and the horizontal subspace at q, for all q in P. Second, the push forward of the horizontal subspace of the Principal G-bundle P at point q by an action g of the structure group G is equal to the horizontal subspace of the principal G-bundle P at the transformation of the point q by the action g, for all g in G and q in P.
 The Ricci curvature is 2-form with respect to a connection 1-form on spacetime. The 2-form that appears in the Yang-Mills Lagrangian is exact if and only if it is equal to the loop integral of a 1-form along the boundary of a very small oriented area (F_munu = dϕ). In other words, the loop integral of the 1-form ϕ, along the boundary of a region (a parallelogram) equals the integral of the exterior derivative of the 1-form over the region. But if this 1-form exists (an exact symmetry,) then the integral introduces a gauge potential, where one has the freedom to change the constant as a reference level, also known as a gauge transformation.
 
