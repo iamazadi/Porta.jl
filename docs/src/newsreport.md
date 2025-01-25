@@ -500,25 +500,25 @@ A connection measures the scale difference in fibers above one of the regions co
 
 [A local path dependence with curvature](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/gaugeconnections/fig1519localpathdependence.jl)
 
+The bundle curvature is shown, as a horizontal loop fails to close above the unit circle.
 A complex number, denoted by ``z``, sets the coordinate of a point in the base space ``\mathbb{C}``.
 The unit circle ``S^1 \in \mathbb{C}`` is parameterized with ``z = e^{i \theta}``.
-The fibers are 1-dimensional and are modelled on the real line ``\mathbb{R}``.
 
 ![40](./assets/newsreport/40.PNG)
 
 [A complex 1-dimensional vector space as the fiber space, where the *stretch* corresponds to multiplication by a real number.](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/gaugeconnections/fig1520stretchbyrealnumbers.jl)
 
 We use the explicit connection ``\nabla = \frac{\partial}{\partial z} - A``, where ``A`` is a complex smooth function of ``z``.
-The bundle curvature is shown, as a horizontal loop fails to close above the unit circle.
-A **real stretch** corresponds to the multiplication of ``A`` with a real number ``\mathbb{R}``.
+If function ``A`` is complex differentiable in a neighborhood of point ``z``, then the bundle curvature vanishes.
+But, if ``A = 𝑖 × k × z``, then for the part of the bundle above the unit circle ``S^1`` we get a *real stretch* with a given value of ``k``.
 
 ![41](./assets/newsreport/41.PNG)
 
 [A complex 1-dimensional vector space as the fiber space, where the *stretch* corresponds to multiplication by a complex number.](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/gaugeconnections/fig1521stretchbycomplexnumbers.jl)
 
-If function ``A`` is complex differentiable in a neighborhood of point ``z``, then the bundle curvature vanishes.
-But, if ``A = 𝑖 × k × z``, then for the part of the bundle above the unit circle ``S^1`` we get a strained bundle with a given value of ``k``.
-A **complex stretch** scales the connection ``\nabla`` with a complex number ``\mathbb{C}``.
+One can also extend the symmetry of the fiber space into a 2-dimensional real vector space.
+The fiber space can have a complex structure to make it a 1-dimensional complex vector space.
+In that case, a **complex stretch** twists the connection ``\nabla`` through multiplication with a complex number ``\mathbb{C}``.
 
 Hence, by the uniqueness of integral curves (which is a theorem about the uniqueness of solutions to ordinary differential equations) we have ``\phi_X(s) \cdot \phi_X(t) = \phi_X(s + t) \ \forall t \in I \cap (t_{min} - s, t_{max} - s)``.
 This implies the claim by uniqueness of solutions of ordinary differential equations.
