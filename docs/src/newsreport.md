@@ -510,7 +510,7 @@ The unit circle ``S^1 \in \mathbb{C}`` is parameterized with ``z = e^{i \theta}`
 
 We use the explicit connection ``\nabla = \frac{\partial}{\partial z} - A``, where ``A`` is a complex smooth function of ``z``.
 If function ``A`` is complex differentiable in a neighborhood of point ``z``, then the bundle curvature vanishes.
-But, if ``A = 𝑖 × k × z``, then for the part of the bundle above the unit circle ``S^1`` we get a *real stretch* with a given value of ``k``.
+But, if ``A = 𝑖 × k × z``, then for the part of the bundle above the unit circle ``S^1`` we get a **real stretch** with a given value of ``k``.
 
 ![41](./assets/newsreport/41.PNG)
 
@@ -679,88 +679,116 @@ The Ricci curvature is 2-form with respect to a connection 1-form on spacetime. 
 
 [Configuration space](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/lagrangians/fig201configurationspace.jl)
 
-The configuration space of Unicycle is a manifold of dimension N, each of whose points represents a possible configuration of chassis, reaction wheel and rolling wheel. As the system evolves in time, a sequence of telemetry frames make a curve in the configuration space. The behavior of Unicycle follows a curve in the configuration space, and is constrained with a function that is defined on the tangent bundle of configuration space. We are free to change the laws of motion of the robot by programming a microcontroller. However, a program must respect the constraints of the Lagrangian function in order to achieve the goal of its mission.
+Each point in the configuration space represents a possible configuration of the chassis, reaction wheel and rolling wheel.
+As the system evolves in time, a sequence of telemetry frames make a curve in the configuration space.
+The behavior of the robot is constrained with a function that is defined on the tangent bundle of configuration space.
 
 ![46](./assets/newsreport/46.PNG)
 
 [The Lagrangian on the tangent bundle of configuration space ``T(\mathcal{C})`` vs. the Hamiltonian ``\mathcal{H}`` on the cotangent bundle ``T^*(\mathcal{C})`` (phase space)](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/lagrangians/fig202phasespace.jl)
 
-Showing a unique connection ‘a’ on the Clifford bundle requires the specification of a point ‘p’ in the bundle, as well as the infinitesimal action ‘v’ of the structure group and a direction ‘X’ in the horizontal subspace. Then, the value of the connection 1-form ‘a’ equals the scalar product of ‘v’ and ‘X’, which is in the Lie algebra of the fiber symmetry group. In the neighborhood of point ‘p’, the connection ‘a’ as a gauge field is not constant in every direction. So we take the exterior derivative of ‘a’ at ‘p’ to get a better look at the structure of the bundle. The tangent space at ‘p’ is a 3-dimensional manifold that is distributed into horizontal and vertical subspaces, because ‘a’ is an Ehresmann connection. This is different from the Levi-Civita connection that describes the structure of spacetime. In other words, the entire Clifford bundle is located at single spacetime event. The Yang-Mills Lagrangian is a smooth function on the tangent bundle of configuration space, because the curvature 2-form (as a result of the exterior derivative of connection 1-form ‘a’) is defined everywhere in the configuration space. Alternatively the Hamiltonian is defined as a smooth function on the cotangent bundle of configuration space (phase space).
-
+The total space of the Clifford bundle is located at a single spacetime event.
+As an example, the Yang-Mills Lagrangian is the scalar product of a differential form on a principal G-bundle with itself.
+Alternatively, the Hamiltonian is defined as a smooth function on the phase space, also known as the cotangent bundle of the configuration space.
 
 ![47](./assets/newsreport/47.PNG)
 
 [Hamilton's principle](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/lagrangians/fig203hamiltonprinciple.jl)
 
-Hamilton's principle. The Yang-Mills Lagrangian is a smooth function that is defined on the tangent bundle of configuration space. One derives the equations of motion for (mostly) kinetic particles such as photons (and neutrinos) using Hamilton's principle. A particle moves through the configuration space such that the integral of the Lagrangian along a path between two fixed points is stationary, under variations of the curve. But, the Yang-Mills Lagrangian is an adjoint-invariant scalar product of the curvature 2-form on a principal G-bundle over spacetime. The adjoint bundle is an associated vector bundle of the principal G-bundle, whose values represent the difference between two connections. Furthermore, the curvature 2-form is the exterior derivative of a connection 1-form on the principal bundle. Therefore, the Lagrangian forces a particle to move in the direction of the smallest ξ arrow, which makes ξ tangent to the curve.
+One derives the equations of motion for (mostly) kinetic particles such as photons (and neutrinos) using Hamilton's principle.
+A particle moves through the configuration space such that the integral of the Lagrangian along a path between two fixed points is stationary, under variations of the curve.
+But, the Yang-Mills Lagrangian is an adjoint-invariant scalar product of the curvature 2-form on a principal G-bundle over spacetime.
+The adjoint bundle is an associated vector bundle of the principal G-bundle, whose values represent the difference between two connections.
 
 ![48](./assets/newsreport/48.PNG)
 
 [Staitionary values of a smooth real-valued function ``f`` of several variables](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/lagrangians/fig204stationaryvalues.jl)
 
-Geodesic curves describe the shortest distance between two fixed points in a smooth manifold. The specification of a path in this example requires two variables x and y. In general, the Lagrangian requires many variables to be fully specified. The tangent bundle of the configuration space of a dynamical system has geodesic curves, along which the integral of the Lagrangian is stationary. 
-
-A scalar field of two variables is shown, which has two stationary points. The exterior derivative of the field at a stationary point is very small in every direction. The partial derivative of the scalar field with respect to x equals zero at a local minimum or maximum. Also, the partial derivative of the field with respect to y is equal to zero, at either of the stationary points where its two-dimensional surface is horizontal.
-
-Another kind of stationary value occurs at saddle points, where a curve with positive curvature intersects a curve with negative curvature. This 2-surface has an inflection point along a straight line crossing the center of the shape. An inflection point, because at the center, curvature changes sign along one direction while it equals zero along the orthogonal direction.
-
+Geodesic curves describe the shortest distance between two fixed points in a smooth manifold.
+The exterior derivative of a scalar field at a stationary point is very small in every direction.
+The tangent bundle of the configuration space of a dynamical system has geodesic curves, along which the integral of the Lagrangian is stationary. 
 
 ![49](./assets/newsreport/49.PNG)
 
 [The Hamiltonian flow](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/lagrangians/fig205hamiltonianflow.jl)
 
-The set of equally spaced parallel planes is called a stack. The positive direction agrees with the motion of a falling particle in the gravitational field of the Earth. The stack represents the gravitational work 1-form and its direction is downward. A golden particle travels in the direction of the black arrow. Over the first few seconds of falling towards the Earth’s center, the traveling distance is short. That is why the spacing is approximately constant between every parallel plane in the stack. The 1-form of the motion vector equals the sum of planes pierced by the vector. The greater the value of work 1-form, the higher the density of stack planes. It is equivalent to the work done moving the particle mass along the vector. The magnitude of the gravitational field (the gravitational constant) for a mass near the surface of the Earth is equal to the inverse of the spacing between planes. See figures 32.2,3 in Tristan Needham 2021.
-
-The Hamiltonian flow is a vector field on phase space. Given initial position and momentum, the Newtonian time-evolution of the falling particle is shown using arrows on the cotangent bundle of configuration space. Per unit mass, the Hamiltonian equals the squared norm of the particle's momentum over two, plus the gravitational constant times the norm of the particle's position. Given a momentum initialization, the Hamiltonian values are fixed for all positions in a plane. The potential energy is the same everywhere in a plane in the stack, and is proportional to the norm of position, which is the radius of the Earth plus the height of the particle from the Earth’s surface. As the particle falls freely, it follows a geodesic trajectory in the configuration space, as if gravity is removed. Then the total energy of the dynamical system is conserved to make the derivative of the Hamiltonian with respect to time equal to zero. Falling to the Earth, the particle must gain as much kinetic energy (momentum) as it loses in potential energy (height). See figure 20-5 in Roger Penrose 2005.
-
+The Hamiltonian flow is a section of the cotangent bundle of the configuration space.
+The Newtonian time-evolution of a particle in free fall, follows a geodesic trajectory in the configuration space.
+The stack of equally spaced parallel planes represents the gravitational work 1-form and its direction is downward.
 
 ![50](./assets/newsreport/50.PNG)
 
 [Small oscillations](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/lagrangians/fig206smalloscillations.jl)
 
-A pendulum, swinging under gravity. For small oscillations, the motion of the bob approximates simple harmonic motion, the displacement of the bob (mapped out as a function of time) giving a ‘sine wave’. The equation of motion is derived from the Hamiltonian H(p, q) = norm(p)^2 / (2 * l^2) + l * (1 - cos(q)), where ‘l’ denotes the length of the pendulum, and (p, q) denotes a tuple of the pendulum's bob momentum and position from the stable equilibrium point, respectively. Here, mass and the gravitational acceleration of the Earth don’t come into the equation of simple harmonic motion for unity. Then, for small displacements of the bob, the equation of motion is derived: the second derivative of position with respect to time (acceleration) is proportional to the outward motion. Solving the equation of motion, a sine wave, a cosine wave, and a linear combination of sine and cosine waves satisfy the equation. It was the observation of Galileo in 1583 that the period of oscillation, for such small oscillations, is independent of the amplitude of the oscillation (the maximum distance away from the stable equilibrium point.) One way to achieve such a small oscillation is to initialize the position vector with a very small magnitude.
-
-We know that the partial derivative of the Hamiltonian with respect to momentum equals the derivative of position with respect to time. Now, if we take the derivative of the partial derivative of the Hamiltonian with respect to momentum, with respect to time, then we find a matrix-vector product. But, the second derivative of position with respect to time (acceleration) is one side of the equation of motion, which is proportional to position. After a power series expansion of the Hamiltonian about the equilibrium point, the proportionality of acceleration and position of the pendulum bob turn out to be equal to the eigenvalue of the matrix in the linear transformation (the matrix-vector product.) Since the transformation is a subgroup of an orthogonal group (rotation,) the matrix representation of the pendulum’s Newtonian time-evolution is unitary. We also know that the matrix representation of an orthogonal group preserves a positive-definite scalar product. Therefore, the eigenvalue of the transformation is positive and has a positive square root. Dividing the square root of the eigenvalue by two pi yields the normal frequency of the normal mode, which is the one eigenvector corresponding to the eigenvalue. Because the pendulum’s motion is restricted to a plane in this example, there is only one normal mode. See also figure 20-6 in Roger Penrose 2005.
-
+In 1583, Galileo observed that the period of small oscillations is independent of the the maximum distance away from the stable equilibrium point.
+As it turns out, acceleration and position transform in a linear way, after expanding a power series of the Hamiltonian about the equilibrium point.
+Since the pendulum rotate as a special orthogonal group, the pendulum’s Newtonian time-evolution is unitary.
 
 ![51](./assets/newsreport/51.PNG)
 
 [Liouville's theorem](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/lagrangians/fig207liouvillestheorem.jl)
 
-The boundary nodes of a sovereign country are in the stack of gravitational work 1-form. The configuration space of a falling particle near the surface of the Earth specifies: an altitude above a geographic coordinate (latitude and longitude), along with a velocity vector (or momentum per unit mass.) The Hamiltonian is interpreted as the total energy of a falling particle. One needs to look at the cotangent bundle of the configuration space, in order to define a Hamiltonian for a particle's motion. In free fall motion, total energy is conserved because the particle follows a geodesic trajectory. It implies that the work 1-form transforms potential energy to kinetic energy, such that the total energy of the system is conserved but the kind of energy is transformed. Therefore, the Hamiltonian is constant all along as a scalar field, while the configuration of the particle evolves according to the Hamiltonian flow. The cotangent bundle of the configuration space is where the gravitational work 1-form is defined. The value of the work 1-form is calculated by counting how many planes the velocity arrow pierces. The planes in the particle’s path are counted as positive whenever the direction of the work 1-form pierced by the vector agrees with the vector’s direction, and negative otherwise.
-
-The boundary nodes are inscribed inside a parallelogram, where two horizontal vectors make the edges. An area 2-form eats the edges and spits out an area of scalar type. A 2-form is a completely antisymmetric tensor of valence {0 2}^T, meaning that swapping the pair of inputs changes the sign of the area as a result. Swapping the two edges as inputs to the area 2-form, the sign of the output area changes. Liouville’s theorem states that the Hamiltonian flow preserves the area of the initial phase-space boundary (representing a range of possible initial momentum states), even though the shape of this boundary becomes distorted in the time-evolution.
-
+The boundary of the phase space represents a range of possible initial momentum states.
+The shape of the boundary is distorted during the time-evolution of the physical system.
+Liouville’s theorem states that the Hamiltonian flow preserves the volume of the initial phase-space boundary.
 
 ![52](./assets/newsreport/52.PNG)
 
 [The reduced phase space of ``T^*(\mathcal{C})``](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/lagrangians/fig208phasespace.jl)
 
-The time-evolution of a particle of unit mass falling to the Earth’s surface is derived from a function called the Hamiltonian. The Hamiltonian is defined on the phase space, where the specification of the position and momentum of the particle requires a 6-dimensional vector [q; p]. In terms of position ‘q’ and momentum ‘p’, the Hamiltonian is defined as: the squared norm of p over two, plus the norm of q times the gravitational constant ‘g’. The exterior derivative of the gravitational work 1-form (the stack) equals approximately zero (it’s constant,) because seconds after the beginning of falling to Earth, the particle’s still near the surface. So, the Hamiltonian is defined on the cotangent bundle of a 3-dimensional configuration space, which is a 6-dimensional symplectic manifold (also known as phase space.)
-Under gravity, the particle falls along a geodesic curve (radial lines) in the configuration space. The value of the Hamiltonian function is constant throughout the motion, which implies the conservation of the sum of kinetic and potential energies. In the phase space, there is a 5-dimensional region containing a 4-dimensional family of the Hamiltonian flow trajectories. The reduced phase space, whose points represent these trajectories, is itself a 4-dimensional symplectic manifold. The degrees of freedom of the 5-dimensional region can be thought of as the latitude and longitude coordinates along with a 3-vector momentum vector. However, the 4-dimensional symplectic manifold removes an axis from the momentum vector. The partial component of the momentum vector that is removed from the phase space is calculated by projecting the momentum vector on the line tangent to the trajectory. It’s remarkable that the reduced phase space can still be the configuration space of a smaller physical system and is allowed to have its own reality.
-
+The value of the Hamiltonian function is constant throughout the motion, which implies the conservation of the sum of kinetic and potential energies.
+In order to reduce the phase space, substract a partial component of momentum, as a result of projecting momentum onto the line tangent to the trajectory.
+It’s remarkable that the reduced phase space can be the configuration space of a physical system.
 
 ![53](./assets/newsreport/53.PNG)
 
 [Hamilton's principle for field Lagrangians](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/lagrangians/fig209fieldlagrangians.jl)
 
-Points in S³ are represented by unit Quaternion numbers (vectors in ℝ⁴.) Multiplication on both the left and right sides of a Quaternion number with another Quaternion preserves the round metric on S³. There are three different flows on the surface of the 3-sphere. The first flow is in the direction of the vector field K₁, the second flow follows along vector field K₂, and finally the third flow moves in the direction of K₃ ∈ so(4). Each element of the vector fields K₁, K₂ and K₃ is a 4x4 matrix of real elements ℝ, as a basis for the special orthogonal group so(4), the Lie algebra of the group of rotations of ℝ⁴ and motions in S³. Since lengths and angles are preserved along the flows, the Quaternionic motion pushes elements around in a 3-sphere. Yet, so(4) is a 6-dimensional symmetry group because multiplication is not commutative for a pair of Quaternions. Another way to think about it is: four choose two equals six, where we count the number of basis 2-forms in four dimensions. As a consequence, there is a linear transformation that preserves a scalar product, mapping from 2 copies of S³ to the Special Orthogonal group of real dimension 4, SO(4). However, the multiplication of the identity matrix with itself results in no motion at all, so does the multiplication of minus identity with itself. Therefore, if we denote the 4 by 4 identity matrix with ‘I’, then the tuple of inputs (I, I) and (-I, -I) are in the kernel of the map: S³ × S³ \ {(I, I), (-I, -I)} → SO(4).
+The Yang-Mills Lagrangian is the magnitude of a 2-form with respect to a connection 1-form on spacetime.
+The 2-form has an exact symmetry if and only if it is equal to the loop integral of a 1-form along the boundary of an oriented area.
+But if this 1-form exists, then the integral introduces a scalar constant, and one has the freedom to transform the gauge as a reference level.
 
-An Ehresmann connection distributes the tangent bundle of S³ into two orthogonal subspaces. Vectors tangent to S³ make a right angle with a radial line. A connection 1-form ϕ on the Clifford bundle eats a vector tangent to S³ as input, and together with the infinitesimal motion along K₃, uses a scalar product to spit out a scalar number as output. On the other hand, vectors ϵu and ϵv show infinitesimal motions in the direction of K₁ and K₂, respectively. Then, the exterior derivative of the 1-form is calculated as Ω = (ϕb_v - ϕd_v) - (ϕc_u - ϕa_u), where ϕa_u denotes the value of the 1-form ϕ at point ‘a’ in the direction of ϵu. So, the exterior derivative of a 1-form ϕ is a 2-form Ω. We assume that all three flows (K₁, K₂ and K₃) are closed, meaning the exterior derivative of each one of the flows equals zero. Counting the number of equally-spaced sections pierced by K₃, one finds that the flow has non-zero period (circulation). Now, for a general vector field on S³ where a linear combination of vector fields K₁, K₂ and K₃ represents a flow, the period is no longer a scalar and is calculated as a 3-vector of the contribution of each one of the three flows. This implies that the first de Rahm cohomology group of S³ is equal to ℝ³.
+Points in S³ are represented by unit Quaternion numbers (vectors in ℝ⁴.)
+Multiplication on both the left and right sides of a Quaternion number with another Quaternion preserves the round metric on S³.
+There are three different flows on the surface of the 3-sphere.
+The first flow is in the direction of the vector field K₁, the second flow follows along vector field K₂, and finally the third flow moves in the direction of K₃ ∈ so(4).
+Each element of the vector fields K₁, K₂ and K₃ is a 4x4 matrix of real elements ℝ, as a basis for the special orthogonal group so(4), the Lie algebra of the group of rotations of ℝ⁴ and motions in S³.
+Since lengths and angles are preserved along the flows, the Quaternionic motion pushes elements around in a 3-sphere.
+Yet, so(4) is a 6-dimensional symmetry group because multiplication is not commutative for a pair of Quaternions.
+Another way to think about it is: four choose two equals six, where we count the number of basis 2-forms in four dimensions.
+As a consequence, there is a linear transformation that preserves a scalar product, mapping from 2 copies of S³ to the Special Orthogonal group of real dimension 4, SO(4).
+However, the multiplication of the identity matrix with itself results in no motion at all, so does the multiplication of minus identity with itself.
+Therefore, if we denote the 4 by 4 identity matrix with ‘I’, then the tuple of inputs (I, I) and (-I, -I) are in the kernel of the map: S³ × S³ \ {(I, I), (-I, -I)} → SO(4).
 
-But, the Yang-Mills Lagrangian is one half of the scalar product of a 2-form with respect to a connection 1-form on spacetime. The 2-form that appears in the Yang-Mills Lagrangian is exact if and only if it is equal to the loop integral of a 1-form along the boundary of a very small oriented area. In other words, the loop integral of the 1-form ϕ, along the boundary of a region (the parallelogram with vertices a, b, c and d) equals the integral of the exterior derivative of the 1-form (dϕ) over the region. But if this 1-form exists (an exact symmetry,) then the integral introduces a scalar constant and one has the freedom to change the constant as a reference level (also known as a gauge transformation.)
+An Ehresmann connection distributes the tangent bundle of S³ into two orthogonal subspaces.
+Vectors tangent to S³ make a right angle with a radial line.
+A connection 1-form ϕ on the Clifford bundle eats a vector tangent to S³ as input, and together with the infinitesimal motion along K₃, uses a scalar product to spit out a scalar number as output.
+On the other hand, vectors ϵu and ϵv show infinitesimal motions in the direction of K₁ and K₂, respectively.
+Then, the exterior derivative of the 1-form is calculated as Ω = (ϕb_v - ϕd_v) - (ϕc_u - ϕa_u), where ϕa_u denotes the value of the 1-form ϕ at point ‘a’ in the direction of ϵu.
+So, the exterior derivative of a 1-form ϕ is a 2-form Ω.
+We assume that all three flows (K₁, K₂ and K₃) are closed, meaning the exterior derivative of each one of the flows equals zero.
+Counting the number of equally-spaced sections pierced by K₃, one finds that the flow has non-zero period (circulation).
+Now, for a general vector field on S³ where a linear combination of vector fields K₁, K₂ and K₃ represents a flow, the period is no longer a scalar and is calculated as a 3-vector of the contribution of each one of the three flows.
+This implies that the first de Rahm cohomology group of S³ is equal to ℝ³.
 
-After continuous deformations of a parallelepiped at point ‘p’, one can think of the volume form of three tangent vectors in K₁, K₂ and K₃ as a blister, enclosing a 3-region. The exterior derivative of a closed 2-form (dΩ) is equal to zero. Deformation theorem for closed 2-forms states that the period of a closed 2-form out of a closed 2-surface is invariant under a continuous deformation of the surface. Because the 2-form is closed dΩ = 0, what flows into the blister must flow out. So the flux out of the volume is invariant under deformations. Furthermore, Hamilton’s principle for field Lagrangians means that a field configuration follows a geodesic in the configuration space, whose tangent bundle is where the Lagrangian is defined. The case that we illustrate here, configures the 2-form with two vectors ϵu and ϵv in the horizontal subspace at ‘p’, where the loop integral of ϕ along the boundary of a parallelogram (with midpoints a, b, c and d) is stationary. In spacetime however, the Yang-Mills Lagrangian scales a 4-form at each point, such that the integral of the scaled differential form is stationary over a 4-region, which is enclosed between two fixed 3-regions. The boundary of the pair of 3-regions can come together in an asymptotic way, or they can be glued together. For example, in the case of gluing two copies of a sphere together, we use the clutching construction to build the tangent bundle, which in turn gives rise to spinors that define the Dirac Lagrangian.
-
+After continuous deformations of a parallelepiped at point ‘p’, one can think of the volume form of three tangent vectors in K₁, K₂ and K₃ as a blister, enclosing a 3-region.
+The exterior derivative of a closed 2-form (dΩ) is equal to zero.
+Deformation theorem for closed 2-forms states that the period of a closed 2-form out of a closed 2-surface is invariant under a continuous deformation of the surface.
+Because the 2-form is closed dΩ = 0, what flows into the blister must flow out.
+So the flux out of the volume is invariant under deformations.
+Furthermore, Hamilton’s principle for field Lagrangians means that a field configuration follows a geodesic in the configuration space, whose tangent bundle is where the Lagrangian is defined.
+The case that we illustrate here, configures the 2-form with two vectors ϵu and ϵv in the horizontal subspace at ‘p’, where the loop integral of ϕ along the boundary of a parallelogram (with midpoints a, b, c and d) is stationary.
+In spacetime however, the Yang-Mills Lagrangian scales a 4-form at each point, such that the integral of the scaled differential form is stationary over a 4-region, which is enclosed between two fixed 3-regions.
+The boundary of the pair of 3-regions can come together in an asymptotic way, or they can be glued together.
+For example, in the case of gluing two copies of a sphere together, we use the clutching construction to build the tangent bundle, which in turn gives rise to spinors that define the Dirac Lagrangian.
 
 ![54](./assets/newsreport/54.PNG)
 
 [Hamilton's principle for field Lagrangians](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/lagrangians/fig2010fieldlagrangians.jl)
 
-A connection (denoted by A) on a principal G-bundle P assigns a horizontal subspace of the tangent space to each point q in P, in a smooth way. First, the tangent space of a principal bundle P at point q is equal to the direct sum of the vertical subspace and the horizontal subspace at q, for all q in P. Second, the push forward of the horizontal subspace of the Principal G-bundle P at point q by an action g of the structure group G is equal to the horizontal subspace of the principal G-bundle P at the transformation of point q by the action of g, for all g in G and q in P.
-The loop integral of a connection at a point q along the edges of a parallelogram with infinitesimal edges is equal to the exterior derivative of the connection A, which in turn equals F. The exterior derivative of the connection 1-form A is a 2-form F, which has two indices downstairs in order to denote two inputs. The point q is a vertex of the infinitesimal parallelogram where two of the edges intersect. These edges are inputs to the 2-form F.
-A field Lagrangian can be as simple as the scalar product of a 2-form with itself. Then, Hamilton’s principle expresses that the integral of a 4-form on spacetime with the density of some Lagrangian over a 4-dimensional region is stationary. The boundary of a well-behaved compact oriented 4 dimensional region is a (compact oriented) 3-dimensional region, consisting of those points of the 4-region that do not lie in the 4-dimensional interior. The 4-region has a boundary that is constructed with a pair of 3-regions. According to Hamilton’s principle for field Lagrangians, the loop integral of a 3-form along the 3-region boundaries is stationary. For example, by first puncturing two 3-spheres and then gluing them together along their boundaries, one can obtain a pair of 3-regions in spacetime that enclose a 4-region over which the integral of a 4-form is performed. In this example the boundary of a punctured 3-sphere is a 2-dimensional sphere.
-
+The boundary of a well-behaved compact oriented 4-dimensional region is a 3-dimensional region.
+The boundary consists of those points of the 4-region that do not lie in the interior.
+Hamilton’s principle states that the integral of a 4-form, scaled by some field Lagrangian, over a 4-dimensional region is stationary.
 
 The following three chapters discuss applications in physics: the Lagrangians and interactions in the Standard Model, spontaneous symmetry breaking, the Higgs mechanism of mass generation, and some more advanced and modern topics like neutrino masses and CP violation.
 Depending on the time, the interests and the prior knowledge of the reader, he or she can take a shortcut and immediately start at the chapters on connections, spinors or Lagrangians, and then go back if more detailed mathematical knowledge is required at some point.
