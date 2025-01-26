@@ -326,6 +326,10 @@ Our aim in this subsection is to prove that the orthochronous spin group ``Spin^
 
 ![24](./assets/newsreport/24.PNG)
 
+A connection (denoted by A) on a principal G-bundle P assigns a horizontal subspace of the tangent space to each point q in P, in a smooth way.
+First, the tangent space of a principal bundle P at point q is equal to the direct sum of the vertical subspace and the horizontal subspace at q, for all q in P.
+Second, the push forward of the horizontal subspace of the Principal G-bundle P at point q by an action g of the structure group G is equal to the horizontal subspace of the principal G-bundle P at the transformation of point q by the action of g, for all g in G and q in P.
+
 With the discovery of a new particle, announced on 4 July 2012 at CERN, whose properties are "consistent with the long-sought Higgs boson" [31], the final elementary particle predicted by the classical Standard Model of particle physics has been found.
 Interactions between fields corresponding to elementary particles (quarks, leptons, gauge bosons, Higgs bosons), determined by the Lagrangian.
 The Higgs mechanism of mass generation for gauge bosons as well as the mass generation for fermions via Yukawa couplings.
@@ -747,40 +751,6 @@ It’s remarkable that the reduced phase space can be the configuration space of
 The Yang-Mills Lagrangian is the magnitude of a 2-form with respect to a connection 1-form on spacetime.
 The 2-form has an exact symmetry if and only if it is equal to the loop integral of a 1-form along the boundary of an oriented area.
 But if this 1-form exists, then the integral introduces a scalar constant, and one has the freedom to transform the gauge as a reference level.
-
-Points in S³ are represented by unit Quaternion numbers (vectors in ℝ⁴.)
-Multiplication on both the left and right sides of a Quaternion number with another Quaternion preserves the round metric on S³.
-There are three different flows on the surface of the 3-sphere.
-The first flow is in the direction of the vector field K₁, the second flow follows along vector field K₂, and finally the third flow moves in the direction of K₃ ∈ so(4).
-Each element of the vector fields K₁, K₂ and K₃ is a 4x4 matrix of real elements ℝ, as a basis for the special orthogonal group so(4), the Lie algebra of the group of rotations of ℝ⁴ and motions in S³.
-Since lengths and angles are preserved along the flows, the Quaternionic motion pushes elements around in a 3-sphere.
-Yet, so(4) is a 6-dimensional symmetry group because multiplication is not commutative for a pair of Quaternions.
-Another way to think about it is: four choose two equals six, where we count the number of basis 2-forms in four dimensions.
-As a consequence, there is a linear transformation that preserves a scalar product, mapping from 2 copies of S³ to the Special Orthogonal group of real dimension 4, SO(4).
-However, the multiplication of the identity matrix with itself results in no motion at all, so does the multiplication of minus identity with itself.
-Therefore, if we denote the 4 by 4 identity matrix with ‘I’, then the tuple of inputs (I, I) and (-I, -I) are in the kernel of the map: S³ × S³ \ {(I, I), (-I, -I)} → SO(4).
-
-An Ehresmann connection distributes the tangent bundle of S³ into two orthogonal subspaces.
-Vectors tangent to S³ make a right angle with a radial line.
-A connection 1-form ϕ on the Clifford bundle eats a vector tangent to S³ as input, and together with the infinitesimal motion along K₃, uses a scalar product to spit out a scalar number as output.
-On the other hand, vectors ϵu and ϵv show infinitesimal motions in the direction of K₁ and K₂, respectively.
-Then, the exterior derivative of the 1-form is calculated as Ω = (ϕb_v - ϕd_v) - (ϕc_u - ϕa_u), where ϕa_u denotes the value of the 1-form ϕ at point ‘a’ in the direction of ϵu.
-So, the exterior derivative of a 1-form ϕ is a 2-form Ω.
-We assume that all three flows (K₁, K₂ and K₃) are closed, meaning the exterior derivative of each one of the flows equals zero.
-Counting the number of equally-spaced sections pierced by K₃, one finds that the flow has non-zero period (circulation).
-Now, for a general vector field on S³ where a linear combination of vector fields K₁, K₂ and K₃ represents a flow, the period is no longer a scalar and is calculated as a 3-vector of the contribution of each one of the three flows.
-This implies that the first de Rahm cohomology group of S³ is equal to ℝ³.
-
-After continuous deformations of a parallelepiped at point ‘p’, one can think of the volume form of three tangent vectors in K₁, K₂ and K₃ as a blister, enclosing a 3-region.
-The exterior derivative of a closed 2-form (dΩ) is equal to zero.
-Deformation theorem for closed 2-forms states that the period of a closed 2-form out of a closed 2-surface is invariant under a continuous deformation of the surface.
-Because the 2-form is closed dΩ = 0, what flows into the blister must flow out.
-So the flux out of the volume is invariant under deformations.
-Furthermore, Hamilton’s principle for field Lagrangians means that a field configuration follows a geodesic in the configuration space, whose tangent bundle is where the Lagrangian is defined.
-The case that we illustrate here, configures the 2-form with two vectors ϵu and ϵv in the horizontal subspace at ‘p’, where the loop integral of ϕ along the boundary of a parallelogram (with midpoints a, b, c and d) is stationary.
-In spacetime however, the Yang-Mills Lagrangian scales a 4-form at each point, such that the integral of the scaled differential form is stationary over a 4-region, which is enclosed between two fixed 3-regions.
-The boundary of the pair of 3-regions can come together in an asymptotic way, or they can be glued together.
-For example, in the case of gluing two copies of a sphere together, we use the clutching construction to build the tangent bundle, which in turn gives rise to spinors that define the Dirac Lagrangian.
 
 ![54](./assets/newsreport/54.PNG)
 
