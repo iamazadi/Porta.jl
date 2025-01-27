@@ -105,7 +105,7 @@ After a transformation in the linear space of the generators of the cone, the si
 
 Construct a complicated object by annihilating and creating boundaries.
 Look at transformations in the tangent bundle, in order to mark the orientation of boundaries.
-Follow the following 9 steps for building a tangent bundle on the 3-sphere.
+Follow the following 9 steps for building a vector bundle on the 3-sphere.
 
 1. Mark the boundary of one copy of ``SO(3)`` with sixteen vertices of a hypercube.
 2. Make a tangent frame at origin point ``O`` and parallel transport it to the marked points.
@@ -118,13 +118,13 @@ Follow the following 9 steps for building a tangent bundle on the 3-sphere.
 9. Compare them with frames originated from the center of chart ``N`` at origin ``O``.
 
 The twist in frames ``I`` compared to frames ``II`` is like the reorientation of 3D objects in the Euclidean three-dimensional space.
-Even though both copies of ``SO(3)`` represent the same 3D orientation, they are distinguished from each other as points in the special linear group of complex dimension two ``SL(2,C)``.
+Even though both copies of ``SO(3)`` represent the same 3D orientation, they are distinguished from each other as points in the special unitary group of complex dimension two ``SU(2)``.
 
 The equivalence class of twisted frames at boundary points defines a group of rotations ``SO(3)``.
-The clutching construction makes an associated vector bundle on the 3-dimensional sphere ``S^+``.
+The clutching construction makes an associated vector bundle on the 3-dimensional sphere ``S^3``.
 The construction creates a vector bundle through a continuous function denoted by ``f``.
 The clutching function resolves the conflicts of tangent frames along the boundary.
-It does so by producing an image elements in ``SO(3)`` given an element in ``SO(3) \times SO(3)``, over the intersectional region.
+It does so by producing an image elements in ``SO(3)`` given an element in the boundary where the two copies of ``S^3`` meet.
 
 ![13](./assets/newsreport/13.PNG)
 
