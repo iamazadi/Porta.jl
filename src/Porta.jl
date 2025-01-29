@@ -29,5 +29,6 @@ include("basemap.jl")
 include("utilities.jl")
 include("clutchingconstruction.jl")
 include("tangentbundle.jl")
+include("unicycle/telemetry.jl")
 
 end # module

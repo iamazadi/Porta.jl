@@ -38,5 +38,9 @@ end
     include("tangentbundle_tests.jl")
 end
 
+@time @testset "The Interface Tests" begin
+    include("unicycle_tests/telemetry_tests.jl")
+end
+
 elapsed = time() - start
 println("Testing took", elapsed)
