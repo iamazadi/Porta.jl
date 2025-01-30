@@ -1,3 +1,6 @@
+using GLMakie
+
+
 u, v, w = ℝ³(rand(3)), ℝ³(rand(3)), ℝ³(rand(3))
 a, b = ℝ³(rand(3)), ℝ³(rand(3))
 zero = ℝ³([0.0; 0.0; 0.0])
@@ -36,3 +39,15 @@ array2 = map(x -> 2x, array1)
 
 @test isapprox(array1, array1, atol = TOLERANCE)
 @test isapprox(array1, array2, atol = TOLERANCE) == false
+
+
+# interoperability tests
+p3 = Point3f(rand(3))
+v3 = Vec3f(rand(3))
+p = ℝ³(p3)
+v = ℝ³(v3)
+
+@test isapprox(vec(p), vec(p3))
+@test isapprox(vec(v), vec(v3))
+@test isapprox(Point3f(p), p3)
+@test isapprox(Vec3f(v), v3)

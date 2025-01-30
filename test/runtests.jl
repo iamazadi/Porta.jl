@@ -26,16 +26,19 @@ end
 
 @time @testset "The Bundles Tests" begin
     include("cliffordbundle_tests.jl")
+    include("projection_tests.jl")
 end
 
 @time @testset "The Graphics Tests" begin
     include("earth_tests.jl")
+    include("nullcone_tests.jl")
     include("rotation_tests.jl")
     include("surface_tests.jl")
     include("whirl_tests.jl")
     include("basemap_tests.jl")
     include("utilities_tests.jl")
     include("tangentbundle_tests.jl")
+    include("scene_tests.jl")
 end
 
 @time @testset "The Interface Tests" begin

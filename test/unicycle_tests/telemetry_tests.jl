@@ -12,13 +12,7 @@ centerofmass = Porta.find_centerofmass(chassis_stl)
 @test length(centerofmass) == 3
 
 chassis_colormap = :rainbow
-x̂ = ℝ³([1.0; 0.0; 0.0])
-ŷ = ℝ³([0.0; 1.0; 0.0])
-ẑ = ℝ³([0.0; 0.0; 1.0])
-chassis_qx = ℍ(π / 2, x̂)
-chassis_qy = ℍ(0.0, ŷ)
-chassis_qz = ℍ(0.0, ẑ)
-chassis_rotation = chassis_qx * chassis_qy * chassis_qz
+chassis_rotation = ℍ(π / 2, ℝ³([1.0; 0.0; 0.0]))
 chassis_origin = Point3f(-0.1, -0.1, -0.02)
 chassis_scale = 0.001
 robot = make_sprite(lscene.scene, lscene.scene, chassis_origin, chassis_rotation, chassis_scale, chassis_stl, chassis_colormap)

@@ -2,7 +2,6 @@ import CSV
 import DataFrames
 import GLMakie
 
-export Point
 export Line
 export Edge
 export getdistance
@@ -18,28 +17,17 @@ export getcenter
 
 
 """
-    Represents a point
-
-fields: x and y.
-"""
-struct Point{T}
-    x::T
-    y::T
-end
-
-
-"""
     show(p)
 
 Print a string representation of the point `p`.
 """
-Base.show(io::IO, p::Point) = print(io, "($(p.x), $(p.y))")
+Base.show(io::IO, p::ℝ²) = print(io, "$p")
 
 
 """
     Represents an edge between two endpoints of a line segment.
 """
-const Edge = Tuple{Point{T}, Point{T}} where T
+const Edge = Tuple{ℝ², ℝ²}
 
 
 """
@@ -187,25 +175,29 @@ end
 
 Determine whther a ray cast from a point intersects an edge with the given point `p` and `edge`.
 """
-function rayintersectseg(p::Point{T}, edge::Edge{T}) where T
+function rayintersectseg(p::ℝ², edge::Edge)
     a, b = edge
-    if a.y > b.y
+    a_x, a_y = vec(a)
+    b_x, b_y = vec(b)
+    p_x, p_y = vec(p)
+    a_y = vec(a)[2]
+    if a_y > b_y
         a, b = b, a
     end
-    if p.y ∈ (a.y, b.y)
-        p = Point(p.x, p.y + eps(p.y))
+    if p_y ∈ (a_y, b_y)
+        p = ℝ²(p_x, p_y + eps(p_y))
     end
 
     rst = false
-    if (p.y > b.y || p.y < a.y) || (p.x < max(a.x, b.x))
+    if (p_y > b_y || p_y < a_y) || (p_x < max(a_x, b_x))
         return false
     end
 
-    if p.x < min(a.x, b.x)
+    if p_x < min(a_x, b_x)
         rst = true
     else
-        mred = (b.y - a.y) / (b.x - a.x)
-        mblu = (p.y - a.y) / (p.x - a.x)
+        mred = (b_y - a_y) / (b_x - a_x)
+        mblu = (p_y - a_y) / (p_x - a_x)
         rst = mblu ≥ mred
     end
 
@@ -218,7 +210,7 @@ end
 
 Determine whether the given point `p` is inside the shape `poly`.
 """
-isinside(poly::Vector{Tuple{Point{T}, Point{T}}}, p::Point{T}) where T = iseven(count(edge -> rayintersectseg(p, edge), poly))
+isinside(poly::Vector{Tuple{ℝ², ℝ²}}, p::ℝ²) = iseven(count(edge -> rayintersectseg(p, edge), poly))
 
 
 """
@@ -229,16 +221,16 @@ Determine whether the given `point` is inside the `boundary`.
 function isinside(point::ℝ³, boundary::Vector{ℝ³})
     N = length(boundary)
     _boundary = map(x -> convert_to_geographic(x), boundary)
-    poly = Vector{Tuple{Point{Float64}, Point{Float64}}}(undef, N)
+    poly = Vector{Tuple{ℝ², ℝ²}}(undef, N)
     for i in 1:N
         a = _boundary[i]
         b = i == N ? _boundary[1] : _boundary[i + 1]
         ar, aθ, aϕ = a
         br, bθ, bϕ = b
-        poly[i] = (Point(aθ, aϕ), Point(bθ, bϕ))
+        poly[i] = (ℝ²(aθ, aϕ), ℝ²(bθ, bϕ))
     end
     r, θ, ϕ = convert_to_geographic(point)
-    isinside(poly, Point(θ, ϕ))
+    isinside(poly, ℝ²(θ, ϕ))
 end
 
 

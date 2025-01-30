@@ -1,5 +1,5 @@
-import FileIO
-import GLMakie
+using FileIO
+using GLMakie
 
 
 point = ℝ³(rand(3))
@@ -36,16 +36,16 @@ basemap = FileIO.load("../data/basemap_color.png")
 color = getcolor(points, basemap, α)
 @test isapprox(color.alpha, α)
 
-a = Point(rand(), rand())
-b = Point(rand(), rand())
+a = ℝ²(rand(), rand())
+b = ℝ²(rand(), rand())
 e = Edge((a, b))
-p = Point(rand(), rand())
+p = ℝ²(rand(), rand())
 @test typeof(rayintersectseg(p, e)) <: Bool
 N = rand(5:10)
-poly = Vector{Tuple{Point{Float64}, Point{Float64}}}(undef, N)
+poly = Vector{Tuple{ℝ², ℝ²}}(undef, N)
 for i in 1:N
-    _a = Point(rand(2)...)
-    _b = Point(rand(2)...)
+    _a = ℝ²(rand(2)...)
+    _b = ℝ²(rand(2)...)
     poly[i] = (_a, _b)
 end
 @test typeof(isinside(poly, p)) <: Bool

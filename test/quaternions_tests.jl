@@ -1,3 +1,6 @@
+using GLMakie
+
+
 # the multiplication table
 table = [elI eli elj elk;
          eli -elI elk -elj;
@@ -161,3 +164,12 @@ timesign = rand([1, -1])
 v = SpinVector(ζ, timesign)
 q = ℍ(v)
 @test isapprox(ℝ³(v), imag(q))
+
+
+# Makie Quaternion constructors
+q = normalize(ℍ(rand(4)))
+h = Quaternion(q)
+@test isapprox(h.data[4], vec(q)[1])
+@test isapprox(h.data[1], vec(q)[2])
+@test isapprox(h.data[2], vec(q)[3])
+@test isapprox(h.data[3], vec(q)[4])

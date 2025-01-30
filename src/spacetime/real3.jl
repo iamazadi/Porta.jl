@@ -1,6 +1,8 @@
 import Base.:+
 import Base.:-
 import Base.:*
+import GLMakie.Point3f
+import GLMakie.Vec3f
 
 
 export ℝ³
@@ -61,3 +63,35 @@ Base.isapprox(a::Array{ℝ³},
     end
     return true
 end
+
+
+"""
+    ℝ³(p)
+
+Convert a point from type Point3f in Makie to ℝ³ for interoperability, with the given point `p`.
+"""
+ℝ³(p::Point3f) = ℝ³(Float64.(vec(p))...)
+
+
+"""
+    Point3f(v)
+
+Convert a vector of type ℝ³ to a 3-dimansional point in Makie for interoperability.
+"""
+Point3f(v::ℝ³) = Point3f(vec(v)...)
+
+
+"""
+    ℝ³(v)
+
+Convert a vector of type Vec3f in Makie to ℝ³ for interoperability.
+"""
+ℝ³(v::Vec3f) = ℝ³(Float64.(vec(v))...)
+
+
+"""
+    Vec3f(v)
+
+Convert a vector of type ℝ³ to a floating point 3-vector in Makie for interoperability.
+"""
+Vec3f(v::ℝ³) = Vec3f(Float64.(vec(v))...)

@@ -7,6 +7,7 @@ import Base.isapprox
 import Base.:+
 import Base.:-
 import Base.:*
+import GLMakie.Quaternion
 
 export ℍ
 export elI
@@ -301,3 +302,11 @@ end
 Transform a spin-vector into a 'vectorial' quaternion.
 """
 ℍ(v::SpinVector) = ℍ(0.0, vec(ℝ³(v))...)
+
+
+"""
+    Quaternion(q)
+
+Converts the quaternion number `q` to a Quaternion type in Makie for interoperability.
+"""
+Quaternion(q::ℍ) = Quaternion(vec(q)[2:4]..., vec(q)[1])
