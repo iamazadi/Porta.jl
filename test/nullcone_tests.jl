@@ -61,3 +61,22 @@ vector = 𝕍(spintransform * κ)
 projection = projectontoplane(vector)
 @test typeof(projection) <: ℝ³
 @test isapprox(vec(projection)[3], 0.0)
+
+
+_generate() = 2rand() - 1 + im * (2rand() - 1)
+κ = SpinVector(_generate(), _generate(), Int(T))
+ϵ = 0.1
+ζ = Complex(κ)
+ζ′ = ζ - (1.0 / √2) * ϵ * (1.0 / κ.a[2]^2)
+κ = SpinVector(ζ, Int(T))
+κ′ = SpinVector(ζ′, Int(T))
+κv = 𝕍(κ)
+κ′v = 𝕍(κ′)
+flagplanematrix = makeflagplane(κv, κ′v - κv, T, segments = segments)
+@test typeof(flagplanematrix) <: Matrix{ℝ³}
+@test size(flagplanematrix) == (segments, segments)
+
+M = Identity(4)
+flagplanematrix = makeflagplane(κv, κ′v - κv, M, segments = segments)
+@test typeof(flagplanematrix) <: Matrix{ℝ³}
+@test size(flagplanematrix) == (segments, segments)

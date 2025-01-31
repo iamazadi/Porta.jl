@@ -91,11 +91,11 @@ text!(lscene,
     markerspace = :data
 )
 
-planematrix = makeplane(κv, ωv, M)
+planematrix = makeflagplane(κv, ωv, M)
 planecolor = Observable(fill(RGBAf(0.5, 0.5, 0.5, 0.5), segments, segments))
 planeobservable = buildsurface(lscene, planematrix, planecolor, transparency = true)
 ê₁, ê₂, ê₃, ê₄ = calculatebasisvectors(κ, ω)
-orthogonalplanematrix = makeplane(𝕍( ê₃), 𝕍( ê₄), M)
+orthogonalplanematrix = makeflagplane(𝕍( ê₃), 𝕍( ê₄), M)
 orthogonalplanecolor = Observable(fill(RGBAf(0.5, 0.5, 0.5, 0.5), segments, segments))
 orthogonalplaneobservable = buildsurface(lscene, orthogonalplanematrix, orthogonalplanecolor, transparency = true)
 κflagplanematrix = makeflagplane(κv, κ′v - κv, T, segments = segments)
@@ -131,9 +131,9 @@ animate(frame::Int) = begin
     ωflagplanematrix = makeflagplane(ωflagplane1, ωflagplane2, T, segments = segments)
     updatesurface!(κflagplanematrix, κflagplaneobservable)
     updatesurface!(ωflagplanematrix, ωflagplaneobservable)
-    planematrix = makeplane(𝕍( ê₁), 𝕍( ê₂), M) # the timelike 2-plane spanned by the flagpoles of κ and ω
+    planematrix = makeflagplane(𝕍( ê₁), 𝕍( ê₂), M) # the timelike 2-plane spanned by the flagpoles of κ and ω
     # σ, the spacelike 2-plane through O, which is the orthogonal complement of the timelike 2-plane spanned by the flagpoles of κ and ω
-    orthogonalplanematrix = makeplane(𝕍( ê₃), 𝕍( ê₄), M)
+    orthogonalplanematrix = makeflagplane(𝕍( ê₃), 𝕍( ê₄), M)
     updatesurface!(planematrix, planeobservable)
     updatesurface!(orthogonalplanematrix, orthogonalplaneobservable)
     hue = Float64(frame) / Float64(frames_number) * 360.0

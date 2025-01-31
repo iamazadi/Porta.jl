@@ -130,7 +130,7 @@ GLMakie.text!(lscene2,
     markerspace = :data
 )
 
-κflagplanematrix = makeflagplane(κv, κ′v - κv, segments = segments)
+κflagplanematrix = makeflagplane(κv, κ′v - κv, T, segments = segments)
 κflagplanecolor = GLMakie.Observable(fill(GLMakie.RGBAf(0.5, 0.5, 0.5, 0.5), segments, segments))
 κflagplaneobservable1 = buildsurface(lscene1, κflagplanematrix, κflagplanecolor, transparency = false)
 κflagplaneobservable2 = buildsurface(lscene2, κflagplanematrix, κflagplanecolor, transparency = false)
@@ -199,7 +199,7 @@ animate(frame::Int) = begin
     κtransformed = 𝕍(spintransform * κ)
     κ′transformed = 𝕍(spintransform * κ′)
     κ″transformed = 𝕍(spintransform * κ″)
-    κflagplanematrix = makeflagplane(κtransformed, 𝕍(LinearAlgebra.normalize(vec(κ′transformed - κtransformed))), segments = segments)
+    κflagplanematrix = makeflagplane(κtransformed, 𝕍(LinearAlgebra.normalize(vec(κ′transformed - κtransformed))), T, segments = segments)
     updatesurface!(κflagplanematrix, κflagplaneobservable1)
     updatesurface!(κflagplanematrix, κflagplaneobservable2)
     κflagplanecolor[] = [GLMakie.RGBAf(convert_hsvtorgb([360.0 * progress; 1.0; 1.0])..., 1.0) for i in 1:segments, j in 1:segments]

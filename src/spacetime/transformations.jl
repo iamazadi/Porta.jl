@@ -1,6 +1,10 @@
 import LinearAlgebra
+
+
 export compute_fourscrew
 export compute_nullrotation
+export calculatetransformation
+export calculatebasisvectors
 
 
 """
@@ -69,7 +73,6 @@ function compute_fourscrew(progress::Float64, status::Int)
 end
 
 
-
 """
     compute_nullrotation(progress)
 
@@ -121,4 +124,49 @@ function compute_nullrotation(progress::Float64)
     @assert(isapprox(v₁, v₂, atol = tolerance), "The null vector t + z is not invariant under the null rotation, $v₁ != $v₂.")
 
     M
+end
+
+
+"""
+    calculatetransformation(z₁, z₂, z₃, w₁, w₂, w₃)
+
+Calculate the bilinear transformation that takes the given three points `z₁`, `z₂` and `z₃` to three points `w₁`, `w₂` and `w₃`.
+"""
+function calculatetransformation(z₁::Complex, z₂::Complex, z₃::Complex, w₁::Complex, w₂::Complex, w₃::Complex)
+    f(z::Complex) = begin
+        A = (w₁ - w₂) * (z - z₂) * (z₁ - z₃)
+        B = (w₁ - w₃) * (z₁ - z₂) * (z - z₃)
+        (w₃ * A - w₂ * B) / (A - B)
+    end
+end
+
+
+"""
+    calculatebasisvectors(κ, ω)
+
+Calculate an orthonormal set of basis vectors with the given spin-vectors `κ` and `ω`.
+"""
+function calculatebasisvectors(κ::SpinVector, ω::SpinVector)
+    κv = 𝕍( κ)
+    ωv = 𝕍( ω)
+    zero = 𝕍( 0.0, 0.0, 0.0, 0.0)
+    B = stack([vec(κv), vec(ωv), vec(zero), vec(zero)])
+    N = LinearAlgebra.nullspace(B)
+    a = 𝕍(N[begin:end, 1])
+    b = 𝕍(N[begin:end, 2])
+    a = 𝕍(LinearAlgebra.normalize(vec(a - κv - ωv)))
+    b = 𝕍(LinearAlgebra.normalize(vec(b - κv - ωv)))
+    v₁ = ℝ⁴(κv)
+    v₂ = ℝ⁴(ωv)
+    v₃ = ℝ⁴(a)
+    v₄ = ℝ⁴(b)
+    e₁ = v₁
+    ê₁ = normalize(e₁)
+    e₂ = v₂ - dot(ê₁, v₂) * ê₁
+    ê₂ = normalize(e₂)
+    e₃ = v₃ - dot(ê₁, v₃) * ê₁ - dot(ê₂, v₃) * ê₂
+    ê₃ = normalize(e₃)
+    e₄ = v₄ - dot(ê₁, v₄) * ê₁ - dot(ê₂, v₄) * ê₂ - dot(ê₃, v₄) * ê₃
+    ê₄ = normalize(e₄)
+    ê₁, ê₂, ê₃, ê₄
 end

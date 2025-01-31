@@ -98,7 +98,7 @@ GLMakie.text!(lscene,
 ϕ = rand()
 ψ = rand()
 transformation = SpinTransformation(θ, ϕ, ψ)
-κflagplanematrix = makeflagplane(κv, κ′v - κv, segments = segments)
+κflagplanematrix = makeflagplane(κv, κ′v - κv, T, segments = segments)
 κflagplanecolor = GLMakie.Observable(fill(GLMakie.RGBAf(0.5, 0.5, 0.5, 0.5), segments, segments))
 κflagplaneobservable = buildsurface(lscene, κflagplanematrix, κflagplanecolor, transparency = false)
 
@@ -132,7 +132,7 @@ animate(frame::Int) = begin
     updatesurface!(planematrix, planeobservable)
     κ_transformed = 𝕍(spintransform * κ)
     κ′_transformed = 𝕍(spintransform * κ′)
-    κflagplanematrix = makeflagplane(κ_transformed, 𝕍(LinearAlgebra.normalize(vec(κ′_transformed - κ_transformed))), segments = segments)
+    κflagplanematrix = makeflagplane(κ_transformed, 𝕍(LinearAlgebra.normalize(vec(κ′_transformed - κ_transformed))), T, segments = segments)
     updatesurface!(κflagplanematrix, κflagplaneobservable)
     κflagplanecolor[] = [GLMakie.RGBAf(convert_hsvtorgb([360.0 * progress; 1.0; 1.0])..., 1.0) for i in 1:segments, j in 1:segments]
     κhead[] = GLMakie.Point3f(project(ℍ(LinearAlgebra.normalize(vec(κ_transformed)))))
