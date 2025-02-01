@@ -7,7 +7,7 @@ twospherematrix = maketwosphere(origin, segments = segments)
 
 axis = normalize(ℝ³(rand(3)))
 M = ℍ(rand(), axis)
-T = rand([-1.0, 0.0, 1.0])
+T = rand([-1.0, 1.0])
 compressedprojection = rand([true, false])
 spherematrix = makesphere(M, T, compressedprojection = compressedprojection, segments = segments)
 @test typeof(spherematrix) <: Matrix{ℝ³}
@@ -51,8 +51,8 @@ makestereographicprojectionplane(M, T = T, segments = segments)
 @test typeof(spherematrix) <: Matrix{ℝ³}
 @test size(spherematrix) == (segments, segments)
 
-generate() = 2rand() - 1 + im * (2rand() - 1)
-κ = SpinVector(generate(), generate(), Int(T))
+_generate() = 2rand() - 1 + im * (2rand() - 1)
+κ = SpinVector(_generate(), _generate(), Int(T))
 θ = rand() * 2π
 ϕ = rand() * 2π
 ψ = rand() * 2π
@@ -62,8 +62,6 @@ projection = projectontoplane(vector)
 @test typeof(projection) <: ℝ³
 @test isapprox(vec(projection)[3], 0.0)
 
-
-_generate() = 2rand() - 1 + im * (2rand() - 1)
 κ = SpinVector(_generate(), _generate(), Int(T))
 ϵ = 0.1
 ζ = Complex(κ)

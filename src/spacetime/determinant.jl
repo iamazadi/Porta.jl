@@ -1,3 +1,4 @@
+export sub
 export det
 export minor
 export cofactor
