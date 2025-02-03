@@ -7,6 +7,9 @@ timesign = rand([1; -1])
 μ = generate()
 zero = SpinVector([Complex(0.0); Complex(0.0)], timesign)
 
+@test typeof(vec(κ)) <: Vector{Complex}
+@test typeof(mat(κ)) <: Matrix{<:Complex}
+
 ## The properties of basic operations on the spin-space G
 @test(isapprox(λ * (μ * κ), (λ * μ) * κ))
 @test(isapprox(1κ, κ))

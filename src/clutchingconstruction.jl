@@ -3,8 +3,8 @@ export getpoint
 export paralleltransport
 export resetcamera
 export markframe
-export updatepoint
 export updateui
+export updatepoint
 export rotatecamera
 export labelpoint
 export switchcharts
@@ -18,7 +18,7 @@ export showset2
 
 Make a set of tous of revolution visible by changing the alpha color channel for illustration.
 """
-function showtori(colorarray::GLMakie.Observable{Matrix{GLMakie.RGBA{Float32}}}, toruscolor::GLMakie.RGBA{Float32})
+function showtori(colorarray::GLMakie.Observable{Matrix{GLMakie.RGBAf}}, toruscolor::GLMakie.RGBAf)
     color = GLMakie.to_value(colorarray)[1]
     segments = size(colorarray[])[1]
     if isapprox(color.alpha, 0)
@@ -176,10 +176,10 @@ function updateui(chart::Bool, p₁::ℝ⁴,
     arrowx¹heads::GLMakie.Observable{GLMakie.Point{3, Float32}},
     arrowx²heads::GLMakie.Observable{GLMakie.Point{3, Float32}},
     arrowx³heads::GLMakie.Observable{GLMakie.Point{3, Float32}},
-    arrowcolorn::GLMakie.Observable{Vector{GLMakie.RGBA{Float64}}},
-    arrowcolors::GLMakie.Observable{Vector{GLMakie.RGBA{Float64}}},
-    arrowxcolorn::GLMakie.Observable{Vector{GLMakie.RGBA{Float32}}},
-    arrowxcolors::GLMakie.Observable{Vector{GLMakie.RGBA{Float32}}},
+    arrowcolorn::GLMakie.Observable{Vector{GLMakie.RGBAf}},
+    arrowcolors::GLMakie.Observable{Vector{GLMakie.RGBAf}},
+    arrowxcolorn::GLMakie.Observable{Vector{GLMakie.RGBAf}},
+    arrowxcolors::GLMakie.Observable{Vector{GLMakie.RGBAf}},
     ps::GLMakie.Observable{Vector{GLMakie.Point{3, Float32}}},
     ns::GLMakie.Observable{Vector{GLMakie.Point{3, Float32}}},
     psn::GLMakie.Observable{Vector{GLMakie.Point{3, Float32}}},
@@ -282,10 +282,10 @@ function updatepoint(p::ℝ⁴, p₀::GLMakie.Observable{ℝ⁴}, p₁::GLMakie.
     arrowx¹heads::GLMakie.Observable{GLMakie.Point{3, Float32}},
     arrowx²heads::GLMakie.Observable{GLMakie.Point{3, Float32}},
     arrowx³heads::GLMakie.Observable{GLMakie.Point{3, Float32}},
-    arrowcolorn::GLMakie.Observable{Vector{GLMakie.RGBA{Float64}}},
-    arrowcolors::GLMakie.Observable{Vector{GLMakie.RGBA{Float64}}},
-    arrowxcolorn::GLMakie.Observable{Vector{GLMakie.RGBA{Float32}}},
-    arrowxcolors::GLMakie.Observable{Vector{GLMakie.RGBA{Float32}}},
+    arrowcolorn::GLMakie.Observable{Vector{GLMakie.RGBAf}},
+    arrowcolors::GLMakie.Observable{Vector{GLMakie.RGBAf}},
+    arrowxcolorn::GLMakie.Observable{Vector{GLMakie.RGBAf}},
+    arrowxcolors::GLMakie.Observable{Vector{GLMakie.RGBAf}},
     ps::GLMakie.Observable{Vector{GLMakie.Point{3, Float32}}},
     ns::GLMakie.Observable{Vector{GLMakie.Point{3, Float32}}},
     psn::GLMakie.Observable{Vector{GLMakie.Point{3, Float32}}},
@@ -384,7 +384,7 @@ end
 
 Switch coordinate charts from one to the other.
 """
-switchcharts(chart::String, charttoggle::GLMakie.Observable{Any}) = begin
+function switchcharts(chart::String, charttoggle::GLMakie.Observable{Any})
     if chart == "S"
         charttoggle[] = true
         return "Switched coordinate charts from N to S."
@@ -401,7 +401,7 @@ end
         arrowx¹head, arrowx²head, arrowx³head, ghostps, ghostns,
         sliderx¹, sliderx², sliderx³, sliderx⁴; tolerance)
 
-Parallel transport a tangent vector along the given `path` and time progress `t`.
+Parallel transport a tangent vector along the given `path` and with the given time progress `t`.
 """
 function paralleltransport(path::Vector{String}, t::Float64, points::Dict{String, ℝ⁴}, chart::Bool, p₁::ℝ⁴,
     tail::GLMakie.Observable{GLMakie.Point{3, Float32}},
@@ -430,7 +430,7 @@ function paralleltransport(path::Vector{String}, t::Float64, points::Dict{String
     end
     if chart
         paralleltransport("o", "a", points, sliderx¹,  sliderx², sliderx³, sliderx⁴)
-        switchcharts("N")
+        switchcharts("N", toggle.active)
         paralleltransport("a", "o", points, sliderx¹, sliderx², sliderx³, sliderx⁴)
     end
 

@@ -41,7 +41,8 @@ end
     include("surface_tests.jl")
     include("whirl_tests.jl")
     include("basemap_tests.jl")
-    include("utilities_tests.jl")
+    include("cliffordbundle_tests.jl")
+    include("clutchingconstruction_tests.jl")
     include("tangentbundle_tests.jl")
     include("scene_tests.jl")
 end

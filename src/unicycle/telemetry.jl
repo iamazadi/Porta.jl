@@ -1,7 +1,5 @@
 import GeometryBasics
-import GLMakie.Quaternion
-import GLMakie.Point3f
-import GLMakie.Vec3f
+import GLMakie
 
 
 export make_sprite

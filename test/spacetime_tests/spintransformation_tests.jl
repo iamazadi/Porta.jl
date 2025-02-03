@@ -6,6 +6,8 @@ m = [α β; γ δ]
 a = SpinTransformation(α, β, γ, δ)
 b = SpinTransformation(v)
 c = SpinTransformation(m) # initialization with the spin-matrix
+@test typeof(vec(a)) <: Vector{<:Complex}
+@test length(vec(a)) == 4
 @test isapprox(a, b)
 @test isapprox(b, c)
 @test !isapprox(0.0, det(a)) # non-singularity

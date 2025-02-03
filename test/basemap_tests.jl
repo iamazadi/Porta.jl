@@ -32,3 +32,11 @@ update!(basemap, chart)
 _matrix = getsurface(basemap.observable, segments, segments)
 
 @test all([!isapprox(matrix[i, j], _matrix[i, j]) for i in 1:segments for j in 1:segments])
+
+# update all fields with one function call for efficiency
+matrix = getsurface(basemap.observable, segments, segments)
+x = ℍ(normalize(ℝ⁴(rand(4))))
+M = rand(4, 4)
+update!(basemap, x, gauge, M, chart)
+_matrix = getsurface(basemap.observable, segments, segments)
+@test all([!isapprox(matrix[i, j], _matrix[i, j]) for i in 1:segments for j in 1:segments])

@@ -61,3 +61,28 @@ q = normalize(ℍ(rand(4)))
 p = πmap(q)
 
 @test isapprox(norm(p), 1)
+
+
+## Connection 1-forms
+ϕ = rand()
+θ = rand()
+q = ℍ(exp(ϕ * K(1) + θ * K(2)))
+ϵ = 1e-5
+u, v, a = calculateconnection(q, ϵ = ϵ)
+
+@test typeof(u) <: ℝ⁴
+@test typeof(v) <: ℝ⁴
+@test typeof(a) <: Complex
+@test isapprox(real(a), 0.0)
+
+ϕ = rand() * 2π
+θ = rand() * 2π
+α = rand() * 2π
+γ = rand() * 2π
+point =  ℍ(exp(ϕ * K(1) + θ * K(2)) * exp(α * K(3)))
+X = ℍ(exp((ϕ + ϵ * sin(γ)) * K(1) + (θ + ϵ * cos(γ)) * K(2)) * exp(α * K(3))) - point
+X = normalize(ℝ⁴(vec(X)))
+v, a = calculateconnection(point, X, ϵ = ϵ)
+@test typeof(v) <: ℝ⁴
+@test typeof(a) <: Complex
+@test isapprox(real(a), 0.0)

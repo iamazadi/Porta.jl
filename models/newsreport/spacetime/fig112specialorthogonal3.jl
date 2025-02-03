@@ -136,9 +136,9 @@ end
 points["o"] = ℝ⁴(0.0, 0.0, 0.0, 0.0)
 
 # The arrows pointing to the current location of the frame
-arrowcolor = GLMakie.Observable([GLMakie.RGBA(1.0, 0.0, 0.0, 1.0)])
-arrowcolorn = GLMakie.Observable([GLMakie.RGBA(1.0, 0.0, 0.0, 1.0)])
-arrowcolors = GLMakie.Observable([GLMakie.RGBA(1.0, 0.0, 0.0, 1.0)])
+arrowcolor = GLMakie.Observable([GLMakie.RGBAf(1.0, 0.0, 0.0, 1.0)])
+arrowcolorn = GLMakie.Observable([GLMakie.RGBAf(1.0, 0.0, 0.0, 1.0)])
+arrowcolors = GLMakie.Observable([GLMakie.RGBAf(1.0, 0.0, 0.0, 1.0)])
 tail, head = GLMakie.Observable(GLMakie.Point3f(0.0, 0.0, 0.0)), GLMakie.Observable(GLMakie.Point3f(0.0, 0.0, 1.0))
 ps = GLMakie.@lift([$tail])
 ns = GLMakie.@lift([$head])
@@ -166,7 +166,6 @@ GLMakie.arrows!(lscenes,
 )
 
 # The frames
-tail = GLMakie.Observable(GLMakie.Point3f(0.0, 0.0, 0.0))
 tailn = GLMakie.Observable(GLMakie.Point3f(0.0, 0.0, 0.0))
 tails = GLMakie.Observable(GLMakie.Point3f(0.0, 0.0, 0.0))
 arrowx¹head = GLMakie.Observable(GLMakie.Point3f(x̂))
