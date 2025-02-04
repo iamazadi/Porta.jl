@@ -2,6 +2,8 @@ r = ℍ(rand() * 2π, normalize(ℝ³(rand(3))))
 t = ℝ³(rand(3))
 q = Dualquaternion(r, t)
 
+@test typeof(vec(q)) <: Vector{Float64}
+@test length(vec(q)) == 8
 @test isapprox(conj(conj(q)), q)
 
 # Unit condition
@@ -11,8 +13,12 @@ h = Dualquaternion(g, q)
 ĥ = normalize(h)
 p = 2Dualquaternion(h)
 
-# unit quaternions representing points on a unit 3-sphere
+# unit quaternions representing points in the unit 3-sphere
 @test isapprox(1.0, norm(ĥ)[1])
+
+scalar = rand()
+@test isapprox(scalar, norm(scalar * ĥ)[1])
+
 # vector imag(ĥ) in the tangent space of S³ at real(ĥ) is perpendicular to the normal real(ĥ)
 @test isapprox(0.0, dot(real(ĥ), imag(ĥ)), atol = TOLERANCE)
 @test !isapprox(h, p)

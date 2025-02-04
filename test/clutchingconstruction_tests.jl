@@ -103,8 +103,6 @@ lookat = ℝ³(0.0, 0.0, 0.0)
 lookatn = ℝ³(0.0, 0.0, 0.0)
 lookats = ℝ³(0.0, 0.0, 0.0)
 up = ℝ³(0.0, 0.0, 1.0)
-message = resetcamera(lscene, lscenen, lscenes, eyeposition, eyepositionn, eyepositions, lookat, lookatn, lookats, up)
-@test typeof(message) <: String
 
 ## test markframe
 name = rand(set)
@@ -166,11 +164,6 @@ updatepoint(point, p₀, p₁, toggle.active[], tangentvector, tail, tailn, tail
 @test all([!isapprox(p₁[], initialp₁), !isapprox(p₀[], initialp₀)])
 
 
-## test rotatecamera
-message = rotatecamera(timestep, eyeposition, eyepositionn, eyepositions, lookat, lookatn, lookats, up, lscene, lscenen, lscenes)
-@test typeof(message) <: String
-
-
 ## test labelpoint
 label = "o"
 point = ℝ⁴(rand(4))
@@ -194,8 +187,8 @@ q₁ = Dualquaternion(ℍ(π / 4, ẑ) * ℍ(π / 2, x̂))
 q₂ = Dualquaternion(ℍ(-π / 4, ẑ) * ℍ(π / 2, x̂))
 smallradius = rand()
 bigradius = smallradius + rand()
-toruscolor = GLMakie.RGBAf(0.0, 0.0, 0.0, 0.0)
-toruscolorarray = GLMakie.Observable(fill(toruscolor, segments, segments))
+toruscolor = RGBAf(0.0, 0.0, 0.0, 0.0)
+toruscolorarray = Observable(fill(toruscolor, segments, segments))
 configurationq = Dualquaternion(ℝ³(0.0, 0.0, 0.0))
 torus = buildsurface(lscene, constructtorus(configurationq, smallradius, bigradius, segments = segments), toruscolorarray)
 torusn = buildsurface(lscenen, constructtorus(configurationq, smallradius, bigradius, segments = segments), toruscolorarray)

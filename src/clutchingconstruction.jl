@@ -1,11 +1,9 @@
 export showtori
 export getpoint
 export paralleltransport
-export resetcamera
 export markframe
 export updateui
 export updatepoint
-export rotatecamera
 export labelpoint
 export switchcharts
 export rotatetorus
@@ -81,20 +79,6 @@ function paralleltransport(source, sink, points::Dict{String, ℝ⁴}, sliderx¹
         paralleltransport(source, sink, t, points, sliderx¹, sliderx², sliderx³, sliderx⁴)
     end
     "parallel transport the frame from point `$source` to '$sink'"
-end
-
-
-"""
-    resetcamera(lscene, lscenen, lscenes, eyeposition, eyepositionn, eyepositions, lookat, lookatn, lookats, up)
-
-Resets the eyeposition, look at and up vactors of cameras (caused by creating objects in the scene.)
-"""
-function resetcamera(lscene::GLMakie.LScene, lscenen::GLMakie.LScene, lscenes::GLMakie.LScene,
-    eyeposition::ℝ³, eyepositionn::ℝ³, eyepositions::ℝ³, lookat::ℝ³, lookatn::ℝ³, lookats::ℝ³, up::ℝ³)
-    updatecamera!(lscene, eyeposition, lookat, up)
-    updatecamera!(lscenen, eyeposition, lookat, up)
-    updatecamera!(lscenes, eyeposition, lookat, up)
-    "Reset 'the eyeposition', 'look at' and 'up' vactors of cameras."
 end
 
 
@@ -242,22 +226,6 @@ function updateui(chart::Bool, p₁::ℝ⁴,
     arrowx³head[] = GLMakie.Point3f(rotate(ℝ³(0.0, 0.0, 1.0), g))
     ghostps[] = [tail[], tail[], tail[]]
     ghostns[] = [arrowx¹head[], arrowx²head[], arrowx³head[]]
-end
-
-
-"""
-    rotatecamera(step, eyeposition, eyepositionn, eyepositions, lookat, lookatn, lookats, up, lscene, lscenen, lscenes)
-
-Resets the eyeposition, look at and up vactors of cameras caused by creating objects in the scene,
-with the given `step` which determines the rotation degree.
-"""
-function rotatecamera(step::Float64, eyeposition::ℝ³, eyepositionn::ℝ³, eyepositions::ℝ³,
-    lookat::ℝ³, lookatn::ℝ³, lookats::ℝ³, up::ℝ³, lscene::GLMakie.LScene, lscenen::GLMakie.LScene, lscenes::GLMakie.LScene)
-    q = ℍ(step * 2π, ℝ³(0.0, 0.0, 1.0))
-    updatecamera!(lscene, rotate(eyeposition, q), lookat, up)
-    updatecamera!(lscenen, rotate(eyepositionn, q), lookatn, up)
-    updatecamera!(lscenes, rotate(eyepositions, q), lookats, up)
-    "Rotate the camera about the ẑ axis."
 end
 
 

@@ -23,6 +23,17 @@ v₁ = ℍ(rand(4))
 v₂ = ℍ(rand(4))
 z = ℍ(0.0, 0.0, 0.0, 0.0)
 α, β = rand(2)
+
+d = rand([2, 4])
+@test typeof(Identity(d)) <: Matrix{Float64}
+@test size(Identity(d)) == (d, d)
+
+@test typeof(mat3(u)) <: Matrix{Float64}
+@test size(mat3(u)) == (3, 3)
+
+@test typeof(mat4(u)) <: Matrix{Float64}
+@test size(mat4(u)) == (4, 4)
+
 @test isapprox(dot(u, v), dot(v, u)) # Symmetric
 @test isapprox(dot(u, α * v₁ + β * v₂), α * dot(u, v₁) + β * dot(u, v₂)) # Linear
 @test dot(u, u) ≥ 0 # Positive semidefinite I
