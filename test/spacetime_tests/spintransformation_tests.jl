@@ -27,11 +27,11 @@ c = SpinTransformation(convert(Matrix{Complex}, adjoint(mat(a))))
 @test isapprox(mat(a * c), [Complex(1) 0; 0 Complex(1)]) # identity
 @test isapprox(mat(inverse(c)), adjoint(mat(c))) # unitary
 
-identity = SpinTransformation(Complex.([1.0 0.0; 0.0 1.0]))
-@test isapprox(identity.α, Complex(1.0)) || isapprox(identity.α, -Complex(1.0)) # normalization
-@test isapprox(identity.α, identity.δ) # identity matrix
-@test isapprox(identity.β, identity.γ) # identity matrix
-@test isapprox(identity.β, Complex(0.0)) # identity matrix
+identitytransformation = SpinTransformation(Complex.([1.0 0.0; 0.0 1.0]))
+@test isapprox(identitytransformation.α, Complex(1.0)) || isapprox(identitytransformation.α, -Complex(1.0)) # normalization
+@test isapprox(identitytransformation.α, identitytransformation.δ) # identity matrix
+@test isapprox(identitytransformation.β, identitytransformation.γ) # identity matrix
+@test isapprox(identitytransformation.β, Complex(0.0)) # identity matrix
 
 
 ## check the implication of constructing spacetime vectors with spin vectors

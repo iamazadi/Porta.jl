@@ -359,3 +359,8 @@ _{derivative}\left( 0, t, 1 \right) \newline
 0 \newline
 \end{array}
 \right]``
+
+
+## Reference
+Yohanes Daud, Abdullah Al Mamun and Jian-Xin Xu, *Dynamic modeling and characteristics analysis of
+lateral-pendulum unicycle robot*, Robotica (2017) volume 35, pp. 537–568. © Cambridge University Press 2015, doi:10.1017/S0263574715000703.

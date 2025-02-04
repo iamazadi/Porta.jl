@@ -49,14 +49,13 @@ end
 
 
 """
-    gettextrotation(scene)
+    gettextrotation(lscene)
 
-Calculate the orientation of the camera of the given `scene` for rotating text in an automatic way.
+Calculate the orientation of the camera of the given `lscene` for rotating text in an automatic way.
 """
-gettextrotation(scene::GLMakie.LScene) = begin
-    eyeposition_observable = scene.scene.camera.eyeposition
-    lookat_observable = scene.scene.camera.lookat
-    rotationaxis = GLMakie.@lift(normalize(ℝ³(Float64.(vec($eyeposition_observable - $lookat_observable))...)))
+gettextrotation(lscene::GLMakie.LScene) = begin
+    eyeposition_observable = lscene.scene.camera.eyeposition
+    rotationaxis = GLMakie.@lift(normalize(ℝ³(Float64.(vec($(lscene.scene.camera.view_direction)))...)))
     rotationangle = GLMakie.@lift(Float64(π / 2 + atan(($eyeposition_observable)[2], ($eyeposition_observable)[1])))
     GLMakie.@lift(GLMakie.Quaternion(ℍ($rotationangle, $rotationaxis) * ℍ(getrotation(ℝ³(0.0, 0.0, 1.0), $rotationaxis)...)))
 end

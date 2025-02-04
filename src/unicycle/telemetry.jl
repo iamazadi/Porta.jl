@@ -44,7 +44,7 @@ function make_sprite(scene::GLMakie.Scene, parent::GLMakie.Scene, origin::GLMaki
         GLMakie.rotate!(child, GLMakie.Quaternion(rotation))
         GLMakie.scale!(child, scale, scale, scale)
         centered = stl.position .- GLMakie.Point3f(center_of_mass...)
-        stl = GeometryBasics.Mesh(GeometryBasics.meta(centered; normals=stl.normals), GeometryBasics.faces(stl))
+        stl = GeometryBasics.mesh(stl, position = centered)
         GLMakie.translate!(child, origin) # translates the visual mesh in the viewport
     else
         # if we don't have an origin, we need to correct for the parents translation
