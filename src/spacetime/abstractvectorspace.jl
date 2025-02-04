@@ -3,6 +3,7 @@ import Base.show
 import Base.isapprox
 import Base.length
 import Base.transpose
+import LinearAlgebra.normalize
 
 
 export VectorSpace

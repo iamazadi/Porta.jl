@@ -1,6 +1,5 @@
-import FileIO
-import GLMakie
-import LinearAlgebra
+using GLMakie
+using LinearAlgebra
 using Porta
 
 
@@ -8,7 +7,7 @@ figuresize = (4096, 2160)
 segments = 60
 frames_number = 360
 modelname = "fig11transformations"
-M = I(4)
+M = Identity(4)
 x̂ = ℝ³([1.0; 0.0; 0.0])
 ŷ = ℝ³([0.0; 1.0; 0.0])
 ẑ = ℝ³([0.0; 0.0; 1.0])
@@ -21,26 +20,26 @@ t = 𝕍(1.0, 0.0, 0.0, 0.0)
 x = 𝕍(0.0, 1.0, 0.0, 0.0)
 y = 𝕍(0.0, 0.0, 1.0, 0.0)
 z = 𝕍(0.0, 0.0, 0.0, 1.0)
-v = 𝕍(LinearAlgebra.normalize(rand(4)))
+v = 𝕍(normalize(rand(4)))
 
-makefigure() = GLMakie.Figure(size = figuresize)
-fig = GLMakie.with_theme(makefigure, GLMakie.theme_black())
-pl = GLMakie.PointLight(GLMakie.Point3f(0), GLMakie.RGBf(0.0862, 0.0862, 0.0862))
-al = GLMakie.AmbientLight(GLMakie.RGBf(0.9, 0.9, 0.9))
-lscene = GLMakie.LScene(fig[1, 1], show_axis=false, scenekw = (lights = [pl, al], clear=true, backgroundcolor = :white))
+makefigure() = Figure(size = figuresize)
+fig = with_theme(makefigure, theme_black())
+pl = PointLight(Point3f(0), RGBf(0.0862, 0.0862, 0.0862))
+al = AmbientLight(RGBf(0.9, 0.9, 0.9))
+lscene = LScene(fig[1, 1], show_axis=false, scenekw = (lights = [pl, al], clear=true, backgroundcolor = :white))
 
-arrowsize = GLMakie.Vec3f(0.06, 0.08, 0.1)
+arrowsize = Vec3f(0.06, 0.08, 0.1)
 linewidth = 0.04
-tail = GLMakie.Observable(GLMakie.Point3f(0.0, 0.0, 0.0))
-thead = GLMakie.Observable(GLMakie.Point3f(project(ℍ(vec(t)))))
-xhead = GLMakie.Observable(GLMakie.Point3f(project(ℍ(vec(x)))))
-yhead = GLMakie.Observable(GLMakie.Point3f(project(ℍ(vec(y)))))
-zhead = GLMakie.Observable(GLMakie.Point3f(project(ℍ(vec(z)))))
-vhead = GLMakie.Observable(GLMakie.Point3f(project(ℍ(vec(v)))))
-ps = GLMakie.@lift([$tail, $tail, $tail, $tail, $tail])
-ns = GLMakie.@lift([$thead, $xhead, $yhead, $zhead, $vhead])
+tail = Observable(Point3f(0.0, 0.0, 0.0))
+thead = Observable(Point3f(project(ℍ(vec(t)))))
+xhead = Observable(Point3f(project(ℍ(vec(x)))))
+yhead = Observable(Point3f(project(ℍ(vec(y)))))
+zhead = Observable(Point3f(project(ℍ(vec(z)))))
+vhead = Observable(Point3f(project(ℍ(vec(v)))))
+ps = @lift([$tail, $tail, $tail, $tail, $tail])
+ns = @lift([$thead, $xhead, $yhead, $zhead, $vhead])
 colorants = [:red, :blue, :green, :orange, :black]
-GLMakie.arrows!(lscene,
+arrows!(lscene,
     ps, ns, fxaa = true, # turn on anti-aliasing
     color = colorants,
     linewidth = linewidth, arrowsize = arrowsize,
@@ -48,13 +47,9 @@ GLMakie.arrows!(lscene,
 )
 
 titles = ["O", "g₀", "g₁", "g₂", "g₃", "V"]
-eyeposition_observable = lscene.scene.camera.eyeposition
-lookat_observable = lscene.scene.camera.lookat
-rotationaxis = GLMakie.@lift(normalize(ℝ³(Float64.([vec($eyeposition_observable)...] - [vec($lookat_observable)...])...)))
-rotationangle = GLMakie.@lift(Float64(π / 2 + atan(($eyeposition_observable)[2], ($eyeposition_observable)[1])))
-rotation = GLMakie.@lift(GLMakie.Quaternion(ℍ($rotationangle, $rotationaxis) * ℍ(getrotation(ẑ, $rotationaxis)...)))
-GLMakie.text!(lscene,
-    GLMakie.@lift(map(x -> GLMakie.Point3f((isnan(x) ? ẑ : x)), [$tail, $thead, $xhead, $yhead, $zhead, $vhead])),
+rotation = gettextrotation(lscene)
+text!(lscene,
+    @lift(map(x -> Point3f((isnan(x) ? ẑ : x)), [$tail, $thead, $xhead, $yhead, $zhead, $vhead])),
     text = titles,
     color = [:gold, colorants...],
     rotation = rotation,
@@ -79,21 +74,18 @@ animate(frame::Int) = begin
     y_transformed = M * ℍ(vec(y))
     z_transformed = M * ℍ(vec(z))
     v_transformed = M * ℍ(vec(v))
-    thead[] = GLMakie.Point3f(project(t_transformed))
-    xhead[] = GLMakie.Point3f(project(x_transformed))
-    yhead[] = GLMakie.Point3f(project(y_transformed))
-    zhead[] = GLMakie.Point3f(project(z_transformed))
-    vhead[] = GLMakie.Point3f(project(v_transformed))
+    thead[] = Point3f(project(t_transformed))
+    xhead[] = Point3f(project(x_transformed))
+    yhead[] = Point3f(project(y_transformed))
+    zhead[] = Point3f(project(z_transformed))
+    vhead[] = Point3f(project(v_transformed))
 
-    updatecamera(lscene, eyeposition, lookat, up)
+    updatecamera!(lscene, eyeposition, lookat, up)
 end
 
 
 animate(1)
 
-
-GLMakie.record(fig, joinpath("gallery", "$modelname.mp4"), 1:frames_number) do frame
+record(fig, joinpath("gallery", "$modelname.mp4"), 1:frames_number) do frame
     animate(frame)
 end
-
-# GLMakie.save(joinpath("gallery", "$(modelname)01.png"), fig)
