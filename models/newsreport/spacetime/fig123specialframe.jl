@@ -1,6 +1,5 @@
 using FileIO
 using GLMakie
-import LinearAlgebra
 using Porta
 
 

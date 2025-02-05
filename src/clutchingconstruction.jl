@@ -326,7 +326,10 @@ function labelpoint(name::String, point::ℝ⁴, islabeled::Dict{String, Bool}, 
     rotationn::GLMakie.Observable{GLMakie.Quaternion{Float64}},
     rotations::GLMakie.Observable{GLMakie.Quaternion{Float64}},
     fontsize::Float64, eyeposition::ℝ³, eyepositionn::ℝ³, eyepositions::ℝ³, lookat::ℝ³, lookatn::ℝ³, lookats::ℝ³, up::ℝ³)
-    projectedpoint = GLMakie.Point3f(project(point))
+    projectedpoint = GLMakie.Point3f(0.0, 0.0, 0.0)
+    if isapprox(norm(point), 1.0)
+        projectedpoint = GLMakie.Point3f(project(point))
+    end
     if !get(islabeled, name, false)
         visible = name ∈ set1 ? set1visible : set2visible
         visiblen = GLMakie.@lift($visible && !$(charttoggle))

@@ -1,6 +1,6 @@
 using FileIO
 using GLMakie
-import LinearAlgebra
+using LinearAlgebra
 using Porta
 
 
@@ -102,7 +102,7 @@ for (i, scale1) in enumerate(collect(range(0.0, stop = 1.0, length = segments)))
     _κlinepoints = Observable(Point3f[])
     _κlinecolors = Observable(Int[])
     for (j, scale2) in enumerate(collect(range(0.0, stop = 1.0, length = segments)))
-        κvector = LinearAlgebra.normalize(vec(scale1 * κv + scale2 * κ′v))
+        κvector = normalize(vec(scale1 * κv + scale2 * κ′v))
         κpoint = Point3f(projectnocompression(ℍ(κvector)))
         push!(_κlinepoints[], κpoint)
         push!(_κlinecolors[], i + j)
@@ -122,9 +122,9 @@ northpole = Observable(Point3f(0.0, 0.0, 1.0))
 ps = @lift([$origin, $κobservable,
             $origin, $κ′observable,
             $origin, $κ″observable])
-ns = @lift([$κobservable, LinearAlgebra.normalize($κ′observable - $κobservable),
-            $κ′observable, LinearAlgebra.normalize($κ″observable - $κ′observable),
-            $κ″observable, LinearAlgebra.normalize($κobservable - $κ″observable)])
+ns = @lift([$κobservable, normalize($κ′observable - $κobservable),
+            $κ′observable, normalize($κ″observable - $κ′observable),
+            $κ″observable, normalize($κobservable - $κ″observable)])
 colorants = [:red, :green, :blue, :black]
 arrows!(lscene,
     ps, ns, fxaa = true, # turn on anti-aliasing
@@ -159,11 +159,11 @@ meshscatter!(lscene, κ″observable, markersize = 0.05, color = colorants[3])
 segmentP = @lift([$northpole, $κobservable])
 segmentP′ = @lift([$northpole, $κ′observable])
 segmentP″ = @lift([$northpole, $κ″observable])
-segmentcolors = collect(1:segments)
+segmentcolors = collect(1:2)
 linewidth = 8.0
-lines!(lscene, segmentP, linewidth = 2linewidth, color = segmentcolors, colormap = :plasma, colorrange = (1, segments), transparency = false)
-lines!(lscene, segmentP′, linewidth = 2linewidth, color = segmentcolors, colormap = :plasma, colorrange = (1, segments), transparency = false)
-lines!(lscene, segmentP″, linewidth = 2linewidth, color = segmentcolors, colormap = :plasma, colorrange = (1, segments), transparency = false)
+lines!(lscene, segmentP, linewidth = 2linewidth, color = segmentcolors, colormap = :plasma, colorrange = (1, 2), transparency = false)
+lines!(lscene, segmentP′, linewidth = 2linewidth, color = segmentcolors, colormap = :plasma, colorrange = (1, 2), transparency = false)
+lines!(lscene, segmentP″, linewidth = 2linewidth, color = segmentcolors, colormap = :plasma, colorrange = (1, 2), transparency = false)
 
 trajectorycolor = Observable(Int[])
 κtrajectory = Observable(Point3f[])
@@ -190,9 +190,9 @@ animate(frame::Int) = begin
     r, θ, ϕ = convert_to_geographic(ℝ³(κ″))
     κ″transformed = 𝕍( vec(M * q * ℍ(exp(ϕ / 2 * K(1) + θ * K(2)) * exp(gauge2 * K(3)))))
     northpole[] = Point3f(project(M * q * ℍ(exp((float(0.0) / 2) * K(1) + float(π / 2) * K(2)) * exp(gauge2 * K(3)))))
-    κflagplanematrix = makeflagplane(κtransformed, 𝕍( LinearAlgebra.normalize(vec(κ′transformed - κtransformed))), T, compressedprojection = true, segments = segments)
+    κflagplanematrix = makeflagplane(κtransformed, 𝕍( normalize(vec(κ′transformed - κtransformed))), T, compressedprojection = true, segments = segments)
     updatesurface!(κflagplanematrix, κflagplaneobservable)
-    κflagplanecolor[] = [RGBAf(convert_hsvtorgb([360.0 * progress; 1.0; 1.0])..., 0.9) for i in 1:segments, j in 1:segments]
+    κflagplanecolor[] = [RGBAf(convert_hsvtorgb([359.0 * progress; 1.0; 1.0])..., 0.9) for i in 1:segments, j in 1:segments]
     κobservable[] = Point3f(project(normalize(ℍ(vec(κtransformed)))))
     κ′observable[] = Point3f(project(normalize(ℍ(vec(κ′transformed)))))
     κ″observable[] = Point3f(project(normalize(ℍ(vec(κ″transformed)))))
@@ -207,7 +207,7 @@ animate(frame::Int) = begin
     if (frame % 10) == 0
         arrows!(lscene,
                 [κobservable[], κ′observable[], κ″observable[]],
-                0.5 .* LinearAlgebra.normalize.([κ′observable[] - κobservable[], κ″observable[] - κ′observable[], κobservable[] - κ″observable[]]),
+                0.5 .* normalize.([κ′observable[] - κobservable[], κ″observable[] - κ′observable[], κobservable[] - κ″observable[]]),
                 fxaa = true, # turn on anti-aliasing
                 color = [colorants[1], colorants[2], colorants[3]],
                 linewidth = arrowlinewidth * 0.5, arrowsize = arrowsize .* 0.5,
@@ -217,7 +217,7 @@ animate(frame::Int) = begin
         _κlinepoints = Point3f[]
         _κlinecolors = Int[]
         for (j, scale2) in enumerate(collect(range(0.0, stop = T, length = segments)))
-            κvector = normalize(ℍ(vec(scale1 * κtransformed + scale2 * 𝕍( LinearAlgebra.normalize(vec(κ′transformed - κtransformed))))))
+            κvector = normalize(ℍ(vec(scale1 * κtransformed + scale2 * 𝕍( normalize(vec(κ′transformed - κtransformed))))))
             κpoint = Point3f(project(κvector))
             push!(_κlinepoints, κpoint)
             push!(_κlinecolors, i + j)

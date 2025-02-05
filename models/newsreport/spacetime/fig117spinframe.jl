@@ -1,6 +1,6 @@
 using FileIO
 using GLMakie
-import LinearAlgebra
+using LinearAlgebra
 using Porta
 
 
@@ -34,8 +34,8 @@ x = 𝕍( 0.0, 1.0, 0.0, 0.0)
 y = 𝕍( 0.0, 0.0, 1.0, 0.0)
 z = 𝕍( 0.0, 0.0, 0.0, 1.0)
 
-οv = 𝕍( LinearAlgebra.normalize(vec(𝕍(ο))))
-ιv = 𝕍( LinearAlgebra.normalize(vec(𝕍(ι))))
+οv = 𝕍( normalize(vec(𝕍(ο))))
+ιv = 𝕍( normalize(vec(𝕍(ι))))
 
 generate() = 2rand() - 1 + im * (2rand() - 1)
 κ = SpinVector(generate(), generate(), timesign)
@@ -80,8 +80,8 @@ for (i, scale1) in enumerate(collection)
     _οlinecolors = Observable(Int[])
     _ιlinecolors = Observable(Int[])
     for (j, scale2) in enumerate(collection)
-        οvector = LinearAlgebra.normalize(vec(scale1 * οv + scale2 * x))
-        ιvector = LinearAlgebra.normalize(vec(scale1 * ιv + scale2 * -x))
+        οvector = normalize(vec(scale1 * οv + scale2 * x))
+        ιvector = normalize(vec(scale1 * ιv + scale2 * -x))
         οpoint = Point3f(vec(project(ℍ(οvector)))...)
         ιpoint = Point3f(vec(project(ℍ(ιvector)))...)
         push!(_οlinepoints[], οpoint)
@@ -154,8 +154,8 @@ animate(frame::Int) = begin
         _οlinecolors = Int[]
         _ιlinecolors = Int[]
         for (j, scale2) in enumerate(collection)
-            οvector = normalize(ℍ(vec(scale1 * οv_transformed + scale2 * 𝕍(LinearAlgebra.normalize(vec(οv_transformed - ο′v_transformed))))))
-            ιvector = normalize(ℍ(vec(scale1 * ιv_transformed + scale2 * 𝕍(LinearAlgebra.normalize(vec(ιv_transformed - ι′v_transformed))))))
+            οvector = normalize(ℍ(vec(scale1 * οv_transformed + scale2 * 𝕍(normalize(vec(οv_transformed - ο′v_transformed))))))
+            ιvector = normalize(ℍ(vec(scale1 * ιv_transformed + scale2 * 𝕍(normalize(vec(ιv_transformed - ι′v_transformed))))))
             οpoint = Point3f(vec(project(οvector))...)
             ιpoint = Point3f(vec(project(ιvector))...)
             push!(_οlinepoints, οpoint)
@@ -176,19 +176,18 @@ animate(frame::Int) = begin
     spherematrix = makesphere(M, Float64(timesign))
     updatesurface!(spherematrix, sphereobservable)
 
-    οflagplanematrix = makeflagplane(οv_transformed, 𝕍(LinearAlgebra.normalize(vec(ο′v_transformed - οv_transformed))), Float64(timesign), compressedprojection = true, segments = segments)
-    ιflagplanematrix = makeflagplane(ιv_transformed, 𝕍(LinearAlgebra.normalize(vec(ι′v_transformed - ιv_transformed))), Float64(timesign), compressedprojection = true, segments = segments)
+    οflagplanematrix = makeflagplane(οv_transformed, 𝕍(normalize(vec(ο′v_transformed - οv_transformed))), Float64(timesign), compressedprojection = true, segments = segments)
+    ιflagplanematrix = makeflagplane(ιv_transformed, 𝕍(normalize(vec(ι′v_transformed - ιv_transformed))), Float64(timesign), compressedprojection = true, segments = segments)
     updatesurface!(οflagplanematrix, οflagplaneobservable)
     updatesurface!(ιflagplanematrix, ιflagplaneobservable)
-    οflagplanecolor[] = fill(RGBAf(convert_hsvtorgb([progress * 360.0; 1.0; 1.0])..., 0.8), segments, segments)
-    ιflagplanecolor[] = fill(RGBAf(convert_hsvtorgb([360.0 - (progress * 360.0); 1.0; 1.0])..., 0.8), segments, segments)
+    οflagplanecolor[] = fill(RGBAf(convert_hsvtorgb([progress * 359.0; 1.0; 1.0])..., 0.8), segments, segments)
+    ιflagplanecolor[] = fill(RGBAf(convert_hsvtorgb([359.0 - (progress * 359.0); 1.0; 1.0])..., 0.8), segments, segments)
 
     updatecamera!(lscene, eyeposition, lookat, up)
 end
 
 
 animate(1)
-
 
 record(fig, joinpath("gallery", "$modelname.mp4"), 1:frames_number) do frame
     animate(frame)

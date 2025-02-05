@@ -1,6 +1,6 @@
 using FileIO
 using GLMakie
-import LinearAlgebra
+using LinearAlgebra
 using Porta
 
 
@@ -55,9 +55,9 @@ generate() = 2rand() - 1 + im * (2rand() - 1)
 ωv = 𝕍( normalize(ℝ⁴(𝕍( ω))))
 ω′v = 𝕍( normalize(ℝ⁴(𝕍( ω′))))
 
-u = 𝕍(LinearAlgebra.normalize(rand(4)))
-v = 𝕍(LinearAlgebra.normalize(rand(4)))
-p = 𝕍(LinearAlgebra.normalize(vec(u + v)))
+u = 𝕍(normalize(rand(4)))
+v = 𝕍(normalize(rand(4)))
+p = 𝕍(normalize(vec(u + v)))
 
 tail = Observable(Point3f(0.0, 0.0, 0.0))
 κhead = Observable(Point3f(project(ℝ⁴(κv))))
@@ -136,9 +136,9 @@ animate(frame::Int) = begin
     orthogonalplanematrix = makeflagplane(𝕍( ê₃), 𝕍( ê₄), M)
     updatesurface!(planematrix, planeobservable)
     updatesurface!(orthogonalplanematrix, orthogonalplaneobservable)
-    hue = Float64(frame) / Float64(frames_number) * 360.0
+    hue = Float64(frame) / Float64(frames_number) * 359.0
     planecolor[] = fill(RGBAf(convert_hsvtorgb([hue; 0.5; 0.5])..., 0.5), segments, segments)
-    orthogonalplanecolor[] = fill(RGBAf(convert_hsvtorgb([360.0 - hue; 0.5; 0.5])..., 0.5), segments, segments)
+    orthogonalplanecolor[] = fill(RGBAf(convert_hsvtorgb([359.0 - hue; 0.5; 0.5])..., 0.5), segments, segments)
     κhead[] = Point3f(project(ℝ⁴(_κv)))
     ωhead[] = Point3f(project(ℝ⁴(_ωv)))
     uhead[] = Point3f(project(u))

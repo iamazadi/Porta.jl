@@ -3,6 +3,7 @@ import Base.:-
 import Base.:*
 import GLMakie.Point3f
 import GLMakie.Vec3f
+import LinearAlgebra.cross
 
 
 export ℝ³

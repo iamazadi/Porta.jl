@@ -1,7 +1,5 @@
 using FileIO
 using GLMakie
-import LinearAlgebra
-import Porta.project
 using Porta
 
 
@@ -94,7 +92,6 @@ Qraycolors2 = Observable(Int[])
 Qraylines2 = lines!(lscene, Qraypoints2, linewidth = 2linewidth, color = Qraycolors2, colormap = :plasma, transparency = false)
 
 previousstage = 1
-
 
 timesign = -1
 ο = SpinVector([Complex(1.0); Complex(0.0)], timesign)
@@ -279,7 +276,6 @@ end
 
 
 animate(1)
-
 
 record(fig, joinpath("gallery", "$modelname.mp4"), 1:frames_number) do frame
     animate(frame)

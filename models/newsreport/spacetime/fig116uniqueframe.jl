@@ -1,6 +1,6 @@
 using FileIO
 using GLMakie
-import LinearAlgebra
+using LinearAlgebra
 using Porta
 
 
@@ -57,7 +57,7 @@ Bhead = @lift(Point3f(normalize(project(ℍ($B)))))
 Chead = @lift(Point3f(normalize(project(ℍ($C)))))
 Dhead = @lift(Point3f(normalize(project(ℍ($D)))))
 ps = @lift([$origin, $κobservable, $κobservable, $κobservable, $κobservable, $κobservable])
-ns = @lift([$κobservable, LinearAlgebra.normalize($κ′observable - $κobservable), $Ahead, $Bhead, $Chead, $Dhead])
+ns = @lift([$κobservable, normalize($κ′observable - $κobservable), $Ahead, $Bhead, $Chead, $Dhead])
 colorants = [:black, :gray, :red, :green, :blue, :orange]
 arrows!(lscene,
     ps, ns, fxaa = true, # turn on anti-aliasing
@@ -112,7 +112,7 @@ animate(frame::Int) = begin
     v = normalize(ℝ⁴(1.0, 1.0, 1.0, 1.0))
     D[] = normalize(v - dot(v, A[]) * A[] - dot(v, B[]) * B[] - dot(v, C[]) * C[])
 
-    κflagplanecolor[] = [RGBAf(convert_hsvtorgb([360.0 * progress; 1.0; 1.0])..., 0.8) for i in 1:segments, j in 1:segments]
+    κflagplanecolor[] = [RGBAf(convert_hsvtorgb([359.0 * progress; 1.0; 1.0])..., 0.8) for i in 1:segments, j in 1:segments]
 
     spherematrix = makesphere(a, b, T, compressedprojection = true, segments = segments)
     updatesurface!(spherematrix, sphereobservable)

@@ -1,6 +1,5 @@
 using FileIO
 using GLMakie
-import LinearAlgebra
 using Porta
 
 
@@ -174,7 +173,6 @@ end
 
 
 animate(1)
-
 
 record(fig, joinpath("gallery", "$modelname.mp4"), 1:frames_number) do frame
     animate(frame)

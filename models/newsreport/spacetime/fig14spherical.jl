@@ -1,6 +1,5 @@
-import FileIO
-import GLMakie
-import LinearAlgebra
+using FileIO
+using GLMakie
 using Porta
 
 
@@ -32,13 +31,13 @@ for i in eachindex(countries["name"])
     end
 end
 
-makefigure() = GLMakie.Figure(size = figuresize)
-fig = GLMakie.with_theme(makefigure, GLMakie.theme_black())
-pl = GLMakie.PointLight(GLMakie.Point3f(0), GLMakie.RGBf(0.0862, 0.0862, 0.0862))
-al = GLMakie.AmbientLight(GLMakie.RGBf(0.9, 0.9, 0.9))
-lscene = GLMakie.LScene(fig[1, 1], show_axis=false, scenekw = (lights = [pl, al], clear=true, backgroundcolor = :white))
+makefigure() = Figure(size = figuresize)
+fig = with_theme(makefigure, theme_black())
+pl = PointLight(Point3f(0), RGBf(0.0862, 0.0862, 0.0862))
+al = AmbientLight(RGBf(0.9, 0.9, 0.9))
+lscene = LScene(fig[1, 1], show_axis=false, scenekw = (lights = [pl, al], clear=true, backgroundcolor = :white))
 
-mask = FileIO.load("data/basemap_mask.png")
+mask = load("data/basemap_mask.png")
 
 lspaceθ = range(π / 2, stop = -π / 2, length = segments)
 lspaceϕ = range(-π, stop = float(π), length = segments)
@@ -52,73 +51,69 @@ planeobservable = buildsurface(lscene, planematrix, mask, transparency = true)
 planematrix = [project(convert_to_cartesian([1.0; θ; ϕ])) for θ in lspaceθ, ϕ in lspaceϕ]
 updatesurface!(planematrix, planeobservable)
 
-Ppoints = GLMakie.Observable(GLMakie.Point3f[])
-Ppoints′ = GLMakie.Observable(GLMakie.Point3f[])
-Pcolors = GLMakie.Observable(Int[])
-Pcolors′ = GLMakie.Observable(Int[])
+Ppoints = Observable(Point3f[])
+Ppoints′ = Observable(Point3f[])
+Pcolors = Observable(Int[])
+Pcolors′ = Observable(Int[])
 stage = 1
-Plines = GLMakie.lines!(lscene, Ppoints, linewidth = 2linewidth, color = Pcolors, colormap = :rainbow, colorrange = (1, length(boundary_nodes[stage])), transparency = false)
-Plines′ = GLMakie.lines!(lscene, Ppoints′, linewidth = 2linewidth, color = Pcolors′, colormap = :rainbow, colorrange = (1, length(boundary_nodes[stage])), transparency = false)
+Plines = lines!(lscene, Ppoints, linewidth = 2linewidth, color = Pcolors, colormap = :rainbow, colorrange = (1, length(boundary_nodes[stage])), transparency = false)
+Plines′ = lines!(lscene, Ppoints′, linewidth = 2linewidth, color = Pcolors′, colormap = :rainbow, colorrange = (1, length(boundary_nodes[stage])), transparency = false)
 
 colorants = [:gold, :purple, :navyblue, :black, :orange]
-Sbase = GLMakie.Observable(GLMakie.Point3f(0.0, 0.0, -1.0))
-Cbase = GLMakie.Observable(GLMakie.Point3f(0.0, 0.0, 0.0))
-Nbase = GLMakie.Observable(GLMakie.Point3f(0.0, 0.0, 1.0))
-Pbase = GLMakie.Observable(GLMakie.Point3f(0.0, 0.0, 0.0))
-Pbase′ = GLMakie.Observable(GLMakie.Point3f(0.0, 0.0, 0.0))
-Sball = GLMakie.meshscatter!(lscene, Sbase, markersize = 0.05, color = colorants[1])
-Cball = GLMakie.meshscatter!(lscene, Cbase, markersize = 0.05, color = colorants[2])
-Nball = GLMakie.meshscatter!(lscene, Nbase, markersize = 0.05, color = colorants[3])
-Pball = GLMakie.meshscatter!(lscene, Pbase, markersize = 0.05, color = colorants[4])
-Pball′ = GLMakie.meshscatter!(lscene, Pbase′, markersize = 0.05, color = colorants[5])
+Sbase = Observable(Point3f(0.0, 0.0, -1.0))
+Cbase = Observable(Point3f(0.0, 0.0, 0.0))
+Nbase = Observable(Point3f(0.0, 0.0, 1.0))
+Pbase = Observable(Point3f(0.0, 0.0, 0.0))
+Pbase′ = Observable(Point3f(0.0, 0.0, 0.0))
+Sball = meshscatter!(lscene, Sbase, markersize = 0.05, color = colorants[1])
+Cball = meshscatter!(lscene, Cbase, markersize = 0.05, color = colorants[2])
+Nball = meshscatter!(lscene, Nbase, markersize = 0.05, color = colorants[3])
+Pball = meshscatter!(lscene, Pbase, markersize = 0.05, color = colorants[4])
+Pball′ = meshscatter!(lscene, Pbase′, markersize = 0.05, color = colorants[5])
 
-segmentNPP′ = GLMakie.@lift([$Nbase, $Pbase, $Pbase′])
-segmentNPP′colors = GLMakie.Observable([1, 2, 3])
-GLMakie.lines!(lscene, segmentNPP′, linewidth = 2linewidth, color = segmentNPP′, colormap = :plasma, colorrange = (1, 3), transparency = false)
-segmentSP = GLMakie.@lift([$Sbase, $Pbase])
-segmentSC = GLMakie.@lift([$Sbase, $Cbase])
-segmentCN = GLMakie.@lift([$Cbase, $Nbase])
-segmentCP = GLMakie.@lift([$Cbase, $Pbase])
-segmentCP′ = GLMakie.@lift([$Cbase, $Pbase′])
-segmentcolors = GLMakie.Observable([1, 2])
-GLMakie.lines!(lscene, segmentSP, linewidth = 2linewidth, color = segmentcolors, colormap = :spring, colorrange = (1, 2), transparency = false)
-GLMakie.lines!(lscene, segmentSC, linewidth = 2linewidth, color = segmentcolors, colormap = :summer, colorrange = (1, 2), transparency = false)
-GLMakie.lines!(lscene, segmentCN, linewidth = 2linewidth, color = segmentcolors, colormap = :fall, colorrange = (1, 2), transparency = false)
-GLMakie.lines!(lscene, segmentCP, linewidth = 2linewidth, color = segmentcolors, colormap = :winter, colorrange = (1, 2), transparency = false)
-GLMakie.lines!(lscene, segmentCP′, linewidth = 2linewidth, color = segmentcolors, colormap = :winter, colorrange = (1, 2), transparency = false)
+segmentNPP′ = @lift([$Nbase, $Pbase, $Pbase′])
+segmentNPP′colors = Observable([1, 2, 3])
+lines!(lscene, segmentNPP′, linewidth = 2linewidth, color = segmentNPP′, colormap = :plasma, colorrange = (1, 3), transparency = false)
+segmentSP = @lift([$Sbase, $Pbase])
+segmentSC = @lift([$Sbase, $Cbase])
+segmentCN = @lift([$Cbase, $Nbase])
+segmentCP = @lift([$Cbase, $Pbase])
+segmentCP′ = @lift([$Cbase, $Pbase′])
+segmentcolors = Observable([1, 2])
+lines!(lscene, segmentSP, linewidth = 2linewidth, color = segmentcolors, colormap = :spring, colorrange = (1, 2), transparency = false)
+lines!(lscene, segmentSC, linewidth = 2linewidth, color = segmentcolors, colormap = :summer, colorrange = (1, 2), transparency = false)
+lines!(lscene, segmentCN, linewidth = 2linewidth, color = segmentcolors, colormap = :fall, colorrange = (1, 2), transparency = false)
+lines!(lscene, segmentCP, linewidth = 2linewidth, color = segmentcolors, colormap = :winter, colorrange = (1, 2), transparency = false)
+lines!(lscene, segmentCP′, linewidth = 2linewidth, color = segmentcolors, colormap = :winter, colorrange = (1, 2), transparency = false)
 
-ϕarc1 = GLMakie.Observable(GLMakie.Point3f[])
-ϕarc2 = GLMakie.Observable(GLMakie.Point3f[])
-ϕarccolors = GLMakie.Observable(Int[])
-GLMakie.lines!(lscene, ϕarc1, linewidth = 2linewidth, color = ϕarccolors, colormap = :blues, colorrange = (1, segments), transparency = false)
-GLMakie.lines!(lscene, ϕarc2, linewidth = 2linewidth, color = ϕarccolors, colormap = :blues, colorrange = (1, segments), transparency = false)
+ϕarc1 = Observable(Point3f[])
+ϕarc2 = Observable(Point3f[])
+ϕarccolors = Observable(Int[])
+lines!(lscene, ϕarc1, linewidth = 2linewidth, color = ϕarccolors, colormap = :blues, colorrange = (1, segments), transparency = false)
+lines!(lscene, ϕarc2, linewidth = 2linewidth, color = ϕarccolors, colormap = :blues, colorrange = (1, segments), transparency = false)
 
-arrowsize = GLMakie.Vec3f(0.06, 0.08, 0.1)
+arrowsize = Vec3f(0.06, 0.08, 0.1)
 arrowlinewidth = 0.04
 arrowscale = 1.2
-tail = GLMakie.Observable(GLMakie.Point3f(0.0, 0.0, 0.0))
-xhead = GLMakie.Observable(GLMakie.Point3f(arrowscale * x̂))
-yhead = GLMakie.Observable(GLMakie.Point3f(arrowscale * ŷ))
-zhead = GLMakie.Observable(GLMakie.Point3f(arrowscale * ẑ))
-ps = GLMakie.@lift([$tail, $tail, $tail])
-ns = GLMakie.@lift([$xhead, $yhead, $zhead])
+tail = Observable(Point3f(0.0, 0.0, 0.0))
+xhead = Observable(Point3f(arrowscale * x̂))
+yhead = Observable(Point3f(arrowscale * ŷ))
+zhead = Observable(Point3f(arrowscale * ẑ))
+ps = @lift([$tail, $tail, $tail])
+ns = @lift([$xhead, $yhead, $zhead])
 axiscolorants = [:red, :green, :blue]
-GLMakie.arrows!(lscene,
+arrows!(lscene,
     ps, ns, fxaa = true, # turn on anti-aliasing
     color = axiscolorants,
     linewidth = arrowlinewidth, arrowsize = arrowsize,
     align = :origin
 )
 
-eyeposition_observable = lscene.scene.camera.eyeposition
-lookat_observable = lscene.scene.camera.lookat
-rotationaxis = GLMakie.@lift(normalize(ℝ³(Float64.([vec($eyeposition_observable)...] - [vec($lookat_observable)...])...)))
-rotationangle = GLMakie.@lift(Float64(π / 2 + atan(($eyeposition_observable)[2], ($eyeposition_observable)[1])))
-rotation = GLMakie.@lift(GLMakie.Quaternion(ℍ($rotationangle, $rotationaxis) * ℍ(getrotation(ẑ, $rotationaxis)...)))
-textobservables = GLMakie.Observable(GLMakie.Point3f[])
+rotation = gettextrotation(lscene)
+textobservables = Observable(Point3f[])
 titles = ["S", "C", "N", "P", "P′", "x", "y", "z"]
 textobservables[] = [Sbase[], Cbase[], Nbase[], Pbase[], Pbase′[], xhead[], yhead[], zhead[]]
-GLMakie.text!(lscene,
+text!(lscene,
     textobservables,
     text = titles,
     color = [colorants; axiscolorants],
@@ -128,23 +123,23 @@ GLMakie.text!(lscene,
     markerspace = :data
 )
 
-θlinepoints1 = GLMakie.Observable(GLMakie.Point3f[])
-θlinepoints2 = GLMakie.Observable(GLMakie.Point3f[])
-θlinepoints3 = GLMakie.Observable(GLMakie.Point3f[])
-ϕlinepoints1 = GLMakie.Observable(GLMakie.Point3f[])
-ϕlinepoints2 = GLMakie.Observable(GLMakie.Point3f[])
-linecolors = GLMakie.Observable(Int[])
-GLMakie.lines!(lscene, θlinepoints1, color = linecolors, linewidth = 2linewidth, colorrange = (1, segments), colormap = :grays)
-GLMakie.lines!(lscene, θlinepoints2, color = linecolors, linewidth = 2linewidth, colorrange = (1, segments), colormap = :grays)
-GLMakie.lines!(lscene, θlinepoints3, color = linecolors, linewidth = 2linewidth, colorrange = (1, segments), colormap = :grays)
-GLMakie.lines!(lscene, ϕlinepoints1, color = linecolors, linewidth = 2linewidth, colorrange = (1, segments), colormap = :grays)
-GLMakie.lines!(lscene, ϕlinepoints2, color = linecolors, linewidth = 2linewidth, colorrange = (1, segments), colormap = :grays)
+θlinepoints1 = Observable(Point3f[])
+θlinepoints2 = Observable(Point3f[])
+θlinepoints3 = Observable(Point3f[])
+ϕlinepoints1 = Observable(Point3f[])
+ϕlinepoints2 = Observable(Point3f[])
+linecolors = Observable(Int[])
+lines!(lscene, θlinepoints1, color = linecolors, linewidth = 2linewidth, colorrange = (1, segments), colormap = :grays)
+lines!(lscene, θlinepoints2, color = linecolors, linewidth = 2linewidth, colorrange = (1, segments), colormap = :grays)
+lines!(lscene, θlinepoints3, color = linecolors, linewidth = 2linewidth, colorrange = (1, segments), colormap = :grays)
+lines!(lscene, ϕlinepoints1, color = linecolors, linewidth = 2linewidth, colorrange = (1, segments), colormap = :grays)
+lines!(lscene, ϕlinepoints2, color = linecolors, linewidth = 2linewidth, colorrange = (1, segments), colormap = :grays)
 
 
 anglestitles = ["θ", "θ/2", "θ/2", "ϕ", "ϕ"]
-anglestextobservables = GLMakie.Observable(GLMakie.Point3f[])
-anglestextobservables[] = [GLMakie.Point3f(0.0, 0.0, 0.0) for _ in anglestitles]
-GLMakie.text!(lscene,
+anglestextobservables = Observable(Point3f[])
+anglestextobservables[] = [Point3f(0.0, 0.0, 0.0) for _ in anglestitles]
+text!(lscene,
     anglestextobservables,
     text = anglestitles,
     color = [:black for _ in anglestitles],
@@ -169,39 +164,39 @@ animate(frame::Int) = begin
     N = ℝ³(Float64.(vec(Nbase[]))...)
     P = nodes[index]
     P′ = project(P)
-    Pbase[] = GLMakie.Point3f(P)
-    Pbase′[] = GLMakie.Point3f(P′)
-    push!(Ppoints[], GLMakie.Point3f(P))
-    push!(Ppoints′[], GLMakie.Point3f(P′))
+    Pbase[] = Point3f(P)
+    Pbase′[] = Point3f(P′)
+    push!(Ppoints[], Point3f(P))
+    push!(Ppoints′[], Point3f(P′))
     push!(Pcolors[], index)
     push!(Pcolors′[], index)
-    GLMakie.notify(Ppoints)
-    GLMakie.notify(Pcolors)
-    GLMakie.notify(Ppoints′)
-    GLMakie.notify(Pcolors′)
+    notify(Ppoints)
+    notify(Pcolors)
+    notify(Ppoints′)
+    notify(Pcolors′)
     textobservables[] = [Sbase[], Cbase[], Nbase[], Pbase[], Pbase′[], xhead[], yhead[], zhead[]]
 
-    θlinepoints1[] = GLMakie.Point3f[]
-    θlinepoints2[] = GLMakie.Point3f[]
-    ϕlinepoints1[] = GLMakie.Point3f[]
-    ϕlinepoints2[] = GLMakie.Point3f[]
+    θlinepoints1[] = Point3f[]
+    θlinepoints2[] = Point3f[]
+    ϕlinepoints1[] = Point3f[]
+    ϕlinepoints2[] = Point3f[]
 
-    θlinepoints1[] = [GLMakie.Point3f(normalize(α * N + (1.0 - α) * P)) for α in range(0.0, stop = 1.0, length = segments)] .* 0.5
-    θlinepoints2[] = [GLMakie.Point3f(S + 0.5 * normalize((α * N + (1.0 - α) * normalize(P - S)))) for α in range(0.0, stop = 1.0, length = segments)]
-    θlinepoints3[] = [GLMakie.Point3f(P′ + 0.5 * normalize((α * normalize(N - P′) + (1.0 - α) * normalize(C - P′)))) for α in range(0.0, stop = 1.0, length = segments)]
+    θlinepoints1[] = [Point3f(normalize(α * N + (1.0 - α) * P)) for α in range(0.0, stop = 1.0, length = segments)] .* 0.5
+    θlinepoints2[] = [Point3f(S + 0.5 * normalize((α * N + (1.0 - α) * normalize(P - S)))) for α in range(0.0, stop = 1.0, length = segments)]
+    θlinepoints3[] = [Point3f(P′ + 0.5 * normalize((α * normalize(N - P′) + (1.0 - α) * normalize(C - P′)))) for α in range(0.0, stop = 1.0, length = segments)]
 
-    ϕlinepoints1[] = [GLMakie.Point3f(normalize(α * x̂ + (1.0 - α) * P′)) for α in range(0.0, stop = 1.0, length = segments)] .* 0.5
-    ϕlinepoints2[] = map(x -> GLMakie.Point3f(ℝ³(Float64.(vec(x)[1:2])... , Float64(√(1.0 - (vec(x)[1]^2 + vec(x)[2]^2))))), ϕlinepoints1[])
+    ϕlinepoints1[] = [Point3f(normalize(α * x̂ + (1.0 - α) * P′)) for α in range(0.0, stop = 1.0, length = segments)] .* 0.5
+    ϕlinepoints2[] = map(x -> Point3f(ℝ³(Float64.(vec(x)[1:2])... , Float64(√(1.0 - (vec(x)[1]^2 + vec(x)[2]^2))))), ϕlinepoints1[])
     linecolors[] = collect(1:segments)
-    GLMakie.notify(θlinepoints1)
-    GLMakie.notify(θlinepoints2)
-    GLMakie.notify(θlinepoints3)
-    GLMakie.notify(ϕlinepoints1)
-    GLMakie.notify(ϕlinepoints2)
-    GLMakie.notify(linecolors)
+    notify(θlinepoints1)
+    notify(θlinepoints2)
+    notify(θlinepoints3)
+    notify(ϕlinepoints1)
+    notify(ϕlinepoints2)
+    notify(linecolors)
 
-    ϕarc1[] = [GLMakie.Point3f(normalize(α * N + (1.0 - α) * P′)) for α in range(0.0, stop = 1.0, length = segments)]
-    ϕarc2[] = [GLMakie.Point3f(normalize(α * N + (1.0 - α) * x̂)) for α in range(0.0, stop = 1.0, length = segments)]
+    ϕarc1[] = [Point3f(normalize(α * N + (1.0 - α) * P′)) for α in range(0.0, stop = 1.0, length = segments)]
+    ϕarc2[] = [Point3f(normalize(α * N + (1.0 - α) * x̂)) for α in range(0.0, stop = 1.0, length = segments)]
     ϕarccolors[] = collect(1:segments)
 
     θ1 = θlinepoints1[][1]
@@ -235,13 +230,12 @@ animate(frame::Int) = begin
     else
         global lookat = ratio * (P′ + ℝ³(Float64.(vec(Cbase[]))...)) + (1.0 - ratio) * lookat
     end
-    updatecamera(lscene, eyeposition, lookat, up)
+    updatecamera!(lscene, eyeposition, lookat, up)
 end
 
 
 animate(1)
 
-
-GLMakie.record(fig, joinpath("gallery", "$modelname.mp4"), 1:frames_number) do frame
+record(fig, joinpath("gallery", "$modelname.mp4"), 1:frames_number) do frame
     animate(frame)
 end

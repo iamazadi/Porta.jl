@@ -1,6 +1,5 @@
-import FileIO
-import GLMakie
-import LinearAlgebra
+using FileIO
+using GLMakie
 using Porta
 
 
@@ -33,13 +32,13 @@ for i in eachindex(countries["name"])
 end
 
 
-makefigure() = GLMakie.Figure(size = figuresize)
-fig = GLMakie.with_theme(makefigure, GLMakie.theme_black())
-pl = GLMakie.PointLight(GLMakie.Point3f(0), GLMakie.RGBf(0.0862, 0.0862, 0.0862))
-al = GLMakie.AmbientLight(GLMakie.RGBf(0.9, 0.9, 0.9))
-lscene = GLMakie.LScene(fig[1, 1], show_axis=false, scenekw = (lights = [pl, al], clear=true, backgroundcolor = :white))
+makefigure() = Figure(size = figuresize)
+fig = with_theme(makefigure, theme_black())
+pl = PointLight(Point3f(0), RGBf(0.0862, 0.0862, 0.0862))
+al = AmbientLight(RGBf(0.9, 0.9, 0.9))
+lscene = LScene(fig[1, 1], show_axis=false, scenekw = (lights = [pl, al], clear=true, backgroundcolor = :white))
 
-mask = FileIO.load("data/basemap_mask.png")
+mask = load("data/basemap_mask.png")
 
 lspaceθ = range(π / 2, stop = -π / 2, length = segments)
 lspaceϕ = range(-π, stop = float(π), length = segments)
@@ -53,50 +52,46 @@ planeobservable = buildsurface(lscene, planematrix, mask, transparency = true)
 planematrix = [project(convert_to_cartesian([1.0; θ; ϕ])) for θ in lspaceθ, ϕ in lspaceϕ]
 updatesurface!(planematrix, planeobservable)
 
-Ppoints = GLMakie.Observable(GLMakie.Point3f[])
-Ppoints′ = GLMakie.Observable(GLMakie.Point3f[])
-Pcolors = GLMakie.Observable(Int[])
-Pcolors′ = GLMakie.Observable(Int[])
-Plines = GLMakie.lines!(lscene, Ppoints, linewidth = 2linewidth, color = Pcolors, colormap = :rainbow, colorrange = (1, frames_number), transparency = false)
-Plines′ = GLMakie.lines!(lscene, Ppoints′, linewidth = 2linewidth, color = Pcolors′, colormap = :rainbow, colorrange = (1, frames_number), transparency = false)
+Ppoints = Observable(Point3f[])
+Ppoints′ = Observable(Point3f[])
+Pcolors = Observable(Int[])
+Pcolors′ = Observable(Int[])
+Plines = lines!(lscene, Ppoints, linewidth = 2linewidth, color = Pcolors, colormap = :rainbow, colorrange = (1, frames_number), transparency = false)
+Plines′ = lines!(lscene, Ppoints′, linewidth = 2linewidth, color = Pcolors′, colormap = :rainbow, colorrange = (1, frames_number), transparency = false)
 
 colorants = [:red, :green, :blue, :black, :orange, :gold]
-Abase = GLMakie.Observable(GLMakie.Point3f(0.0, 0.0, 0.0))
-Bbase = GLMakie.Observable(GLMakie.Point3f(0.0, 0.0, 0.0))
-Cbase = GLMakie.Observable(GLMakie.Point3f(0.0, 0.0, 0.0))
-Nbase = GLMakie.Observable(GLMakie.Point3f(0.0, 0.0, 1.0))
-Pbase = GLMakie.Observable(GLMakie.Point3f(0.0, 0.0, 0.0))
-Pbase′ = GLMakie.Observable(GLMakie.Point3f(0.0, 0.0, 0.0))
-Aball = GLMakie.meshscatter!(lscene, Abase, markersize = 0.05, color = colorants[1])
-Bball = GLMakie.meshscatter!(lscene, Bbase, markersize = 0.05, color = colorants[2])
-Cball = GLMakie.meshscatter!(lscene, Cbase, markersize = 0.05, color = colorants[3])
-Nball = GLMakie.meshscatter!(lscene, Nbase, markersize = 0.05, color = colorants[4])
-Pball = GLMakie.meshscatter!(lscene, Pbase, markersize = 0.05, color = colorants[5])
-Pball′ = GLMakie.meshscatter!(lscene, Pbase′, markersize = 0.05, color = colorants[6])
+Abase = Observable(Point3f(0.0, 0.0, 0.0))
+Bbase = Observable(Point3f(0.0, 0.0, 0.0))
+Cbase = Observable(Point3f(0.0, 0.0, 0.0))
+Nbase = Observable(Point3f(0.0, 0.0, 1.0))
+Pbase = Observable(Point3f(0.0, 0.0, 0.0))
+Pbase′ = Observable(Point3f(0.0, 0.0, 0.0))
+Aball = meshscatter!(lscene, Abase, markersize = 0.05, color = colorants[1])
+Bball = meshscatter!(lscene, Bbase, markersize = 0.05, color = colorants[2])
+Cball = meshscatter!(lscene, Cbase, markersize = 0.05, color = colorants[3])
+Nball = meshscatter!(lscene, Nbase, markersize = 0.05, color = colorants[4])
+Pball = meshscatter!(lscene, Pbase, markersize = 0.05, color = colorants[5])
+Pball′ = meshscatter!(lscene, Pbase′, markersize = 0.05, color = colorants[6])
 
-segmentNPP′ = GLMakie.@lift([$Nbase, $Pbase, $Pbase′])
-segmentNPP′colors = GLMakie.Observable([1, 2, 3])
-GLMakie.lines!(lscene, segmentNPP′, linewidth = 2linewidth, color = segmentNPP′, colormap = :plasma, colorrange = (1, 3), transparency = false)
-segmentAP = GLMakie.@lift([$Abase, $Pbase])
-segmentBP = GLMakie.@lift([$Bbase, $Pbase])
-segmentCN = GLMakie.@lift([$Cbase, $Nbase])
-segmentCP′ = GLMakie.@lift([$Cbase, $Pbase′])
-segmentcolors = GLMakie.Observable([1, 2])
-GLMakie.lines!(lscene, segmentAP, linewidth = 2linewidth, color = segmentcolors, colormap = :spring, colorrange = (1, 2), transparency = false)
-GLMakie.lines!(lscene, segmentBP, linewidth = 2linewidth, color = segmentcolors, colormap = :summer, colorrange = (1, 2), transparency = false)
-GLMakie.lines!(lscene, segmentCN, linewidth = 2linewidth, color = segmentcolors, colormap = :fall, colorrange = (1, 2), transparency = false)
-GLMakie.lines!(lscene, segmentCP′, linewidth = 2linewidth, color = segmentcolors, colormap = :winter, colorrange = (1, 2), transparency = false)
+segmentNPP′ = @lift([$Nbase, $Pbase, $Pbase′])
+segmentNPP′colors = Observable([1, 2, 3])
+lines!(lscene, segmentNPP′, linewidth = 2linewidth, color = segmentNPP′, colormap = :plasma, colorrange = (1, 3), transparency = false)
+segmentAP = @lift([$Abase, $Pbase])
+segmentBP = @lift([$Bbase, $Pbase])
+segmentCN = @lift([$Cbase, $Nbase])
+segmentCP′ = @lift([$Cbase, $Pbase′])
+segmentcolors = Observable([1, 2])
+lines!(lscene, segmentAP, linewidth = 2linewidth, color = segmentcolors, colormap = :spring, colorrange = (1, 2), transparency = false)
+lines!(lscene, segmentBP, linewidth = 2linewidth, color = segmentcolors, colormap = :summer, colorrange = (1, 2), transparency = false)
+lines!(lscene, segmentCN, linewidth = 2linewidth, color = segmentcolors, colormap = :fall, colorrange = (1, 2), transparency = false)
+lines!(lscene, segmentCP′, linewidth = 2linewidth, color = segmentcolors, colormap = :winter, colorrange = (1, 2), transparency = false)
 
 
 titles = ["A", "B", "C", "N", "P", "P′"]
-eyeposition_observable = lscene.scene.camera.eyeposition
-lookat_observable = lscene.scene.camera.lookat
-rotationaxis = GLMakie.@lift(normalize(ℝ³(Float64.([vec($eyeposition_observable)...] - [vec($lookat_observable)...])...)))
-rotationangle = GLMakie.@lift(Float64(π / 2 + atan(($eyeposition_observable)[2], ($eyeposition_observable)[1])))
-rotation = GLMakie.@lift(GLMakie.Quaternion(ℍ($rotationangle, $rotationaxis) * ℍ(getrotation(ẑ, $rotationaxis)...)))
-textobservables = GLMakie.Observable(GLMakie.Point3f[])
+rotation = gettextrotation(lscene)
+textobservables = Observable(Point3f[])
 textobservables[] = [Abase[], Bbase[], Cbase[], Nbase[], Pbase[], Pbase′[]]
-GLMakie.text!(lscene,
+text!(lscene,
     textobservables,
     text = titles,
     color = colorants,
@@ -118,18 +113,18 @@ animate(frame::Int) = begin
     index = max(1, Int(floor(stageprogress * N)))
     P = nodes[index]
     P′ = project(P)
-    Abase[] = GLMakie.Point3f([vec(P)[1:2]..., 0.0])
-    Bbase[] = GLMakie.Point3f([0.0; 0.0; vec(P)[3]])
-    Pbase[] = GLMakie.Point3f(P)
-    Pbase′[] = GLMakie.Point3f(P′)
-    push!(Ppoints[], GLMakie.Point3f(P))
-    push!(Ppoints′[], GLMakie.Point3f(P′))
+    Abase[] = Point3f([vec(P)[1:2]..., 0.0])
+    Bbase[] = Point3f([0.0; 0.0; vec(P)[3]])
+    Pbase[] = Point3f(P)
+    Pbase′[] = Point3f(P′)
+    push!(Ppoints[], Point3f(P))
+    push!(Ppoints′[], Point3f(P′))
     push!(Pcolors[], index)
     push!(Pcolors′[], index)
-    GLMakie.notify(Ppoints)
-    GLMakie.notify(Pcolors)
-    GLMakie.notify(Ppoints′)
-    GLMakie.notify(Pcolors′)
+    notify(Ppoints)
+    notify(Pcolors)
+    notify(Ppoints′)
+    notify(Pcolors′)
     textobservables[] = [Abase[], Bbase[], Cbase[], Nbase[], Pbase[], Pbase′[]]
 
     if frame == 1
@@ -144,13 +139,12 @@ animate(frame::Int) = begin
     else
         global lookat = ratio * (P′ + ℝ³(Float64.(vec(Cbase[]))...)) + (1.0 - ratio) * lookat
     end
-    updatecamera(lscene, eyeposition, lookat, up)
+    updatecamera!(lscene, eyeposition, lookat, up)
 end
 
 
 animate(1)
 
-
-GLMakie.record(fig, joinpath("gallery", "$modelname.mp4"), 1:frames_number) do frame
+record(fig, joinpath("gallery", "$modelname.mp4"), 1:frames_number) do frame
     animate(frame)
 end

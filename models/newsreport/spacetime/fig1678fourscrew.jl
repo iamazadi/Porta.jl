@@ -1,6 +1,5 @@
 import FileIO
 import GLMakie
-import LinearAlgebra
 using Porta
 
 
@@ -9,7 +8,7 @@ segments = 360
 frames_number = 360
 modelname = "fig1678fourscrew"
 
-M = I(4)
+M = Identity(4)
 x̂ = ℝ³([1.0; 0.0; 0.0])
 ŷ = ℝ³([0.0; 1.0; 0.0])
 ẑ = ℝ³([0.0; 0.0; 1.0])
@@ -52,16 +51,13 @@ animate(frame::Int) = begin
     updatesurface!(planematrix1, planeobservable1)
     updatesurface!(planematrix2, planeobservable2)
 
-    updatecamera(lscene1, eyeposition, lookat, up)
-    updatecamera(lscene2, eyeposition, lookat, up)
+    updatecamera!(lscene1, eyeposition, lookat, up)
+    updatecamera!(lscene2, eyeposition, lookat, up)
 end
 
 
 animate(1)
 
-
 GLMakie.record(fig, joinpath("gallery", "$modelname.mp4"), 1:frames_number) do frame
     animate(frame)
 end
-
-# GLMakie.save(joinpath("gallery", "$(modelname)01.png"), fig)

@@ -1,5 +1,4 @@
-import FileIO
-import GLMakie
+using GLMakie
 using Porta
 
 segments = 30
@@ -11,7 +10,7 @@ modelname = "fig112specialorthogonal3"
 tolerance = 1e-3
 # Text labels for specifying landmarks
 fontsize = 0.5
-arrowsize = GLMakie.Vec3f(0.06, 0.08, 0.1)
+arrowsize = Vec3f(0.06, 0.08, 0.1)
 linewidth = 0.05
 markersize = 0.05
 lookat = ℝ³(0.0, 0.0, 0.0)
@@ -19,23 +18,23 @@ lookatn = ℝ³(0.0, 0.0, 0.0)
 lookats = ℝ³(0.0, 0.0, 0.0)
 up = ℝ³(0.0, 0.0, 1.0)
 # the small radius of a torus
-r = 0.04
+smallradius = 0.04
 # the large radius of a torus
-R = 1.0
+bigradius = 1.0
 sphereradius = 1.0
 transparency = true
 # The marker's position in a chart
-p₀ = GLMakie.Observable(ℝ⁴(0.0, 0.0, 0.0, 0.0))
-p₁ = GLMakie.Observable(ℝ⁴(0.0, 0.0, 0.0, 0.0))
-tangentvector = GLMakie.Observable(ℝ⁴(1.0, 0.0, 0.0, 0.0))
+p₀ = Observable(ℝ⁴(0.0, 0.0, 0.0, 0.0))
+p₁ = Observable(ℝ⁴(0.0, 0.0, 0.0, 0.0))
+tangentvector = Observable(ℝ⁴(1.0, 0.0, 0.0, 0.0))
 objectives = []
-currentobjective = GLMakie.Observable("Determine the clutching function!")
+currentobjective = Observable("Determine the clutching function!")
 islabeled = Dict{String, Bool}()
-transparentcolor = GLMakie.RGBAf(0.0, 0.0, 0.0, 0.0)
-clearwhite = GLMakie.RGBAf(1.0, 1.0, 1.0, 0.5)
-red = GLMakie.RGBAf(1.0, 0.0, 0.0, 1.0)
-green = GLMakie.RGBAf(0.0, 1.0, 0.0, 1.0)
-blue = GLMakie.RGBAf(0.0, 0.0, 1.0, 1.0)
+transparentcolor = RGBAf(0.0, 0.0, 0.0, 0.0)
+clearwhite = RGBAf(1.0, 1.0, 1.0, 0.5)
+red = RGBAf(1.0, 0.0, 0.0, 1.0)
+green = RGBAf(0.0, 1.0, 0.0, 1.0)
+blue = RGBAf(0.0, 0.0, 1.0, 1.0)
 x̂ = ℝ³(1.0, 0.0, 0.0)
 ŷ = ℝ³(0.0, 1.0, 0.0)
 ẑ = ℝ³(0.0, 0.0, 1.0)
@@ -68,65 +67,64 @@ path2 = ["d"; "f"; "n"; "l"]
 q₁ = Dualquaternion(ℍ(π / 4, ẑ) * ℍ(π / 2, x̂))
 q₂ = Dualquaternion(ℍ(-π / 4, ẑ) * ℍ(π / 2, x̂))
 
-makefigure() = GLMakie.Figure(resolution = resolution)
+makefigure() = Figure(size = resolution)
 
-fig = GLMakie.with_theme(makefigure, GLMakie.theme_black())
-toggle = GLMakie.Toggle(fig, active = false)
-controlstatus = GLMakie.Observable(true) # in order to prevent a recursive call when updating UI controls
-pl = GLMakie.PointLight(GLMakie.Point3f(0), GLMakie.RGBf(20, 20, 20))
-al = GLMakie.AmbientLight(GLMakie.RGBf(0.9, 0.9, 0.9))
-screen = GLMakie.display(fig, resolution = resolution)
-lscene = GLMakie.LScene(fig[1:8, 1:2], show_axis=true,
-                        scenekw = (resolution = resolution, lights = [pl, al], backgroundcolor=:white, clear=true))
-lscenen = GLMakie.LScene(fig[1:2, 3], show_axis=true,
-                          scenekw = (resolution = resolution1, lights = [pl, al], backgroundcolor=:white, clear=true))
-lscenes = GLMakie.LScene(fig[3:4, 3], show_axis=true,
-                          scenekw = (resolution = resolution1, lights = [pl, al], backgroundcolor=:white, clear=true))
+fig = with_theme(makefigure, theme_black())
+toggle = Toggle(fig, active = false)
+controlstatus = Observable(true) # in order to prevent a recursive call when updating UI controls
+pl = PointLight(Point3f(0), RGBf(20, 20, 20))
+al = AmbientLight(RGBf(0.9, 0.9, 0.9))
+lscene = LScene(fig[1:8, 1:2], show_axis=true,
+                        scenekw = (size = resolution, lights = [pl, al], backgroundcolor=:white, clear=true))
+lscenen = LScene(fig[1:2, 3], show_axis=true,
+                          scenekw = (size = resolution1, lights = [pl, al], backgroundcolor=:white, clear=true))
+lscenes = LScene(fig[3:4, 3], show_axis=true,
+                          scenekw = (size = resolution1, lights = [pl, al], backgroundcolor=:white, clear=true))
 
 eyeposition = ℝ³(Float64.(vec(lscene.scene.camera.eyeposition[]))...)
 eyepositionn = ℝ³(Float64.(vec(lscenen.scene.camera.eyeposition[]))...)
 eyepositions = ℝ³(Float64.(vec(lscenes.scene.camera.eyeposition[]))...)
 
-sliderx¹ = GLMakie.Slider(fig[5, 3], range = -1:0.00001:1, startvalue = 0)
-sliderx² = GLMakie.Slider(fig[6, 3], range = -1:0.00001:1, startvalue = 0)
-sliderx³ = GLMakie.Slider(fig[7, 3], range = -1:0.00001:1, startvalue = 0)
-sliderx⁴ = GLMakie.Slider(fig[8, 3], range = -1:0.00001:1, startvalue = 0)
+sliderx¹ = Slider(fig[5, 3], range = -1:0.00001:1, startvalue = 0)
+sliderx² = Slider(fig[6, 3], range = -1:0.00001:1, startvalue = 0)
+sliderx³ = Slider(fig[7, 3], range = -1:0.00001:1, startvalue = 0)
+sliderx⁴ = Slider(fig[8, 3], range = -1:0.00001:1, startvalue = 0)
 
-textbox = GLMakie.Textbox(fig, placeholder = "Enter a name", width = 115)
+textbox = Textbox(fig, placeholder = "Enter a name", width = 115)
 textbox.stored_string = "I"
 # theme buttons for a dark theme
-buttoncolor = GLMakie.RGBf(0.3, 0.3, 0.3)
-markbutton = GLMakie.Button(fig, label = "Mark the frame", buttoncolor = buttoncolor)
-resetbutton = GLMakie.Button(fig, label = "Reset frame", buttoncolor = buttoncolor)
-label = GLMakie.Label(fig, GLMakie.lift(x -> x ? "Chart S" : "Chart N", toggle.active))
-fig[9, 3] = GLMakie.grid!(GLMakie.hcat(textbox, markbutton, resetbutton, toggle, label), tellheight = false)
-status = GLMakie.Label(fig, currentobjective, fontsize = 30)
+buttoncolor = RGBf(0.3, 0.3, 0.3)
+markbutton = Button(fig, label = "Mark the frame", buttoncolor = buttoncolor)
+resetbutton = Button(fig, label = "Reset frame", buttoncolor = buttoncolor)
+label = Label(fig, lift(x -> x ? "Chart S" : "Chart N", toggle.active))
+fig[9, 3] = grid!(hcat(textbox, markbutton, resetbutton, toggle, label), tellheight = false)
+status = Label(fig, currentobjective, fontsize = 30)
 fig[9, 1:2] = status
 
 # Spheres for showing the boundary of S³ as the skin of a solid ball
 configurationq = Dualquaternion(ℝ³(0.0, 0.0, 0.0))
-colorarray = GLMakie.Observable(fill(GLMakie.RGBAf(1.0, 1.0, 1.0, 0.2), segments, segments))
+colorarray = Observable(fill(RGBAf(1.0, 1.0, 1.0, 0.2), segments, segments))
 sphere = buildsurface(lscene, constructsphere(configurationq, sphereradius, segments = segments), colorarray, transparency = transparency)
-colorarray = GLMakie.Observable(fill(GLMakie.RGBAf(1.0, 0.0, 1.0, 0.2), segments, segments))
+colorarray = Observable(fill(RGBAf(1.0, 0.0, 1.0, 0.2), segments, segments))
 spheren = buildsurface(lscenen, constructsphere(configurationq, sphereradius, segments = segments), colorarray, transparency = transparency)
-colorarray = GLMakie.Observable(fill(GLMakie.RGBAf(1.0, 1.0, 0.0, 0.2), segments, segments))
+colorarray = Observable(fill(RGBAf(1.0, 1.0, 0.0, 0.2), segments, segments))
 spheres = buildsurface(lscenes, constructsphere(configurationq, sphereradius, segments = segments), colorarray, transparency = transparency)
 
-toruscolor = GLMakie.RGBAf(0.0, 0.0, 0.0, 0.0)
-toruscolorarray = GLMakie.Observable(fill(toruscolor, segments, segments))
+toruscolor = RGBAf(0.0, 0.0, 0.0, 0.0)
+toruscolorarray = Observable(fill(toruscolor, segments, segments))
 
-torus = buildsurface(lscene, constructtorus(configurationq, r, R, segments = segments), toruscolorarray, transparency = transparency)
-torusn = buildsurface(lscenen, constructtorus(configurationq, r, R, segments = segments), toruscolorarray, transparency = transparency)
-toruss = buildsurface(lscenes, constructtorus(configurationq, r, R, segments = segments), toruscolorarray, transparency = transparency)
+torus = buildsurface(lscene, constructtorus(configurationq, smallradius, bigradius, segments = segments), toruscolorarray, transparency = transparency)
+torusn = buildsurface(lscenen, constructtorus(configurationq, smallradius, bigradius, segments = segments), toruscolorarray, transparency = transparency)
+toruss = buildsurface(lscenes, constructtorus(configurationq, smallradius, bigradius, segments = segments), toruscolorarray, transparency = transparency)
 
 segmentsmemo = []
 for (keya, valuea) in points
     for (keyb, valueb) in points
         if isapprox(abs(norm(valuea - valueb)), 1.0)
             if (keya, keyb) ∉ segmentsmemo && (keyb, keya) ∉ segmentsmemo
-                GLMakie.lines!(lscene, [GLMakie.Point3f(project(valuea)), GLMakie.Point3f(project(valueb))], color = collect(1:2), linewidth = 5, colorrange = (1, 2), colormap = :gold)
-                GLMakie.lines!(lscenen, [GLMakie.Point3f(project(valuea)), GLMakie.Point3f(project(valueb))], color = collect(1:2), linewidth = 5, colorrange = (1, 2), colormap = :gold, visible = GLMakie.@lift(!$(toggle.active)))
-                GLMakie.lines!(lscenes, [GLMakie.Point3f(project(valuea)), GLMakie.Point3f(project(valueb))], color = collect(1:2), linewidth = 5, colorrange = (1, 2), colormap = :gold, visible = toggle.active)
+                lines!(lscene, [Point3f(project(valuea)), Point3f(project(valueb))], color = collect(1:2), linewidth = 5, colorrange = (1, 2), colormap = :gold)
+                lines!(lscenen, [Point3f(project(valuea)), Point3f(project(valueb))], color = collect(1:2), linewidth = 5, colorrange = (1, 2), colormap = :gold, visible = @lift(!$(toggle.active)))
+                lines!(lscenes, [Point3f(project(valuea)), Point3f(project(valueb))], color = collect(1:2), linewidth = 5, colorrange = (1, 2), colormap = :gold, visible = toggle.active)
                 push!(segmentsmemo, (keya, keyb))
             end
         end
@@ -136,29 +134,29 @@ end
 points["o"] = ℝ⁴(0.0, 0.0, 0.0, 0.0)
 
 # The arrows pointing to the current location of the frame
-arrowcolor = GLMakie.Observable([GLMakie.RGBAf(1.0, 0.0, 0.0, 1.0)])
-arrowcolorn = GLMakie.Observable([GLMakie.RGBAf(1.0, 0.0, 0.0, 1.0)])
-arrowcolors = GLMakie.Observable([GLMakie.RGBAf(1.0, 0.0, 0.0, 1.0)])
-tail, head = GLMakie.Observable(GLMakie.Point3f(0.0, 0.0, 0.0)), GLMakie.Observable(GLMakie.Point3f(0.0, 0.0, 1.0))
-ps = GLMakie.@lift([$tail])
-ns = GLMakie.@lift([$head])
-psn = GLMakie.@lift([$tail])
-nsn = GLMakie.@lift([$head])
-pss = GLMakie.@lift([$tail])
-nss = GLMakie.@lift([$head])
-GLMakie.arrows!(lscene,
+arrowcolor = Observable([RGBAf(1.0, 0.0, 0.0, 1.0)])
+arrowcolorn = Observable([RGBAf(1.0, 0.0, 0.0, 1.0)])
+arrowcolors = Observable([RGBAf(1.0, 0.0, 0.0, 1.0)])
+tail, head = Observable(Point3f(0.0, 0.0, 0.0)), Observable(Point3f(0.0, 0.0, 1.0))
+ps = @lift([$tail])
+ns = @lift([$head])
+psn = @lift([$tail])
+nsn = @lift([$head])
+pss = @lift([$tail])
+nss = @lift([$head])
+arrows!(lscene,
     ps, ns, fxaa = true, # turn on anti-aliasing
     color = arrowcolor,
     linewidth = linewidth, arrowsize = arrowsize,
     align = :origin
 )
-GLMakie.arrows!(lscenen,
+arrows!(lscenen,
     psn, nsn, fxaa = true, # turn on anti-aliasing
     color = arrowcolorn,
     linewidth = linewidth, arrowsize = arrowsize,
     align = :origin
 )
-GLMakie.arrows!(lscenes,
+arrows!(lscenes,
     pss, nss, fxaa = true, # turn on anti-aliasing
     color = arrowcolors,
     linewidth = linewidth, arrowsize = arrowsize,
@@ -166,44 +164,44 @@ GLMakie.arrows!(lscenes,
 )
 
 # The frames
-tailn = GLMakie.Observable(GLMakie.Point3f(0.0, 0.0, 0.0))
-tails = GLMakie.Observable(GLMakie.Point3f(0.0, 0.0, 0.0))
-arrowx¹head = GLMakie.Observable(GLMakie.Point3f(x̂))
-arrowx²head = GLMakie.Observable(GLMakie.Point3f(ŷ))
-arrowx³head = GLMakie.Observable(GLMakie.Point3f(ẑ))
-arrowx¹headn = GLMakie.Observable(GLMakie.Point3f(x̂))
-arrowx²headn = GLMakie.Observable(GLMakie.Point3f(ŷ))
-arrowx³headn = GLMakie.Observable(GLMakie.Point3f(ẑ))
-arrowx¹heads = GLMakie.Observable(GLMakie.Point3f(x̂))
-arrowx²heads = GLMakie.Observable(GLMakie.Point3f(ŷ))
-arrowx³heads = GLMakie.Observable(GLMakie.Point3f(ẑ))
-arrowxcolor = GLMakie.Observable([red, green, blue])
-arrowxcolorn = GLMakie.Observable([red, green, blue])
-arrowxcolors = GLMakie.Observable([red, green, blue])
+tailn = Observable(Point3f(0.0, 0.0, 0.0))
+tails = Observable(Point3f(0.0, 0.0, 0.0))
+arrowx¹head = Observable(Point3f(x̂))
+arrowx²head = Observable(Point3f(ŷ))
+arrowx³head = Observable(Point3f(ẑ))
+arrowx¹headn = Observable(Point3f(x̂))
+arrowx²headn = Observable(Point3f(ŷ))
+arrowx³headn = Observable(Point3f(ẑ))
+arrowx¹heads = Observable(Point3f(x̂))
+arrowx²heads = Observable(Point3f(ŷ))
+arrowx³heads = Observable(Point3f(ẑ))
+arrowxcolor = Observable([red, green, blue])
+arrowxcolorn = Observable([red, green, blue])
+arrowxcolors = Observable([red, green, blue])
 
-GLMakie.arrows!(lscene,
-    GLMakie.@lift([$tail, $tail, $tail]), GLMakie.@lift([$arrowx¹head, $arrowx²head, $arrowx³head]), fxaa = true, # turn on anti-aliasing
+arrows!(lscene,
+    @lift([$tail, $tail, $tail]), @lift([$arrowx¹head, $arrowx²head, $arrowx³head]), fxaa = true, # turn on anti-aliasing
     color = arrowxcolor,
     linewidth = linewidth, arrowsize = arrowsize,
     align = :origin
 )
-GLMakie.arrows!(lscenen,
-    GLMakie.@lift([$tailn, $tailn, $tailn]), GLMakie.@lift([$arrowx¹headn, $arrowx²headn, $arrowx³headn]), fxaa = true, # turn on anti-aliasing
+arrows!(lscenen,
+    @lift([$tailn, $tailn, $tailn]), @lift([$arrowx¹headn, $arrowx²headn, $arrowx³headn]), fxaa = true, # turn on anti-aliasing
     color = arrowxcolorn,
     linewidth = linewidth, arrowsize = arrowsize,
     align = :origin
 )
-GLMakie.arrows!(lscenes,
-    GLMakie.@lift([$tails, $tails, $tails]), GLMakie.@lift([$arrowx¹heads, $arrowx²heads, $arrowx³heads]), fxaa = true, # turn on anti-aliasing
+arrows!(lscenes,
+    @lift([$tails, $tails, $tails]), @lift([$arrowx¹heads, $arrowx²heads, $arrowx³heads]), fxaa = true, # turn on anti-aliasing
     color = arrowxcolors,
     linewidth = linewidth, arrowsize = arrowsize,
     align = :origin
 )
-ghostps = GLMakie.Observable([tail[], tail[], tail[]])
-ghostns = GLMakie.Observable([arrowx¹head[], arrowx²head[], arrowx³head[]])
-GLMakie.arrows!(lscene,
+ghostps = Observable([tail[], tail[], tail[]])
+ghostns = Observable([arrowx¹head[], arrowx²head[], arrowx³head[]])
+arrows!(lscene,
     ghostps, ghostns, fxaa = true, # turn on anti-aliasing
-    color = [GLMakie.RGBAf(1.0, 1.0, 0.0, 0.5), GLMakie.RGBAf(0.0, 1.0, 0.0, 0.5), GLMakie.RGBAf(0.0, 1.0, 1.0, 0.5)],
+    color = [RGBAf(1.0, 1.0, 0.0, 0.5), RGBAf(0.0, 1.0, 0.0, 0.5), RGBAf(0.0, 1.0, 1.0, 0.5)],
     linewidth = linewidth, arrowsize = arrowsize,
     align = :origin
 )
@@ -212,8 +210,8 @@ rotation = gettextrotation(lscene)
 rotationn = gettextrotation(lscenen)
 rotations = gettextrotation(lscenes)
 
-set1visible = GLMakie.Observable(true)
-set2visible = GLMakie.Observable(true)
+set1visible = Observable(true)
+set2visible = Observable(true)
 
 push!(objectives, x -> labelpoint("o", points["o"], islabeled, set1, set1visible, set2visible, toggle.active, markersize, lscene, lscenen, lscenes, rotation, rotationn, rotations, fontsize, eyeposition, eyepositionn, eyepositions, lookat, lookatn, lookats, up))
 
@@ -281,13 +279,13 @@ push!(objectives, x -> paralleltransport("a", "o", x, points, sliderx¹, sliderx
 
 push!(objectives, x -> rotatecamera(x, eyeposition, eyepositionn, eyepositions, lookat, lookatn, lookats, up, lscene, lscenen, lscenes))
 
-GLMakie.on(sliderx¹.value) do x¹
+on(sliderx¹.value) do x¹
     # refuse to update the current point whenever controling is off
-    if !GLMakie.to_value(controlstatus) return end
+    if !to_value(controlstatus) return end
 
-    x² = GLMakie.to_value(sliderx².value)
-    x³ = GLMakie.to_value(sliderx³.value)
-    x⁴ = GLMakie.to_value(sliderx⁴.value)
+    x² = to_value(sliderx².value)
+    x³ = to_value(sliderx³.value)
+    x⁴ = to_value(sliderx⁴.value)
     radius = √abs(x¹^2 + x²^2 + x³^2 + x⁴^2)
     if radius > 1
         # in order to prevent DomainError with negative values
@@ -304,13 +302,13 @@ GLMakie.on(sliderx¹.value) do x¹
         ps, ns, psn, nsn, pss, nss, ghostps, ghostns)
 end
 
-GLMakie.on(sliderx².value) do x²
+on(sliderx².value) do x²
     # refuse to update the current point whenever controling is off
-    if !GLMakie.to_value(controlstatus) return end
+    if !to_value(controlstatus) return end
 
-    x¹ = GLMakie.to_value(sliderx¹.value)
-    x³ = GLMakie.to_value(sliderx³.value)
-    x⁴ = GLMakie.to_value(sliderx⁴.value)
+    x¹ = to_value(sliderx¹.value)
+    x³ = to_value(sliderx³.value)
+    x⁴ = to_value(sliderx⁴.value)
     radius = √abs(x¹^2 + x²^2 + x³^2 + x⁴^2)
     if radius > 1
         # in order to prevent DomainError with negative values
@@ -327,13 +325,13 @@ GLMakie.on(sliderx².value) do x²
         ps, ns, psn, nsn, pss, nss, ghostps, ghostns)
 end
 
-GLMakie.on(sliderx³.value) do x³
+on(sliderx³.value) do x³
     # refuse to update the current point whenever controling is off
-    if !GLMakie.to_value(controlstatus) return end
+    if !to_value(controlstatus) return end
 
-    x¹ = GLMakie.to_value(sliderx¹.value)
-    x² = GLMakie.to_value(sliderx².value)
-    x⁴ = GLMakie.to_value(sliderx⁴.value)
+    x¹ = to_value(sliderx¹.value)
+    x² = to_value(sliderx².value)
+    x⁴ = to_value(sliderx⁴.value)
     radius = √abs(x¹^2 + x²^2 + x³^2 + x⁴^2)
     if radius > 1
         # in order to prevent DomainError with negative values
@@ -350,13 +348,13 @@ GLMakie.on(sliderx³.value) do x³
         ps, ns, psn, nsn, pss, nss, ghostps, ghostns)
 end
 
-GLMakie.on(sliderx⁴.value) do x⁴
+on(sliderx⁴.value) do x⁴
     # refuse to update the current point whenever controling is off
-    if !GLMakie.to_value(controlstatus) return end
+    if !to_value(controlstatus) return end
 
-    x¹ = GLMakie.to_value(sliderx¹.value)
-    x² = GLMakie.to_value(sliderx².value)
-    x³ = GLMakie.to_value(sliderx³.value)
+    x¹ = to_value(sliderx¹.value)
+    x² = to_value(sliderx².value)
+    x³ = to_value(sliderx³.value)
     radius = √abs(x¹^2 + x²^2 + x³^2 + x⁴^2)
     if radius > 1
         # in order to prevent DomainError with negative values
@@ -373,20 +371,20 @@ GLMakie.on(sliderx⁴.value) do x⁴
         ps, ns, psn, nsn, pss, nss, ghostps, ghostns)
 end
 
-GLMakie.on(toggle.active) do chart
-    x¹, x², x³, x⁴ = vec(GLMakie.to_value(p₁))
+on(toggle.active) do chart
+    x¹, x², x³, x⁴ = vec(to_value(p₁))
     controlstatus[] = false
-    if !isapprox(GLMakie.to_value(sliderx¹.value), x¹)
-        GLMakie.set_close_to!(sliderx¹, x¹)
+    if !isapprox(to_value(sliderx¹.value), x¹)
+        set_close_to!(sliderx¹, x¹)
     end
-    if !isapprox(GLMakie.to_value(sliderx².value), x²)
-        GLMakie.set_close_to!(sliderx², x²)
+    if !isapprox(to_value(sliderx².value), x²)
+        set_close_to!(sliderx², x²)
     end
-    if !isapprox(GLMakie.to_value(sliderx³.value), x³)
-        GLMakie.set_close_to!(sliderx³, x³)
+    if !isapprox(to_value(sliderx³.value), x³)
+        set_close_to!(sliderx³, x³)
     end
-    if !isapprox(GLMakie.to_value(sliderx⁴.value), x⁴)
-        GLMakie.set_close_to!(sliderx⁴, x⁴)
+    if !isapprox(to_value(sliderx⁴.value), x⁴)
+        set_close_to!(sliderx⁴, x⁴)
     end
     controlstatus[] = true
     updateui(chart, p₁[], tangentvector, tail, tailn, tails, arrowx¹head, arrowx²head, arrowx³head, arrowx¹headn, arrowx²headn,
@@ -399,7 +397,7 @@ end
 f = 1
 N = f * length(objectives)
 timestamps = range(0, N, step = 1 / framerate)
-GLMakie.record(fig, "gallery/$modelname.mp4", timestamps; framerate = framerate) do t
+record(fig, "gallery/$modelname.mp4", timestamps; framerate = framerate) do t
     τ = t / f + 1
     index = isapprox(τ, length(objectives) + 1) ? Int(floor(τ) - 1) : Int(floor(τ))
     objective = objectives[index]
@@ -411,10 +409,9 @@ GLMakie.record(fig, "gallery/$modelname.mp4", timestamps; framerate = framerate)
 end
 
 
-
 previouslength = length(objectives)
 # initialize the tori
-rotatetorus(q₁, q₂, 0.0, segments, r, R, torus, torusn, toruss)
+rotatetorus(q₁, q₂, 0.0, segments, smallradius, bigradius, torus, torusn, toruss)
 showtori(toruscolorarray, toruscolor)
 resetcamera(lscene, lscenen, lscenes, eyeposition, eyepositionn, eyepositions, lookat, lookatn, lookats, up)
 
@@ -426,7 +423,7 @@ push!(objectives, x -> rotatecamera(x, eyeposition, eyepositionn, eyepositions, 
 
 push!(objectives, x -> showset2(set1visible, set2visible))
 
-push!(objectives, x -> rotatetorus(q₁, q₂, x, segments, r, R, torus, torusn, toruss))
+push!(objectives, x -> rotatetorus(q₁, q₂, x, segments, smallradius, bigradius, torus, torusn, toruss))
 push!(objectives, x -> paralleltransport(path2, x, points, toggle.active[], p₁[], tail, arrowx¹head, arrowx²head, arrowx³head, ghostps, ghostns, sliderx¹, sliderx², sliderx³, sliderx⁴, tolerance = tolerance))
 
 push!(objectives, x -> rotatecamera(x, eyeposition, eyepositionn, eyepositions, lookat, lookatn, lookats, up, lscene, lscenen, lscenes))
@@ -435,7 +432,7 @@ push!(objectives, x -> rotatecamera(x, eyeposition, eyepositionn, eyepositions, 
 f = 15
 N = f * (length(objectives) - previouslength)
 timestamps = range(0, N, step = 1 / framerate)
-GLMakie.record(fig, "gallery/$(modelname)part2.mp4", timestamps; framerate = framerate) do t
+record(fig, "gallery/$(modelname)part2.mp4", timestamps; framerate = framerate) do t
     τ = t / f + 1 + previouslength
     index = isapprox(τ, length(objectives) + 1) ? Int(floor(τ) - 1) : Int(floor(τ))
     objective = objectives[index]
