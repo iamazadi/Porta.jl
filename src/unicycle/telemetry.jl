@@ -28,11 +28,12 @@ end
 """
     make_sprite(scene, parent, origin, rotation, scale, stl, colormap)
 
-Instantiate a visual object in the `scene` with the given `parent` object,
+Instantiate a visual object in the `scene` with the given `parent` instance,
 `origin` position, `rotation`, `scale`, `stl` object 3D file and `colormap`.
 """
-function make_sprite(scene::GLMakie.Scene, parent::GLMakie.Scene, origin::GLMakie.Point3f,
+function make_sprite(scene::GLMakie.Scene, parent::Any, origin::GLMakie.Point3f,
     rotation::ℍ, scale::Float64, stl::GeometryBasics.Mesh, colormap::Symbol)
+    # the type of the parent object should be Union{GLMakie.Mesh, GLMakie.Scene}
     center_of_mass = find_centerofmass(stl)
     # Create a child transformation from the parent
     child = GLMakie.Transformation(parent)

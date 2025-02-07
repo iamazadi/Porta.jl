@@ -15,7 +15,13 @@ chassis_colormap = :rainbow
 chassis_rotation = ℍ(π / 2, ℝ³([1.0; 0.0; 0.0]))
 chassis_origin = Point3f(-0.1, -0.1, -0.02)
 chassis_scale = 0.001
-robot = make_sprite(lscene.scene, lscene.scene, chassis_origin, chassis_rotation, chassis_scale, chassis_stl, chassis_colormap)
+parent = lscene.scene
+robot = make_sprite(lscene.scene, parent, chassis_origin, chassis_rotation, chassis_scale, chassis_stl, chassis_colormap)
+@test typeof(robot) <: GLMakie.Mesh
+
+parent = chassis_stl
+robot = make_sprite(lscene.scene, parent, chassis_origin, chassis_rotation, chassis_scale, chassis_stl, chassis_colormap)
+@test typeof(robot) <: GLMakie.Mesh
 
 roll = string(round(rand(), digits = 2))
 pitch = string(round(rand(), digits = 2))
