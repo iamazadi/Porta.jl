@@ -4,7 +4,7 @@ using Porta
 
 
 figuresize = (4096, 2160)
-segments = 180
+segments = 90
 frames_number = 360
 modelname = "fig1517typesofconnection"
 x̂ = ℝ³([1.0; 0.0; 0.0])
@@ -100,12 +100,11 @@ path1 = Observable(Point3f[])
 path2 = Observable(Point3f[])
 path3 = Observable(Point3f[])
 path4 = Observable(Point3f[])
-pathcolors = collect(1:frames_number)
-lines!(lscene, path, color = pathcolors, linewidth = linewidth / 2, colorrange = (1, frames_number), colormap = :rainbow)
-lines!(lscene, path1, color = pathcolors, linewidth = linewidth / 2, colorrange = (1, frames_number), colormap = :spring)
-lines!(lscene, path2, color = pathcolors, linewidth = linewidth / 2, colorrange = (1, frames_number), colormap = :summer)
-lines!(lscene, path3, color = pathcolors, linewidth = linewidth / 2, colorrange = (1, frames_number), colormap = :fall)
-lines!(lscene, path4, color = pathcolors, linewidth = linewidth / 2, colorrange = (1, frames_number), colormap = :winter)
+lines!(lscene, path, color = GLMakie.@lift(collect(1:length($path))), linewidth = linewidth / 2, colorrange = (1, frames_number), colormap = :rainbow)
+lines!(lscene, path1, color = GLMakie.@lift(collect(1:length($path1))), linewidth = linewidth / 2, colorrange = (1, frames_number), colormap = :spring)
+lines!(lscene, path2, color = GLMakie.@lift(collect(1:length($path2))), linewidth = linewidth / 2, colorrange = (1, frames_number), colormap = :summer)
+lines!(lscene, path3, color = GLMakie.@lift(collect(1:length($path3))), linewidth = linewidth / 2, colorrange = (1, frames_number), colormap = :fall)
+lines!(lscene, path4, color = GLMakie.@lift(collect(1:length($path4))), linewidth = linewidth / 2, colorrange = (1, frames_number), colormap = :winter)
 
 headx = Observable(Point3f(x̂))
 heady = Observable(Point3f(ŷ))
@@ -194,13 +193,12 @@ animate(frame::Int) = begin
 end
 
 
-animate(1)
-
-path[] = Point3f[]
-path1[] = Point3f[]
-path2[] = Point3f[]
-path3[] = Point3f[]
-path4[] = Point3f[]
+# animate(1)
+# path[] = Point3f[]
+# path1[] = Point3f[]
+# path2[] = Point3f[]
+# path3[] = Point3f[]
+# path4[] = Point3f[]
 record(fig, joinpath("gallery", "$modelname.mp4"), 1:frames_number) do frame
     animate(frame)
 end

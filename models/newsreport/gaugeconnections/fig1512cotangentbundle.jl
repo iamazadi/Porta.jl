@@ -223,26 +223,26 @@ text!(lscene2,
 arcpoints = Observable(Point3f[])
 _arcpoints = Observable(Point3f[])
 arccolors = collect(1:segments)
-lines!(lscene2, arcpoints, color = arccolors, linewidth = 2linewidth, colorrange = (1, segments), colormap = :prism)
-lines!(lscene2, _arcpoints, color = arccolors, linewidth = 2linewidth, colorrange = (1, segments), colormap = :prism)
+lines!(lscene2, arcpoints, color = GLMakie.@lift(collect(1:length($arcpoints))), linewidth = 2linewidth, colorrange = (1, segments), colormap = :prism)
+lines!(lscene2, _arcpoints, color = GLMakie.@lift(collect(1:length($_arcpoints))), linewidth = 2linewidth, colorrange = (1, segments), colormap = :prism)
 
 arcpoints2 = Observable(Point3f[])
 arcpoints3 = Observable(Point3f[])
 arcpoints4 = Observable(Point3f[])
-lines!(lscene2, arcpoints2, color = arccolors, linewidth = 2linewidth, colorrange = (1, segments), colormap = :prism, transparency = true)
-lines!(lscene2, arcpoints3, color = arccolors, linewidth = 2linewidth, colorrange = (1, segments), colormap = :prism, transparency = true)
-lines!(lscene2, arcpoints4, color = arccolors, linewidth = 2linewidth, colorrange = (1, segments), colormap = :prism, transparency = true)
+lines!(lscene2, arcpoints2, color = GLMakie.@lift(collect(1:length($arcpoints2))), linewidth = 2linewidth, colorrange = (1, segments), colormap = :prism, transparency = true)
+lines!(lscene2, arcpoints3, color = GLMakie.@lift(collect(1:length($arcpoints3))), linewidth = 2linewidth, colorrange = (1, segments), colormap = :prism, transparency = true)
+lines!(lscene2, arcpoints4, color = GLMakie.@lift(collect(1:length($arcpoints4))), linewidth = 2linewidth, colorrange = (1, segments), colormap = :prism, transparency = true)
 
 arcpointsn = []
 for i in 1:N
     __arcpoints = Observable(Point3f[])
-    lines!(lscene2, __arcpoints, color = arccolors, linewidth = linewidth / 2, colorrange = (1, segments), colormap = :prism, transparency = true)
+    lines!(lscene2, __arcpoints, color = GLMakie.@lift(collect(1:length($__arcpoints))), linewidth = linewidth / 2, colorrange = (1, segments), colormap = :prism, transparency = true)
     push!(arcpointsn, __arcpoints)
 end
 
 sectionalpath = Observable(Point3f[])
 sectionalpathcolors = collect(1:pathsegments)
-lines!(lscene2, sectionalpath, color = sectionalpathcolors, linewidth = linewidth / 2, colorrange = (1, pathsegments), colormap = :darkrainbow)
+lines!(lscene2, sectionalpath, color = GLMakie.@lift(collect(1:length($sectionalpath))), linewidth = linewidth / 2, colorrange = (1, pathsegments), colormap = :darkrainbow)
 
 
 animate(frame::Int) = begin

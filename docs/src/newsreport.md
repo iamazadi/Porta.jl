@@ -62,7 +62,7 @@ The geometry of the equation ``\zeta = e^{i \phi} cot(\theta / 2)`` relates the 
 [Stereographic Projection](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/spacetime/fig15stereographicprojection.jl)
 
 In Minkowski space-time, the intersection of the null cone with a plane yields a sphere.
-As the plane through curve segment ``ON`` varies it provides the stereographic projection.
+As the plane through curve segment ``ON`` varies, it provides the stereographic projection.
 The point ``P`` maps to point ``P^\prime``.
 The parabolic intersection of the sectional plane with the cone has the same intrinsic Euclidean metric as the Argand plane.
 
@@ -71,7 +71,7 @@ The parabolic intersection of the sectional plane with the cone has the same int
 [Four-Screw](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/spacetime/fig1678fourscrew.jl)
 
 A Lorentz transformations in Minkowski space-time chooses an inertial frame for an observer.
-The properties of Lorentz transformations are best shown on the Riemann sphere because it has all the null directions of an observer.
+The properties of Lorentz transformations are best shown on the Riemann sphere, because it has all the null directions of an observer.
 A proper rotation and a boost in the ``z`` direction combine together to make a four-screw.
 
 ![9](./assets/newsreport/9.PNG)
@@ -96,7 +96,7 @@ A spin-vector is shown in terms of points ``P`` and ``P^\prime`` of a null flag.
 
 The curve segment connecting point ``O`` to point ``N`` represents the temporal direction.
 The temporal direction is normal to a cross-section of the null cone.
-The angle between the temporal direction of the two sections determines a metric that measures lengths and angles.
+The angle between the temporal direction of the two sections determines a metric. which measures lengths and angles.
 After a transformation in the linear space of the generators of the cone, the sides of triangles are multiplied by a scalar number.
 
 ![12](./assets/newsreport/12.PNG)
@@ -121,7 +121,7 @@ The twist in frames ``I`` compared to frames ``II`` is like the reorientation of
 Even though both copies of ``SO(3)`` represent the same 3D orientation, they are distinguished from each other as points in the special unitary group of complex dimension two ``SU(2)``.
 
 The equivalence class of twisted frames at boundary points defines a group of rotations ``SO(3)``.
-The clutching construction makes an associated vector bundle on the 3-dimensional sphere ``S^3``.
+The clutching construction makes an associated vector bundle with the 3-dimensional sphere ``S^3``.
 The construction creates a vector bundle through a continuous function denoted by ``f``.
 The clutching function resolves the conflicts of tangent frames along the boundary.
 It does so by producing an image elements in ``SO(3)`` given an element in the boundary where the two copies of ``S^3`` meet.
@@ -131,8 +131,8 @@ It does so by producing an image elements in ``SO(3)`` given an element in the b
 [Dirac's scissors problem](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/spacetime/fig113diracsscissors.jl)
 
 A line passing through the North Pole intersects a section at point ``P`` and makes a corresponding intersection on the other section.
-For showing the metric structure of the sections we choose three points close to each other such that they make similar triangles in every section.
-Dirac’s scissors problem says that a continuous rotation of the structure through ``2\pi`` toggles the sign of the half plane that is attached to it.
+For showing the metric structure of the sections, choose three points close to each other, such that they make similar triangles in each section.
+Dirac’s scissors problem shows that a continuous rotation of the structure through ``2\pi`` changes the sign of the half plane that is attached to it.
 
 ![14](./assets/newsreport/14.PNG)
 
@@ -147,8 +147,8 @@ The geometric structure of similar triangles with vertices: ``P``, ``P^\prime`` 
 [A null flag bundle](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/spacetime/fig115nullflagbundle.jl)
 
 The null-flag bundle ``F`` of ``M``, and its twofold covering space, the spin-vector bundle ``F^\prime`` are shown.
-The bundle projection map sends a null-flag to an event in space-time M.
-Null-flags in the fiber space are 4-dimensional, which make the total space of the null-flag bundle 8-dimensional.
+The bundle projection map sends a null-flag to an event in space-time ``M``.
+Null-flags in the fiber space are 4-dimensional, making the total space of the null-flag bundle 8-dimensional.
 
 ![16](./assets/newsreport/16.PNG)
 
@@ -162,8 +162,8 @@ The following 8 steps construct a unique frame that is right-handed and orthonor
 4. Normalize the sum of the flagpole of the original spin-vector and the flagpole of its antipode to give vector ``A`` in Minkowski vector space.
 5. Calculate the axis ``B`` by projecting the flagpole to the orthogonal complement hyperplane that has ``A`` as its normal vector.
 6. Calculate axis ``C`` by summing the spin-vector that is infinitesimally close to the original spin-vector with the negative of the original spin-vector.
-7. Project the result onto the orthogonal hyperplane where ``A`` is its normal.
-8. Find axis ``D`` by subtracting every partial component that is along ``A``, ``B`` or ``C`` from a random vector.
+7. Project the result onto the orthogonal hyperplane where ``A`` is the normal vector.
+8. Find axis ``D`` by subtracting every partial component that is along ``A``, ``B`` or ``C``, from a random vector.
 
 ![17](./assets/newsreport/17.PNG)
 
@@ -208,7 +208,7 @@ Perform these 4 steps in order to calculate the argument of the scalar product.
 
 The addition of spin-vectors ``\kappa`` and ``\omega`` results in another spin-vector ``\kappa + \omega`` in the spin-space.
 The tails of the flagpoles of ``\kappa``, ``\omega`` and ``\kappa + \omega`` are in a circle.
-The circumcircle of the triangle made by joining the the three spin-vectors makes the same angle with each of the flagpoles.
+The circumcircle of the triangle made by joining the the three spin-vectors makes the same angle with each one of the flagpoles.
 
 ![22](./assets/newsreport/22.PNG)
 
@@ -228,7 +228,7 @@ In this inertial frame, we have four mappings in a circular fashion:
 2. ``\frac{1}{\sqrt{2}} (\kappa - \omega) \mapsto -\omega``
 3. ``\omega \mapsto \frac{1}{\sqrt{2}} (\kappa + \omega)``
 4. ``\frac{1}{\sqrt{2}} (\kappa + \omega) \mapsto \kappa``
-The two spin-vectors, along with their sum and subtraction, all are in a straight line.
+The two spin-vectors, along with their sum and subtraction, are all in a straight line.
 
 # The Story
 
@@ -270,7 +270,7 @@ These particles are fermions (spin ``\frac{1}{2}`` particles) and are described 
 
 ![27](./assets/newsreport/27.PNG)
 
-In physics, commutator ``[A_\mu, A_\nu]`` in the expression for the curvature 2-form ``F_{\mu\nu}`` is interpreted as a direct interaction between gauge bosons described by the gauge field ``A_\mu``.
+In physics, the commutator ``[A_\mu, A_\nu]`` in the expression for the curvature 2-form ``F_{\mu\nu}`` is interpreted as a direct interaction between gauge bosons described by the gauge field ``A_\mu``.
 The commutator of the conection 1-form leads to cubic and quartic terms in the *Yang-Mills Lagrangian*.
 Given a spin structure on a pseudo-Riemannian manifold and the spinor bundle ``S``, we would like to have a covariant derivative on ``S`` so that we can define field equations involving derivatives of spinors.
 
@@ -286,7 +286,7 @@ In the case of a nontrivial fiber bundle, use multiple coordinate charts to cove
 
 Suppose that the base manifold ``M`` is the skin of the globe.
 Further, suppose that the fiber manifold ``V`` is a one-dimensional vector space.
-Then, the total space of the trivial bundle is like a torus of revolution, whereas the twisted bundle is like the Mobius strip.
+Then, the total space of the trivial bundle is like the torus of revolution, whereas the twisted bundle is like the Mobius strip.
 
 ![29](./assets/newsreport/29.PNG)
 
@@ -294,13 +294,13 @@ Then, the total space of the trivial bundle is like a torus of revolution, where
 
 The clutching construction makes a vector bundle over the sphere.
 The twist occurs at the boundary of the two charts.
-Clutching construction gives a continuous vector field globally.
+The clutching construction gives a continuous vector field globally.
 
 ![30](./assets/newsreport/30.PNG)
 
 [A cross-section of a fiber bundle](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/gaugeconnections/fig156crosssection.jl)
 
-A cross section of a bundle is a continuous image of the base manifold.
+A cross-section of a bundle is a continuous image of the base manifold.
 A section intersects each individual fiber in a single point.
 The bundle projection map of a section gives the identity.
 
@@ -309,16 +309,16 @@ The bundle projection map of a section gives the identity.
 [Compare a cross-section of a fiber bundle with the zero section.](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/gaugeconnections/fig157zerosection.jl)
 
 The complex plane extends to infinity in every direction from the origin.
-But in the Riemann sphere, all directions from the north pole end up at the south pole in Antarctica.
+But in the Riemann sphere, all directions from the north pole end up at the south pole, in Antarctica.
 The line bundle can have a global section, where in fact the Clifford bundle can’t have a global section.
 
 ![32](./assets/newsreport/32.PNG)
 
 [The Clifford bundle](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/gaugeconnections/fig158cliffordbundle.jl)
 
-Let ``q`` be a unit quaternion number and its antipodal point ``-q`` is its negative.
+Let ``q`` be a unit quaternion number and its antipodal point ``-q`` its negative.
 The point``q`` is in the unit circle, which is embedded in the two-complex-dimensional plane.
-In the plane ``\mathbb{C}^2`` the unit 3-sphere coordinates assert that ``|w|^2 + |z|^2 = 1``.
+In the plane ``\mathbb{C}^2``, the unit 3-sphere coordinates assert that ``|w|^2 + |z|^2 = 1``.
 
 ![33](./assets/newsreport/33.PNG)
 
@@ -326,7 +326,7 @@ In the plane ``\mathbb{C}^2`` the unit 3-sphere coordinates assert that ``|w|^2 
 
 The fibers of the tangent bundle to ``S^2`` are circles.
 But, each circle-fiber of the Clifford bundle wraps twice around each circle-fiber of the tangent bundle to ``S^2``.
-Wrapping around each circle-fiber of the Clifford bundle once yields the antipodal point in the 3-sphere.
+Wrapping around each circle-fiber of the Clifford bundle once, yields the antipodal point in the 3-sphere.
 
 ![34](./assets/newsreport/34.PNG)
 
@@ -342,7 +342,7 @@ In the complex line bundle, the base space is the ratio ``A : B``, which is prop
 
 Use the exponential function for translation along a direction in the tangent space to get a tangent vector at ``q``.
 Specify a cross-section of the tangent bundle in order to have a nowhere vanishing vector field.
-Define a 1-form by fixing one of the arguments of a scalar product, using elements from the nowhere vanishing vector field.
+Define a 1-form by fixing one of the parameters of a scalar product, using elements from the nowhere vanishing vector field.
 
 ![36](./assets/newsreport/36.PNG)
 
@@ -367,7 +367,7 @@ A horizontal curve in the tangent bundle ``T(\mathbb{R}^2)`` represents the para
 1. Remove a point from circle ``S^1`` to get a trivial region above it.
 2. Apply a linear transformation to the fibers of a copy of the trivial region.
 3. Identify the endpoints of the two trivial regions after splitting, such that they make the circle whole again.
-A connection measures the scale difference in fibers above one of the regions compared with sections above the other region.
+A connection measures the scale difference in fibers above one of the regions compared to sections above the other region.
 
 ![39](./assets/newsreport/39.PNG)
 
@@ -432,8 +432,8 @@ Finally, scalar products construct the gauge invariant Yang-Mills Lagrangian.
 [Configuration space](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/lagrangians/fig201configurationspace.jl)
 
 Each point in the configuration space represents a possible configuration of the chassis, reaction wheel and rolling wheel.
-As the system evolves in time, a sequence of telemetry frames make a curve in the configuration space.
-The behavior of the robot is constrained with a function that is defined on the tangent bundle of configuration space.
+As the system evolves in time, a sequence of telemetry frames makes a curve in the configuration space.
+The behavior of the robot is constrained by a function that is defined on the tangent bundle of the configuration space.
 
 ![46](./assets/newsreport/46.PNG)
 
@@ -450,7 +450,7 @@ Alternatively, the Hamiltonian is defined as a smooth function on the phase spac
 One derives the equations of motion for (mostly) kinetic particles such as photons (and neutrinos) using Hamilton's principle.
 A particle moves through the configuration space such that the integral of the Lagrangian along a path between two fixed points is stationary, under variations of the curve.
 But, the Yang-Mills Lagrangian is an adjoint-invariant scalar product of the curvature 2-form on a principal G-bundle over spacetime.
-The adjoint bundle is an associated vector bundle of the principal G-bundle, whose values represent the difference between two connections.
+The adjoint bundle is a vector bundle associated with the principal G-bundle, whose values represent the difference between two connections.
 
 ![48](./assets/newsreport/48.PNG)
 
@@ -474,7 +474,7 @@ The stack of equally spaced parallel planes represents the gravitational work 1-
 
 In 1583, Galileo observed that the period of small oscillations is independent of the the maximum distance away from the stable equilibrium point.
 As it turns out, acceleration and position transform in a linear way, after expanding a power series of the Hamiltonian about the equilibrium point.
-Since the pendulum rotate as a special orthogonal group, the pendulum’s Newtonian time-evolution is unitary.
+Since the pendulum rotates in a special orthogonal group, the pendulum’s Newtonian time-evolution is unitary.
 
 ![51](./assets/newsreport/51.PNG)
 
@@ -516,9 +516,9 @@ Hamilton’s principle states that the integral of a 4-form, scaled by some fiel
 
 A connection (denoted by ``A``) on a principal G-bundle ``P`` assigns a horizontal subspace of the tangent space to each point ``q`` in ``P``, in a smooth way.
 First, the tangent space of a principal bundle ``P`` at point ``q`` is equal to the direct sum of the vertical subspace and the horizontal subspace at ``q``, for all ``q`` in ``P``.
-Second, the push forward of the horizontal subspace of the Principal G-bundle ``P`` at point ``q`` by an action ``g`` of the structure group ``G`` is equal to the horizontal subspace of the principal G-bundle ``P`` at the transformation of the point ``q`` by the action ``g``, for all ``g`` in ``G`` and ``q`` in ``P``.
+Second, the pushforward of the horizontal subspace of the Principal G-bundle ``P`` at point ``q`` by an action ``g`` of the structure group ``G`` is equal to the horizontal subspace of the principal G-bundle ``P`` at the transformation of the point ``q`` by the action ``g``, for all ``g`` in ``G`` and ``q`` in ``P``.
 
-If the exterior derivative of the curvature 2-form vanishes, then there exists a 1-form potential that acts as a reference level. The vector representation of the 1-form is called a vector potential. But, the 1-form on spacetime is called a gauge field. So gemoterically, the vector potential is normal to the stack of horizontal planes of the 1-form.
+If the exterior derivative of the curvature 2-form vanishes, then there exists a 1-form potential that acts as a reference level. The vector representation of the 1-form is called a vector potential. But, the 1-form on spacetime is called a gauge field. So gemoterically, the vector potential is normal to the stack of horizontal planes representing the 1-form.
 
 # References
 

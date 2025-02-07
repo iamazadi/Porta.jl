@@ -4,7 +4,7 @@ using Porta
 
 
 figuresize = (4096, 2160)
-segments = 100
+segments = 60
 frames_number = 360
 modelname = "fig1518gluingforconnection"
 x̂ = ℝ³([1.0; 0.0; 0.0])
@@ -65,8 +65,8 @@ strain(θ::Float64, ϕ::Float64, strain::Float64) = strain / 2π .* [θ; ϕ]
 lspace = range(0.0, stop = distance, length = segments)
 for index in 1:length(boundary_names)
     boundary = convert_to_geographic.(boundary_nodes[index])
-    fiber1 = [origin1 + rotate(radius + rotate(ℝ³(transform(vec(boundary[i])[2:3]..., _distance, 0.0)..., 0.0), ℍ(π / 2, x̂)), ℍ(_distance, ẑ)) for i in eachindex(boundary), _distance in lspace]
-    fiber2 = [origin2 + rotate(radius + rotate(ℝ³(transform(vec(boundary[i])[2:3]..., _distance, 0.0)..., 0.0), ℍ(π / 2, x̂)), ℍ(_distance, ẑ)) for i in eachindex(boundary), _distance in lspace]
+    fiber1 = [origin1 + rotate(radius + rotate(ℝ³(strain(vec(boundary[i])[2:3]..., _distance)..., 0.0), ℍ(π / 2, x̂)), ℍ(_distance, ẑ)) for i in eachindex(boundary), _distance in lspace]
+    fiber2 = [origin2 + rotate(radius + rotate(ℝ³(strain(vec(boundary[i])[2:3]..., _distance)..., 0.0), ℍ(π / 2, x̂)), ℍ(_distance, ẑ)) for i in eachindex(boundary), _distance in lspace]
     color = fill(getcolor(boundary_nodes[index], reference, 0.5), length(boundary), segments)
     push!(fibersobservables1, buildsurface(lscene, fiber1, color, transparency = true))
     push!(fibersobservables2, buildsurface(lscene, fiber2, color, transparency = true))

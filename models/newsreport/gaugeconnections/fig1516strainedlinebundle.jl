@@ -4,7 +4,7 @@ using Porta
 
 
 figuresize = (4096, 2160)
-segments = 180
+segments = 90
 frames_number = 360
 modelname = "fig1516strainedlinebundle"
 x̂ = ℝ³([1.0; 0.0; 0.0])

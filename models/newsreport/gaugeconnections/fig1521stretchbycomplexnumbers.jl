@@ -18,7 +18,7 @@ transform(θ::Float64, ϕ::Float64, α::Float64, interpolation::Float64) = inter
 
 
 figuresize = (4096, 2160)
-segments = 100
+segments = 180
 frames_number = 360
 modelname = "fig1521stretchbycomplexnumbers"
 x̂ = ℝ³([1.0; 0.0; 0.0])

@@ -71,7 +71,7 @@ arcpoints1 = Observable(Point3f[])
 arcpoints2 = Observable(Point3f[])
 arcpoints3 = Observable(Point3f[])
 arcpoints4 = Observable(Point3f[])
-arccolors = Observable(collect(1:segments))
+arccolors = Observable(Int[])
 lines!(lscene1, arcpoints1, color = arccolors, linewidth = 2linewidth, colorrange = (1, segments), colormap = :prism)
 lines!(lscene2, arcpoints2, color = arccolors, linewidth = 2linewidth, colorrange = (1, segments), colormap = :prism)
 lines!(lscene1, arcpoints3, color = arccolors, linewidth = 2linewidth, colorrange = (1, segments), colormap = :seaborn_bright)
@@ -103,6 +103,7 @@ animate(frame::Int) = begin
         arcpoints3[] = [Point3f(rotate(radius + rotate(point, ℍ(π / 2, x̂)), ℍ(_distance, ẑ))) for _distance in lspace]
         arcpoints4[] = [Point3f(rotate(radius + rotate(point, ℍ(π / 2, x̂) * ℍ(_distance, ẑ)), ℍ(_distance, ẑ))) for _distance in lspace]
     end
+    arccolors[] = collect(1:segments)
     updatecamera!(lscene1, eyeposition, sum(section1) * (1.0 / segments^2), up)
     updatecamera!(lscene2, eyeposition, sum(section2) * (1.0 / segments^2), up)
 end
