@@ -435,8 +435,6 @@ Each point in the configuration space represents a possible configuration of the
 As the system evolves in time, a sequence of telemetry frames makes a curve in the configuration space.
 The behavior of the robot is constrained by a function that is defined on the tangent bundle of the configuration space.
 
-[How to Derive the Lagrangian][./reactionwheelunicycle.md]
-
 ![46](./assets/newsreport/46.PNG)
 
 [The Lagrangian on the tangent bundle of configuration space ``T(\mathcal{C})`` vs. the Hamiltonian ``\mathcal{H}`` on the cotangent bundle ``T^*(\mathcal{C})`` (phase space)](https://github.com/iamazadi/Porta.jl/blob/master/models/newsreport/lagrangians/fig202phasespace.jl)

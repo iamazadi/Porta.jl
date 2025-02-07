@@ -1,5 +1,5 @@
-import FileIO
-import GLMakie
+using FileIO
+using GLMakie
 using Porta
 
 
@@ -16,14 +16,14 @@ eyeposition = normalize(ℝ³(1.0, 1.0, 1.0)) * float(π)
 lookat = ℝ³(0.0, 0.0, 0.0)
 up = normalize(ℝ³(0.0, 0.0, 1.0))
 totalstages = 1
-mask = FileIO.load("data/basemap_mask.png")
+mask = load("data/basemap_mask.png")
 
-makefigure() = GLMakie.Figure(size = figuresize)
-fig = GLMakie.with_theme(makefigure, GLMakie.theme_black())
-pl = GLMakie.PointLight(GLMakie.Point3f(0), GLMakie.RGBf(0.0862, 0.0862, 0.0862))
-al = GLMakie.AmbientLight(GLMakie.RGBf(0.9, 0.9, 0.9))
-lscene1 = GLMakie.LScene(fig[1, 1], show_axis=false, scenekw = (lights = [pl, al], clear=true, backgroundcolor = :white))
-lscene2 = GLMakie.LScene(fig[1, 2], show_axis=false, scenekw = (lights = [pl, al], clear=true, backgroundcolor = :white))
+makefigure() = Figure(size = figuresize)
+fig = with_theme(makefigure, theme_black())
+pl = PointLight(Point3f(0), RGBf(0.0862, 0.0862, 0.0862))
+al = AmbientLight(RGBf(0.9, 0.9, 0.9))
+lscene1 = LScene(fig[1, 1], show_axis=false, scenekw = (lights = [pl, al], clear=true, backgroundcolor = :white))
+lscene2 = LScene(fig[1, 2], show_axis=false, scenekw = (lights = [pl, al], clear=true, backgroundcolor = :white))
 
 T = 1.0
 spherematrix = makesphere(M, T, segments = segments)
@@ -58,6 +58,6 @@ end
 
 animate(1)
 
-GLMakie.record(fig, joinpath("gallery", "$modelname.mp4"), 1:frames_number) do frame
+record(fig, joinpath("gallery", "$modelname.mp4"), 1:frames_number) do frame
     animate(frame)
 end

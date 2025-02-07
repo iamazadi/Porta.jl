@@ -1,6 +1,3 @@
-import GLMakie.project
-
-
 export project
 export projectnocompression
 

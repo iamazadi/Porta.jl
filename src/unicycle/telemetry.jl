@@ -1,3 +1,4 @@
+import GeometryBasics
 import GLMakie
 
 
@@ -11,7 +12,7 @@ export parsescalar
 
 Calculate the center of mass of a three-dimensional object with the given `stl` data.
 """
-function find_centerofmass(stl::GLMakie.Mesh)
+function find_centerofmass(stl::GeometryBasics.Mesh)
     center_of_mass = [0.0; 0.0; 0.0]
     points_number = 0
     for tri in stl
@@ -31,7 +32,7 @@ Instantiate a visual object in the `scene` with the given `parent` instance,
 `origin` position, `rotation`, `scale`, `stl` object 3D file and `colormap`.
 """
 function make_sprite(scene::GLMakie.Scene, parent::Any, origin::GLMakie.Point3f,
-    rotation::ℍ, scale::Float64, stl::GLMakie.Mesh, colormap::Symbol)
+    rotation::ℍ, scale::Float64, stl::GeometryBasics.Mesh, colormap::Symbol)
     # the type of the parent object should be Union{GLMakie.Mesh, GLMakie.Scene}
     center_of_mass = find_centerofmass(stl)
     # Create a child transformation from the parent
@@ -44,7 +45,7 @@ function make_sprite(scene::GLMakie.Scene, parent::Any, origin::GLMakie.Point3f,
         GLMakie.rotate!(child, GLMakie.Quaternion(rotation))
         GLMakie.scale!(child, scale, scale, scale)
         centered = stl.position .- GLMakie.Point3f(center_of_mass...)
-        stl = GLMakie.mesh(stl, position = centered)
+        stl = GeometryBasics.Mesh(GeometryBasics.meta(centered, normals = stl.normals), GeometryBasics.faces(stl))
         GLMakie.translate!(child, origin) # translates the visual mesh in the viewport
     else
         # if we don't have an origin, we need to correct for the parents translation
