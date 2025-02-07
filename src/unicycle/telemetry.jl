@@ -1,4 +1,3 @@
-import GeometryBasics
 import GLMakie
 
 
@@ -12,7 +11,7 @@ export parsescalar
 
 Calculate the center of mass of a three-dimensional object with the given `stl` data.
 """
-function find_centerofmass(stl::GeometryBasics.Mesh)
+function find_centerofmass(stl::GLMakie.Mesh)
     center_of_mass = [0.0; 0.0; 0.0]
     points_number = 0
     for tri in stl
