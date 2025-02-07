@@ -1,4 +1,4 @@
-import LinearAlgebra
+using LinearAlgebra
 using FileIO
 using GLMakie
 using Porta
@@ -39,7 +39,7 @@ end
 d(Φ, A) = begin
     rows, cols = size(A)
     D = Matrix{Float64}(undef, rows, cols)
-    E = Matrix{Float64}(LinearAlgebra.I, cols, cols) .* ϵ
+    E = Matrix{Float64}(I, cols, cols) .* ϵ
     for (i, v) in enumerate(eachrow(A))
         P = repeat(v, 1, cols)
         P′ = P + E
@@ -105,7 +105,7 @@ end
 normal(x, f) = begin
     tx = tangent_head(x, f, [1; 0])
     ty = tangent_head(x, f, [0; 1])
-    [LinearAlgebra.normalize(LinearAlgebra.cross(tx[i], ty[i])) for i = 1:size(x, 1)]
+    [normalize(cross(tx[i], ty[i])) for i = 1:size(x, 1)]
 end
 plane(x, f, ξ) = begin
     t = tangent_tail(x)
@@ -113,10 +113,10 @@ plane(x, f, ξ) = begin
     ty = tangent_head(x, f, [0; ξ[2]*0.1+1])
     surf(i) = begin
         p = Array{Float64}(undef, 2, 2, 3)
-        p[1, 1, :] = LinearAlgebra.normalize(tx[i] + ty[i] .+ ϵ * rand()) + t[i]
-        p[1, 2, :] = LinearAlgebra.normalize(-tx[i] + ty[i] .+ ϵ * rand()) + t[i]
-        p[2, 1, :] = LinearAlgebra.normalize(tx[i] - ty[i] .+ ϵ * rand()) + t[i]
-        p[2, 2, :] = LinearAlgebra.normalize(-tx[i] - ty[i] .+ ϵ * rand()) + t[i]
+        p[1, 1, :] = normalize(tx[i] + ty[i] .+ ϵ * rand()) + t[i]
+        p[1, 2, :] = normalize(-tx[i] + ty[i] .+ ϵ * rand()) + t[i]
+        p[2, 1, :] = normalize(tx[i] - ty[i] .+ ϵ * rand()) + t[i]
+        p[2, 2, :] = normalize(-tx[i] - ty[i] .+ ϵ * rand()) + t[i]
         p
     end
     [surf(i) for i = 1:size(x, 1)]

@@ -1,12 +1,12 @@
-import LinearAlgebra
+using LinearAlgebra
 using FileIO
 using GLMakie
 using Porta
 using OrdinaryDiffEq, ForwardDiff, NonlinearSolve
 
 
-H(q, p) = m * LinearAlgebra.norm(p)^2 / 2 + m * g * LinearAlgebra.norm(q)
-L(q, p) = m * LinearAlgebra.norm(p)^2 / 2 - m * g * LinearAlgebra.norm(q)
+H(q, p) = m * norm(p)^2 / 2 + m * g * norm(q)
+L(q, p) = m * norm(p)^2 / 2 - m * g * norm(q)
 
 pdot(dp, p, q, params, t) = ForwardDiff.gradient!(dp, q -> -H(q, p), q)
 qdot(dq, p, q, params, t) = ForwardDiff.gradient!(dq, p -> H(q, p), p)
@@ -104,7 +104,7 @@ for (index, node) in enumerate(nodes)
     push!(ns[], Point3f(head))
     trajectorypoints = Observable(Point3f[])
     push!(trajectories, trajectorypoints)
-    lines!(lscene, trajectorypoints, color = trajectorycolors, linewidth = boundarylinewidth / 10.0, colorrange = (1, frames_number), colormap = :plasma, transparency = true)
+    lines!(lscene, trajectorypoints, color = @lift(collect(1:length($trajectorypoints))), linewidth = boundarylinewidth / 10.0, colorrange = (1, frames_number), colormap = :plasma, transparency = true)
     println("Processed node $index out of $(length(nodes)) nodes in total.")
 end
 
@@ -155,7 +155,7 @@ animate(frame::Int) = begin
     notify(ps)
     notify(ns)
 
-    _altitude = LinearAlgebra.norm(ps[][1])
+    _altitude = norm(ps[][1])
     sphere1 = [convert_to_cartesian([_altitude; θ; ϕ]) for θ in lspaceθ, ϕ in lspaceϕ]
     updatesurface!(sphere1, sphere1_observable)
 

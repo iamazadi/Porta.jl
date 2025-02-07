@@ -1,12 +1,12 @@
-import LinearAlgebra
+using LinearAlgebra
 using FileIO
 using GLMakie
 using Porta
 using OrdinaryDiffEq, ForwardDiff, NonlinearSolve
 
 
-H(q, p) = m * LinearAlgebra.norm(p)^2 / 2 + m * g * LinearAlgebra.norm(q)
-L(q, p) = m * LinearAlgebra.norm(p)^2 / 2 - m * g * LinearAlgebra.norm(q)
+H(q, p) = m * norm(p)^2 / 2 + m * g * norm(q)
+L(q, p) = m * norm(p)^2 / 2 - m * g * norm(q)
 
 pdot(dp, p, q, params, t) = ForwardDiff.gradient!(dp, q -> -H(q, p), q)
 qdot(dq, p, q, params, t) = ForwardDiff.gradient!(dq, p -> H(q, p), p)
@@ -97,14 +97,14 @@ for (index, node) in enumerate(nodes)
     head = ℝ³(vec(sol.u[1])[1:3]...)
     ball_observable = Observable(Point3f(tail))
     push!(balls, ball_observable)
-    color = GLMakie.RGBAf(convert_hsvtorgb([359.0 * float(index) / float(length(nodes)); 1.0; 1.0])..., 0.5)
+    color = RGBAf(convert_hsvtorgb([359.0 * float(index) / float(length(nodes)); 1.0; 1.0])..., 0.5)
     push!(colors, color)
     meshscatter!(lscene1, ball_observable, markersize = markersize / 2, color = color)
     push!(ps[], Point3f(tail))
     push!(ns[], Point3f(head))
     trajectorypoints = Observable(Point3f[])
     push!(trajectories, trajectorypoints)
-    lines!(lscene1, trajectorypoints, color = trajectorycolors, linewidth = boundarylinewidth / 10.0, colorrange = (1, frames_number), colormap = :plasma, transparency = true)
+    lines!(lscene1, trajectorypoints, color = @lift(collect(1:length($trajectorypoints))), linewidth = boundarylinewidth / 10.0, colorrange = (1, frames_number), colormap = :plasma, transparency = true)
     println("Computed trajectory $index out of $(length(nodes)) trajectories in total.")
 end
 
@@ -131,9 +131,9 @@ plane_color = fill(getcolor(nodes, reference, 0.5), segments2, segments2)
 plane_observables = buildsurface(lscene2, plane, plane_color, transparency = true)
 balls_observable = Observable(map(x -> Point3f(convert_to_geographic(x)[2], convert_to_geographic(x)[3], 0.0), nodes))
 lines!(lscene2, balls_observable, color = collect(1:length(nodes)), linewidth = boundarylinewidth, colorrange = (1, length(nodes)), colormap = :darkrainbow, transparency = false)
-colors = [GLMakie.RGBAf(convert_hsvtorgb([359.0 * float(i) / float(length(nodes)); 1.0; 1.0])..., 0.5) for i in eachindex(nodes)]
+colors = [RGBAf(convert_hsvtorgb([359.0 * float(i) / float(length(nodes)); 1.0; 1.0])..., 0.5) for i in eachindex(nodes)]
 meshscatter!(lscene2, balls_observable, markersize = markersize, color = colors, transparency = true)
-ns2 = Observable(ns[])
+ns2 = Observable([Point3f(0, 0, 0) for i in eachindex(nodes)])
 arrows!(lscene2,
     balls_observable, ns2, fxaa = true, # turn on anti-aliasing
     color = colors,
@@ -194,7 +194,7 @@ animate(frame::Int) = begin
     plane = [ℝ³([θ; ϕ; 0.0]) for θ in _patchlspaceθ, ϕ in _patchlspaceϕ]
     updatesurface!(plane, plane_observables)
 
-    _altitude = LinearAlgebra.norm(ps[][1])
+    _altitude = norm(ps[][1])
     sphere1 = [convert_to_cartesian([_altitude; θ; ϕ]) for θ in lspaceθ, ϕ in lspaceϕ]
     updatesurface!(sphere1, sphere1_observable)
 
@@ -212,7 +212,7 @@ animate(frame::Int) = begin
         println(" H₁ = $H₁, H₂ = $H₂ ")
     end
     if isapprox(frame % 30, 0)
-        patchcolor1 = fill(GLMakie.RGBAf(convert_hsvtorgb([progress * 359.0; 1.0; 1.0])..., 0.5), segments2, segments2)
+        patchcolor1 = fill(RGBAf(convert_hsvtorgb([progress * 359.0; 1.0; 1.0])..., 0.5), segments2, segments2)
         patch1 = [convert_to_cartesian([_altitude; θ; ϕ]) for θ in patchlspaceθ, ϕ in patchlspaceϕ]
         buildsurface(lscene1, patch1, patchcolor1, transparency = true)
     end

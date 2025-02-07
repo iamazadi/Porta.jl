@@ -149,7 +149,6 @@ q₂ = @lift($q₁ * ℍ(exp(ϵ * K(2))))
 q₃ = @lift($point * ℍ(exp(ϵ * K(2))))
 q₄ = @lift($q₃ * ℍ(exp(ϵ * K(1))))
 liebracket = @lift(($q₂ - $q₄) * (1.0 / (ϵ * ϵ)))
-# F = @lift($ξ + 0.5 * $liebracket)
 
 point_observable = @lift(Point3f(project(normalize($point))))
 X_observable = @lift(Point3f(normalize(project($X))))

@@ -1,4 +1,4 @@
-import LinearAlgebra
+using LinearAlgebra
 using FileIO
 using GLMakie
 using Porta
@@ -28,7 +28,7 @@ pl = PointLight(Point3f(0), RGBf(0.0862, 0.0862, 0.0862))
 al = AmbientLight(RGBf(0.9, 0.9, 0.9))
 lscene = LScene(fig[1, 1], show_axis=true, scenekw = (lights = [pl, al], clear=true, backgroundcolor = :white))
 
-sprite = Observable(LinearAlgebra.normalize(Point3f(rand(3))))
+sprite = Observable(normalize(Point3f(rand(3))))
 basepoint = Observable(Point3f(rand()))
 meshscatter!(lscene, sprite, markersize = markersize, color = :gold)
 meshscatter!(lscene, basepoint, markersize = markersize / 2, color = :red)
@@ -75,8 +75,8 @@ const g = 1.0 # m / s²
 const m = 1.0 # unit mass
 const l = 1.0 # pendulum length
 
-H(q, p) = LinearAlgebra.norm(p)^2 / (2.0 * m * l^2) + m * g * l * (1.0 - cos(LinearAlgebra.norm(q)))
-L(q, p, dq, dp) = (1.0 / 2.0) * m * l^2 * LinearAlgebra.norm(dp)^2 - m * g * l * (1.0 - cos(LinearAlgebra.norm(q)))
+H(q, p) = norm(p)^2 / (2.0 * m * l^2) + m * g * l * (1.0 - cos(norm(q)))
+L(q, p, dq, dp) = (1.0 / 2.0) * m * l^2 * norm(dp)^2 - m * g * l * (1.0 - cos(norm(q)))
 
 pdot(dp, p, q, params, t) = ForwardDiff.gradient!(dp, q -> -H(q, p), q)
 qdot(dq, p, q, params, t) = ForwardDiff.gradient!(dq, p -> H(q, p), p)
@@ -120,7 +120,7 @@ animate(frame::Int) = begin
     lpoints[] = [Point3f(q₀) + (1 - α) * Point3f(x̂) + α * Point3f(q₁) for α in range(0.0, stop = 1.0, length = segments)]
     notify(lpoints)
     try
-        lines!(lscene, lpoints[], color = lcolors, linewidth = pathlinewidth / 4, colorrange = (1, segments), colormap = :magma, linestyle = :solid)
+        lines!(lscene, lpoints[], color = collect(1:length(lpoints[])), linewidth = pathlinewidth / 4, colorrange = (1, length(lpoints[])), colormap = :magma, linestyle = :solid)
     catch e
         println(e)
     end

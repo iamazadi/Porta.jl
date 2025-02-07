@@ -1,4 +1,4 @@
-import LinearAlgebra
+using LinearAlgebra
 using FileIO
 using GLMakie
 using Porta
@@ -6,8 +6,8 @@ using OrdinaryDiffEq, ForwardDiff, NonlinearSolve
 
 
 figuresize = (4096, 2160)
-segments = 90
-segments2 = 5
+segments = 60
+segments2 = 6
 frames_number = 360
 modelname = "fig205hamiltonianflow"
 totalstages = 6
@@ -37,7 +37,7 @@ pl = PointLight(Point3f(0), RGBf(0.0862, 0.0862, 0.0862))
 al = AmbientLight(RGBf(0.9, 0.9, 0.9))
 lscene = LScene(fig[1, 1], show_axis=true, scenekw = (lights = [pl, al], clear=true, backgroundcolor = :white))
 
-sprite = Observable(LinearAlgebra.normalize(Point3f(rand(3))))
+sprite = Observable(normalize(Point3f(rand(3))))
 meshscatter!(lscene, sprite, markersize = markersize, color = :gold)
 
 ## Load the Natural Earth data
@@ -65,8 +65,8 @@ center = sum([convert_to_geographic(x) for x in nodes]) .* (1.0 / N)
 const g = 9.8 * 1e-1 # m / s²
 const m = 1.0
 
-H(q, p) = m * LinearAlgebra.norm(p)^2 / 2 + m * g * LinearAlgebra.norm(q)
-L(q, p) = m * LinearAlgebra.norm(p)^2 / 2 - m * g * LinearAlgebra.norm(q)
+H(q, p) = m * norm(p)^2 / 2 + m * g * norm(q)
+L(q, p) = m * norm(p)^2 / 2 - m * g * norm(q)
 
 pdot(dp, p, q, params, t) = ForwardDiff.gradient!(dp, q -> -H(q, p), q)
 qdot(dq, p, q, params, t) = ForwardDiff.gradient!(dq, p -> H(q, p), p)
@@ -254,7 +254,7 @@ animate(frame::Int) = begin
         sprite2 = Point3f(geosolq[2], geosolq[3], spacing * radius)
         sprite[] = stageprogress * sprite2 + (1.0 - stageprogress) * sprite1
         ns1 = [Point3f(vec(solp))]
-        ns2 = [Point3f(vec(LinearAlgebra.normalize(Point3f(point_observables[end][] - point_observables[begin][]))))]
+        ns2 = [Point3f(vec(normalize(Point3f(point_observables[end][] - point_observables[begin][]))))]
         particle_ns[] = stageprogress .* ns2 + (1.0 - stageprogress) .* ns1
         tail1 = Point3f(convert_to_cartesian(center))
         tail2 = Point3f(ℝ³(convert_to_geographic(ℝ³(tail1))[2], convert_to_geographic(ℝ³(tail1))[3], spacing))
@@ -290,7 +290,7 @@ animate(frame::Int) = begin
         geosolq = convert_to_geographic(solq)
         solp = ℝ³(vec(sol.u[solutionindex])[1:3])
         sprite[] = Point3f(geosolq[2], geosolq[3], spacing * radius)
-        particle_ns[] = [Point3f(vec(LinearAlgebra.normalize(Point3f(point_observables[end][] - point_observables[begin][]))))]
+        particle_ns[] = [Point3f(vec(normalize(Point3f(point_observables[end][] - point_observables[begin][]))))]
         tail1 = Point3f(convert_to_cartesian(center))
         v₁tail[] = Point3f(ℝ³(convert_to_geographic(ℝ³(tail1))[2], convert_to_geographic(ℝ³(tail1))[3], spacing))
         v₂tail[] = (boundarypoints_observables[10][])[tailindex]
@@ -337,7 +337,7 @@ animate(frame::Int) = begin
         geosolq = convert_to_geographic(solq)
         solp = ℝ³(vec(sol.u[solutionindex])[1:3])
         sprite[] = Point3f(geosolq[2], geosolq[3], norm(solq) * spacing * radius)
-        particle_ns[] = [Point3f(vec(LinearAlgebra.normalize(Point3f(point_observables[end][] - point_observables[begin][]))))]
+        particle_ns[] = [Point3f(vec(normalize(Point3f(point_observables[end][] - point_observables[begin][]))))]
         tail1 = Point3f(convert_to_cartesian(center))
         v₁tail[] = Point3f(ℝ³(convert_to_geographic(ℝ³(tail1))[2], convert_to_geographic(ℝ³(tail1))[3], spacing))
         v₂tail[] = (boundarypoints_observables[10][])[tailindex]
@@ -383,15 +383,15 @@ animate(frame::Int) = begin
         geosolq = convert_to_geographic(solq)
         solp = ℝ³(vec(sol.u[solutionindex])[1:3])
         sprite[] = Point3f(geosolq[2], geosolq[3], norm(solq) * spacing * radius)
-        particle_ns[] = [Point3f(vec(LinearAlgebra.normalize(Point3f(point_observables[end][] - point_observables[begin][]))))]
+        particle_ns[] = [Point3f(vec(normalize(Point3f(point_observables[end][] - point_observables[begin][]))))]
         tail1 = Point3f(convert_to_cartesian(center))
         v₁tail[] = Point3f(ℝ³(convert_to_geographic(ℝ³(tail1))[2], convert_to_geographic(ℝ³(tail1))[3], spacing))
         v₂tail[] = (boundarypoints_observables[10][])[tailindex]
         v₁head[] = v₂tail[] - v₁tail[] 
         v₂head[] = Point3f(convert_to_cartesian(sum([convert_to_geographic(ℝ³(vec(x)...)) for x in boundarypoints_observables[10][]]) * (1.0 / length(boundarypoints_observables[10][])))) - v₂tail[]
     end
-    arrowheads = [LinearAlgebra.normalize(Point3f(point_observables[index][] - point_observables[max(index - 1, 1)][])) for index in eachindex(point_observables)]
-    arrowheads[1] = LinearAlgebra.normalize(Point3f(point_observables[end][] - point_observables[begin][]))
+    arrowheads = [normalize(Point3f(point_observables[index][] - point_observables[max(index - 1, 1)][])) for index in eachindex(point_observables)]
+    arrowheads[1] = normalize(Point3f(point_observables[end][] - point_observables[begin][]))
     ns[] = arrowheads
     global up = ℝ³(arrowheads[1])
     updatecamera!(lscene, eyeposition, lookat, up)

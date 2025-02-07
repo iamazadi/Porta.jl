@@ -4,7 +4,7 @@ using Porta
 
 
 figuresize = (4096, 2160)
-segments = 60
+segments = 36
 spacingsnumber = 12
 frames_number = 360
 modelname = "fig2010fieldlagrangians"
