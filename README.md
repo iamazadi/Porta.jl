@@ -1,14 +1,15 @@
 # Geometrize the quantum!
 
-This project is inspired by Eric Weinstein's Graph-Wall-Tome (GWT) project. Watch visual models on the YouTube [channel](https://youtube.com/@iamazadi?si=Ef7T911xWIj-NBkQ).
+This project is inspired by Eric Weinstein's Graph-Wall-Tome (GWT) project. Watch mathematical models on the YouTube [channel](https://youtube.com/@iamazadi?si=Ef7T911xWIj-NBkQ).
 
 [![](https://img.shields.io/badge/docs-dev-blue.svg)](https://iamazadi.github.io/Porta.jl/dev/)
 
 ## Requirements
-- CSV v0.10.13
-- DataFrames v1.6.1
-- FileIO v1.16.3
-- GLMakie v0.9.9
+- CSV
+- DataFrames
+- FileIO
+- GeometryBasics
+- GLMakie
 
 
 ## Installation
@@ -27,7 +28,7 @@ or get the latest experimental code.
 ```
 
 ## Usage
-For client-side code read the tests, and for examples on how to build please check out the models directory. See [planethopf.jl](../master/models/planethopf.jl) as an example!
+For client-side code see the tests, and check out the `models` directory for examples.
 
 ## Status
 - Logic [Doing]
