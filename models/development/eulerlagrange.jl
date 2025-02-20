@@ -1,4 +1,4 @@
-import LinearAlgebra
+using LinearAlgebra
 using ModelingToolkit
 using ModelingToolkit: t_nounits as t, D_nounits as D
 using Latexify
@@ -33,13 +33,13 @@ eqs = [I_w ~ [[I_w1; 0.0; 0.0; 0.0] [0.0; I_w2; 0.0; 0.0] [0.0; 0.0; I_w3; 0.0] 
        rgT ~ cgT * rcT
        rP_r ~ [0.0; 0.0; 0.0; 1.0]
        gP_r ~ rgT * rP_r
-       rw2T ~ LinearAlgebra.inv(w2gT) * rgT
+       rw2T ~ inv(w2gT) * rgT
        V_w ~ D.(gP_w)
        V_c ~ D.(gP_c)
        V_r ~ D.(gP_r)
-       Ω_w ~ [0.0; D(θ); 0.0; 0.0] + [D(α); 0.0; 0.0; 0.0] + LinearAlgebra.inv(w2gT) * [0.0; 0.0; D(δ); 0.0]
-       Ω_c ~ [0.0; D(β); 0.0; 0.0] + LinearAlgebra.inv(cw2T) * [D(α); 0.0; 0.0; 0.0] + LinearAlgebra.inv(cgT) * [0.0; 0.0; D(δ); 0.0]
-       Ω_r ~ [D(γ); 0.0; 0.0; 0.0] + LinearAlgebra.inv(rcT) * [0.0; D(β); 0.0; 0.0] + LinearAlgebra.inv(rw2T) * [D(α); 0.0; 0.0; 0.0] + LinearAlgebra.inv(rgT) * [0.0; 0.0; D(δ); 0.0]
+       Ω_w ~ [0.0; D(θ); 0.0; 0.0] + [D(α); 0.0; 0.0; 0.0] + inv(w2gT) * [0.0; 0.0; D(δ); 0.0]
+       Ω_c ~ [0.0; D(β); 0.0; 0.0] + inv(cw2T) * [D(α); 0.0; 0.0; 0.0] + inv(cgT) * [0.0; 0.0; D(δ); 0.0]
+       Ω_r ~ [D(γ); 0.0; 0.0; 0.0] + inv(rcT) * [0.0; D(β); 0.0; 0.0] + inv(rw2T) * [D(α); 0.0; 0.0; 0.0] + inv(rgT) * [0.0; 0.0; D(δ); 0.0]
        T_w ~ 0.5 * m_w * V_w' * V_w + 0.5 * Ω_w' * I_w * Ω_w
        P_w ~ m_w * g * gP_w[3]
        T_c ~ 0.5 * m_c * V_c' * V_c + 0.5 * Ω_c' * I_c * Ω_c
@@ -96,13 +96,13 @@ rcT = [[1.0; 0.0; 0.0; 0.0] [0.0; 1.0; 0.0; 0.0] [0.0; 0.0; 1.0; 0.0] [0.0; 0.0;
 rgT = cgT * rcT
 rP_r = [0.0; 0.0; 0.0; 1.0]
 gP_r = rgT * rP_r
-rw2T = LinearAlgebra.inv(w2gT) * rgT
+rw2T = inv(w2gT) * rgT
 V_w = D.(gP_w)
 V_c = D.(gP_c)
 V_r = D.(gP_r)
-Ω_w = [0.0; D(θ); 0.0; 0.0] + [D(α); 0.0; 0.0; 0.0] + LinearAlgebra.inv(w2gT) * [0.0; 0.0; D(δ); 0.0]
-Ω_c = [0.0; D(β); 0.0; 0.0] + LinearAlgebra.inv(cw2T) * [D(α); 0.0; 0.0; 0.0] + LinearAlgebra.inv(cgT) * [0.0; 0.0; D(δ); 0.0]
-Ω_r = [D(γ); 0.0; 0.0; 0.0] + LinearAlgebra.inv(rcT) * [0.0; D(β); 0.0; 0.0] + LinearAlgebra.inv(rw2T) * [D(α); 0.0; 0.0; 0.0] + LinearAlgebra.inv(rgT) * [0.0; 0.0; D(δ); 0.0]
+Ω_w = [0.0; D(θ); 0.0; 0.0] + [D(α); 0.0; 0.0; 0.0] + inv(w2gT) * [0.0; 0.0; D(δ); 0.0]
+Ω_c = [0.0; D(β); 0.0; 0.0] + inv(cw2T) * [D(α); 0.0; 0.0; 0.0] + inv(cgT) * [0.0; 0.0; D(δ); 0.0]
+Ω_r = [D(γ); 0.0; 0.0; 0.0] + inv(rcT) * [0.0; D(β); 0.0; 0.0] + inv(rw2T) * [D(α); 0.0; 0.0; 0.0] + inv(rgT) * [0.0; 0.0; D(δ); 0.0]
 T_w = 0.5 * m_w * V_w' * V_w + 0.5 * Ω_w' * I_w * Ω_w
 P_w = m_w * g * gP_w[3]
 T_c = 0.5 * m_c * V_c' * V_c + 0.5 * Ω_c' * I_c * Ω_c
