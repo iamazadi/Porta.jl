@@ -9,6 +9,8 @@ figuresize = (1920, 1080)
 segments = 30
 frames_number = 360
 modelname = "unicycle"
+maxplotnumber = 500
+plotsampleratio = 0.9
 
 x̂ = ℝ³([1.0; 0.0; 0.0])
 ŷ = ℝ³([0.0; 1.0; 0.0])
@@ -79,12 +81,15 @@ statustext = Observable("Not connected.")
 statuslabel = Label(fig, statustext)
 fig[1, 2] = grid!(hcat(statuslabel, buttons...), tellheight = false, tellwidth = false)
 
-linegraphx1 = Observable(0..10)
+
+rollpoints = Observable(Point2f[(0, 0)])
+pitchpoints = Observable(Point2f[(0, 0)])
+
 linegraphx2 = Observable(0..10)
-linegraphy1 = Observable(sin)
 linegraphy2 = Observable(cos)
-lineobject1 = lines!(ax1, linegraphx1, linegraphy1, color = :red)
-lineobject2 = lines!(ax2, linegraphx2, linegraphy2, color = :green)
+roll_lineobject = scatter!(ax1, rollpoints, color = :red)
+pitch_lineobject = scatter!(ax1, pitchpoints, color = :green)
+lineobject2 = lines!(ax2, linegraphx2, linegraphy2, color = :blue)
 
 chassis_stl = load(chassis_stl_path)
 reactionwheel_stl = load(reactionwheel_stl_path)
@@ -135,6 +140,15 @@ on(buttons[1].clicks) do n
         if flag
             roll = readings["roll"] / 180.0 * π
             pitch = -readings["pitch"] / 180.0 * π
+            if rand() > plotsampleratio # skip samples in order to make the plotter interface closer to real time
+                timestamp = length(rollpoints[]) + 1
+                roll_point = Point2f(timestamp, roll)
+                pitch_point = Point2f(timestamp, pitch)
+                rollpoints[] = push!(rollpoints[], roll_point)
+                pitchpoints[] = push!(pitchpoints[], pitch_point)
+                number = length(rollpoints[])
+                xlims!(ax1, number - maxplotnumber, number)
+            end
             v1 = readings["v1"]
             v2 = readings["v2"]
             q = ℍ(roll, x̂) * ℍ(pitch, ŷ)
