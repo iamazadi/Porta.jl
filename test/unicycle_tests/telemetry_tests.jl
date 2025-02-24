@@ -23,15 +23,14 @@ parent = chassis_stl
 robot = make_sprite(lscene.scene, parent, chassis_origin, chassis_rotation, chassis_scale, chassis_stl, chassis_colormap)
 @test typeof(robot) <: GLMakie.Mesh
 
-roll = string(round(rand(), digits = 2))
-pitch = string(round(rand(), digits = 2))
-rolling_ctrl_output = string(round(rand(), digits = 2))
-reaction_ctrl_output = string(round(rand(), digits = 2))
-dt = string(round(rand(), digits = 6))
-keywords = ["roll", "pitch", "v1", "v2"]
-message = "roll: $roll, pitch: $pitch, v1: $reaction_ctrl_output, v2: $rolling_ctrl_output, dt: $dt\r\n"
+x1k = string(round(rand(), digits = 2))
+x2k = string(round(rand(), digits = 2))
+u1k = string(round(rand(), digits = 2))
+u2k = string(round(rand(), digits = 2))
+headers = ["x1k", "x2k", "u1k", "u2k", "x1k+", "x2k+", "u1k+", "u2k+"]
+message = "x1k: $x1k, x2k: $x2k, u1k: $u1k, u2k: $u2k, x1k+: 14.40, x2k+: 0.25, u1k+: 40.00, u2k+: 31.23, dt: 0.000007"
 
-beginninglabel = "roll: "
+beginninglabel = "x1k: "
 endinglabel = ", "
 type = Float64
 scalar = parsescalar(message, beginninglabel, endinglabel, type = type)
@@ -41,8 +40,8 @@ _beginninglabel = "nothing"
 scalar = parsescalar(message, _beginninglabel, endinglabel; type = type)
 @test isnothing(scalar)
 
-readings = parsetext(message)
+readings = parsetext(message, headers)
 @test typeof(readings) <: Dict
 
-@test all([x in keys(readings) for x in keywords])
-@test all([!isnothing(readings[x]) for x in keywords])
+@test all([x in keys(readings) for x in headers])
+@test all([!isnothing(readings[x]) for x in headers])

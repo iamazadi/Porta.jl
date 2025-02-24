@@ -86,28 +86,18 @@ end
 
 
 """
-    parsetext(text)
+    parsetext(text, headers)
 
-Parse the values of robot telemetry with the given `text`.
+Parse the values of robot telemetry with the given `text` and `headers` list.
 """
-parsetext(text::String) = begin
+parsetext(text::String, headers::Vector{String}) = begin
     readings = Dict()
     if length(text) > 30
-        scalar = parsescalar(text, "roll: ", ", ", type = Float64)
-        if !isnothing(scalar)
-            readings["roll"] = scalar
-        end
-        scalar = parsescalar(text, "pitch: ", ", ", type = Float64)
-        if !isnothing(scalar)
-            readings["pitch"] = scalar
-        end
-        scalar = parsescalar(text, "v1: ", ", ", type = Float64)
-        if !isnothing(scalar)
-            readings["v1"] = scalar
-        end
-        scalar = parsescalar(text, "v2: ", ", ", type = Float64)
-        if !isnothing(scalar)
-            readings["v2"] = scalar
+        for header in eachindex(headers)
+            scalar = parsescalar(text, "$(headers[header]): ", ", ", type = Float64)
+            if !isnothing(scalar)
+                readings[headers[header]] = scalar
+            end
         end
     end
     readings

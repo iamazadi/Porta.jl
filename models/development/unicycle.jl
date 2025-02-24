@@ -11,6 +11,7 @@ frames_number = 360
 modelname = "unicycle"
 maxplotnumber = 500
 plotsampleratio = 0.9
+headers = ["x1k", "x2k", "u1k", "u2k", "x1k+", "x2k+", "u1k+", "u2k+"]
 
 x̂ = ℝ³([1.0; 0.0; 0.0])
 ŷ = ℝ³([0.0; 1.0; 0.0])
@@ -134,12 +135,15 @@ on(buttons[1].clicks) do n
     errormonitor(@async while (isopen(clientside) && run)
         text = readline(clientside, keep = true)
         println(text)
-        readings = parsetext(text)
-        flag = "roll" in keys(readings) && "pitch" in keys(readings) && "v1" in keys(readings) && "v2" in keys(readings) &&
-            !isnothing(readings["roll"]) && !isnothing(readings["pitch"]) && !isnothing(readings["v1"]) && !isnothing(readings["v2"])
+        filtered = replace(text, "\0" => "")
+        filtered = replace(filtered, "\r\n" => "")
+        readings = parsetext(filtered, headers)
+        # x1k: -13.76, x2k: 1.60, u1k: -40.00, u2k: 43.36, x1k+: -13.76, x2k+: 1.60, u1k+: -40.00, u2k+: 43.36, dt: 0.000006
+        allkeys = keys(readings)
+        flag = all([x ∈ allkeys for x in headers]) && all([!isnothing(readings[x]) for x in headers])
         if flag
-            roll = readings["roll"] / 180.0 * π
-            pitch = -readings["pitch"] / 180.0 * π
+            roll = readings["x1k"] / 180.0 * π
+            pitch = -readings["x2k"] / 180.0 * π
             if rand() > plotsampleratio # skip samples in order to make the plotter interface closer to real time
                 timestamp = length(rollpoints[]) + 1
                 roll_point = Point2f(timestamp, roll)
@@ -149,8 +153,8 @@ on(buttons[1].clicks) do n
                 number = length(rollpoints[])
                 xlims!(ax1, number - maxplotnumber, number)
             end
-            v1 = readings["v1"]
-            v2 = readings["v2"]
+            v1 = readings["u1k"]
+            v2 = readings["u2k"]
             q = ℍ(roll, x̂) * ℍ(pitch, ŷ)
             O_B_R = mat3(q)
     
