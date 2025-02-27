@@ -12,6 +12,11 @@ modelname = "unicycle"
 maxplotnumber = 500
 plotsampleratio = 0.9
 headers = ["x1k", "x2k", "u1k", "u2k", "x1k+", "x2k+", "u1k+", "u2k+"]
+clientside = nothing
+run = false
+readings = Dict()
+statedimension = 2 # xₖ ∈ ℝⁿ
+inputdimension = 2 # uₖ ∈ ℝᵐ
 
 x̂ = ℝ³([1.0; 0.0; 0.0])
 ŷ = ℝ³([0.0; 1.0; 0.0])
@@ -119,14 +124,116 @@ reaction_angle = 0.0
 rolling_angle = 0.0
 
 
-clientside = nothing
-run = false
-
-
 disconnect(clientside) = begin
     if !isnothing(clientside)
         close(clientside)
     end
+end
+
+
+"""
+    ϕ(z)
+
+Calculate a basis vector consisting of quadratic terms in the given elements of `z`,
+which contains state and input components.
+"""
+function ϕ(z::Vector{Float64})
+    z.^2
+end
+
+
+"""
+    Q(W, x, u)
+
+Calculate the Q function with the given vector `W` of the elements of the kernel matrix S, state `x` and input `u`.
+"""
+function calculateQ(W::Vector{Float64}, x::Vector{Float64}, u::Vector{Float64})
+    z = [x; u]
+    transpose(W) * ϕ(z)
+end
+
+
+"""
+    evaluateQfunction(xₖ, xₖ₊₁, uₖ, uₖ₊₁, Q, R)
+
+Evaluate the Q function uisng the Q learning Bellman equation,
+with the given state `xₖ`, next state `xₖ₊₁`, input `uₖ`, next input `uₖ₊₁`,
+the state weighting matrix `Q` in the performance index, and the input weighting matrix `R`.
+"""
+function evaluateQfunction(xₖ::Vector{Float64}, xₖ₊₁::Vector{Float64}, uₖ::Vector{Float64}, uₖ₊₁::Vector{Float64}, Q::Matrix{Float64}, R::Matrix{Float64})
+    zₖ = [xₖ; uₖ]
+    zₖ₊₁ = [xₖ₊₁; uₖ₊₁]
+    lefthandside = transpose(Wᵢ₊₁) * (ϕ(zₖ) - ϕ(zₖ₊₁))
+    righthandside = 0.5 * (transpose(xₖ) * Q * xₖ + transpose(uₖ) * R * uₖ)
+end
+
+
+"""
+    feedbackpolicy(xₖ, Kʲ)
+
+Calculate the control input uₖ with the given system state `xₖ` as feedback and `Kʲ` as gain matrix.
+"""
+function feedbackpolicy(xₖ::Vector{Float64}, Kʲ::Matrix{Float64})
+    uₖ = -Kʲ * xₖ
+    return uₖ
+end
+
+
+"""
+    calculate(data)
+
+An adaptive control algorithm using Q function identification by RLS techniques.
+"""
+calculate(data::Dict) = begin
+    #########################################
+    # INITIALIZE.
+    #########################################
+
+    # Select an initial feedback policy at j = 0.
+    # The initial gain matrix need not be stabalizing and can be selected equal to zero.
+    K⁰ = zeros(Float64, statedimension + inputdimension, statedimension + inputdimension)
+    Kʲ = deepcopy(K⁰)
+
+    #########################################
+    # STEP j.
+    #########################################
+
+    ### Identify the Q function using RLS
+
+    # At time k, apply the control uₖ based on the current policy uₖ = -Kʲ * xₖ
+    # and measure the data set (xₖ, uₖ, xₖ₊₁, uₖ₊₁) where uₖ₊₁ is computed using uₖ₊₁ = -Kʲ * xₖ₊₁.
+    xₖ = [data["x1k"]; data["x2k"]]
+    uₖ = feedbackpolicy(xₖ, Kʲ)
+    xₖ₊₁ = [data["x1k+"]; data["x2k+"]]
+    uₖ₊₁ = feedbackpolicy(xₖ₊₁, Kʲ)
+    dataset = (xₖ, uₖ, xₖ₊₁, uₖ₊₁)
+    # Compute the quuadratic basis sets ϕ(zₖ), ϕ(zₖ₊₁).
+    zₖ = [xₖ; uₖ]
+    zₖ₊₁ = [xₖ₊₁; uₖ₊₁]
+    basisset = ϕ(zₖ)
+    basisset1 = ϕ(zₖ₊₁)
+    # Now perform a one-step update in the parameter vector W by applying RLS to equation (S27).
+    evaluateQfunction(dataset..., Q, R)
+    # Repeat at the next time k + 1 and continue until RLS converges and the new parameter vector Wⱼ₊₁ is found.
+
+    ### Update the control policy
+
+    # Unpack the vector Wⱼ₊₁ into the kernel matrix
+    # Q(xₖ, uₖ) ≡ 0.5 * transpose([xₖ; uₖ]) * S * [xₖ; uₖ] = 0.5 * transpose([xₖ; uₖ]) * [Sₓₓ Sₓᵤ; Sᵤₓ Sᵤᵤ] * [xₖ; uₖ]
+
+    # Perform the control update using (S24), which is uₖ = -S⁻¹ᵤᵤ * Sᵤₓ * xₖ
+    # uₖ = -S⁻¹ᵤᵤ * Sᵤₓ * xₖ
+
+    #########################################
+    # SET j = j + 1. GO TO STEP j.
+    #########################################
+
+
+    #########################################
+    # TERMINATION.
+    #########################################
+
+    # The algorithm is terminated when there are no further updates to the Q function or the control policy at each step.
 end
 
 
@@ -135,10 +242,11 @@ on(buttons[1].clicks) do n
     errormonitor(@async while (isopen(clientside) && run)
         text = readline(clientside, keep = true)
         println(text)
+        # x1k: -13.76, x2k: 1.60, u1k: -40.00, u2k: 43.36, x1k+: -13.76, x2k+: 1.60, u1k+: -40.00, u2k+: 43.36, dt: 0.000006
         filtered = replace(text, "\0" => "")
         filtered = replace(filtered, "\r\n" => "")
-        readings = parsetext(filtered, headers)
-        # x1k: -13.76, x2k: 1.60, u1k: -40.00, u2k: 43.36, x1k+: -13.76, x2k+: 1.60, u1k+: -40.00, u2k+: 43.36, dt: 0.000006
+        global readings = parsetext(filtered, headers)
+        # calculate(readings)
         allkeys = keys(readings)
         flag = all([x ∈ allkeys for x in headers]) && all([!isnothing(readings[x]) for x in headers])
         if flag
