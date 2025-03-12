@@ -36,6 +36,11 @@ for j in eachindex(simulationTime)
     global recursiceleastsquares = predict(recursiceleastsquares, positionNoisy[j], Cₖ)
 end
 
+# test the convergence of estimates after predictions
+@test abs(positionNoisy[end] - position[end]) < 1.0
+@test abs(recursiceleastsquares.estimates[end][1] - initialPosition) < 1.0
+@test abs(recursiceleastsquares.estimates[end][2] - initialVelocity) < 1.0
+@test abs(recursiceleastsquares.estimates[end][3] - acceleration) < 1.0
 
 ## Uncomment the following for functional verification
 # verify the position vector by plotting the results
