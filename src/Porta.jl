@@ -33,5 +33,6 @@ include("scene.jl")
 include("clutchingconstruction.jl")
 include("tangentbundle.jl")
 include("unicycle/telemetry.jl")
+include("unicycle/recursiveleastsquares.jl")
 
 end # module

@@ -1,3 +1,6 @@
+import LinearAlgebra.det
+
+
 export sub
 export det
 export minor

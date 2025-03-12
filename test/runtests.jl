@@ -49,6 +49,7 @@ end
 
 @time @testset "The Interface Tests" begin
     include("unicycle_tests/telemetry_tests.jl")
+    include("unicycle_tests/recursiveleastsquares_tests.jl")
 end
 
 elapsed = time() - start
