@@ -17,6 +17,14 @@ run = false
 readings = Dict()
 statedimension = 2 # xₖ ∈ ℝⁿ
 inputdimension = 2 # uₖ ∈ ℝᵐ
+ordernumber = statedimension + inputdimension
+λ = 1.0
+δ = 1e-3
+w₀ = zeros(ordernumber)
+P₀ = LinearAlgebra.I(ordernumber) .* (1.0 / δ)
+wₙ = deepcopy(w₀)
+Pₙ = deepcopy(P₀)
+K⁰ = zeros(Float64, ordernumber, ordernumber)
 
 x̂ = ℝ³([1.0; 0.0; 0.0])
 ŷ = ℝ³([0.0; 1.0; 0.0])
@@ -132,6 +140,98 @@ end
 
 
 """
+    Q(W, x, u)
+
+Calculate the Q function with the given vector `W` of the elements of the kernel matrix S, state `x` and input `u`.
+"""
+function calculateQ(W::Vector{Float64}, x::Vector{Float64}, u::Vector{Float64})
+    z = [x; u]
+    transpose(W) * ϕ(z)
+end
+
+
+# """
+#     evaluateQfunction(xₖ, xₖ₊₁, uₖ, uₖ₊₁)
+
+# Evaluate the Q function uisng the Q learning Bellman equation,
+# with the given state `xₖ`, next state `xₖ₊₁`, input `uₖ`, next input `uₖ₊₁`.
+# """
+# function evaluateQfunction(xₖ::Vector{Float64}, xₖ₊₁::Vector{Float64},
+#                            uₖ::Vector{Float64}, uₖ₊₁::Vector{Float64};
+#                            w₀::Vector{Float64} = zeros(length([xₖ; uₖ])),
+#                            λ::Float64 = 1.0,
+#                            δ::Float64 = 1e-3)
+#     # zₖ = [xₖ; uₖ]
+#     # zₖ₊₁ = [xₖ₊₁; uₖ₊₁]
+#     # lefthandside = transpose(Wᵢ₊₁) * (ϕ(zₖ) - ϕ(zₖ₊₁))
+#     # righthandside = 0.5 * (transpose(xₖ) * Q * xₖ + transpose(uₖ) * R * uₖ)
+#     # the state weighting matrix `Q` in the performance index, and the input weighting matrix `R`
+
+#     # Wᵀᵢ₊₁ * (ϕ(zₖ) - ϕ(zₖ₊₁)) = 0.5 * (xᵀₖ * Q * xₖ + uᵀₖ * R * uₖ)
+
+#     dataset = (xₖ, uₖ, xₖ₊₁, uₖ₊₁)
+
+#     p = length([dataset[1]; dataset[2]])
+#     wₙ₋₁ = deepcopy(wₙ)
+#     Pₙ₋₁ = deepcopy(Pₙ)
+#     for n in eachindex(dataset)
+#         xₙ = [dataset[1]; dataset[2]]
+#         zₙ = Pₙ₋₁ * xₙ
+#         gₙ = (1.0 / (λ + transpose(x) * zₙ)) * zₙ
+#         # αₙ = dₙ - transpose(wₙ₋₁) * xₙ
+#         αₙ = transpose(Wᵢ₊₁) * (ϕ([xₖ; uₖ]) - ϕ([xₖ₊₁; uₖ₊₁]))
+#         global wₙ = wₙ₋₁ + αₙ * gₙ
+#         global Pₙ = 1.0 / λ * (Pₙ₋₁ - gₙ * zₙ)
+#     end
+
+#     return wₙ, Pₙ
+
+#     # Parameters:
+#     #    p = Filter order
+#     #    λ = Exponential weighting factor
+#     #    δ = Value used to initialize P(0)
+#     # Initialization:
+#     #    w₀ = 0
+#     #    P(0) = δ⁻¹I
+#     # Computation:
+#     #    For n = 1, 2, ... compute
+#     #     z(n) = P(n - 1) * x*(n)
+#     #     g(n) = (1.0 / (λ + xᵀ(n) * z(n))) * z(n)
+#     #     α(n) = d(n) - wᵀₙ₋₁ * x(n)
+#     #     wₙ = wₙ₋₁ + α(n) * g(n)
+#     #     P(n) = 1.0 / λ * (P(n - 1) - g(n) * zᴴ(n))
+
+
+#     # function [A, E] = rls(x, d, nord, lambda)
+#     #     %
+#     #     delta = 0.001;
+#     #     X = convm(x, nord);
+#     #     [M, NJ = size (X);
+#     #     if nargin < 4, lambda 1.0; end
+#     #     P = eye(N) / delta;
+#     #     W(l, :) = zeros(l, N);
+#     #     for k = 2:M - nord + l;
+#     #     end;
+#     #     z = P * X(k, :) ';
+#     #     g = z / (lambda + X(k, :) * z);
+#     #     alpha = d(k) - X(k, :) * W(k - 1, :) .';
+#     #     W(k, :) = W(k - 1, :) + alpha * g.';
+#     #     P = (P - g * z. ') / lambda;        
+# end
+
+
+"""
+    feedbackpolicy(xₖ, Kʲ)
+
+Calculate the control input uₖ with the given system state `xₖ` as feedback and `Kʲ` as gain matrix.
+"""
+function feedbackpolicy(xₖ::Vector{Float64}, Kʲ::Matrix{Float64})
+    uₖ = -Kʲ * xₖ
+    return uₖ
+end
+
+
+"""
     ϕ(z)
 
 Calculate a basis vector consisting of quadratic terms in the given elements of `z`,
@@ -143,39 +243,12 @@ end
 
 
 """
-    Q(W, x, u)
-
-Calculate the Q function with the given vector `W` of the elements of the kernel matrix S, state `x` and input `u`.
-"""
-function calculateQ(W::Vector{Float64}, x::Vector{Float64}, u::Vector{Float64})
-    z = [x; u]
-    transpose(W) * ϕ(z)
-end
+    initialize()
 
 
 """
-    evaluateQfunction(xₖ, xₖ₊₁, uₖ, uₖ₊₁, Q, R)
-
-Evaluate the Q function uisng the Q learning Bellman equation,
-with the given state `xₖ`, next state `xₖ₊₁`, input `uₖ`, next input `uₖ₊₁`,
-the state weighting matrix `Q` in the performance index, and the input weighting matrix `R`.
-"""
-function evaluateQfunction(xₖ::Vector{Float64}, xₖ₊₁::Vector{Float64}, uₖ::Vector{Float64}, uₖ₊₁::Vector{Float64}, Q::Matrix{Float64}, R::Matrix{Float64})
-    zₖ = [xₖ; uₖ]
-    zₖ₊₁ = [xₖ₊₁; uₖ₊₁]
-    lefthandside = transpose(Wᵢ₊₁) * (ϕ(zₖ) - ϕ(zₖ₊₁))
-    righthandside = 0.5 * (transpose(xₖ) * Q * xₖ + transpose(uₖ) * R * uₖ)
-end
-
-
-"""
-    feedbackpolicy(xₖ, Kʲ)
-
-Calculate the control input uₖ with the given system state `xₖ` as feedback and `Kʲ` as gain matrix.
-"""
-function feedbackpolicy(xₖ::Vector{Float64}, Kʲ::Matrix{Float64})
-    uₖ = -Kʲ * xₖ
-    return uₖ
+function initialize()
+    Kʲ = deepcopy(K⁰)
 end
 
 
@@ -191,8 +264,7 @@ calculate(data::Dict) = begin
 
     # Select an initial feedback policy at j = 0.
     # The initial gain matrix need not be stabalizing and can be selected equal to zero.
-    K⁰ = zeros(Float64, statedimension + inputdimension, statedimension + inputdimension)
-    Kʲ = deepcopy(K⁰)
+    initialize()
 
     #########################################
     # STEP j.
@@ -206,14 +278,22 @@ calculate(data::Dict) = begin
     uₖ = feedbackpolicy(xₖ, Kʲ)
     xₖ₊₁ = [data["x1k+"]; data["x2k+"]]
     uₖ₊₁ = feedbackpolicy(xₖ₊₁, Kʲ)
-    dataset = (xₖ, uₖ, xₖ₊₁, uₖ₊₁)
-    # Compute the quuadratic basis sets ϕ(zₖ), ϕ(zₖ₊₁).
+    # dataset = (xₖ, uₖ, xₖ₊₁, uₖ₊₁)
+    # Compute the quadratic basis sets ϕ(zₖ), ϕ(zₖ₊₁).
     zₖ = [xₖ; uₖ]
     zₖ₊₁ = [xₖ₊₁; uₖ₊₁]
-    basisset = ϕ(zₖ)
-    basisset1 = ϕ(zₖ₊₁)
+    # basisset1 = ϕ(zₖ)
+    # basisset2 = ϕ(zₖ₊₁)
     # Now perform a one-step update in the parameter vector W by applying RLS to equation (S27).
-    evaluateQfunction(dataset..., Q, R)
+    wₙ₋₁ = deepcopy(wₙ)
+    Pₙ₋₁ = deepcopy(Pₙ)
+    xₙ = zₖ
+    zₙ = Pₙ₋₁ * xₙ
+    gₙ = (1.0 / (λ + transpose(x) * zₙ)) * zₙ
+    # αₙ = dₙ - transpose(wₙ₋₁) * xₙ
+    αₙ = transpose(Wᵢ₊₁) * (ϕ(zₖ) - ϕ(zₖ₊₁))
+    global wₙ = wₙ₋₁ + αₙ * gₙ
+    global Pₙ = 1.0 / λ * (Pₙ₋₁ - gₙ * zₙ)
     # Repeat at the next time k + 1 and continue until RLS converges and the new parameter vector Wⱼ₊₁ is found.
 
     ### Update the control policy
