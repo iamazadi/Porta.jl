@@ -34,5 +34,6 @@ include("clutchingconstruction.jl")
 include("tangentbundle.jl")
 include("unicycle/telemetry.jl")
 include("unicycle/recursiveleastsquares.jl")
+include("unicycle/linearquadraticregulator.jl")
 
 end # module
