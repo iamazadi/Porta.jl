@@ -11,7 +11,7 @@ frames_number = 360
 modelname = "unicycle"
 maxplotnumber = 500
 plotsampleratio = 0.9
-headers = ["x1k", "x2k", "u1k", "u2k", "x1k+", "x2k+", "u1k+", "u2k+"]
+headers = ["x1k", "x2k", "u1k", "u2k", "encoder", "velocity"]
 clientside = nothing
 run = false
 readings = Dict()
@@ -139,184 +139,6 @@ disconnect(clientside) = begin
 end
 
 
-"""
-    Q(W, x, u)
-
-Calculate the Q function with the given vector `W` of the elements of the kernel matrix S, state `x` and input `u`.
-"""
-function calculateQ(W::Vector{Float64}, x::Vector{Float64}, u::Vector{Float64})
-    z = [x; u]
-    transpose(W) * ϕ(z)
-end
-
-
-# """
-#     evaluateQfunction(xₖ, xₖ₊₁, uₖ, uₖ₊₁)
-
-# Evaluate the Q function uisng the Q learning Bellman equation,
-# with the given state `xₖ`, next state `xₖ₊₁`, input `uₖ`, next input `uₖ₊₁`.
-# """
-# function evaluateQfunction(xₖ::Vector{Float64}, xₖ₊₁::Vector{Float64},
-#                            uₖ::Vector{Float64}, uₖ₊₁::Vector{Float64};
-#                            w₀::Vector{Float64} = zeros(length([xₖ; uₖ])),
-#                            λ::Float64 = 1.0,
-#                            δ::Float64 = 1e-3)
-#     # zₖ = [xₖ; uₖ]
-#     # zₖ₊₁ = [xₖ₊₁; uₖ₊₁]
-#     # lefthandside = transpose(Wᵢ₊₁) * (ϕ(zₖ) - ϕ(zₖ₊₁))
-#     # righthandside = 0.5 * (transpose(xₖ) * Q * xₖ + transpose(uₖ) * R * uₖ)
-#     # the state weighting matrix `Q` in the performance index, and the input weighting matrix `R`
-
-#     # Wᵀᵢ₊₁ * (ϕ(zₖ) - ϕ(zₖ₊₁)) = 0.5 * (xᵀₖ * Q * xₖ + uᵀₖ * R * uₖ)
-
-#     dataset = (xₖ, uₖ, xₖ₊₁, uₖ₊₁)
-
-#     p = length([dataset[1]; dataset[2]])
-#     wₙ₋₁ = deepcopy(wₙ)
-#     Pₙ₋₁ = deepcopy(Pₙ)
-#     for n in eachindex(dataset)
-#         xₙ = [dataset[1]; dataset[2]]
-#         zₙ = Pₙ₋₁ * xₙ
-#         gₙ = (1.0 / (λ + transpose(x) * zₙ)) * zₙ
-#         # αₙ = dₙ - transpose(wₙ₋₁) * xₙ
-#         αₙ = transpose(Wᵢ₊₁) * (ϕ([xₖ; uₖ]) - ϕ([xₖ₊₁; uₖ₊₁]))
-#         global wₙ = wₙ₋₁ + αₙ * gₙ
-#         global Pₙ = 1.0 / λ * (Pₙ₋₁ - gₙ * zₙ)
-#     end
-
-#     return wₙ, Pₙ
-
-#     # Parameters:
-#     #    p = Filter order
-#     #    λ = Exponential weighting factor
-#     #    δ = Value used to initialize P(0)
-#     # Initialization:
-#     #    w₀ = 0
-#     #    P(0) = δ⁻¹I
-#     # Computation:
-#     #    For n = 1, 2, ... compute
-#     #     z(n) = P(n - 1) * x*(n)
-#     #     g(n) = (1.0 / (λ + xᵀ(n) * z(n))) * z(n)
-#     #     α(n) = d(n) - wᵀₙ₋₁ * x(n)
-#     #     wₙ = wₙ₋₁ + α(n) * g(n)
-#     #     P(n) = 1.0 / λ * (P(n - 1) - g(n) * zᴴ(n))
-
-
-#     # function [A, E] = rls(x, d, nord, lambda)
-#     #     %
-#     #     delta = 0.001;
-#     #     X = convm(x, nord);
-#     #     [M, NJ = size (X);
-#     #     if nargin < 4, lambda 1.0; end
-#     #     P = eye(N) / delta;
-#     #     W(l, :) = zeros(l, N);
-#     #     for k = 2:M - nord + l;
-#     #     end;
-#     #     z = P * X(k, :) ';
-#     #     g = z / (lambda + X(k, :) * z);
-#     #     alpha = d(k) - X(k, :) * W(k - 1, :) .';
-#     #     W(k, :) = W(k - 1, :) + alpha * g.';
-#     #     P = (P - g * z. ') / lambda;        
-# end
-
-
-"""
-    feedbackpolicy(xₖ, Kʲ)
-
-Calculate the control input uₖ with the given system state `xₖ` as feedback and `Kʲ` as gain matrix.
-"""
-function feedbackpolicy(xₖ::Vector{Float64}, Kʲ::Matrix{Float64})
-    uₖ = -Kʲ * xₖ
-    return uₖ
-end
-
-
-"""
-    ϕ(z)
-
-Calculate a basis vector consisting of quadratic terms in the given elements of `z`,
-which contains state and input components.
-"""
-function ϕ(z::Vector{Float64})
-    z.^2
-end
-
-
-"""
-    initialize()
-
-
-"""
-function initialize()
-    Kʲ = deepcopy(K⁰)
-end
-
-
-"""
-    calculate(data)
-
-An adaptive control algorithm using Q function identification by RLS techniques.
-"""
-calculate(data::Dict) = begin
-    #########################################
-    # INITIALIZE.
-    #########################################
-
-    # Select an initial feedback policy at j = 0.
-    # The initial gain matrix need not be stabalizing and can be selected equal to zero.
-    initialize()
-
-    #########################################
-    # STEP j.
-    #########################################
-
-    ### Identify the Q function using RLS
-
-    # At time k, apply the control uₖ based on the current policy uₖ = -Kʲ * xₖ
-    # and measure the data set (xₖ, uₖ, xₖ₊₁, uₖ₊₁) where uₖ₊₁ is computed using uₖ₊₁ = -Kʲ * xₖ₊₁.
-    xₖ = [data["x1k"]; data["x2k"]]
-    uₖ = feedbackpolicy(xₖ, Kʲ)
-    xₖ₊₁ = [data["x1k+"]; data["x2k+"]]
-    uₖ₊₁ = feedbackpolicy(xₖ₊₁, Kʲ)
-    # dataset = (xₖ, uₖ, xₖ₊₁, uₖ₊₁)
-    # Compute the quadratic basis sets ϕ(zₖ), ϕ(zₖ₊₁).
-    zₖ = [xₖ; uₖ]
-    zₖ₊₁ = [xₖ₊₁; uₖ₊₁]
-    # basisset1 = ϕ(zₖ)
-    # basisset2 = ϕ(zₖ₊₁)
-    # Now perform a one-step update in the parameter vector W by applying RLS to equation (S27).
-    wₙ₋₁ = deepcopy(wₙ)
-    Pₙ₋₁ = deepcopy(Pₙ)
-    xₙ = zₖ
-    zₙ = Pₙ₋₁ * xₙ
-    gₙ = (1.0 / (λ + transpose(x) * zₙ)) * zₙ
-    # αₙ = dₙ - transpose(wₙ₋₁) * xₙ
-    αₙ = transpose(Wᵢ₊₁) * (ϕ(zₖ) - ϕ(zₖ₊₁))
-    global wₙ = wₙ₋₁ + αₙ * gₙ
-    global Pₙ = 1.0 / λ * (Pₙ₋₁ - gₙ * zₙ)
-    # Repeat at the next time k + 1 and continue until RLS converges and the new parameter vector Wⱼ₊₁ is found.
-
-    ### Update the control policy
-
-    # Unpack the vector Wⱼ₊₁ into the kernel matrix
-    # Q(xₖ, uₖ) ≡ 0.5 * transpose([xₖ; uₖ]) * S * [xₖ; uₖ] = 0.5 * transpose([xₖ; uₖ]) * [Sₓₓ Sₓᵤ; Sᵤₓ Sᵤᵤ] * [xₖ; uₖ]
-
-    # Perform the control update using (S24), which is uₖ = -S⁻¹ᵤᵤ * Sᵤₓ * xₖ
-    # uₖ = -S⁻¹ᵤᵤ * Sᵤₓ * xₖ
-
-    #########################################
-    # SET j = j + 1. GO TO STEP j.
-    #########################################
-
-
-    #########################################
-    # TERMINATION.
-    #########################################
-
-    # The algorithm is terminated when there are no further updates to the Q function or the control policy at each step.
-end
-
-
 on(buttons[1].clicks) do n
     global run = true
     errormonitor(@async while (isopen(clientside) && run)
@@ -352,7 +174,7 @@ on(buttons[1].clicks) do n
     
             pivot_ps[] = [Point3f(pivot_observable[]...), Point3f(pivot_observable[]...), Point3f(pivot_observable[]...)]
     
-            global reaction_angle = reaction_angle + float(v1) / 45.0 * 0.1
+            global reaction_angle = readings["encoder"] / 50.0 * 2π # reaction_angle + float(v1) / 45.0 * 0.1
             global rolling_angle = rolling_angle + float(v2) / 255.0 * 0.01
             rq = Quaternion(ℍ(reaction_angle, x̂))
             mq = Quaternion(ℍ(rolling_angle, ẑ))
