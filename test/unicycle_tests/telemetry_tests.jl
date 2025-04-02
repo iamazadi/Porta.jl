@@ -45,3 +45,18 @@ readings = parsetext(message, headers)
 
 @test all([x in keys(readings) for x in headers])
 @test all([!isnothing(readings[x]) for x in headers])
+
+_x1 = round(rand(), digits = 2)
+_x2 = round(rand(), digits = 2)
+_x3 = round(rand(), digits = 2)
+x1 = string(_x1)
+x2 = string(_x2)
+x3 = string(_x3)
+dimension = 3
+beginninglabel = "A2: "
+endinglabel = "A3: "
+delimiter = ","
+message = "A1: $x2, $x1, $x3, A2: $x1, $x2, $x3, A3: $x1, $x3, $x2, A4: $x3, $x2, $x1, "
+vector = parsevector(message, beginninglabel, endinglabel, delimiter, dimension)
+@test length(vector) == 3
+@test isapprox(vector, [_x1; _x2; _x3])

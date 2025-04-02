@@ -5,6 +5,7 @@ import GLMakie
 export make_sprite
 export parsetext
 export parsescalar
+export parsevector
 
 
 """
@@ -59,7 +60,7 @@ end
 """
     parsescalar(text, beginninglabel, endinglabel)
 
-Parse a scalar value that begins with `beginninglabel` and ends with `endinglabel`, with the given `text` string.
+Parse a scalar value, which begins with `beginninglabel` and ends with `endinglabel`, with the given `text` string.
 """
 parsescalar(text::String, beginninglabel::String, endinglabel::String; type::DataType = Int) = begin
     scalar = nothing
@@ -82,6 +83,39 @@ parsescalar(text::String, beginninglabel::String, endinglabel::String; type::Dat
         end
     end
     scalar
+end
+
+
+"""
+    parsevector(text, beginninglabel, endinglabel, delimiter, dimension)
+
+Parse a vector value with the given `text` string, which is separated using the `delimiter` character,
+begins with `beginninglabel` and ends with `endinglabel`, and the length of the vector denoted by `dimension`.
+"""
+function parsevector(text::String, beginninglabel::String, endinglabel::String, delimiter::String, dimension::Int)
+    vector = Float64[]
+    index = findfirst(beginninglabel, text)
+    if !isnothing(index)
+        _text = replace(text, text[begin:index[end]] => "")
+        if length(_text) > 3
+            index = findfirst(endinglabel, _text)
+            if !isnothing(index)
+                _text = replace(_text, _text[index[begin]:end] => "")
+                if length(_text) > 3
+                    _text = strip(_text)
+                    items = split(_text, delimiter)
+                    try
+                        for i in 1:dimension
+                            push!(vector, parse(Float64, items[i]))
+                        end
+                    catch e
+                        println("Not parsed: $_text. $e")
+                    end
+                end
+            end
+        end
+    end
+    vector
 end
 
 

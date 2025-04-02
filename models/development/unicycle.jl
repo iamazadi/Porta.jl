@@ -11,7 +11,11 @@ frames_number = 360
 modelname = "unicycle"
 maxplotnumber = 500
 plotsampleratio = 0.9
-headers = ["x1k", "x2k", "u1k", "u2k", "encoder", "velocity"]
+headers = ["j", "k", "pitch", "enc"]
+dimension = 10
+beginninglabel = "z: "
+endinglabel = "j: "
+delimiter = ","
 clientside = nothing
 run = false
 readings = Dict()
@@ -148,12 +152,13 @@ on(buttons[1].clicks) do n
         filtered = replace(text, "\0" => "")
         filtered = replace(filtered, "\r\n" => "")
         global readings = parsetext(filtered, headers)
+        systemstate = parsevector(filtered, beginninglabel, endinglabel, delimiter, dimension)
         # calculate(readings)
         allkeys = keys(readings)
-        flag = all([x ∈ allkeys for x in headers]) && all([!isnothing(readings[x]) for x in headers])
+        flag = all([x ∈ allkeys for x in headers]) && all([!isnothing(readings[x]) for x in headers]) && length(systemstate) == dimension
         if flag
-            roll = readings["x1k"] / 180.0 * π
-            pitch = -readings["x2k"] / 180.0 * π
+            roll = systemstate[1] / 180.0 * π
+            pitch = -readings["pitch"] / 180.0 * π
             if rand() > plotsampleratio # skip samples in order to make the plotter interface closer to real time
                 timestamp = length(rollpoints[]) + 1
                 roll_point = Point2f(timestamp, roll)
@@ -163,8 +168,8 @@ on(buttons[1].clicks) do n
                 number = length(rollpoints[])
                 xlims!(ax1, number - maxplotnumber, number)
             end
-            v1 = readings["u1k"]
-            v2 = readings["u2k"]
+            v1 = systemstate[4]
+            v2 = systemstate[5]
             q = ℍ(roll, x̂) * ℍ(pitch, ŷ)
             O_B_R = mat3(q)
     
@@ -174,7 +179,7 @@ on(buttons[1].clicks) do n
     
             pivot_ps[] = [Point3f(pivot_observable[]...), Point3f(pivot_observable[]...), Point3f(pivot_observable[]...)]
     
-            global reaction_angle = readings["encoder"] / 50.0 * 2π # reaction_angle + float(v1) / 45.0 * 0.1
+            global reaction_angle = readings["enc"] / 50.0 * 2π # reaction_angle + float(v1) / 45.0 * 0.1
             global rolling_angle = rolling_angle + float(v2) / 255.0 * 0.01
             rq = Quaternion(ℍ(reaction_angle, x̂))
             mq = Quaternion(ℍ(rolling_angle, ẑ))
@@ -190,6 +195,7 @@ end
 
 on(buttons[3].clicks) do n
     disconnect(clientside)
+    # execute the command nc 192.168.4.1 10000 in terminal for testing
     global clientside = connect("192.168.4.1", 10000)
     if isopen(clientside)
         statustext[] = "Connected."
