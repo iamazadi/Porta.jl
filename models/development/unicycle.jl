@@ -9,9 +9,8 @@ figuresize = (1920, 1080)
 segments = 30
 frames_number = 360
 modelname = "unicycle"
-maxplotnumber = 500
-plotsampleratio = 0.9
-headers = ["j", "k", "pitch", "enc"]
+maxplotnumber = 300
+headers = ["j", "k", "roll", "pitch", "enc0", "enc1", "v1", "v2"]
 dimension = 10
 beginninglabel = "z: "
 endinglabel = "j: "
@@ -99,14 +98,14 @@ statustext = Observable("Not connected.")
 statuslabel = Label(fig, statustext)
 fig[1, 2] = grid!(hcat(statuslabel, buttons...), tellheight = false, tellwidth = false)
 
-
-rollpoints = Observable(Point2f[(0, 0)])
-pitchpoints = Observable(Point2f[(0, 0)])
+graphpoints = Observable([Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)]])
 
 linegraphx2 = Observable(0..10)
 linegraphy2 = Observable(cos)
-roll_lineobject = scatter!(ax1, rollpoints, color = :red)
-pitch_lineobject = scatter!(ax1, pitchpoints, color = :green)
+roll_lineobject = scatter!(ax1, @lift(($graphpoints)[1]), color = :red)
+pitch_lineobject = scatter!(ax1, @lift(($graphpoints)[2]), color = :green)
+encoder1_lineobject = scatter!(ax1, @lift(($graphpoints)[3]), color = :orange)
+encoder2_lineobject = scatter!(ax1, @lift(($graphpoints)[4]), color = :pink)
 lineobject2 = lines!(ax2, linegraphx2, linegraphy2, color = :blue)
 
 chassis_stl = load(chassis_stl_path)
@@ -157,19 +156,36 @@ on(buttons[1].clicks) do n
         allkeys = keys(readings)
         flag = all([x ∈ allkeys for x in headers]) && all([!isnothing(readings[x]) for x in headers]) && length(systemstate) == dimension
         if flag
-            roll = systemstate[1] / 180.0 * π
+            roll = readings["roll"] / 180.0 * π
             pitch = -readings["pitch"] / 180.0 * π
-            if rand() > plotsampleratio # skip samples in order to make the plotter interface closer to real time
-                timestamp = length(rollpoints[]) + 1
-                roll_point = Point2f(timestamp, roll)
-                pitch_point = Point2f(timestamp, pitch)
-                rollpoints[] = push!(rollpoints[], roll_point)
-                pitchpoints[] = push!(pitchpoints[], pitch_point)
-                number = length(rollpoints[])
-                xlims!(ax1, number - maxplotnumber, number)
+            encoder1 = readings["enc0"] / (255.0 * 255.0)
+            encoder2 = readings["enc1"] / (255.0 * 255.0)
+            # plot the system state graph
+            _graphpoints = graphpoints[]
+            _rollpoints = _graphpoints[1]
+            _pitchpoints = _graphpoints[2]
+            _encoder1points = _graphpoints[3]
+            _encoder2points = _graphpoints[4]
+            timestamp = vec(_rollpoints[end])[1] + 1.0
+            push!(_rollpoints, Point2f(timestamp, roll))
+            push!(_pitchpoints, Point2f(timestamp, pitch))
+            push!(_encoder1points, Point2f(timestamp, encoder1))
+            push!(_encoder2points, Point2f(timestamp, encoder2))
+            number = length(_rollpoints)
+            if number > maxplotnumber
+                _rollpoints = _rollpoints[number - maxplotnumber + 1:end]
+                _pitchpoints = _pitchpoints[number - maxplotnumber + 1:end]
+                _encoder1points = _encoder1points[number - maxplotnumber + 1:end]
+                _encoder2points = _encoder2points[number - maxplotnumber + 1:end]
+                @assert(length(_rollpoints) == maxplotnumber)
+                graphpoints[] = [_rollpoints, _pitchpoints, _encoder1points, _encoder2points]
+            else
+                graphpoints[] = [_rollpoints, _pitchpoints, _encoder1points, _encoder2points]
             end
-            v1 = systemstate[4]
-            v2 = systemstate[5]
+            xlims!(ax1, timestamp - maxplotnumber, timestamp)
+            #######
+            v1 = readings["v1"]
+            v2 = readings["v2"]
             q = ℍ(roll, x̂) * ℍ(pitch, ŷ)
             O_B_R = mat3(q)
     
@@ -179,8 +195,8 @@ on(buttons[1].clicks) do n
     
             pivot_ps[] = [Point3f(pivot_observable[]...), Point3f(pivot_observable[]...), Point3f(pivot_observable[]...)]
     
-            global reaction_angle = readings["enc"] / 50.0 * 2π # reaction_angle + float(v1) / 45.0 * 0.1
-            global rolling_angle = rolling_angle + float(v2) / 255.0 * 0.01
+            global reaction_angle = reaction_angle + float(v1) * 0.1 # readings["enc"] / 50.0 * 2π
+            global rolling_angle = rolling_angle + float(v2) * 0.01
             rq = Quaternion(ℍ(reaction_angle, x̂))
             mq = Quaternion(ℍ(rolling_angle, ẑ))
             GLMakie.rotate!(rollingwheel, mq)
