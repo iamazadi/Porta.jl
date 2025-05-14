@@ -8,6 +8,7 @@ makedocs(
         "Home" => "index.md",
         "Hopf Fibration" => "hopffibration.md",
         "News Report" => "newsreport.md",
+        "General Mathematics 2" => "generalmathematics2.md",
         "Reaction Wheel Unicycle" => "reactionwheelunicycle.md"
     ]
 )
