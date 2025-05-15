@@ -126,7 +126,7 @@ For a two-variable function ``f(x, y)``, higher order derivatives are as follows
 
 - ``\frac{\partial^2 f}{\partial y \partial x} = \frac{\partial}{\partial y} (\frac{\partial f}{\partial x})`` or ``{f\prime}_{xy}``.
 
-### Example
+### Exercise
 
 With the given function ``f(x, y) = ln(x^4 y^2) - y``, find the second partial derivative of ``f(x, y)`` both with respect to ``x``, the second partial derivative of ``f(x, y)`` both with respect to ``y``, the second partial derivative of ``f(x, y)`` first taken with respect to ``y`` and then with respect to ``x``, and the second partial derivative of ``f(x, y)`` with respect to ``x`` and ``y``.
 
@@ -144,7 +144,7 @@ With the given function ``f(x, y) = ln(x^4 y^2) - y``, find the second partial d
 
 There are a few states for the chain rule:
 
-1. Suppose the function ``f(x, y)`` is defined. The variables``x`` and ``y`` are on their own functions of other variables, such as ``t``. In this state:
+- The first state. Suppose the function ``f(x, y)`` is defined. The variables``x`` and ``y`` are on their own functions of other variables, such as ``t``. In this state:
 
 ``\frac{\partial f}{\partial t} = \frac{\partial f}{\partial x} \frac{\partial x}{\partial t}``.
 
@@ -156,9 +156,9 @@ If ``f(x, y) = x^3 y - y^2 x + 4x`` and ``x = sin(t)`` and ``y = 2e^t``, then fi
 
 *Reminder:* ``(e^u)\prime = u\prime e^u``.
 
-2. The second state. If we have ``f(x, y, z)`` a three-variable function and ``x, y, z`` three functions of ``t``, then we have:
+- The second state. If we have ``f(x, y, z)`` a three-variable function and ``x, y, z`` three functions of ``t``, then we have:
 
-``\frac{\partial f}{\partial t} = \frac{partial f}{partial x} \frac{\partial x}{\partial t} + \frac{\partial f}{\partial y} \frac{\partial y}{\partial t} + \frac{\partial f}{\partial z} \frac{\partial z}{\partial t}``.
+``\frac{\partial f}{\partial t} = \frac{\partial f}{\partial x} \frac{\partial x}{\partial t} + \frac{\partial f}{\partial y} \frac{\partial y}{\partial t} + \frac{\partial f}{\partial z} \frac{\partial z}{\partial t}``.
 
 ### Example
 
@@ -168,11 +168,11 @@ The three-variable function ``f(x, y, z) = x y^3 - x^2 z^3 + ln(x y)`` is given,
 
 *Reminder:* ``(ln(u))\prime = \frac{u\prime}{u}``.
 
-3. The state of the third kind. If ``f(x, y)`` is a two-variable function, and ``x`` and ``y`` are two-variable functions of for example ``r`` and ``s``, then:
+- The state of the third kind. If ``f(x, y)`` is a two-variable function, and ``x`` and ``y`` are two-variable functions of for example ``r`` and ``s``, then:
 
 - ``\frac{\partial f}{\partial r} = \frac{\partial f}{\partial x} \frac{\partial x}{\partial r} + \frac{\partial f}{\partial y} \frac{\partial y}{\partial r}``.
 
-- ``\frac{\partial f}{\partial s} = \frac{\partial f}{\partial x} \frac{\partial x}{\partial s} + \frac{\partial f}{\partial y}{\partial y}{\partial s}``.
+- ``\frac{\partial f}{\partial s} = \frac{\partial f}{\partial x} \frac{\partial x}{\partial s} + \frac{\partial f}{\partial y} \frac{\partial y}{\partial s}``.
 
 ### Example
 
@@ -187,6 +187,88 @@ The partial derivative of the function ``f(x, y)`` with respect to ``r``:
 *Reminder:* ``\frac{d}{dx} a^x = \frac{d}{dx} e^{x ln(a)} = e^{x ln(a)} (\frac{d}{dx} x ln(a)) = e^{x ln(a)} ln(a) = a^x ln(a)``.
 
 # The Aplications of Partial Derivatives
+
+## Determining the Maximum and Minimum Values of Multivariable Functions
+
+The steps for determining the extremum points of a twovariable function ``f(x, y)``:
+
+1. Solve the system of equations that is formed with ``\frac{\partial f}{\partial x} = 0`` and ``\frac{\partial f}{\partial y} = 0``. Suppose that the solution of the system is equal to ``(x\_0, y_0)``.
+
+2. Compute the equation ``\Delta(x, y) = {f\prime}_{xx} {f\prime}{yy} - ({f\prime}{xy})^2``.
+
+3. Compute these values: ``\Delta(x_0, y_0)`` and ``{f\prime}{xx}(x_0, y_0)``.
+
+4. If ``\Delta(x_0, y_0) > 0`` and ``{f\prime}{xx}(x_0, y_0) < 0``, then the point ``(x_0, y_0)`` is a local maximum.
+
+5. If ``\Delta(x_0, y_0) > 0`` and ``{f\prime}{xx}(x_0, y_0) > 0``, then the point ``(x_0, y_0)`` is a local minimum.
+
+6. If ``\Delta(x_0, y_0) < 0``, then the point ``(x_0, y_0)`` is a saddle point.
+
+7. If ``\Delta(x_0, y_0) = 0``, then this test does not succeed at determining the type of the point ``(x_0, y_0)``.
+
+### Example
+
+Find the local extremum points of the function ``f(x, y) = 2x y - 5y^2 + 4x - 2x^2 + 4y - 4``.
+
+``\frac{\partial d}{\partial x} = 0`` and ``\frac{\partial f}{\partial y} = 0`` yields: ``2y + 4 - 4x = 0`` and ``2x - 10y + 4 = 0``. Next, we have: ``2y - 4x = -4`` and ``2x - 10y = -4``. Multiplying the equation ``2x - 10y = -4`` by ``2`` results in ``2y - 4x = -4`` and ``4x - 20y = -8``. Then, ``-18y = -12``. Finally, ``y = \frac{-12}{-18} = \frac{2}{3}``. Subsequently, we solve for ``x`` by substituting the numerical value of ``y`` in the equation ``2(\frac{2}{3}) - 4x = -4``, which siplifies to the equation ``-4x = -4 - \frac{4}{3} = \frac{-16}{3}``. Then, we have ``x = \frac{16}{12} = \frac{4}{3}``. This gives the extremum point ``(x_0, y_0) = (\frac{4}{3}, \frac{2}{3})``. Now, we have to determine the type of ``(\frac{4}{3}, \frac{2}{3})``.
+
+``{f\prime}_{xx}(\frac{4}{3}, \frac{2}{3}) = -4`` and ``{f\prime}_{yy}(\frac{4}{3}, \frac{2}{3}) = -10`` and ``{f\prime}_{xy}(\frac{4}{3}, \frac{2}{3}) = 2``.
+
+``\Delta(\frac{4}{3}, \frac{2}{3}) = (-4) (-10) - 2^2 = 40 - 4 = 36``.
+
+Having computed the values of ``{f\prime}_{xx}(\frac{4}{3}, \frac{2}{3})`` and ``\Delta(\frac{4}{3}, \frac{2}{3})`` we can examine the type of the point ``(\frac{4}{3}, \frac{2}{3})`` next:
+
+``\Delta(\frac{4}{3}, \frac{2}{3}) > 0`` and ``{f\prime}_{xx}(\frac{4}{3}, \frac{2}{3}) < 0``, therefore the point ``(\frac{4}{3}, \frac{2}{3})`` is a local maximum according to step four above.
+
+### Exercise
+
+Find the local extremum points of the function ``f(x, y) = x^2 - 2x y + \frac{1}{3} y^3 - 3y``.
+
+``\frac{\partial f}{\partial x} = 2x - 2y = 0``,
+
+``\frac{\partial f}{\partial y} = -2x + y^2 - 3 = 0``.
+
+``2x - 2y = 0``,
+
+``-2x + y^2 = 3``.
+
+``y^2 - 2y = 3``.
+
+``y^2 - 2y - 3 = 0``.
+
+``\frac{2 \pm \sqrt{4 + 12}}{2} = \frac{2 \pm 4}{2} = \frac{1 \pm 2}{1}``. So, the variable ``y`` has two distinguished roots: ``y_1 = 3`` and ``y_2 = -1``.
+
+This is how to find the values of ``x_1`` and ``x_2`` with the given values of ``y_1`` and ``y_2``.
+
+``2x - 2y\_1 = 0``,
+``2x - 2(3) = 0``,
+``2x = 6``,
+``x_1 = 3``.
+
+``2x - 2y_2 = 0``,
+``2x - 2(-1) = 0``,
+``2x = -2``,
+``x_2 = -1``.
+
+The coordinates of the point ``(x_0, y_0)`` for the extremum examination is equal to ``(x_0, y_0) = (3, 3)``, and ``(x_1, y_1) = (-1, -1)``.
+
+``{f\prime}_{xx} = 2``,
+``{f\prime}_{yy} = 2y``,
+``{f\prime}_{xy} = -2``.
+
+``\Delta(x, y) = {f\prime}_{xx} - {f\prime}{yy} - ({f\prime}_{xy})^2 = (2) (2y) - (-2)^2 = 4y - 4``.
+
+For each point ``(x_0, y_0)`` and ``(x_1, y_1)`` respectively we have: ``\Delta(x\_0, y\_0) = 4 (3) - 4 = 8`` and ``\Delta(x\_1, y\_1) = 4 (-1) - 4 = -8``.
+
+``{f\prime}_{xx}(x_0, y_0) = 2``.
+
+But, ``(x_0, y_0) = (3, 3)`` yields ``\Delta(3, 3) > 0`` and ``{f\prime}_{xx}(3, 3) > 3``. Therefore, ``(3, 3)`` is a local minimum point of the function ``f(x, y)``.
+
+Examining the last extremum point, ``(x_1, y_1) = (-1, -1)`` yields ``\Delta(-1, -1) < 0`` and ``{f\prime}_{xx}(-1, -1) > 0``, which makes ``(-1, -1)`` a saddle point.
+
+## The Directional Derivative of Multivariable Functions
+
+
 
 # Dual Integrals
 
