@@ -412,6 +412,18 @@ Here, we do not know the plane's normal vector at point ``(0, 0, 0)``. However, 
 
 The equation of the plane: ``0 (x - 0) + 0 (y - 0) + 3 (z - 0) = 0`` or ``z = 0``.
 
+### Example
+
+Find the equation of a tangent plane to the surface of ``f(x, y, z) = x z^2 - y z + y^2 x`` at point ``A = (1, 1, 1)``.
+
+``\overrightarrow{\nabla f} = \frac{\partial f}{\partial x} \overrightarrow{i} + \frac{\partial f}{\partial y} \overrightarrow{j} + \frac{\partial f}{\partial z} \overrightarrow{k} \bigg_{(1, 1, 1)}.``.
+
+``\overrightarrow{\nabla f} = (z^2 + y^2) \overrightarrow{i} + (2y x - z) \overrightarrow{j} + (2z x - y) \overrightarrow{k} \bigg_{(1, 1, 1)}``.
+
+``\overrightarrow{\nabla f} = 2 \overrightarrow{i} + \overrightarrow{j} + \overrightarrow{k} = (2, 1, 1)``.
+
+The equation of the tangent plane: ``2 (x - 1) + (y - 1) + (z - 1) = 0``.
+
 # Dual Integrals
 
 # The Applications of Dual Integrals
