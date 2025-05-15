@@ -81,18 +81,18 @@ And by induction in this way, the domain of the three-variable function ``w = f(
 
 ``y = x^3 - 2x^5 + sin(x)``.
 
-``y\prime = f\prime(x)``.
+``y^\prime = f^\prime(x)``.
 
-``y\prime = 3x^2 - 10x^4 + cos(x)``.
+``y^\prime = 3x^2 - 10x^4 + cos(x)``.
 
-``f\prime(x) = \lim_{h \to 0} \frac{f(x + h) - f(x)}{h}``.
+``f^\prime(x) = \lim_{h \to 0} \frac{f(x + h) - f(x)}{h}``.
 
 ``f(x, y)``.
 
 When we want to find the derivative of a multivariable function, we must specify with respect to which variable the derivative is to be applied. Other than the one variable, with respect to which the derivative is computed, the rest of the variables are trated as constant values.
 
-The derivative of the function ``f(x, y)`` with respect to ``x`` is denoted by ``\frac{\partial f}{\partial x}`` or ``{f\prime}_x``.
-The derivative of the function ``f(x, y)`` with respect to ``y`` is denoted by ``\frac{\partial f}{\partial y}`` or ``{f\prime}_y``.
+The derivative of the function ``f(x, y)`` with respect to ``x`` is denoted by ``\frac{\partial f}{\partial x}`` or ``{f^\prime}_x``.
+The derivative of the function ``f(x, y)`` with respect to ``y`` is denoted by ``\frac{\partial f}{\partial y}`` or ``{f^\prime}_y``.
 
 ### Example
 
@@ -112,19 +112,19 @@ If the function ``f(x, y, z) = x^5 y^2 z^3 + y x^y - sin(y z^3)`` is defined, th
 
 - ``\frac{\partial f}{\partial z} = 3z^2 x^5 y^2 - 3z^2 y cos(y z^3)``.
 
-*Reminder:* ``(a^u)\prime = u\prime a^u ln(a)``.
+*Reminder:* ``(a^u)^\prime = u^\prime a^u ln(a)``.
 
 ## Higher Order Partial Derivatives
 
 For a two-variable function ``f(x, y)``, higher order derivatives are as follows:
 
-- ``\frac{\partial^2 f}{\partial x^2} = \frac{\partial}{\partial x} (\frac{\partial f}{\partial x})`` or ``{f\prime}_{xx}``.
+- ``\frac{\partial^2 f}{\partial x^2} = \frac{\partial}{\partial x} (\frac{\partial f}{\partial x})`` or ``{f^\prime}_{xx}``.
 
-- ``\frac{\partial^2 f}{\partial y^2} = \frac{\partial}{\partial y} (\frac{\partial f}{\partial y})`` or ``{f\prime}_{yy}``.
+- ``\frac{\partial^2 f}{\partial y^2} = \frac{\partial}{\partial y} (\frac{\partial f}{\partial y})`` or ``{f^\prime}_{yy}``.
 
-- ``\frac{\partial^2 f}{\partial x \partial y} = \frac{\partial}{\partial x} (\frac{\partial f}{\partial y})`` or ``{f\prime}_{yx}``.
+- ``\frac{\partial^2 f}{\partial x \partial y} = \frac{\partial}{\partial x} (\frac{\partial f}{\partial y})`` or ``{f^\prime}_{yx}``.
 
-- ``\frac{\partial^2 f}{\partial y \partial x} = \frac{\partial}{\partial y} (\frac{\partial f}{\partial x})`` or ``{f\prime}_{xy}``.
+- ``\frac{\partial^2 f}{\partial y \partial x} = \frac{\partial}{\partial y} (\frac{\partial f}{\partial x})`` or ``{f^\prime}_{xy}``.
 
 ### Exercise
 
@@ -138,7 +138,7 @@ With the given function ``f(x, y) = ln(x^4 y^2) - y``, find the second partial d
 
 - ``\frac{\partial^2 f}{\partial y \partial x} = \frac{\partial}{\partial y}(\frac{4x^3 y^2}{x^4 y^2}) = \frac{\partial}{\partial y}(\frac{4}{x}) = 0``.
 
-*Reminder:* ``(ln(u))\prime = \frac{u\prime}{u}``.
+*Reminder:* ``(ln(u))^\prime = \frac{u^\prime}{u}``.
 
 ## The Chain Rule
 
@@ -154,7 +154,7 @@ If ``f(x, y) = x^3 y - y^2 x + 4x`` and ``x = sin(t)`` and ``y = 2e^t``, then fi
 
 ``\frac{\partial f}{\partial t} = (3x^2 y - y^2 + 4) cos(t) + 2(x^3 - 2yx) e^t``.
 
-*Reminder:* ``(e^u)\prime = u\prime e^u``.
+*Reminder:* ``(e^u)^\prime = u^\prime e^u``.
 
 - The second state. If we have ``f(x, y, z)`` a three-variable function and ``x, y, z`` three functions of ``t``, then we have:
 
@@ -166,7 +166,7 @@ The three-variable function ``f(x, y, z) = x y^3 - x^2 z^3 + ln(x y)`` is given,
 
 ``\frac{\partial f}{\partial t} = (y^3 - 2x z^3 + \frac{y}{x y}) (2t) + (3y^2 x + \frac{x}{x y})(-4sin(4t)) + (-3z^2 x^2)(\frac{1}{2 \sqrt{t}})``.
 
-*Reminder:* ``(ln(u))\prime = \frac{u\prime}{u}``.
+*Reminder:* ``(ln(u))^\prime = \frac{u^\prime}{u}``.
 
 - The state of the third kind. If ``f(x, y)`` is a two-variable function, and ``x`` and ``y`` are two-variable functions of for example ``r`` and ``s``, then:
 
@@ -194,13 +194,13 @@ The steps for determining the extremum points of a twovariable function ``f(x, y
 
 1. Solve the system of equations that is formed with ``\frac{\partial f}{\partial x} = 0`` and ``\frac{\partial f}{\partial y} = 0``. Suppose that the solution of the system is equal to ``(x_0, y_0)``.
 
-2. Compute the equation ``\Delta(x, y) = {f\prime}_{xx} {f\prime}{yy} - ({f\prime}{xy})^2``.
+2. Compute the equation ``\Delta(x, y) = {f^\prime}_{xx} {f^\prime}{yy} - ({f^\prime}{xy})^2``.
 
-3. Compute these values: ``\Delta(x_0, y_0)`` and ``{f\prime}{xx}(x_0, y_0)``.
+3. Compute these values: ``\Delta(x_0, y_0)`` and ``{f^\prime}{xx}(x_0, y_0)``.
 
-4. If ``\Delta(x_0, y_0) > 0`` and ``{f\prime}{xx}(x_0, y_0) < 0``, then the point ``(x_0, y_0)`` is a local maximum.
+4. If ``\Delta(x_0, y_0) > 0`` and ``{f^\prime}{xx}(x_0, y_0) < 0``, then the point ``(x_0, y_0)`` is a local maximum.
 
-5. If ``\Delta(x_0, y_0) > 0`` and ``{f\prime}{xx}(x_0, y_0) > 0``, then the point ``(x_0, y_0)`` is a local minimum.
+5. If ``\Delta(x_0, y_0) > 0`` and ``{f^\prime}{xx}(x_0, y_0) > 0``, then the point ``(x_0, y_0)`` is a local minimum.
 
 6. If ``\Delta(x_0, y_0) < 0``, then the point ``(x_0, y_0)`` is a saddle point.
 
@@ -212,13 +212,13 @@ Find the local extremum points of the function ``f(x, y) = 2x y - 5y^2 + 4x - 2x
 
 ``\frac{\partial d}{\partial x} = 0`` and ``\frac{\partial f}{\partial y} = 0`` yields: ``2y + 4 - 4x = 0`` and ``2x - 10y + 4 = 0``. Next, we have: ``2y - 4x = -4`` and ``2x - 10y = -4``. Multiplying the equation ``2x - 10y = -4`` by ``2`` results in ``2y - 4x = -4`` and ``4x - 20y = -8``. Then, ``-18y = -12``. Finally, ``y = \frac{-12}{-18} = \frac{2}{3}``. Subsequently, we solve for ``x`` by substituting the numerical value of ``y`` in the equation ``2(\frac{2}{3}) - 4x = -4``, which siplifies to the equation ``-4x = -4 - \frac{4}{3} = \frac{-16}{3}``. Then, we have ``x = \frac{16}{12} = \frac{4}{3}``. This gives the extremum point ``(x_0, y_0) = (\frac{4}{3}, \frac{2}{3})``. Now, we have to determine the type of ``(\frac{4}{3}, \frac{2}{3})``.
 
-``{f\prime}_{xx}(\frac{4}{3}, \frac{2}{3}) = -4`` and ``{f\prime}_{yy}(\frac{4}{3}, \frac{2}{3}) = -10`` and ``{f\prime}_{xy}(\frac{4}{3}, \frac{2}{3}) = 2``.
+``{f^\prime}_{xx}(\frac{4}{3}, \frac{2}{3}) = -4`` and ``{f^\prime}_{yy}(\frac{4}{3}, \frac{2}{3}) = -10`` and ``{f^\prime}_{xy}(\frac{4}{3}, \frac{2}{3}) = 2``.
 
 ``\Delta(\frac{4}{3}, \frac{2}{3}) = (-4) (-10) - 2^2 = 40 - 4 = 36``.
 
-Having computed the values of ``{f\prime}_{xx}(\frac{4}{3}, \frac{2}{3})`` and ``\Delta(\frac{4}{3}, \frac{2}{3})`` we can examine the type of the point ``(\frac{4}{3}, \frac{2}{3})`` next:
+Having computed the values of ``{f^\prime}_{xx}(\frac{4}{3}, \frac{2}{3})`` and ``\Delta(\frac{4}{3}, \frac{2}{3})`` we can examine the type of the point ``(\frac{4}{3}, \frac{2}{3})`` next:
 
-``\Delta(\frac{4}{3}, \frac{2}{3}) > 0`` and ``{f\prime}_{xx}(\frac{4}{3}, \frac{2}{3}) < 0``, therefore the point ``(\frac{4}{3}, \frac{2}{3})`` is a local maximum according to step four above.
+``\Delta(\frac{4}{3}, \frac{2}{3}) > 0`` and ``{f^\prime}_{xx}(\frac{4}{3}, \frac{2}{3}) < 0``, therefore the point ``(\frac{4}{3}, \frac{2}{3})`` is a local maximum according to step four above.
 
 ### Exercise
 
@@ -252,19 +252,19 @@ This is the intermediate step for how to find the values of ``x_1`` and ``x_2`` 
 
 The coordinates of the point ``(x_0, y_0)`` for the extremum examination is equal to ``(x_0, y_0) = (3, 3)``, and ``(x_1, y_1) = (-1, -1)``.
 
-``{f\prime}_{xx} = 2``,
-``{f\prime}_{yy} = 2y``,
-``{f\prime}_{xy} = -2``.
+``{f^\prime}_{xx} = 2``,
+``{f^\prime}_{yy} = 2y``,
+``{f^\prime}_{xy} = -2``.
 
-``\Delta(x, y) = {f\prime}_{xx} - {f\prime}{yy} - ({f\prime}_{xy})^2 = (2) (2y) - (-2)^2 = 4y - 4``.
+``\Delta(x, y) = {f^\prime}_{xx} - {f^\prime}{yy} - ({f^\prime}_{xy})^2 = (2) (2y) - (-2)^2 = 4y - 4``.
 
 For each point ``(x_0, y_0)`` and ``(x_1, y_1)`` respectively we have: ``\Delta(x\_0, y\_0) = 4 (3) - 4 = 8`` and ``\Delta(x\_1, y\_1) = 4 (-1) - 4 = -8``.
 
-``{f\prime}_{xx}(x_0, y_0) = 2``.
+``{f^\prime}_{xx}(x_0, y_0) = 2``.
 
-But, ``(x_0, y_0) = (3, 3)`` yields ``\Delta(3, 3) > 0`` and ``{f\prime}_{xx}(3, 3) > 3``. Therefore, ``(3, 3)`` is a local minimum point of the function ``f(x, y)``.
+But, ``(x_0, y_0) = (3, 3)`` yields ``\Delta(3, 3) > 0`` and ``{f^\prime}_{xx}(3, 3) > 3``. Therefore, ``(3, 3)`` is a local minimum point of the function ``f(x, y)``.
 
-Examining the last extremum point, ``(x_1, y_1) = (-1, -1)`` yields ``\Delta(-1, -1) < 0`` and ``{f\prime}_{xx}(-1, -1) > 0``, which makes ``(-1, -1)`` a saddle point.
+Examining the last extremum point, ``(x_1, y_1) = (-1, -1)`` yields ``\Delta(-1, -1) < 0`` and ``{f^\prime}_{xx}(-1, -1) > 0``, which makes ``(-1, -1)`` a saddle point.
 
 ## The Directional Derivative of Multivariable Functions
 
@@ -274,11 +274,11 @@ The plot of the function ``f(x, y)``.
 
 The gradient of the function ``f(x, y)`` at point ``a`` is found as follows:
 
-The gradient vector ``\overrightarrow{\nabla f}`` or ``grad \ f = \frac{\partial f}{\partial x} \overrightarrow{\i} + \frac{\partial f}{\partial y} \overrightarrow{j} |_a`` evaluated at point ``a``.
+The gradient vector ``\overrightarrow{\nabla f}`` or ``grad \ f = \frac{\partial f}{\partial x} \overrightarrow{i} + \frac{\partial f}{\partial y} \overrightarrow{j} |_a`` evaluated at point ``a``.
 
-The gradient of the function ``w = f(x, y, z)`` at point ``a`` is equal to ``\frac{\partial f}{\partial x} \overrightarrow{\i} + \frac{\partial f}{\partial y} \overrightarrow{\j} + \frac{\partial f}{\partial z} \overrightarrow{k} |_a``.
+The gradient of the function ``w = f(x, y, z)`` at point ``a`` is equal to ``\frac{\partial f}{\partial x} \overrightarrow{i} + \frac{\partial f}{\partial y} \overrightarrow{j} + \frac{\partial f}{\partial z} \overrightarrow{k} |_a``.
 
-Here, ``\overrightarrow{\i}``, ``\overrightarrow{\j}`` and ``\overrightarrow{\k}`` are unit vectors, which represent the unit basis vectors in the three-dimensional space. These are the spatial triples. Every two of them are linearly independent. In other words, none of them can be represented as a linear combination of the other two.
+Here, ``\overrightarrow{i}``, ``\overrightarrow{j}`` and ``\overrightarrow{k}`` are unit vectors, which represent the unit basis vectors in the three-dimensional space. These are the spatial triples. Every two of them are linearly independent. In other words, none of them can be represented as a linear combination of the other two.
 
 - ``\overrightarrow{i} = (1, 0, 0)``
 
@@ -286,28 +286,28 @@ Here, ``\overrightarrow{\i}``, ``\overrightarrow{\j}`` and ``\overrightarrow{\k}
 
 - ``\overrightarrow{k} = (0, 0, 1)``
 
-``|\overrightarrow{\imath}| + |\overrightarrow{j}| + |\overrightarrow{k}| = 1``.
+``|\overrightarrow{i}| + |\overrightarrow{j}| + |\overrightarrow{k}| = 1``.
 
-``(3, -2, 1) = 3\overrightarrow{imath} - 2\overrightarrow{j} + \overrightarrow{k}``.
+``(3, -2, 1) = 3 \overrightarrow{i} - 2 \overrightarrow{j} + \overrightarrow{k}``.
 
 ### Example
 
 Find the gradient of the function ``f(x, y) = -x^4 y^3 + x^2 y - x`` at point ``(2, 3)``.
 
-``\overrightarrow{\nable f} \rvert{(2, 3)} = (-4x^3 y^3 + 2x y - 1) \overrightarrow{i} + (-3x^4 y^2 + x^2) \overrightarrow{j}``,
+``\overrightarrow{\nabla f} \right|_{(2, 3)} = (-4x^3 y^3 + 2x y - 1) \overrightarrow{i} + (-3x^4 y^2 + x^2) \overrightarrow{j}``,
 
-``\overrightarrow{\nable f} \rvert{(2, 3)} = ((-4) (2^3) (3^3) + 2(2) (3) - 1) \overrightarrow{i} + ((-3) (2^4) (3^2) + 2^2) \overrightarrow{j}``,
+``\overrightarrow{\nabla f} \right|_{(2, 3)} = ((-4) (2^3) (3^3) + 2(2) (3) - 1) \overrightarrow{i} + ((-3) (2^4) (3^2) + 2^2) \overrightarrow{j}``,
 
-``\overrightarrow{\nable f} \rvert{(2, 3)} = ((-4) (8) (27) + 12 - 1) \overrightarrow{i} + ((-3) (16) (9) + 4) \overrightarrow{j}``,
+``\overrightarrow{\nabla f} \right|_{(2, 3)} = ((-4) (8) (27) + 12 - 1) \overrightarrow{i} + ((-3) (16) (9) + 4) \overrightarrow{j}``,
 
-``\overrightarrow{\nable f} \rvert{(2, 3)} = -853 \overrightarrow{i} - 428 \overrightarrow{j} = (-853, -428)``.
+``\overrightarrow{\nabla f} \right|_{(2, 3)} = -853 \overrightarrow{i} - 428 \overrightarrow{j} = (-853, -428)``.
 
 
 Remember how we compute the slope ``m_L`` of the line ``L`` in the ``x-y`` plane at point ``x_0``:
 
-``f\prime (x_0) = m_L``.
+``f^\prime (x_0) = m_L``.
 
-``f\prime (x_0) = lim_{x \to x_0} \frac{f(x) - f(x\_0)}{x - x_0}``.
+``f^\prime (x_0) = lim_{x \to x_0} \frac{f(x) - f(x\_0)}{x - x_0}``.
 
 Now, the directional derivative of the function ``f(x, y)`` at point ``a`` in the direction of vector ``\overrightarrow{u}``:
 
@@ -327,10 +327,54 @@ The three-dimensional inner product of vectors ``\overrightarrow{a} = (a_1, a_2,
 
 ``\overrightarrow{a} \cdot \overrightarrow{b} = a_1 b_1 + a_2 b_2 + a_3 b_3``.
 
-### Example
-
 For example, the coordinates of vector ``overrightarrow{a}`` equals its head minus its tail as an arrow, which is equal to ``(6, 4) - (2, 1) = (4, 3)``.
 Also, the magnitude of ``\overrightarrow{a}`` equals ``\overrightarrow{a} = \sqrt{4^2 + 3^2} = \sqrt{25} = 5``.
+
+### Example
+
+Find the directional derivative of the function ``f(x, y) = x^3 y - y^2 x + y - 1`` at point ``p = (1, 2)`` in the direction of vector ``\overrightarrow{u} = 4 \overrightarrow{i} - 3 \overrightarrow{j}``.
+
+First, we need to find the gradient of the function.
+
+``\overrightarrow{\nabla f} = \frac{\partial f}{\partial x} \overrightarrow{i} + \frac{\partial f}{\patrtial y} \overrightarrow{j} \right|_{(1, 2)} = (3x^2 y - y^2) \overrightarrow{i} + (x^3 - 2y x) \overrightarrow{j} \right|_{(1, 2)}``,
+
+``\overrightarrow{\nabla f} = (6 - 4) \overrightarrow{i} + (1 - 4) \overrightarrow{j} = 2 \overrightarrow{i} - 3 \overrightarrow{j} = (2, -3)``.
+
+Second, we need to find the unit vector of ``\overrightarrow{u}``, along which the directional derivative is taken.
+
+``e_{\overrightarrow{u}} = \frac{4 \overrightarrow{i} - 3 \overrightarrow{j}}{\sqrt{4^2 + (-3)^2}} = \frac{(4, -3)}{\sqrt{25}} = (\frac{4}{5}, \frac{-3}{5})``.
+
+Finally, perform an inner product in order to compute the directional derivative of ``f`` in the direction of ``\overrightarrow{u}``.
+
+``D_{\overrightarrow{u}} f = (2, -3) \cdot (\frac{4}{5}, \frac{-3}{5}) = 2 \frac{4}{5} + -3 \frac{-3}{5} = \frac{8}{5} + \frac{9}{5} = \frac{17}{5}``.
+
+### Example
+
+The temperature of each point in the three-dimensional space of a room is computed using the relation: ``T(x, y, z) = x^2 y^2 + z x - z^2 y``. If we move starting from the point ``(1, -1, 1)`` in this room, in the direction of the vector ``\overrightarrow{u} = (2, 1, 1)``, then how much temperature change is experienced?
+
+This question asks us to find the directional derivative of the function ``T`` at the point ``p`` in the direction of the vector ``\overrightarrow{u}``.
+
+Find the gradient of the function ``f(x, y, z)`` first.
+
+``\overrightarrow{\nabla T} = \frac{\partial T}{\partial x} \overrightarrow{i} + \frac{\partial T}{\partial y} \overrightarrow{j} + \frac{\partial T}{\partial z} \overrightarrow{k} \right|_{(1, -1, 1)}``.
+
+``\overrightarrow{\nabla T} = (2x y^2 + z) \overrightarrow{i} + (2y x^2 - z^2) \overrightarrow{j} + (x - 2z y) \overrightarrow{k} \right|_{(1, -1, 1)}``.
+
+``\overrightarrow{\nabla T} = (2 + 1) \overrightarrow{i} + (-2 - 1) \overrightarrow{j} + (1 + 2) \overrightarrow{k} = 3 \verrightarrow{i} - 3 \overrightarrow{j} + 3 \overrightarrow{k}``.
+
+Next, find the unit vector ``e_{\overrightarrow{u}} to determine the direction of the derivative.
+
+``e_{\overrightarrow{u}} = \frac{(2, 1, 1)}{\sqrt{4 + 1 + 1}} = \frac{(2, 1, 1)}{\sqrt{6}} = (\frac{2}{\sqrt{6}}, \frac{1}{\sqrt{6}}, \frac{1}{\sqrt{6}})``.
+
+In the end, find the directional derivative of ``f`` at ``(1, -1, 1)`` in the direction of ``e_{\overrightarrow{u}}``:
+
+``D_{\overrightarrow{u}} T = (3, -3, 3) \cdot (\frac{2}{\sqrt{6}}, \frac{1}{\sqrt{6}}, \frac{1}{\sqrt{6}}) = \frac{(3) (2)}{\sqrt{6}} + \frac{-3}{\sqrt{6}} + \frac{3}{\sqrt{6}}``.
+
+``D_{\overrightarrpw{u}} T = \frac{6}{\sqrt{6}} = \frac{6 \sqrt{6}}{\sqrt{6} \sqrt{6}} = \frac{6 \sqrt{6}}{6} = \sqrt{6}``.
+
+## The Applications of the Gradient
+
+
 
 # Dual Integrals
 
