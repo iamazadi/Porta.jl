@@ -356,7 +356,7 @@ This question asks us to find the directional derivative of the function ``T`` a
 
 Find the gradient of the function ``f(x, y, z)`` first.
 
-``\overrightarrow{\nabla T} = \left \frac{\partial T}{\partial x} \overrightarrow{i} + \frac{\partial T}{\partial y} \overrightarrow{j} + \frac{\partial T}{\partial z} \overrightarrow{k} \right|_{(1, -1, 1)}``.
+``\overrightarrow{\nabla T} = \frac{\partial T}{\partial x} \overrightarrow{i} + \frac{\partial T}{\partial y} \overrightarrow{j} + \frac{\partial T}{\partial z} \overrightarrow{k} \bigg|_{(1, -1, 1)}``.
 
 ``\overrightarrow{\nabla T} = \left (2x y^2 + z) \overrightarrow{i} + (2y x^2 - z^2) \overrightarrow{j} + (x - 2z y) \overrightarrow{k} \right|_{(1, -1, 1)}``.
 
@@ -374,7 +374,43 @@ In the end, find the directional derivative of ``f`` at ``(1, -1, 1)`` in the di
 
 ## The Applications of the Gradient
 
+Writing the equation of a plane in the three-dimensional space ``\mathbb{R}^3``. In order to write the equation of the plane in three-dimensional space, we need a point of the plane and a vector perpendicular to the plane, called the normal vector.
 
+``A_0 = (x_0, y_0, z_0)``.
+
+For writing the equation of the plane, specify another point in the plane, like ``A = (x, y, z)``, and plot the vector ``\overrightarrow{A_0 A}``.
+
+Let ``\overrightarrow{n} = (a, b, c)`` be the vector normal to the plane. Both points ``A`` and ``A_0`` being in the plane, implies that the vectors ``\overrightarrow{n}`` and ``\overrightarrow{A_0 A}`` are perpendicular. Therefore, their inner product vanishes.
+
+``\overrightarrow{A_0 A} = (x - x_0, y - y_0, z - z_0)``, ``\overrightarrow{n} = (a, b, c)``.
+
+The equation of the plane with the vector normal to the plane ``\overrightarrow{n} = (a, b, c)`` that passes through the point ``A_0 = (x_0, y_0, z_0)``.
+
+``\overrightarrow{A_0 A} \cdot \overrightarrow{n} = a (x - x_0), b (y - y_0), c (z - z_0) = 0``.
+
+### Example
+
+Write the equation of a plane that passes through point ``(3, -2, 1)`` and its normal vector equals ``(5, 2, 3)``.
+
+``5 (x - 3) + 2 (y + 2) + 3 (z - 1) = 0``.
+
+In addition to finding the equation of plane, another application of the gradient is to find the equation of the *tangent plane* of the surface of a multivariable function ``f``, at a point on the surface.
+
+The plane ``P`` is tangent to the surface at point ``A``.
+
+### Example
+
+Find the equation of the tangent plane of the function ``f(x, y, z) = 3z - x cos(y) + e^x`` at point ``P - (0, 0, 0)``.
+
+Here, we do not know the plane's normal vector at point ``(0, 0, 0)``. However, according to the definition of the gradient vector, the plane's normal vector at this point, is the same as the gradient vector at this point.
+
+``\overrightarrow{\nabla f} = \frac{\partial f}{\partial x} \overrightarrow{i} + \frac{\partial f}{\partial y} \overrightarrow{j} + \frac{\partial f}{\partial z} \overrightarrow{k} \bigg_{(0, 0, 0)}``.
+
+``\overrightarrow{nabla f} = (-cos(y) + e^x) \overrightarrow{i} (x \ sin(y)) \overrightarrow{j} + 3 \overrightarrow{k} \bigg_{(0, 0, 0)}``.
+
+``\overrightarrow{\nabla f} = (-1 + 1) \overrightarrow{i} + 0 \overrightarrow{j} + 3 \overrightarrow{k} = (0, 0, 3)``.
+
+The equation of the plane: ``0 (x - 0) + 0 (y - 0) + 3 (z - 0) = 0`` or ``z = 0``.
 
 # Dual Integrals
 
