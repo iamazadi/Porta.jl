@@ -294,13 +294,13 @@ Here, ``\overrightarrow{i}``, ``\overrightarrow{j}`` and ``\overrightarrow{k}`` 
 
 Find the gradient of the function ``f(x, y) = -x^4 y^3 + x^2 y - x`` at point ``(2, 3)``.
 
-``\overrightarrow{\nabla f} \right|_{(2, 3)} = (-4x^3 y^3 + 2x y - 1) \overrightarrow{i} + (-3x^4 y^2 + x^2) \overrightarrow{j}``,
+``\left \overrightarrow{\nabla f} \right|_{(2, 3)} = (-4x^3 y^3 + 2x y - 1) \overrightarrow{i} + (-3x^4 y^2 + x^2) \overrightarrow{j}``,
 
-``\overrightarrow{\nabla f} \right|_{(2, 3)} = ((-4) (2^3) (3^3) + 2(2) (3) - 1) \overrightarrow{i} + ((-3) (2^4) (3^2) + 2^2) \overrightarrow{j}``,
+``\left \overrightarrow{\nabla f} \right|_{(2, 3)} = ((-4) (2^3) (3^3) + 2(2) (3) - 1) \overrightarrow{i} + ((-3) (2^4) (3^2) + 2^2) \overrightarrow{j}``,
 
-``\overrightarrow{\nabla f} \right|_{(2, 3)} = ((-4) (8) (27) + 12 - 1) \overrightarrow{i} + ((-3) (16) (9) + 4) \overrightarrow{j}``,
+``\left \overrightarrow{\nabla f} \right|_{(2, 3)} = ((-4) (8) (27) + 12 - 1) \overrightarrow{i} + ((-3) (16) (9) + 4) \overrightarrow{j}``,
 
-``\overrightarrow{\nabla f} \right|_{(2, 3)} = -853 \overrightarrow{i} - 428 \overrightarrow{j} = (-853, -428)``.
+``\left \overrightarrow{\nabla f} \right|_{(2, 3)} = -853 \overrightarrow{i} - 428 \overrightarrow{j} = (-853, -428)``.
 
 
 Remember how we compute the slope ``m_L`` of the line ``L`` in the ``x-y`` plane at point ``x_0``:
@@ -336,7 +336,7 @@ Find the directional derivative of the function ``f(x, y) = x^3 y - y^2 x + y - 
 
 First, we need to find the gradient of the function.
 
-``\overrightarrow{\nabla f} = \frac{\partial f}{\partial x} \overrightarrow{i} + \frac{\partial f}{\patrtial y} \overrightarrow{j} \right|_{(1, 2)} = (3x^2 y - y^2) \overrightarrow{i} + (x^3 - 2y x) \overrightarrow{j} \right|_{(1, 2)}``,
+``\overrightarrow{\nabla f} = \left \frac{\partial f}{\partial x} \overrightarrow{i} + \frac{\partial f}{\patrtial y} \overrightarrow{j} \right|_{(1, 2)} = \left (3x^2 y - y^2) \overrightarrow{i} + (x^3 - 2y x) \overrightarrow{j} \right|_{(1, 2)}``,
 
 ``\overrightarrow{\nabla f} = (6 - 4) \overrightarrow{i} + (1 - 4) \overrightarrow{j} = 2 \overrightarrow{i} - 3 \overrightarrow{j} = (2, -3)``.
 
@@ -356,13 +356,13 @@ This question asks us to find the directional derivative of the function ``T`` a
 
 Find the gradient of the function ``f(x, y, z)`` first.
 
-``\overrightarrow{\nabla T} = \frac{\partial T}{\partial x} \overrightarrow{i} + \frac{\partial T}{\partial y} \overrightarrow{j} + \frac{\partial T}{\partial z} \overrightarrow{k} \right|_{(1, -1, 1)}``.
+``\overrightarrow{\nabla T} = \left \frac{\partial T}{\partial x} \overrightarrow{i} + \frac{\partial T}{\partial y} \overrightarrow{j} + \frac{\partial T}{\partial z} \overrightarrow{k} \right|_{(1, -1, 1)}``.
 
-``\overrightarrow{\nabla T} = (2x y^2 + z) \overrightarrow{i} + (2y x^2 - z^2) \overrightarrow{j} + (x - 2z y) \overrightarrow{k} \right|_{(1, -1, 1)}``.
+``\overrightarrow{\nabla T} = \left (2x y^2 + z) \overrightarrow{i} + (2y x^2 - z^2) \overrightarrow{j} + (x - 2z y) \overrightarrow{k} \right|_{(1, -1, 1)}``.
 
-``\overrightarrow{\nabla T} = (2 + 1) \overrightarrow{i} + (-2 - 1) \overrightarrow{j} + (1 + 2) \overrightarrow{k} = 3 \verrightarrow{i} - 3 \overrightarrow{j} + 3 \overrightarrow{k}``.
+``\overrightarrow{\nabla T} = (2 + 1) \overrightarrow{i} + (-2 - 1) \overrightarrow{j} + (1 + 2) \overrightarrow{k} = 3 \overrightarrow{i} - 3 \overrightarrow{j} + 3 \overrightarrow{k}``.
 
-Next, find the unit vector ``e_{\overrightarrow{u}} to determine the direction of the derivative.
+Next, find the unit vector ``e_{\overrightarrow{u}}`` to determine the direction of the derivative.
 
 ``e_{\overrightarrow{u}} = \frac{(2, 1, 1)}{\sqrt{4 + 1 + 1}} = \frac{(2, 1, 1)}{\sqrt{6}} = (\frac{2}{\sqrt{6}}, \frac{1}{\sqrt{6}}, \frac{1}{\sqrt{6}})``.
 
@@ -370,7 +370,7 @@ In the end, find the directional derivative of ``f`` at ``(1, -1, 1)`` in the di
 
 ``D_{\overrightarrow{u}} T = (3, -3, 3) \cdot (\frac{2}{\sqrt{6}}, \frac{1}{\sqrt{6}}, \frac{1}{\sqrt{6}}) = \frac{(3) (2)}{\sqrt{6}} + \frac{-3}{\sqrt{6}} + \frac{3}{\sqrt{6}}``.
 
-``D_{\overrightarrpw{u}} T = \frac{6}{\sqrt{6}} = \frac{6 \sqrt{6}}{\sqrt{6} \sqrt{6}} = \frac{6 \sqrt{6}}{6} = \sqrt{6}``.
+``D_{\overrightarrow{u}} T = \frac{6}{\sqrt{6}} = \frac{6 \sqrt{6}}{\sqrt{6} \sqrt{6}} = \frac{6 \sqrt{6}}{6} = \sqrt{6}``.
 
 ## The Applications of the Gradient
 
