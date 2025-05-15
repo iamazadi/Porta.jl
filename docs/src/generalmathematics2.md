@@ -1,5 +1,5 @@
 ```@meta
-Description = "News Report"
+Description = "General Mathematics 2"
 ```
 
 # Multivariable Functions
@@ -192,7 +192,7 @@ The partial derivative of the function ``f(x, y)`` with respect to ``r``:
 
 The steps for determining the extremum points of a twovariable function ``f(x, y)``:
 
-1. Solve the system of equations that is formed with ``\frac{\partial f}{\partial x} = 0`` and ``\frac{\partial f}{\partial y} = 0``. Suppose that the solution of the system is equal to ``(x\_0, y_0)``.
+1. Solve the system of equations that is formed with ``\frac{\partial f}{\partial x} = 0`` and ``\frac{\partial f}{\partial y} = 0``. Suppose that the solution of the system is equal to ``(x_0, y_0)``.
 
 2. Compute the equation ``\Delta(x, y) = {f\prime}_{xx} {f\prime}{yy} - ({f\prime}{xy})^2``.
 
@@ -236,9 +236,9 @@ Find the local extremum points of the function ``f(x, y) = x^2 - 2x y + \frac{1}
 
 ``y^2 - 2y - 3 = 0``.
 
-``\frac{2 \pm \sqrt{4 + 12}}{2} = \frac{2 \pm 4}{2} = \frac{1 \pm 2}{1}``. So, the variable ``y`` has two distinguished roots: ``y_1 = 3`` and ``y_2 = -1``.
+``\frac{-(-2) \pm \sqrt{4 + 12}}{2} = \frac{2 \pm 4}{2} = \frac{1 \pm 2}{1}``. So by solving an equation of order 2 in variable ``y``, the variable ``y`` has two distinguished roots: ``y_1 = 3`` and ``y_2 = -1``.
 
-This is how to find the values of ``x_1`` and ``x_2`` with the given values of ``y_1`` and ``y_2``.
+This is the intermediate step for how to find the values of ``x_1`` and ``x_2`` with the given values of ``y_1`` and ``y_2``.
 
 ``2x - 2y\_1 = 0``,
 ``2x - 2(3) = 0``,
@@ -268,7 +268,69 @@ Examining the last extremum point, ``(x_1, y_1) = (-1, -1)`` yields ``\Delta(-1,
 
 ## The Directional Derivative of Multivariable Functions
 
+The gradient vector of function ``f(x, y)`` at point ``(x_0, y_0)`` is a vector that is perpendicular to the surface of the function ``f(x, y)`` at the point ``(x_0, y_0)``.
 
+The plot of the function ``f(x, y)``.
+
+The gradient of the function ``f(x, y)`` at point ``a`` is found as follows:
+
+The gradient vector ``\overrightarrow{\nabla f}`` or ``grad \ f = \frac{\partial f}{\partial x} \overrightarrow{\i} + \frac{\partial f}{\partial y} \overrightarrow{j} |_a`` evaluated at point ``a``.
+
+The gradient of the function ``w = f(x, y, z)`` at point ``a`` is equal to ``\frac{\partial f}{\partial x} \overrightarrow{\i} + \frac{\partial f}{\partial y} \overrightarrow{\j} + \frac{\partial f}{\partial z} \overrightarrow{k} |_a``.
+
+Here, ``\overrightarrow{\i}``, ``\overrightarrow{\j}`` and ``\overrightarrow{\k}`` are unit vectors, which represent the unit basis vectors in the three-dimensional space. These are the spatial triples. Every two of them are linearly independent. In other words, none of them can be represented as a linear combination of the other two.
+
+- ``\overrightarrow{i} = (1, 0, 0)``
+
+- ``\overrightarrow{j} = (0, 1, 0)``
+
+- ``\overrightarrow{k} = (0, 0, 1)``
+
+``|\overrightarrow{\imath}| + |\overrightarrow{j}| + |\overrightarrow{k}| = 1``.
+
+``(3, -2, 1) = 3\overrightarrow{imath} - 2\overrightarrow{j} + \overrightarrow{k}``.
+
+### Example
+
+Find the gradient of the function ``f(x, y) = -x^4 y^3 + x^2 y - x`` at point ``(2, 3)``.
+
+``\overrightarrow{\nable f} \rvert{(2, 3)} = (-4x^3 y^3 + 2x y - 1) \overrightarrow{i} + (-3x^4 y^2 + x^2) \overrightarrow{j}``,
+
+``\overrightarrow{\nable f} \rvert{(2, 3)} = ((-4) (2^3) (3^3) + 2(2) (3) - 1) \overrightarrow{i} + ((-3) (2^4) (3^2) + 2^2) \overrightarrow{j}``,
+
+``\overrightarrow{\nable f} \rvert{(2, 3)} = ((-4) (8) (27) + 12 - 1) \overrightarrow{i} + ((-3) (16) (9) + 4) \overrightarrow{j}``,
+
+``\overrightarrow{\nable f} \rvert{(2, 3)} = -853 \overrightarrow{i} - 428 \overrightarrow{j} = (-853, -428)``.
+
+
+Remember how we compute the slope ``m_L`` of the line ``L`` in the ``x-y`` plane at point ``x_0``:
+
+``f\prime (x_0) = m_L``.
+
+``f\prime (x_0) = lim_{x \to x_0} \frac{f(x) - f(x\_0)}{x - x_0}``.
+
+Now, the directional derivative of the function ``f(x, y)`` at point ``a`` in the direction of vector ``\overrightarrow{u}``:
+
+``Df_{\overrightarrow{u}} = \overrightarrow{\nabla f} \cdot e_{\overrightarrow{u}}``,
+
+where ``cdot`` denotes the inner product, and ``e_{\overrightarrow{u}}`` denotes the unit vector of ``\overrightarrow{u}``.
+
+In order to compute the unit vector ``e_{\overrightarrow{u}}``, divide the vector ``\overrightarrow{u}`` by its magnitude ``|\overrightarrow{u}|`` by element:
+
+``e_{\overrightarrow{u}} = \frac{\overrightarrow{u}}{|\overrightarrow{u}|}``.
+
+The magnitude of a vector such as ``a = (a_1, a_2, a_3)`` equals ``|\overrightarrow{a}| = \sqrt{{a_1}^2 + {a_2}^2 + {a_3}^2}`` in the three-dimensional case. However, in the two-dimensional case where ``a = (a_1, a_2)`` is a tuple, the length of ``a`` is equal to ``|\overrightarrow{a}| = \sqrt{{a_1}^2 + {a_2}^2}``.
+
+The inner product of a pair of vectors such as ``\overrightarrow{a} = (a_1, a_2)`` and ``\overrightarrow{b} = (b_1, b_2)`` is computed either as ``\overrightarrow{a} \cdot \overrightarrow{b} = a_1 b_1 + a_2 b_2`` or ``\overrightarrow{a} \cdot \overrightarrow{b} = |\overrightarrow{a}| |\overrightarrow{b}| cos(\alpha)``, where ``\alpha`` denotes the angle between the two vectors ``\overrightarrow{a}`` and ``\overrightarrow{b}``.
+
+The three-dimensional inner product of vectors ``\overrightarrow{a} = (a_1, a_2, a_3)`` and ``\overrightarrow{b} = (b_1, b_2, b_3)`` is eqaul to:
+
+``\overrightarrow{a} \cdot \overrightarrow{b} = a_1 b_1 + a_2 b_2 + a_3 b_3``.
+
+### Example
+
+For example, the coordinates of vector ``overrightarrow{a}`` equals its head minus its tail as an arrow, which is equal to ``(6, 4) - (2, 1) = (4, 3)``.
+Also, the magnitude of ``\overrightarrow{a}`` equals ``\overrightarrow{a} = \sqrt{4^2 + 3^2} = \sqrt{25} = 5``.
 
 # Dual Integrals
 
