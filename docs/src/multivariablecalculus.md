@@ -1,5 +1,5 @@
 ```@meta
-Description = "General Mathematics 2"
+Description = "Multivariable Calculus"
 ```
 
 # Multivariable Functions
@@ -28,6 +28,8 @@ The volume of a sphere: ``V(x, y, z) = xyz``.
 
 The volume of a cylinder: ``V(r, h) = \pi r^2 h``.
 
+![1](./assets/multivariablecalculus/1.jpg)
+
 ### Example
 
 The average of the ``n`` numbers ``x_1, x_2, ..., x_n``:
@@ -38,6 +40,8 @@ The average of the ``n`` numbers ``x_1, x_2, ..., x_n``:
 
 The domain of the two-variable function ``f(x, y)`` is either a point in the ``x-y`` plane, or part, or the entire coordinate system ``x-y \in \mathbb{R}^2 ``.
 
+![2](./assets/multivariablecalculus/2.jpg)
+
 ### Examples
 
 Find the domain of the follwoing functions and then plot it as a shape.
@@ -45,11 +49,15 @@ Find the domain of the follwoing functions and then plot it as a shape.
 *Example A.* ``f(x, y) = 2x^3 y + x^2 y^2 - y + 5``
 ``D_f = \{ (x, y) | x \in \mathbb{R}, y \in \mathbb{R} \} = \mathbb{R}^2``.
 
+![3](./assets/multivariablecalculus/3.jpg)
+
 *Example B.* ``f(x, y) = \frac{1}{x - y}``
 
 ``D_f = \{ (x, y) | x - y \neq 0 \} = \{ (x, y) | x \neq y \}``.
 
 The whole plane, with the line ``y = x`` removed.
+
+![4](./assets/multivariablecalculus/4.jpg)
 
 *Example C.* ``f(x, y) = \sqrt{x - y}``
 
@@ -57,21 +65,31 @@ The whole plane, with the line ``y = x`` removed.
 
 On and under the line `` y = x``.
 
+![5](./assets/multivariablecalculus/5.jpg)
+
 *Example D.* ``f(x, y) = \frac{\sqrt{y - 3}}{\sqrt{5 - x}}``
 
 ``D_f = \{ (x, y) | y - 3 \geq 0, 5 - x > 0 \} = \{ (x, y) | y \geq 3, x < 5 \}``.
+
+![6](./assets/multivariablecalculus/6.jpg)
 
 *Example E.* ``f(x, y) = \frac{\sqrt{y + 1}}{\sqrt[n]{2 - |x|}}``
 
 ``D_f = \{ (x, y) | y + 1 \geq 0, 2 - |x| > 0 \} = \{ (x, y) | y \geq -1, -2 < x < 2 \}``.
 
+![7](./assets/multivariablecalculus/7.jpg)
+
 The shape of two-variable functions are going to be three-dimensional plots, which are also called surfaces.
+
+![8](./assets/multivariablecalculus/8.jpg)
 
 ``z = f(x, y)``.
 
 The triple ``(x, y, z)``.
 
 Since drawing three-dimensional shapes is time consuming, we just make a few examples of surfaces.
+
+![9](./assets/multivariablecalculus/9.jpg)
 
 And by induction in this way, the domain of the three-variable function ``w = f(x, y, z)`` is three-dimensional, and its plot is four-dimensional.
 
@@ -206,6 +224,8 @@ The steps for determining the extremum points of a twovariable function ``f(x, y
 
 7. If ``\Delta(x_0, y_0) = 0``, then this test does not succeed at determining the type of the point ``(x_0, y_0)``.
 
+![10](./assets/multivariablecalculus/10.jpg)
+
 ### Example
 
 Find the local extremum points of the function ``f(x, y) = 2x y - 5y^2 + 4x - 2x^2 + 4y - 4``.
@@ -268,7 +288,9 @@ Examining the last extremum point, ``(x_1, y_1) = (-1, -1)`` yields ``\Delta(-1,
 
 ## The Directional Derivative of Multivariable Functions
 
-The gradient vector of function ``f(x, y)`` at point ``(x_0, y_0)`` is a vector that is perpendicular to the surface of the function ``f(x, y)`` at the point ``(x_0, y_0)``.
+The gradient vector of function ``f(x, y)`` at point ``(x_0, y_0)`` is a vector that is orthogonal to the surface of the function ``f(x, y)`` at the point ``(x_0, y_0)``.
+
+![11](./assets/multivariablecalculus/11.jpg)
 
 The plot of the function ``f(x, y)``.
 
@@ -309,6 +331,8 @@ Remember how we compute the slope ``m_L`` of the line ``L`` in the ``x-y`` plane
 
 ``f^\prime (x_0) = lim_{x \to x_0} \frac{f(x) - f(x\_0)}{x - x_0}``.
 
+![12](./assets/multivariablecalculus/12.jpg)
+
 Now, the directional derivative of the function ``f(x, y)`` at point ``a`` in the direction of vector ``\overrightarrow{u}``:
 
 ``Df_{\overrightarrow{u}} = \overrightarrow{\nabla f} \cdot e_{\overrightarrow{u}}``,
@@ -328,6 +352,9 @@ The three-dimensional inner product of vectors ``\overrightarrow{a} = (a_1, a_2,
 ``\overrightarrow{a} \cdot \overrightarrow{b} = a_1 b_1 + a_2 b_2 + a_3 b_3``.
 
 For example, the coordinates of vector ``\overrightarrow{a}`` equals its head minus its tail as an arrow, which is equal to ``(6, 4) - (2, 1) = (4, 3)``.
+
+![13](./assets/multivariablecalculus/13.jpg)
+
 Also, the magnitude of ``\overrightarrow{a}`` equals ``\overrightarrow{a} = \sqrt{4^2 + 3^2} = \sqrt{25} = 5``.
 
 ### Example
@@ -376,6 +403,8 @@ In the end, find the directional derivative of ``f`` at ``(1, -1, 1)`` in the di
 
 Writing the equation of a plane in the three-dimensional space ``\mathbb{R}^3``. In order to write the equation of the plane in three-dimensional space, we need a point of the plane and a vector perpendicular to the plane, called the normal vector.
 
+![14](./assets/multivariablecalculus/14.jpg)
+
 ``A_0 = (x_0, y_0, z_0)``.
 
 For writing the equation of the plane, specify another point in the plane, like ``A = (x, y, z)``, and plot the vector ``\overrightarrow{A_0 A}``.
@@ -395,6 +424,8 @@ Write the equation of a plane that passes through point ``(3, -2, 1)`` and its n
 ``5 (x - 3) + 2 (y + 2) + 3 (z - 1) = 0``.
 
 In addition to finding the equation of plane, another application of the gradient is to find the equation of the *tangent plane* of the surface of a multivariable function ``f``, at a point on the surface.
+
+![15](./assets/multivariablecalculus/15.jpg)
 
 The plane ``P`` is tangent to the surface at point ``A``.
 
@@ -448,11 +479,17 @@ The equation of the tangent plane: ``2 (x - 1) + (y - 1) + (z - 1) = 0``.
 
 The area between the plot of ``f(x)`` and the ``x``-axis, from point ``a`` to point ``b``, equals the integral ``S = \int_{a}^{b} f(x) \ dx``.
 
+![16](./assets/multivariablecalculus/16.jpg)
+
 By extending that idea, the double integral ``\int_A^{} \int f(x, y) \ dA`` is the volume of a three-dimensional shape that is bounded from above by the surface of ``f(x, y)`` and from below by the region ``A`` on the ``xy`` plane.
+
+![17](./assets/multivariablecalculus/17.jpg)
 
 ## Types of Integral Regions
 
 - This domain type is normal to both ``x`` and ``y`` (rectangular regions). For the region ``A`` to be normal to ``x``, it is required that a line passing through any of the corner points of region ``A``, and parallel to the ``x``-axis, must not pass through the region. Similarly, the region ``A`` is normal to ``y`` when a line passing through any of the corner points of region ``A``, and parallel to the ``y``-axis, does not pass through the region.
+
+![18](./assets/multivariablecalculus/18.jpg)
 
 This region is both normal to ``x`` and ``y``.
 
@@ -468,6 +505,8 @@ The region ``A`` has two boundaries: ``a \leq x \leq b`` and ``c \leq y \leq d``
 
 Let ``A`` be a region of the shape: ``A``: ``2 \leq x \le 4`` and ``1 \leq y \leq 2``. Find the double integral of function ``f(x, y) = x^2 y - x y^3 + x`` on this region.
 
+![19](./assets/multivariablecalculus/19.jpg)
+
 ``S = \int_2^4 \int_1^2 (x^2 y - x y^3 + x) dy \dx = \int_2^4 (\frac{x^2 y^2}{2} - \frac{x y^4}{4} + x y) |_1^2 dx.``
 
 ``S = \int_2^4 ((2x^2 - 4x + 2x) - (\frac{x^2}{2} - \frac{x}{4} + x)) dx``.
@@ -482,9 +521,13 @@ The volume is equal to: ``S = (32 - 22) - (4 - 5.5) = 10 - (-1.5) = 10 + 1.5 = 1
 
 - The second type of region. The region is normal to ``x`` and not normal to ``y``.
 
+![20](./assets/multivariablecalculus/20.jpg)
+
 ``\int_A \int f(x, y) dA = \int_c^d \int_{h(y)}^{g(y)} dx \ dy``.
 
 - The third type of region. The region is normal to ``y`` and not normal to ``x``.
+
+![21](./assets/multivariablecalculus/21.jpg)
 
 ``\int_A \int f(x, y) dA = \int_a^b \int_c^{h(x)} f(x,y) dy \ dx``.
 
