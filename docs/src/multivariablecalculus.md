@@ -296,9 +296,9 @@ The plot of the function ``f(x, y)``.
 
 The gradient of the function ``f(x, y)`` at point ``a`` is found as follows:
 
-The gradient vector ``\overrightarrow{\nabla f}`` or ``grad \ f = \frac{\partial f}{\partial x} \overrightarrow{i} + \frac{\partial f}{\partial y} \left \overrightarrow{j} \right|_{a}`` evaluated at point ``a``.
+The gradient vector ``\overrightarrow{\nabla f}`` or ``grad \ f = \frac{\partial f}{\partial x} \overrightarrow{i} + \frac{\partial f}{\partial y} \overrightarrow{j} |_{a}`` evaluated at point ``a``.
 
-The gradient of the function ``w = f(x, y, z)`` at point ``a`` is equal to ``\frac{\partial f}{\partial x} \overrightarrow{i} + \frac{\partial f}{\partial y} \overrightarrow{j} + \frac{\partial f}{\partial z} \left \overrightarrow{k} \right|_{a}``.
+The gradient of the function ``w = f(x, y, z)`` at point ``a`` is equal to ``\frac{\partial f}{\partial x} \overrightarrow{i} + \frac{\partial f}{\partial y} \overrightarrow{j} + \frac{\partial f}{\partial z} \overrightarrow{k} |_{a}``.
 
 Here, ``\overrightarrow{i}``, ``\overrightarrow{j}`` and ``\overrightarrow{k}`` are unit vectors, which represent the unit basis vectors in the three-dimensional space. These are the spatial triples. Every two of them are linearly independent. In other words, none of them can be represented as a linear combination of the other two.
 
@@ -316,13 +316,13 @@ Here, ``\overrightarrow{i}``, ``\overrightarrow{j}`` and ``\overrightarrow{k}`` 
 
 Find the gradient of the function ``f(x, y) = -x^4 y^3 + x^2 y - x`` at point ``(2, 3)``.
 
-``\left \overrightarrow{\nabla f} \right|_{(2, 3)} = (-4x^3 y^3 + 2x y - 1) \overrightarrow{i} + (-3x^4 y^2 + x^2) \overrightarrow{j}``,
+``\overrightarrow{\nabla f} |_{(2, 3)} = (-4x^3 y^3 + 2x y - 1) \overrightarrow{i} + (-3x^4 y^2 + x^2) \overrightarrow{j}``,
 
-``\left \overrightarrow{\nabla f} \right|_{(2, 3)} = ((-4) (2^3) (3^3) + 2(2) (3) - 1) \overrightarrow{i} + ((-3) (2^4) (3^2) + 2^2) \overrightarrow{j}``,
+``\overrightarrow{\nabla f} |_{(2, 3)} = ((-4) (2^3) (3^3) + 2(2) (3) - 1) \overrightarrow{i} + ((-3) (2^4) (3^2) + 2^2) \overrightarrow{j}``,
 
-``\left \overrightarrow{\nabla f} \right|_{(2, 3)} = ((-4) (8) (27) + 12 - 1) \overrightarrow{i} + ((-3) (16) (9) + 4) \overrightarrow{j}``,
+``\overrightarrow{\nabla f} |_{(2, 3)} = ((-4) (8) (27) + 12 - 1) \overrightarrow{i} + ((-3) (16) (9) + 4) \overrightarrow{j}``,
 
-``\left \overrightarrow{\nabla f} \right|_{(2, 3)} = -853 \overrightarrow{i} - 428 \overrightarrow{j} = (-853, -428)``.
+``\overrightarrow{\nabla f} |_{(2, 3)} = -853 \overrightarrow{i} - 428 \overrightarrow{j} = (-853, -428)``.
 
 
 Remember how we compute the slope ``m_L`` of the line ``L`` in the ``x-y`` plane at point ``x_0``:
@@ -363,7 +363,7 @@ Find the directional derivative of the function ``f(x, y) = x^3 y - y^2 x + y - 
 
 First, we need to find the gradient of the function.
 
-``\overrightarrow{\nabla f} = \frac{\partial f}{\partial x} \overrightarrow{i} + \frac{\partial f}{\patrtial y} \left \overrightarrow{j} \right|_{(1, 2)} = (3x^2 y - y^2) \overrightarrow{i} + (x^3 - 2y x) \left \overrightarrow{j} \right|_{(1, 2)}``,
+``\overrightarrow{\nabla f} = \frac{\partial f}{\partial x} \overrightarrow{i} + \frac{\partial f}{\patrtial y} \overrightarrow{j} |_{(1, 2)} = (3x^2 y - y^2) \overrightarrow{i} + (x^3 - 2y x) \overrightarrow{j} |_{(1, 2)}``,
 
 ``\overrightarrow{\nabla f} = (6 - 4) \overrightarrow{i} + (1 - 4) \overrightarrow{j} = 2 \overrightarrow{i} - 3 \overrightarrow{j} = (2, -3)``.
 
@@ -383,9 +383,9 @@ This question asks us to find the directional derivative of the function ``T`` a
 
 Find the gradient of the function ``f(x, y, z)`` first.
 
-``\overrightarrow{\nabla T} = \frac{\partial T}{\partial x} \overrightarrow{i} + \frac{\partial T}{\partial y} \overrightarrow{j} + \frac{\partial T}{\partial z} \left \overrightarrow{k} \right|_{(1, -1, 1)}``.
+``\overrightarrow{\nabla T} = \frac{\partial T}{\partial x} \overrightarrow{i} + \frac{\partial T}{\partial y} \overrightarrow{j} + \frac{\partial T}{\partial z} \overrightarrow{k} |_{(1, -1, 1)}``.
 
-``\overrightarrow{\nabla T} = (2x y^2 + z) \overrightarrow{i} + (2y x^2 - z^2) \overrightarrow{j} + (x - 2z y) \left \overrightarrow{k} \right|_{(1, -1, 1)}``.
+``\overrightarrow{\nabla T} = (2x y^2 + z) \overrightarrow{i} + (2y x^2 - z^2) \overrightarrow{j} + (x - 2z y) \overrightarrow{k} |_{(1, -1, 1)}``.
 
 ``\overrightarrow{\nabla T} = (2 + 1) \overrightarrow{i} + (-2 - 1) \overrightarrow{j} + (1 + 2) \overrightarrow{k} = 3 \overrightarrow{i} - 3 \overrightarrow{j} + 3 \overrightarrow{k}``.
 
@@ -431,13 +431,13 @@ The plane ``P`` is tangent to the surface at point ``A``.
 
 ### Example
 
-Find the equation of the tangent plane of the function ``f(x, y, z) = 3z - x cos(y) + e^x`` at point ``P - (0, 0, 0)``.
+Find the equation of the tangent plane of the function ``f(x, y, z) = 3z - x cos(y) + e^x`` at point ``P = (0, 0, 0)``.
 
 Here, we do not know the plane's normal vector at point ``(0, 0, 0)``. However, according to the definition of the gradient vector, the plane's normal vector at this point, is the same as the gradient vector at this point.
 
-``\overrightarrow{\nabla f} = \frac{\partial f}{\partial x} \overrightarrow{i} + \frac{\partial f}{\partial y} \overrightarrow{j} + \frac{\partial f}{\partial z} \left \overrightarrow{k} \right|_{(0, 0, 0)}``.
+``\overrightarrow{\nabla f} = \frac{\partial f}{\partial x} \overrightarrow{i} + \frac{\partial f}{\partial y} \overrightarrow{j} + \frac{\partial f}{\partial z} \overrightarrow{k} |_{(0, 0, 0)}``.
 
-``\overrightarrow{nabla f} = (-cos(y) + e^x) \overrightarrow{i} (x \ sin(y)) \overrightarrow{j} + 3 \left \overrightarrow{k} \right|_{(0, 0, 0)}``.
+``\overrightarrow{nabla f} = (-cos(y) + e^x) \overrightarrow{i} (x \ sin(y)) \overrightarrow{j} + 3 \overrightarrow{k} |_{(0, 0, 0)}``.
 
 ``\overrightarrow{\nabla f} = (-1 + 1) \overrightarrow{i} + 0 \overrightarrow{j} + 3 \overrightarrow{k} = (0, 0, 3)``.
 
@@ -447,9 +447,9 @@ The equation of the plane: ``0 (x - 0) + 0 (y - 0) + 3 (z - 0) = 0`` or ``z = 0`
 
 Find the equation of a tangent plane to the surface of ``f(x, y, z) = x z^2 - y z + y^2 x`` at point ``A = (1, 1, 1)``.
 
-``\overrightarrow{\nabla f} = \frac{\partial f}{\partial x} \overrightarrow{i} + \frac{\partial f}{\partial y} \overrightarrow{j} + \frac{\partial f}{\partial z} \left \overrightarrow{k} \right|_{(1, 1, 1)}.``.
+``\overrightarrow{\nabla f} = \frac{\partial f}{\partial x} \overrightarrow{i} + \frac{\partial f}{\partial y} \overrightarrow{j} + \frac{\partial f}{\partial z} \overrightarrow{k} |_{(1, 1, 1)}.``.
 
-``\overrightarrow{\nabla f} = (z^2 + y^2) \overrightarrow{i} + (2y x - z) \overrightarrow{j} + (2z x - y) \left \overrightarrow{k} \right|_{(1, 1, 1)}``.
+``\overrightarrow{\nabla f} = (z^2 + y^2) \overrightarrow{i} + (2y x - z) \overrightarrow{j} + (2z x - y) \overrightarrow{k} |_{(1, 1, 1)}``.
 
 ``\overrightarrow{\nabla f} = 2 \overrightarrow{i} + \overrightarrow{j} + \overrightarrow{k} = (2, 1, 1)``.
 
@@ -481,7 +481,7 @@ The area between the plot of ``f(x)`` and the ``x``-axis, from point ``a`` to po
 
 ![16](./assets/multivariablecalculus/16.jpg)
 
-By extending that idea, the double integral ``\int_A^{} \int f(x, y) \ dA`` is the volume of a three-dimensional shape that is bounded from above by the surface of ``f(x, y)`` and from below by the region ``A`` on the ``xy`` plane.
+By extending that idea, the double integral ``\int \int_A f(x, y) \ dA`` is the volume of a three-dimensional shape that is bounded from above by the surface of ``f(x, y)`` and from below by the region ``A`` on the ``xy`` plane.
 
 ![17](./assets/multivariablecalculus/17.jpg)
 
@@ -497,7 +497,7 @@ This region is both normal to ``x`` and ``y``.
 
 Here, the region is normal to both ``x`` and ``y``. So:
 
-``\int_A^{} \int f(x, y) \ dA = \int_c^d \int_a^b f(x, y) dx \ dy = \int_c^d \int_a^b f(x, y) dy \ dx``.
+``\int \int_A f(x, y) \ dA = \int_c^d \int_a^b f(x, y) dx \ dy = \int_c^d \int_a^b f(x, y) dy \ dx``.
 
 The region ``A`` has two boundaries: ``a \leq x \leq b`` and ``c \leq y \leq d``.
 
@@ -507,7 +507,7 @@ Let ``A`` be a region of the shape: ``A``: ``2 \leq x \le 4`` and ``1 \leq y \le
 
 ![19](./assets/multivariablecalculus/19.jpg)
 
-``S = \int_2^4 \int_1^2 (x^2 y - x y^3 + x) dy \dx = \int_2^4 (\frac{x^2 y^2}{2} - \frac{x y^4}{4} + x y) |_1^2 dx.``
+``S = \int_2^4 \int_1^2 (x^2 y - x y^3 + x) dy \ dx = \int_2^4 (\frac{x^2 y^2}{2} - \frac{x y^4}{4} + x y) |_1^2 dx.``
 
 ``S = \int_2^4 ((2x^2 - 4x + 2x) - (\frac{x^2}{2} - \frac{x}{4} + x)) dx``.
 
@@ -523,13 +523,13 @@ The volume is equal to: ``S = (32 - 22) - (4 - 5.5) = 10 - (-1.5) = 10 + 1.5 = 1
 
 ![20](./assets/multivariablecalculus/20.jpg)
 
-``\int_A \int f(x, y) dA = \int_c^d \int_{h(y)}^{g(y)} dx \ dy``.
+``\int \int_A f(x, y) dA = \int_c^d \int_{h(y)}^{g(y)} dx \ dy``.
 
 - The third type of region. The region is normal to ``y`` and not normal to ``x``.
 
 ![21](./assets/multivariablecalculus/21.jpg)
 
-``\int_A \int f(x, y) dA = \int_a^b \int_c^{h(x)} f(x,y) dy \ dx``.
+``\int \int_A f(x, y) dA = \int_a^b \int_c^{h(x)} f(x,y) dy \ dx``.
 
 # The Applications of Dual Integrals
 

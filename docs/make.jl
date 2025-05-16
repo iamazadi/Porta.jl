@@ -8,7 +8,7 @@ makedocs(
         "Home" => "index.md",
         "Hopf Fibration" => "hopffibration.md",
         "News Report" => "newsreport.md",
-        "General Mathematics 2" => "multivariablecalculus.md",
+        "Multivariable Calculus" => "multivariablecalculus.md",
         "Reaction Wheel Unicycle" => "reactionwheelunicycle.md"
     ]
 )
