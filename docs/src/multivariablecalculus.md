@@ -36,9 +36,9 @@ The average of the ``n`` numbers ``x_1, x_2, ..., x_n``:
 
 ``f(x_1, x_2, ..., x_n) = \frac{1}{n} \sum_{i = 1}^n x_i``.
 
-## The Domain of Multi-variale Functions
+## The Domain of Multivariale Functions
 
-The domain of the two-variable function ``f(x, y)`` is either a point in the ``x-y`` plane, or part, or the entire coordinate system ``x-y \in \mathbb{R}^2 ``.
+The domain of the two-variable function ``f(x, y)`` is either a point in the ``x``-``y`` plane, or part, or the entire ``x``-``y``coordinate system ``\mathbb{R}^2``.
 
 ![2](./assets/multivariablecalculus/2.jpg)
 
@@ -337,7 +337,7 @@ Now, the directional derivative of the function ``f(x, y)`` at point ``a`` in th
 
 ``Df_{\overrightarrow{u}} = \overrightarrow{\nabla f} \cdot e_{\overrightarrow{u}}``,
 
-where ``cdot`` denotes the inner product, and ``e_{\overrightarrow{u}}`` denotes the unit vector of ``\overrightarrow{u}``.
+where ``\cdot`` denotes the inner product, and ``e_{\overrightarrow{u}}`` denotes the unit vector of ``\overrightarrow{u}``.
 
 In order to compute the unit vector ``e_{\overrightarrow{u}}``, divide the vector ``\overrightarrow{u}`` by its magnitude ``|\overrightarrow{u}|`` by element:
 
@@ -363,7 +363,7 @@ Find the directional derivative of the function ``f(x, y) = x^3 y - y^2 x + y - 
 
 First, we need to find the gradient of the function.
 
-``\overrightarrow{\nabla f} = \frac{\partial f}{\partial x} \overrightarrow{i} + \frac{\partial f}{\patrtial y} \overrightarrow{j} |_{(1, 2)}``,
+``\overrightarrow{\nabla f} = \frac{\partial f}{\partial x} \overrightarrow{i} + \frac{\partial f}{\partial y} \overrightarrow{j} |_{(1, 2)}``,
 
 ``\overrightarrow{\nabla f} = (3x^2 y - y^2) \overrightarrow{i} + (x^3 - 2y x) \overrightarrow{j} |_{(1, 2)}``,
 
@@ -487,7 +487,7 @@ By extending that idea, the double integral ``\int \int_A f(x, y) \ dA`` is the 
 
 ![17](./assets/multivariablecalculus/17.jpg)
 
-## Types of Integral Regions
+## Types of Integral Region
 
 - This domain type is normal to both ``x`` and ``y`` (rectangular regions). For the region ``A`` to be normal to ``x``, it is required that a line passing through any of the corner points of region ``A``, and parallel to the ``x``-axis, must not pass through the region. Similarly, the region ``A`` is normal to ``y`` when a line passing through any of the corner points of region ``A``, and parallel to the ``y``-axis, does not pass through the region.
 
