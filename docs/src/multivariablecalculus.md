@@ -363,7 +363,9 @@ Find the directional derivative of the function ``f(x, y) = x^3 y - y^2 x + y - 
 
 First, we need to find the gradient of the function.
 
-``\overrightarrow{\nabla f} = \frac{\partial f}{\partial x} \overrightarrow{i} + \frac{\partial f}{\patrtial y} \overrightarrow{j} |_{(1, 2)} = (3x^2 y - y^2) \overrightarrow{i} + (x^3 - 2y x) \overrightarrow{j} |_{(1, 2)}``,
+``\overrightarrow{\nabla f} = \frac{\partial f}{\partial x} \overrightarrow{i} + \frac{\partial f}{\patrtial y} \overrightarrow{j} |_{(1, 2)}``,
+
+``\overrightarrow{\nabla f} = (3x^2 y - y^2) \overrightarrow{i} + (x^3 - 2y x) \overrightarrow{j} |_{(1, 2)}``,
 
 ``\overrightarrow{\nabla f} = (6 - 4) \overrightarrow{i} + (1 - 4) \overrightarrow{j} = 2 \overrightarrow{i} - 3 \overrightarrow{j} = (2, -3)``.
 
@@ -431,13 +433,13 @@ The plane ``P`` is tangent to the surface at point ``A``.
 
 ### Example
 
-Find the equation of the tangent plane of the function ``f(x, y, z) = 3z - x cos(y) + e^x`` at point ``P = (0, 0, 0)``.
+Calculate the equation of the tangent plane of the function ``f(x, y, z) = 3z - x cos(y) + e^x`` at point ``P = (0, 0, 0)``.
 
 Here, we do not know the plane's normal vector at point ``(0, 0, 0)``. However, according to the definition of the gradient vector, the plane's normal vector at this point, is the same as the gradient vector at this point.
 
 ``\overrightarrow{\nabla f} = \frac{\partial f}{\partial x} \overrightarrow{i} + \frac{\partial f}{\partial y} \overrightarrow{j} + \frac{\partial f}{\partial z} \overrightarrow{k} |_{(0, 0, 0)}``.
 
-``\overrightarrow{nabla f} = (-cos(y) + e^x) \overrightarrow{i} (x \ sin(y)) \overrightarrow{j} + 3 \overrightarrow{k} |_{(0, 0, 0)}``.
+``\overrightarrow{\nabla f} = (-cos(y) + e^x) \overrightarrow{i} (x \ sin(y)) \overrightarrow{j} + 3 \overrightarrow{k} |_{(0, 0, 0)}``.
 
 ``\overrightarrow{\nabla f} = (-1 + 1) \overrightarrow{i} + 0 \overrightarrow{j} + 3 \overrightarrow{k} = (0, 0, 3)``.
 
@@ -447,7 +449,7 @@ The equation of the plane: ``0 (x - 0) + 0 (y - 0) + 3 (z - 0) = 0`` or ``z = 0`
 
 Find the equation of a tangent plane to the surface of ``f(x, y, z) = x z^2 - y z + y^2 x`` at point ``A = (1, 1, 1)``.
 
-``\overrightarrow{\nabla f} = \frac{\partial f}{\partial x} \overrightarrow{i} + \frac{\partial f}{\partial y} \overrightarrow{j} + \frac{\partial f}{\partial z} \overrightarrow{k} |_{(1, 1, 1)}.``.
+``\overrightarrow{\nabla f} = \frac{\partial f}{\partial x} \overrightarrow{i} + \frac{\partial f}{\partial y} \overrightarrow{j} + \frac{\partial f}{\partial z} \overrightarrow{k} |_{(1, 1, 1)}``.
 
 ``\overrightarrow{\nabla f} = (z^2 + y^2) \overrightarrow{i} + (2y x - z) \overrightarrow{j} + (2z x - y) \overrightarrow{k} |_{(1, 1, 1)}``.
 
