@@ -38,7 +38,7 @@ The average of the ``n`` numbers ``x_1, x_2, ..., x_n``:
 
 The domain of the two-variable function ``f(x, y)`` is either a point in the ``x-y`` plane, or part, or the entire coordinate system ``x-y \in \mathbb{R}^2 ``.
 
-### Example
+### Examples
 
 Find the domain of the follwoing functions and then plot it as a shape.
 
@@ -274,9 +274,9 @@ The plot of the function ``f(x, y)``.
 
 The gradient of the function ``f(x, y)`` at point ``a`` is found as follows:
 
-The gradient vector ``\overrightarrow{\nabla f}`` or ``grad \ f = \frac{\partial f}{\partial x} \overrightarrow{i} + \frac{\partial f}{\partial y} \overrightarrow{j} |_a`` evaluated at point ``a``.
+The gradient vector ``\overrightarrow{\nabla f}`` or ``grad \ f = \frac{\partial f}{\partial x} \overrightarrow{i} + \frac{\partial f}{\partial y} \left \overrightarrow{j} \right|_{a}`` evaluated at point ``a``.
 
-The gradient of the function ``w = f(x, y, z)`` at point ``a`` is equal to ``\frac{\partial f}{\partial x} \overrightarrow{i} + \frac{\partial f}{\partial y} \overrightarrow{j} + \frac{\partial f}{\partial z} \overrightarrow{k} |_a``.
+The gradient of the function ``w = f(x, y, z)`` at point ``a`` is equal to ``\frac{\partial f}{\partial x} \overrightarrow{i} + \frac{\partial f}{\partial y} \overrightarrow{j} + \frac{\partial f}{\partial z} \left \overrightarrow{k} \right|_{a}``.
 
 Here, ``\overrightarrow{i}``, ``\overrightarrow{j}`` and ``\overrightarrow{k}`` are unit vectors, which represent the unit basis vectors in the three-dimensional space. These are the spatial triples. Every two of them are linearly independent. In other words, none of them can be represented as a linear combination of the other two.
 
@@ -327,7 +327,7 @@ The three-dimensional inner product of vectors ``\overrightarrow{a} = (a_1, a_2,
 
 ``\overrightarrow{a} \cdot \overrightarrow{b} = a_1 b_1 + a_2 b_2 + a_3 b_3``.
 
-For example, the coordinates of vector ``overrightarrow{a}`` equals its head minus its tail as an arrow, which is equal to ``(6, 4) - (2, 1) = (4, 3)``.
+For example, the coordinates of vector ``\overrightarrow{a}`` equals its head minus its tail as an arrow, which is equal to ``(6, 4) - (2, 1) = (4, 3)``.
 Also, the magnitude of ``\overrightarrow{a}`` equals ``\overrightarrow{a} = \sqrt{4^2 + 3^2} = \sqrt{25} = 5``.
 
 ### Example
@@ -336,7 +336,7 @@ Find the directional derivative of the function ``f(x, y) = x^3 y - y^2 x + y - 
 
 First, we need to find the gradient of the function.
 
-``\overrightarrow{\nabla f} = \left \frac{\partial f}{\partial x} \overrightarrow{i} + \frac{\partial f}{\patrtial y} \overrightarrow{j} \right|_{(1, 2)} = \left (3x^2 y - y^2) \overrightarrow{i} + (x^3 - 2y x) \overrightarrow{j} \right|_{(1, 2)}``,
+``\overrightarrow{\nabla f} = \frac{\partial f}{\partial x} \overrightarrow{i} + \frac{\partial f}{\patrtial y} \left \overrightarrow{j} \right|_{(1, 2)} = (3x^2 y - y^2) \overrightarrow{i} + (x^3 - 2y x) \left \overrightarrow{j} \right|_{(1, 2)}``,
 
 ``\overrightarrow{\nabla f} = (6 - 4) \overrightarrow{i} + (1 - 4) \overrightarrow{j} = 2 \overrightarrow{i} - 3 \overrightarrow{j} = (2, -3)``.
 
@@ -356,9 +356,9 @@ This question asks us to find the directional derivative of the function ``T`` a
 
 Find the gradient of the function ``f(x, y, z)`` first.
 
-``\overrightarrow{\nabla T} = \frac{\partial T}{\partial x} \overrightarrow{i} + \frac{\partial T}{\partial y} \overrightarrow{j} + \frac{\partial T}{\partial z} \overrightarrow{k} \bigg|_{(1, -1, 1)}``.
+``\overrightarrow{\nabla T} = \frac{\partial T}{\partial x} \overrightarrow{i} + \frac{\partial T}{\partial y} \overrightarrow{j} + \frac{\partial T}{\partial z} \left \overrightarrow{k} \right|_{(1, -1, 1)}``.
 
-``\overrightarrow{\nabla T} = \left (2x y^2 + z) \overrightarrow{i} + (2y x^2 - z^2) \overrightarrow{j} + (x - 2z y) \overrightarrow{k} \right|_{(1, -1, 1)}``.
+``\overrightarrow{\nabla T} = (2x y^2 + z) \overrightarrow{i} + (2y x^2 - z^2) \overrightarrow{j} + (x - 2z y) \left \overrightarrow{k} \right|_{(1, -1, 1)}``.
 
 ``\overrightarrow{\nabla T} = (2 + 1) \overrightarrow{i} + (-2 - 1) \overrightarrow{j} + (1 + 2) \overrightarrow{k} = 3 \overrightarrow{i} - 3 \overrightarrow{j} + 3 \overrightarrow{k}``.
 
@@ -404,9 +404,9 @@ Find the equation of the tangent plane of the function ``f(x, y, z) = 3z - x cos
 
 Here, we do not know the plane's normal vector at point ``(0, 0, 0)``. However, according to the definition of the gradient vector, the plane's normal vector at this point, is the same as the gradient vector at this point.
 
-``\overrightarrow{\nabla f} = \frac{\partial f}{\partial x} \overrightarrow{i} + \frac{\partial f}{\partial y} \overrightarrow{j} + \frac{\partial f}{\partial z} \overrightarrow{k} \bigg_{(0, 0, 0)}``.
+``\overrightarrow{\nabla f} = \frac{\partial f}{\partial x} \overrightarrow{i} + \frac{\partial f}{\partial y} \overrightarrow{j} + \frac{\partial f}{\partial z} \left \overrightarrow{k} \right|_{(0, 0, 0)}``.
 
-``\overrightarrow{nabla f} = (-cos(y) + e^x) \overrightarrow{i} (x \ sin(y)) \overrightarrow{j} + 3 \overrightarrow{k} \bigg_{(0, 0, 0)}``.
+``\overrightarrow{nabla f} = (-cos(y) + e^x) \overrightarrow{i} (x \ sin(y)) \overrightarrow{j} + 3 \left \overrightarrow{k} \right|_{(0, 0, 0)}``.
 
 ``\overrightarrow{\nabla f} = (-1 + 1) \overrightarrow{i} + 0 \overrightarrow{j} + 3 \overrightarrow{k} = (0, 0, 3)``.
 
@@ -416,15 +416,77 @@ The equation of the plane: ``0 (x - 0) + 0 (y - 0) + 3 (z - 0) = 0`` or ``z = 0`
 
 Find the equation of a tangent plane to the surface of ``f(x, y, z) = x z^2 - y z + y^2 x`` at point ``A = (1, 1, 1)``.
 
-``\overrightarrow{\nabla f} = \frac{\partial f}{\partial x} \overrightarrow{i} + \frac{\partial f}{\partial y} \overrightarrow{j} + \frac{\partial f}{\partial z} \overrightarrow{k} \bigg_{(1, 1, 1)}.``.
+``\overrightarrow{\nabla f} = \frac{\partial f}{\partial x} \overrightarrow{i} + \frac{\partial f}{\partial y} \overrightarrow{j} + \frac{\partial f}{\partial z} \left \overrightarrow{k} \right|_{(1, 1, 1)}.``.
 
-``\overrightarrow{\nabla f} = (z^2 + y^2) \overrightarrow{i} + (2y x - z) \overrightarrow{j} + (2z x - y) \overrightarrow{k} \bigg_{(1, 1, 1)}``.
+``\overrightarrow{\nabla f} = (z^2 + y^2) \overrightarrow{i} + (2y x - z) \overrightarrow{j} + (2z x - y) \left \overrightarrow{k} \right|_{(1, 1, 1)}``.
 
 ``\overrightarrow{\nabla f} = 2 \overrightarrow{i} + \overrightarrow{j} + \overrightarrow{k} = (2, 1, 1)``.
 
 The equation of the tangent plane: ``2 (x - 1) + (y - 1) + (z - 1) = 0``.
 
-# Dual Integrals
+### Exercises
+
+*Exercise A.* Find the domain of the functions below and plot the result.
+
+- ``f(x, y) = \frac{x + y + 1}{x - y}``.
+
+- ``f(x, y, z) = \frac{1}{z} + \sqrt{x - y}``.
+
+- ``f(x, y) = \sqrt{x^2 + y^2 - 3}``.
+
+- ``\frac{\sqrt{y - 3}}{\sqrt{2 - |x|}}``.
+
+*Exercise B.* Let ``f(x, y) = -x^3 y^2 + sin(x y)`` be a two-variable function. Compute ``\frac{\partial^2 f}{\partial y^2}`` and ``\frac{\partial^2 f}{\partial x \partial y}``.
+
+*Exercise C.* The chain rule. Let ``f(x, y) = x^2 y^2 - x^3 y`` be a function and ``x = cos(t)`` and ``y = 4 e^{2t}``. Compute the partial derivative of ``f`` with respect to ``t``, ``\frac{\partial f}{\partial t}``.
+
+*Exercise D.* Let ``f(x, y) = x y^2 - y x`` be a multivariable function and ``x = s + 5r`` and ``y = s^r`` its parameters in terms of independent variables ``s`` and ``r``. Find ``\frac{\partial f}{\partial s}``.
+
+*Exercise E.* Find the directional derivative of the function ``f(x, y, z) = z x^2 - y x + y^2 z`` at point ``A = (0, 1, -1)``, and in the direction of the vector ``\overrightarrow{u} = (1, 1, -1)``.
+
+# Double Integrals
+
+The area between the plot of ``f(x)`` and the ``x``-axis, from point ``a`` to point ``b``, equals the integral ``S = \int_{a}^{b} f(x) \ dx``.
+
+By extending that idea, the double integral ``\int_A^{} \int f(x, y) \ dA`` is the volume of a three-dimensional shape that is bounded from above by the surface of ``f(x, y)`` and from below by the region ``A`` on the ``xy`` plane.
+
+## Types of Integral Regions
+
+- This domain type is normal to both ``x`` and ``y`` (rectangular regions). For the region ``A`` to be normal to ``x``, it is required that a line passing through any of the corner points of region ``A``, and parallel to the ``x``-axis, must not pass through the region. Similarly, the region ``A`` is normal to ``y`` when a line passing through any of the corner points of region ``A``, and parallel to the ``y``-axis, does not pass through the region.
+
+This region is both normal to ``x`` and ``y``.
+
+*Fact:* If the region is normal to ``x``, then we can replace ``dA`` with ``dx \ dy``. Bringing ``dx`` to left. If the region is normal to ``y``, then we can replace ``dA`` with ``dy \ dx``. Bringing ``dy`` to left. And if the region is not normal to ``x`` we are not allowed to write ``dx \ dy`` instead of ``dA``. Or if the region is not normal to ``y`` we are not allowed to write ``dy \ dx`` instead of ``dA``.
+
+Here, the region is normal to both ``x`` and ``y``. So:
+
+``\int_A^{} \int f(x, y) \ dA = \int_c^d \int_a^b f(x, y) dx \ dy = \int_c^d \int_a^b f(x, y) dy \ dx``.
+
+The region ``A`` has two boundaries: ``a \leq x \leq b`` and ``c \leq y \leq d``.
+
+### Example
+
+Let ``A`` be a region of the shape: ``A``: ``2 \leq x \le 4`` and ``1 \leq y \leq 2``. Find the double integral of function ``f(x, y) = x^2 y - x y^3 + x`` on this region.
+
+``S = \int_2^4 \int_1^2 (x^2 y - x y^3 + x) dy \dx = \int_2^4 (\frac{x^2 y^2}{2} - \frac{x y^4}{4} + x y) |_1^2 dx.``
+
+``S = \int_2^4 ((2x^2 - 4x + 2x) - (\frac{x^2}{2} - \frac{x}{4} + x)) dx``.
+
+``S = \int_2^4 (\frac{3}{2} x^2 - 3x + \frac{x}{4}) dx``.
+
+``S = (\frac{x^3}{2} - 11 \frac{x^2}{8}) |_2^4``.
+
+``S = (\frac{64}{2} - 11 \frac{16}{8}) - (\frac{8}{2} - 11 \frac{4}{8}) = (32 - \frac{176}{8}) - (4 - \frac{44}{8})``.
+
+The volume is equal to: ``S = (32 - 22) - (4 - 5.5) = 10 - (-1.5) = 10 + 1.5 = 11.5``.
+
+- The second type of region. The region is normal to ``x`` and not normal to ``y``.
+
+``\int_A \int f(x, y) dA = \int_c^d \int_{h(y)}^{g(y)} dx \ dy``.
+
+- The third type of region. The region is normal to ``y`` and not normal to ``x``.
+
+``\int_A \int f(x, y) dA = \int_a^b \int_c^{h(x)} f(x,y) dy \ dx``.
 
 # The Applications of Dual Integrals
 
