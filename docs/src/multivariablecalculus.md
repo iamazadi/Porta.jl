@@ -461,21 +461,79 @@ The equation of the tangent plane: ``2 (x - 1) + (y - 1) + (z - 1) = 0``.
 
 *Exercise A.* Find the domain of the functions below and plot the result.
 
-- ``f(x, y) = \frac{x + y + 1}{x - y}``.
+1. ``f(x, y) = \frac{x + y + 1}{x - y}``.
 
-- ``f(x, y, z) = \frac{1}{z} + \sqrt{x - y}``.
+2. ``f(x, y, z) = \frac{1}{z} + \sqrt{x - y}``.
 
-- ``f(x, y) = \sqrt{x^2 + y^2 - 3}``.
+3. ``f(x, y) = \sqrt{x^2 + y^2 - 3}``.
 
-- ``\frac{\sqrt{y - 3}}{\sqrt{2 - |x|}}``.
+4. ``\frac{\sqrt{y - 3}}{\sqrt{2 - |x|}}``.
+
+*Solution A.1*
+
+The roots of the denominator are not in the domain of the function.
+
+``f(x, y) = \frac{x + y + 1}{x - y}``.
+
+``x - y \neq 0``.
+
+``y \neq x``.
+
+The domain of the function includes the whole plane, excluding the points that are on the line ``y = x``. ``D_f = \{ (x, y) | x, y \in \mathbb{R}, x \neq y \}``.
+
+*Solution A.2*
+
+The roots of the function's denominator are not in the domain. ``z \neq 0``.
+
+The argument of the square root function must be greater than or equal to zero. ``x - y \geq 0``.
+
+``x \geq y``.
+
+The domain of the function iscludes the whole space at one side of the plane ``x = y`` in the ``x``-``y``-``z`` space, except for the points that are on the plane ``z = 0``, which is the ``x``-``y`` plane.
+
+``D_f = \{ (x, y, z) | x, y, z \in \mathbb{R}, x \geq y, z \neq 0 \}``.
+
+*Solution A.3*
+
+The argument of the square root must be non-negative: ``x^2 + y^2 - 3 \geq 0``. ``x^2 + y^2 \geq 3``.
+
+``D_f = \{ (x, y) | x, y \in \mathbb{R}, x^2 + y^2 \geq 3 \}``.
+
+The domain of the function is the points on the surface ``x^2 + y^2`` except for parts that are under the plane ``z = 3`` in the negative direction.
+
+*Solution A.4*
+
+The input number to the square root function must be either positive or zero: ``y - 3 \geq 0`` and ``2 - |x| \geq 0``.
+
+``y \geq 3`` and ``|x| \leq 2``.
+
+``y \leq 3`` and ``-2 \leq x \leq 2``.
+
+Also, the roots of the denominator are not in the domain: ``2 - |x| \neq 0``.
+
+``2 - |x| \neq 0``. ``|x| \neq 2``. ``x \neq 2`` and ``x \neq -2``.
+
+The domain includes the encapsulated area between the lines ``y = 3``, ``x = 2`` and ``x = -2``, in the positive direction, excluding the two lines ``x = 2`` and ``x = -2``.
+
+``D_f, \{ (x, y) | x, y \in \mathbb{R}, y \geq 3, -2 < x < 2 \}``.
 
 *Exercise B.* Let ``f(x, y) = -x^3 y^2 + sin(x y)`` be a two-variable function. Compute ``\frac{\partial^2 f}{\partial y^2}`` and ``\frac{\partial^2 f}{\partial x \partial y}``.
 
+*Solution B.*
+
+
+
 *Exercise C.* The chain rule. Let ``f(x, y) = x^2 y^2 - x^3 y`` be a function and ``x = cos(t)`` and ``y = 4 e^{2t}``. Compute the partial derivative of ``f`` with respect to ``t``, ``\frac{\partial f}{\partial t}``.
+
+*Solution C.*
 
 *Exercise D.* Let ``f(x, y) = x y^2 - y x`` be a multivariable function and ``x = s + 5r`` and ``y = s^r`` its parameters in terms of independent variables ``s`` and ``r``. Find ``\frac{\partial f}{\partial s}``.
 
+*Solution D.*
+
 *Exercise E.* Find the directional derivative of the function ``f(x, y, z) = z x^2 - y x + y^2 z`` at point ``A = (0, 1, -1)``, and in the direction of the vector ``\overrightarrow{u} = (1, 1, -1)``.
+
+*Solution E.*
 
 # Double Integrals
 
