@@ -519,21 +519,77 @@ The domain includes the encapsulated area between the lines ``y = 3``, ``x = 2``
 
 *Exercise B.* Let ``f(x, y) = -x^3 y^2 + sin(x y)`` be a two-variable function. Compute ``\frac{\partial^2 f}{\partial y^2}`` and ``\frac{\partial^2 f}{\partial x \partial y}``.
 
-*Solution B.*
+*Solution B.1*
 
+``\frac{\partial^2 f}{\partial y^2} = \frac{\partial}{\partial y} (\frac{\partial f}{\partial y})``.
 
+``\frac{\partial^2 f}{\partial y^2} = \frac{\partial}{\partial y} (\frac{\partial (-x^3 y^2 + sin(x y))}{\partial y})``.
+
+``\frac{\partial^2 f}{\partial y^2} = \frac{\partial}{\partial y} (-2x^3 y + x \ cos(xy)) = -2x^3 - x^2 \ sin(x y)``.
+
+*Solution B.2*
+
+``\frac{\partial^2 f}{\partial x \partial y} = \frac{\partial}{\partial x} (\frac{\partial f}{\partial y})``.
+
+``\frac{\partial^2 f}{\partial x \partial y} = \frac{\partial}{\partial x} (\frac{\partial (-x^3 y^2 + sin(x y))}{\partial y})``.
+
+``\frac{\partial^2 f}{\partial x \partial y} = \frac{\partial}{\partial x} (-2x^3 y + x \ cos(x y)) = -6x y + cos(x y) - x y \ sin(x y)``.
 
 *Exercise C.* The chain rule. Let ``f(x, y) = x^2 y^2 - x^3 y`` be a function and ``x = cos(t)`` and ``y = 4 e^{2t}``. Compute the partial derivative of ``f`` with respect to ``t``, ``\frac{\partial f}{\partial t}``.
 
 *Solution C.*
 
+``\frac{\partial f}{\partial t} = \frac{\partial f}{\partial x} \frac{\partial x}{\partial t} + \frac{\partial f}{\partial y} \frac{\partial y}{\partial t}``.
+
+``\frac{\partial x}{\partial t} = \frac{\partial}{\partial t} cos(t) = -sin(t)``.
+
+``\frac{\partial y}{\partial t} = \frac{\partial}{\partial t} 4e^{2t} = 8e^{2t}``.
+
+``\frac{\partial f}{\partial t} = \frac{\partial f}{\partial x} (-sin(t)) + \frac{\partial f}{\partial y} (8e^{2t})``.
+
+``\frac{\partial f}{\partial x} = 2y^2 x - 3y x^2``.
+
+``\frac{\partial f}{\partial y} = 2x^2 y - x^3``.
+
+``\frac{\partial f}{\partial t} = (2y^2 x - 3y x^2) (-sin(t)) + (2x^2 y - x^3) (8e^{2t})``.
+
 *Exercise D.* Let ``f(x, y) = x y^2 - y x`` be a multivariable function and ``x = s + 5r`` and ``y = s^r`` its parameters in terms of independent variables ``s`` and ``r``. Find ``\frac{\partial f}{\partial s}``.
 
 *Solution D.*
 
+``\frac{\partial f}{\partial s} = \frac{\partial f}{\partial x} \frac{\partial x}{\partial s} + \frac{\partial f}{\partial y} \frac{\partial y}{\partial s}``.
+
+``\frac{\partial f}{\partial x} = y^2 - y`` and ``\frac{\partial f}{\partial y} = 2x y - x``.
+
+``\frac{\partial x}{\partial s} = \frac{\partial (s + 5r)}{\partial s} = 1`` and ``\frac{\partial y}{\partial s} = \frac{\partial s^r}{\partial s} = r \ s^{r - 1}``.
+
+``\frac{\partial f}{\partial s} = (y^2 - y) (1) + (2x y - x) (r \ s^{r - 1})``.
+
 *Exercise E.* Find the directional derivative of the function ``f(x, y, z) = z x^2 - y x + y^2 z`` at point ``A = (0, 1, -1)``, and in the direction of the vector ``\overrightarrow{u} = (1, 1, -1)``.
 
 *Solution E.*
+
+The unit basis vector of ``\overrightarrow{u}`` is equal to ``e_{\overrightarrow{u}} = \frac{\overrightarrow{u}}{|\overrightarrow{u|}``.
+
+The magnitude of vector ``\overrightarrow{u}`` is equal to ``|\overrightarrow{u}| = \sqrt{1^2 + 1^2 + (-1)^2} = \sqrt(1 + 1 + 1) = \sqrt{3}``.
+
+The unit vector of ``\overrightarrow{u}`` equals ``e_{\overrightarrow{u}} = \frac{(1, 1, -1)}{\sqrt{3}} = (\frac{1}{\sqrt{3}}, \frac{1}{\sqrt{3}}, \frac{-1}{\sqrt{3}})``.
+
+The gradient vector of the function ``f(x, y, z)`` equals ``\overrightarrow{\nabla f} = (2z x - y) \overrightarrow{i} + (-x + 2z y) \overrightarrow{j} + (x^2 + y^2) \overrightarrow{k}``.
+
+But, the directional derivative of ``f`` in the direction of ``\overrightarrow{u}`` is the inner product between the gradient of ``f`` and the unit vector of ``\overrightarrow{u}``: ``D_{\overrightarrow{u}} f = \overrightarrow{\nabla f} \cdot e_{\overrightarrow{u}}``.
+
+Therefore, we compute the value of the gradient ``\overrightarrow{\nabla f}`` at the point ``A = (0, 1, -1)`` for a particular solution. ``\overrightarrow{\nabla f} |_A = (2z x - y) \overrightarrow{i} + (-x + 2z y) \overrightarrow{j} + (x^2 + y^2) \overrightarrow{k} |_{A = (0, 1, -1)}``.
+
+``\overrightarrow{\nabla f} |_{0, 1, -1} = (2 (-1) (0) - 1) \overrightarrow{i} + (0 + 2 (-1) (1)) \overrightarrow{j} + (0^2 + 1^2) \overrightarrow{k}``.
+
+``\overrightarrow{\nabla f} |_{0, 1, -1} = - \overrightarrow{i} - 2 \overrightarrow{j} + \overrightarrow{k}``.
+
+``D_{\overrightarrow{u}} f = (-1, -2, 1) \cdot (\frac{1}{\sqrt{3}}, \frac{1}{\sqrt{3}}, \frac(-1){\sqrt{3}})``.
+
+``D_{\overrightarrow{u}} f = (-1) (\frac{1}{\sqrt{3}}) \overrightarrow{i} + (-2) (\frac{1}{\sqrt{3}}) \overrightarrow{j} + (1) (\frac{-1}{\sqrt{3}}) \overrightarrow{k}``.
+
+``D_{\overrightarrow{u}} f = (\frac{-1}{\sqrt{3}}, \frac{-2}{\sqrt{3}}, \frac{-1}{\sqrt{3}}) = (\frac{-\sqrt{3}{3}}, \frac{-2\sqrt{3}}{3}, \frac{-\sqrt{3}}{3})``.
 
 # Double Integrals
 
