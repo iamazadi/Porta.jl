@@ -260,7 +260,7 @@ Find the local extremum points of the function ``f(x, y) = x^2 - 2x y + \frac{1}
 
 This is the intermediate step for how to find the values of ``x_1`` and ``x_2`` with the given values of ``y_1`` and ``y_2``.
 
-``2x - 2y\_1 = 0``,
+``2x - 2y_1 = 0``,
 ``2x - 2(3) = 0``,
 ``2x = 6``,
 ``x_1 = 3``.
@@ -278,7 +278,7 @@ The coordinates of the point ``(x_0, y_0)`` for the extremum examination is equa
 
 ``\Delta(x, y) = {f^\prime}_{xx} - {f^\prime}{yy} - ({f^\prime}_{xy})^2 = (2) (2y) - (-2)^2 = 4y - 4``.
 
-For each point ``(x_0, y_0)`` and ``(x_1, y_1)`` respectively we have: ``\Delta(x\_0, y\_0) = 4 (3) - 4 = 8`` and ``\Delta(x\_1, y\_1) = 4 (-1) - 4 = -8``.
+For each point ``(x_0, y_0)`` and ``(x_1, y_1)`` respectively we have: ``\Delta(x_0, y_0) = 4 (3) - 4 = 8`` and ``\Delta(x_1, y_1) = 4 (-1) - 4 = -8``.
 
 ``{f^\prime}_{xx}(x_0, y_0) = 2``.
 
@@ -329,7 +329,7 @@ Remember how we compute the slope ``m_L`` of the line ``L`` in the ``x-y`` plane
 
 ``f^\prime (x_0) = m_L``.
 
-``f^\prime (x_0) = lim_{x \to x_0} \frac{f(x) - f(x\_0)}{x - x_0}``.
+``f^\prime (x_0) = lim_{x \to x_0} \frac{f(x) - f(x_0)}{x - x_0}``.
 
 ![12](./assets/multivariablecalculus/12.jpg)
 
@@ -481,6 +481,8 @@ The roots of the denominator are not in the domain of the function.
 
 The domain of the function includes the whole plane, excluding the points that are on the line ``y = x``. ``D_f = \{ (x, y) | x, y \in \mathbb{R}, x \neq y \}``.
 
+![ex1](./assets/multivariablecalculus/ex1.JPG)
+
 *Solution A.2*
 
 The roots of the function's denominator are not in the domain. ``z \neq 0``.
@@ -493,6 +495,8 @@ The domain of the function iscludes the whole space at one side of the plane ``x
 
 ``D_f = \{ (x, y, z) | x, y, z \in \mathbb{R}, x \geq y, z \neq 0 \}``.
 
+![ex2](./assets/multivariablecalculus/ex2.JPG)
+
 *Solution A.3*
 
 The argument of the square root must be non-negative: ``x^2 + y^2 - 3 \geq 0``. ``x^2 + y^2 \geq 3``.
@@ -500,6 +504,8 @@ The argument of the square root must be non-negative: ``x^2 + y^2 - 3 \geq 0``. 
 ``D_f = \{ (x, y) | x, y \in \mathbb{R}, x^2 + y^2 \geq 3 \}``.
 
 The domain of the function is the points on the surface ``x^2 + y^2`` except for parts that are under the plane ``z = 3`` in the negative direction.
+
+![ex3](./assets/multivariablecalculus/ex3.JPG)
 
 *Solution A.4*
 
@@ -516,6 +522,8 @@ Also, the roots of the denominator are not in the domain: ``2 - |x| \neq 0``.
 The domain includes the encapsulated area between the lines ``y = 3``, ``x = 2`` and ``x = -2``, in the positive direction, excluding the two lines ``x = 2`` and ``x = -2``.
 
 ``D_f, \{ (x, y) | x, y \in \mathbb{R}, y \geq 3, -2 < x < 2 \}``.
+
+![ex4](./assets/multivariablecalculus/ex4.JPG)
 
 *Exercise B.* Let ``f(x, y) = -x^3 y^2 + sin(x y)`` be a two-variable function. Compute ``\frac{\partial^2 f}{\partial y^2}`` and ``\frac{\partial^2 f}{\partial x \partial y}``.
 
