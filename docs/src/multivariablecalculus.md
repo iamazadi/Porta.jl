@@ -110,14 +110,14 @@ And by induction in this way, the domain of the three-variable function ``w = f(
 
 ``f(x, y)``.
 
-When we want to find the derivative of a multivariable function, we must specify with respect to which variable the derivative is to be applied. Other than the one variable, with respect to which the derivative is computed, the rest of the variables are trated as constant values.
+When we want to find the derivative of a multivariable function, we must specify with respect to which variable the derivative is to be applied. Other than the one variable, with respect to which the derivative is computed, the rest of the variables are treated as constant values.
 
 The derivative of the function ``f(x, y)`` with respect to ``x`` is denoted by ``\frac{\partial f}{\partial x}`` or ``{f^\prime}_x``.
 The derivative of the function ``f(x, y)`` with respect to ``y`` is denoted by ``\frac{\partial f}{\partial y}`` or ``{f^\prime}_y``.
 
 ### Example
 
-If the function ``f(x, y) = -3x^4 y^2 + x^3 y - y^3 + xy`` is defined, then compute the derivative of ``f(x, y)`` with respect to ``x`` and the derivative of ``f(x, y)`` with respect to ``y``.
+If the function ``f(x, y) = -3x^4 y^2 + x^3 y - y^3 + xy`` is defined, then calculate the partial derivative of ``f(x, y)`` with respect to ``x`` and the partial derivative of ``f(x, y)`` with respect to ``y``.
 
 - ``\frac{\partial f}{\partial x} = -12x^3 y^2 + 3x^2 y + y``.
 
@@ -125,19 +125,19 @@ If the function ``f(x, y) = -3x^4 y^2 + x^3 y - y^3 + xy`` is defined, then comp
 
 ### Example
 
-If the function ``f(x, y, z) = x^5 y^2 z^3 + y x^y - sin(y z^3)`` is defined, then compute the derivative of ``f(x, y)`` with respect to ``x``, the derivative of ``f(x, y)`` with respect to ``y``, and the derivative of ``f(x, y)`` with respect to ``z``.
+If the function ``f(x, y, z) = x^5 y^2 z^3 + y x^y - sin(y z^3)`` is defined, then take the partial derivative of ``f(x, y)`` with respect to ``x``, the partial derivative of ``f(x, y)`` with respect to ``y``, and the partial derivative of ``f(x, y)`` with respect to ``z``.
 
 - ``\frac{\partial f}{\partial x} = 5x^4 y^2 z^3 + y x^{y -1}``.
 
-- ``\frac{\partial f}{\partial y} = 2 x^5 y z^3 + x^y ln(x) - z^3 cos(y z^3)``.
+- ``\frac{\partial f}{\partial y} = 2 x^5 y z^3 + x^y + y x^y \ ln(x) - z^3 \ cos(y z^3)``.
 
-- ``\frac{\partial f}{\partial z} = 3z^2 x^5 y^2 - 3z^2 y cos(y z^3)``.
+- ``\frac{\partial f}{\partial z} = 3z^2 x^5 y^2 - 3y z^2 \ cos(y z^3)``.
 
 *Reminder:* ``(a^u)^\prime = u^\prime a^u ln(a)``.
 
 ## Higher Order Partial Derivatives
 
-For a two-variable function ``f(x, y)``, higher order derivatives are as follows:
+For a two-variable function ``f(x, y)``, higher order partial derivatives are as follows:
 
 - ``\frac{\partial^2 f}{\partial x^2} = \frac{\partial}{\partial x} (\frac{\partial f}{\partial x})`` or ``{f^\prime}_{xx}``.
 
@@ -149,7 +149,7 @@ For a two-variable function ``f(x, y)``, higher order derivatives are as follows
 
 ### Exercise
 
-With the given function ``f(x, y) = ln(x^4 y^2) - y``, find the second partial derivative of ``f(x, y)`` both with respect to ``x``, the second partial derivative of ``f(x, y)`` both with respect to ``y``, the second partial derivative of ``f(x, y)`` first taken with respect to ``y`` and then with respect to ``x``, and the second partial derivative of ``f(x, y)`` with respect to ``x`` and ``y``.
+With the given function ``f(x, y) = ln(x^4 y^2) - y``, find the second partial derivative of ``f(x, y)``: **(a)** both with respect to ``x``, **(b)** both with respect to ``y``, **(c)** first taken with respect to ``y`` and then with respect to ``x``, and **(d)** with respect to first ``x`` and then ``y``.
 
 - ``\frac{\partial^2 f}{\partial x^2} = \frac{\partial}{\partial x}(\frac{4x^3 y^2}{x^4 y^2}) = \frac{\partial}{\partial x}(\frac{4}{x}) = \frac{-4}{x^2}``.
 
@@ -165,9 +165,9 @@ With the given function ``f(x, y) = ln(x^4 y^2) - y``, find the second partial d
 
 There are a few states for the chain rule:
 
-- The first state. Suppose the function ``f(x, y)`` is defined. The variables``x`` and ``y`` are on their own functions of other variables, such as ``t``. In this state:
+- The first state. Suppose the function ``f(x, y)`` is defined. The variables ``x`` and ``y`` are on their own functions of other variables, such as ``t``. In this state:
 
-``\frac{\partial f}{\partial t} = \frac{\partial f}{\partial x} \frac{\partial x}{\partial t}``.
+``\frac{\partial f}{\partial t} = \frac{\partial f}{\partial x} \frac{\partial x}{\partial t} + \frac{\partial f}{\partial y} \frac{\partial y}{\partial t}``.
 
 ### Example
 
@@ -189,7 +189,7 @@ The three-variable function ``f(x, y, z) = x y^3 - x^2 z^3 + ln(x y)`` is given,
 
 *Reminder:* ``(ln(u))^\prime = \frac{u^\prime}{u}``.
 
-- The state of the third kind. If ``f(x, y)`` is a two-variable function, and ``x`` and ``y`` are two-variable functions of for example ``r`` and ``s``, then:
+- The state of the third kind. If ``f(x, y)`` is a two-variable function, and ``x`` and ``y`` are two-variable functions, for example functions of independent variables ``r`` and ``s``, then:
 
 - ``\frac{\partial f}{\partial r} = \frac{\partial f}{\partial x} \frac{\partial x}{\partial r} + \frac{\partial f}{\partial y} \frac{\partial y}{\partial r}``.
 
