@@ -4,7 +4,7 @@ Description = "Multivariable Calculus"
 
 # Multivariable Functions
 
-In General Mathematics 1, we were introduced to one-variable functions ``y = f(x)``, that had only one independent variable as input, ``x``. But in reality most of the times, we are faced with functions that have more than one independent variable. These functions are called multivariable functions.
+In General Mathematics 1, we were introduced to one-variable functions ``y = f(x)``, which had only one independent variable as input, ``x``. But in reality most of the times, we are faced with functions that have more than one independent variable. These functions are called multivariable functions.
 
 ``y = f(x)`` is a univariate function.
 
@@ -16,7 +16,7 @@ The function sends the input to the output, ``x \mapsto y``.
 
 - A three-variable function is denoted by ``w = f(x, y, z)``.
 
-- An n-variballe function: ``f(x_1, x_2, ..., x_n)``.
+- An n-variable function: ``f(x_1, x_2, ..., x_n)``.
 
 A few simple examples that show the relevance of multivariable functions.
 
@@ -24,7 +24,7 @@ A few simple examples that show the relevance of multivariable functions.
 
 The area of a rectangle: ``f(x, y) = xy``.
 
-The volume of a sphere: ``V(x, y, z) = xyz``.
+The volume of a cuboid: ``V(x, y, z) = xyz``.
 
 The volume of a cylinder: ``V(r, h) = \pi r^2 h``.
 
@@ -36,32 +36,33 @@ The average of the ``n`` numbers ``x_1, x_2, ..., x_n``:
 
 ``f(x_1, x_2, ..., x_n) = \frac{1}{n} \sum_{i = 1}^n x_i``.
 
-## The Domain of Multivariale Functions
+## The Domain of Multivariable Functions
 
-The domain of the two-variable function ``f(x, y)`` is either a point in the ``x``-``y`` plane, or part, or the entire ``x``-``y``coordinate system ``\mathbb{R}^2``.
+The domain of the two-variable function ``f(x, y)`` is either a point in the ``x``-``y`` plane, or part of, or the entire ``x``-``y``coordinate system ``\mathbb{R}^2``.
 
 ![2](./assets/multivariablecalculus/2.jpg)
 
 ### Examples
 
-Find the domain of the follwoing functions and then plot it as a shape.
+Find the domain of the following functions and then plot it as a shape.
 
 *Example A.* ``f(x, y) = 2x^3 y + x^2 y^2 - y + 5``
+
 ``D_f = \{ (x, y) | x \in \mathbb{R}, y \in \mathbb{R} \} = \mathbb{R}^2``.
 
 ![3](./assets/multivariablecalculus/3.jpg)
 
 *Example B.* ``f(x, y) = \frac{1}{x - y}``
 
-``D_f = \{ (x, y) | x - y \neq 0 \} = \{ (x, y) | x \neq y \}``.
+``D_f = \{ (x, y) | x, y \in \mathbb{R}, x - y \neq 0 \} = \{ (x, y) | x \neq y \}``.
 
-The whole plane, with the line ``y = x`` removed.
+The whole plane, without the line ``y = x``.
 
 ![4](./assets/multivariablecalculus/4.jpg)
 
 *Example C.* ``f(x, y) = \sqrt{x - y}``
 
-``D_f = \{ (x, y) | x - y \geq 0 \} = \{ (x, y) | x \geq y \}``.
+``D_f = \{ (x, y) | x, y \in \mathbb{R}, x - y \geq 0 \} = \{ (x, y) | x \geq y \}``.
 
 On and under the line `` y = x``.
 
@@ -69,17 +70,19 @@ On and under the line `` y = x``.
 
 *Example D.* ``f(x, y) = \frac{\sqrt{y - 3}}{\sqrt{5 - x}}``
 
-``D_f = \{ (x, y) | y - 3 \geq 0, 5 - x > 0 \} = \{ (x, y) | y \geq 3, x < 5 \}``.
+``D_f = \{ (x, y) | x, y \in \mathbb{R}, y - 3 \geq 0, 5 - x > 0 \} = \{ (x, y) | y \geq 3, x < 5 \}``.
 
 ![6](./assets/multivariablecalculus/6.jpg)
 
-*Example E.* ``f(x, y) = \frac{\sqrt{y + 1}}{\sqrt[n]{2 - |x|}}``
+*Example E.* ``f(x, y) = \frac{\sqrt{y + 1}}{\sqrt[4]{2 - |x|}}``
 
-``D_f = \{ (x, y) | y + 1 \geq 0, 2 - |x| > 0 \} = \{ (x, y) | y \geq -1, -2 < x < 2 \}``.
+``D_f = \{ (x, y) | x, y \in \mathbb{R},  y + 1 \geq 0, 2 - |x| > 0 \} = \{ (x, y) | y \geq -1, -2 < x < 2 \}``.
 
 ![7](./assets/multivariablecalculus/7.jpg)
 
-The shape of two-variable functions are going to be three-dimensional plots, which are also called surfaces.
+The lines ``x = 2`` and ``x = -2`` are excluded from the domain of the function ``f(x, y)``.
+
+The shape of two-variable functions are surfaces that are embedded in three-dimensional plots.
 
 ![8](./assets/multivariablecalculus/8.jpg)
 
@@ -91,7 +94,7 @@ Since drawing three-dimensional shapes is time consuming, we just make a few exa
 
 ![9](./assets/multivariablecalculus/9.jpg)
 
-And by induction in this way, the domain of the three-variable function ``w = f(x, y, z)`` is three-dimensional, and its plot is four-dimensional.
+And by induction in this way, the domain of the three-variable function ``w = f(x, y, z)`` is three-dimensional, and the plot of its shape is embedded in the four-dimensional space.
 
 # Partial Derivatives
 
@@ -655,8 +658,8 @@ The volume is equal to: ``S = (32 - 22) - (4 - 5.5) = 10 - (-1.5) = 10 + 1.5 = 1
 
 ``\int \int_A f(x, y) dA = \int_a^b \int_c^{h(x)} f(x,y) dy \ dx``.
 
-# The Applications of Dual Integrals
+# The Applications of Double Integrals
 
 # Reference
 
-- Dr. M.A. Kerayeh Chyan, General mathematics 2, 2022.
+- Dr. M.A. Kerayeh Chyan, General mathematics 2, 2021.
