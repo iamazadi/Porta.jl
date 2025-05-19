@@ -647,27 +647,27 @@ This region is both normal to ``x`` and ``y``.
 
 Here, the region is normal to both ``x`` and ``y``. So:
 
-``\int \int_A f(x, y) \ dA = \int_c^d \int_a^b f(x, y) dx \ dy = \int_c^d \int_a^b f(x, y) dy \ dx``.
+``\int \int_A f(x, y) \ dA = \int_c^d \int_a^b f(x, y) dx \ dy = \int_a^b \int_c^d f(x, y) dy \ dx``.
 
 The region ``A`` has two boundaries: ``a \leq x \leq b`` and ``c \leq y \leq d``.
 
 ### Example
 
-Let ``A`` be a region of the shape: ``A``: ``2 \leq x \le 4`` and ``1 \leq y \leq 2``. Find the double integral of function ``f(x, y) = x^2 y - x y^3 + x`` on this region.
+Let ``A`` be a region of the shape: ``A = \{ (x, y) | x, y \in \mathbb{R}, 2 \leq x \leq 4, 1 \leq y \leq 2 \}``. Find the double integral of function ``f(x, y) = x^2 y - x y^3 + x`` on this region.
 
 ![19](./assets/multivariablecalculus/19.jpg)
 
-``S = \int_2^4 \int_1^2 (x^2 y - x y^3 + x) dy \ dx = \int_2^4 (\frac{x^2 y^2}{2} - \frac{x y^4}{4} + x y) |_1^2 dx.``
+``S = \int_2^4 \int_1^2 (x^2 y - x y^3 + x) dy \ dx = \int_2^4 \left| (\frac{x^2 y^2}{2} - \frac{x y^4}{4} + x y) \right|_1^2 dx.``
 
 ``S = \int_2^4 ((2x^2 - 4x + 2x) - (\frac{x^2}{2} - \frac{x}{4} + x)) dx``.
 
-``S = \int_2^4 (\frac{3}{2} x^2 - 3x + \frac{x}{4}) dx``.
+``S = \int_2^4 (\frac{3}{2} x^2 - 5x + \frac{x}{4}) dx``.
 
-``S = (\frac{x^3}{2} - 11 \frac{x^2}{8}) |_2^4``.
+``S = \left| (\frac{x^3}{2} - 5 \frac{x^2}{2} + \frac{x^2}{8}) \right|_2^4``.
 
-``S = (\frac{64}{2} - 11 \frac{16}{8}) - (\frac{8}{2} - 11 \frac{4}{8}) = (32 - \frac{176}{8}) - (4 - \frac{44}{8})``.
+``S = (\frac{4^3}{2} - (5) \frac{4^2}{2} + \frac{4^2}{8}) - (\frac{2^3}{2} - (5) \frac{2^2}{2} + \frac{2^2}{8})``.
 
-The volume is equal to: ``S = (32 - 22) - (4 - 5.5) = 10 - (-1.5) = 10 + 1.5 = 11.5``.
+The volume is equal to: ``S = (32 - 8 + 2) - (4 - 10 + 0.5) = 26 - (-5.5) = 26 + 5.5 = 31.5``.
 
 - The second type of region. The region is normal to ``x`` and not normal to ``y``.
 
