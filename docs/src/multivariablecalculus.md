@@ -207,7 +207,7 @@ The partial derivative of the function ``f(x, y)`` with respect to ``r``:
 
 *Reminder:* ``\frac{d}{dx} a^x = \frac{d}{dx} e^{x ln(a)} = e^{x ln(a)} (\frac{d}{dx} x ln(a)) = e^{x ln(a)} ln(a) = a^x ln(a)``.
 
-# The Aplications of Partial Derivatives
+# The Applications of Partial Derivatives
 
 ## Determining the Maximum and Minimum Values of Multivariable Functions
 
@@ -247,7 +247,7 @@ Multiplying the equation ``2x - 10y = -4`` by ``2`` results in:
 
 Then, summing the two equations in the system gives us: ``-18y = -12``. Finally, we have the value of ``y = \frac{-12}{-18} = \frac{2}{3}``. Subsequently, we solve for ``x`` by substituting the numerical value of ``y`` in the equation ``2(\frac{2}{3}) - 4x = -4``, which siplifies to the equation ``-4x = -4 - \frac{4}{3} = \frac{-16}{3}``. Then, we have ``x = \frac{16}{12} = \frac{4}{3}``. This gives the extremum point ``(x_0, y_0) = (\frac{4}{3}, \frac{2}{3})``. Now, we have to determine the type of ``(\frac{4}{3}, \frac{2}{3})``.
 
-``{f^\prime}_{xx}(\frac{4}{3}, \frac{2}{3}) = -4`` and ``{f^\prime}_{yy}(\frac{4}{3}, \frac{2}{3}) = -10`` and ``{f^\prime}_{xy}(\frac{4}{3}, \frac{2}{3}) = 2``.
+A few partial derivatives are evaluated at the point: ``{f^\prime}_{xx}(\frac{4}{3}, \frac{2}{3}) = -4``, ``{f^\prime}_{yy}(\frac{4}{3}, \frac{2}{3}) = -10`` and ``{f^\prime}_{xy}(\frac{4}{3}, \frac{2}{3}) = 2``.
 
 ``\Delta(\frac{4}{3}, \frac{2}{3}) = (-4) (-10) - 2^2 = 40 - 4 = 36``.
 
@@ -443,7 +443,7 @@ Let ``\overrightarrow{n} = (a, b, c)`` be the vector normal to the plane. Both p
 
 The equation of the plane with the vector normal to the plane ``\overrightarrow{n} = (a, b, c)`` that passes through the point ``A_0 = (x_0, y_0, z_0)``.
 
-``\overrightarrow{A_0 A} \cdot \overrightarrow{n} = a (x - x_0), b (y - y_0), c (z - z_0) = 0``.
+``\overrightarrow{A_0 A} \cdot \overrightarrow{n} = a (x - x_0) + b (y - y_0) + c (z - z_0) = 0``.
 
 ### Example
 
@@ -451,7 +451,7 @@ Write the equation of a plane that passes through point ``(3, -2, 1)`` and its n
 
 ``5 (x - 3) + 2 (y + 2) + 3 (z - 1) = 0``.
 
-In addition to finding the equation of plane, another application of the gradient is to find the equation of the *tangent plane* of the surface of a multivariable function ``f``, at a point on the surface.
+In addition to finding the equation of the plane, another application of the gradient is to find the equation of the *tangent plane* of the surface of a multivariable function ``f``, at a point on the surface.
 
 ![15](./assets/multivariablecalculus/15.jpg)
 
@@ -459,7 +459,7 @@ The plane ``P`` is tangent to the surface at point ``A``.
 
 ### Example
 
-Calculate the equation of the tangent plane of the function ``f(x, y, z) = 3z - x cos(y) + e^x`` at point ``P = (0, 0, 0)``.
+Calculate the equation of the tangent plane of the function ``f(x, y, z) = 3z - x \ cos(y) + e^x`` at point ``P = (0, 0, 0)``.
 
 Here, we do not know the plane's normal vector at point ``(0, 0, 0)``. However, according to the definition of the gradient vector, the plane's normal vector at this point, is the same as the gradient vector at this point.
 
@@ -473,7 +473,7 @@ The equation of the plane: ``0 (x - 0) + 0 (y - 0) + 3 (z - 0) = 0`` or ``z = 0`
 
 ### Example
 
-Find the equation of a tangent plane to the surface of ``f(x, y, z) = x z^2 - y z + y^2 x`` at point ``A = (1, 1, 1)``.
+Find the equation of the plane tangent to the surface of ``f(x, y, z) = x z^2 - y z + y^2 x`` at point ``A = (1, 1, 1)``.
 
 ``\overrightarrow{\nabla f} = \frac{\partial f}{\partial x} \overrightarrow{i} + \frac{\partial f}{\partial y} \overrightarrow{j} + \frac{\partial f}{\partial z} \overrightarrow{k} |_{(1, 1, 1)}``.
 
@@ -493,7 +493,7 @@ The equation of the tangent plane: ``2 (x - 1) + (y - 1) + (z - 1) = 0``.
 
 3. ``f(x, y) = \sqrt{x^2 + y^2 - 3}``.
 
-4. ``\frac{\sqrt{y - 3}}{\sqrt{2 - |x|}}``.
+4. ``f(x, y) = \frac{\sqrt{y - 3}}{\sqrt{2 - |x|}}``.
 
 *Solution A.1*
 
@@ -505,7 +505,9 @@ The roots of the denominator are not in the domain of the function.
 
 ``y \neq x``.
 
-The domain of the function includes the whole plane, excluding the points that are on the line ``y = x``. ``D_f = \{ (x, y) | x, y \in \mathbb{R}, x \neq y \}``.
+The domain of the function includes the whole plane, excluding the points that are on the line ``y = x``.
+
+``D_f = \{ (x, y) | x, y \in \mathbb{R}, x \neq y \}``.
 
 ![ex1](./assets/multivariablecalculus/ex1.JPG)
 
@@ -517,7 +519,7 @@ The argument of the square root function must be greater than or equal to zero. 
 
 ``x \geq y``.
 
-The domain of the function iscludes the whole space at one side of the plane ``x = y`` in the ``x``-``y``-``z`` space, except for the points that are on the plane ``z = 0``, which is the ``x``-``y`` plane.
+The domain of the function includes the whole space at one side of the plane ``x = y`` in the ``x``-``y``-``z`` space, except for the points that are on the plane ``z = 0``, which is the ``x``-``y`` plane.
 
 ``D_f = \{ (x, y, z) | x, y, z \in \mathbb{R}, x \geq y, z \neq 0 \}``.
 
@@ -535,15 +537,13 @@ The domain of the function is the points on the surface ``x^2 + y^2`` except for
 
 *Solution A.4*
 
-The input number to the square root function must be either positive or zero: ``y - 3 \geq 0`` and ``2 - |x| \geq 0``.
+The input number to the square root function must be either positive or zero: ``y - 3 \geq 0`` and ``2 - |x| > 0``.
 
-``y \geq 3`` and ``|x| \leq 2``.
+``\left\{ \begin{array}{l} y - 3 \geq 0 &\\ |x| \leq 2 \end{array} \right.``
 
-``y \leq 3`` and ``-2 \leq x \leq 2``.
+``\left\{ \begin{array}{l} y \geq 3 &\\ -2 < x < 2 \end{array} \right.``
 
 Also, the roots of the denominator are not in the domain: ``2 - |x| \neq 0``.
-
-``2 - |x| \neq 0``. ``|x| \neq 2``. ``x \neq 2`` and ``x \neq -2``.
 
 The domain includes the encapsulated area between the lines ``y = 3``, ``x = 2`` and ``x = -2``, in the positive direction, excluding the two lines ``x = 2`` and ``x = -2``.
 
@@ -567,7 +567,7 @@ The domain includes the encapsulated area between the lines ``y = 3``, ``x = 2``
 
 ``\frac{\partial^2 f}{\partial x \partial y} = \frac{\partial}{\partial x} (\frac{\partial (-x^3 y^2 + sin(x y))}{\partial y})``.
 
-``\frac{\partial^2 f}{\partial x \partial y} = \frac{\partial}{\partial x} (-2x^3 y + x \ cos(x y)) = -6x y + cos(x y) - x y \ sin(x y)``.
+``\frac{\partial^2 f}{\partial x \partial y} = \frac{\partial}{\partial x} (-2x^3 y + x \ cos(x y)) = -6x^2 y + cos(x y) - x y \ sin(x y)``.
 
 *Exercise C.* The chain rule. Let ``f(x, y) = x^2 y^2 - x^3 y`` be a function and ``x = cos(t)`` and ``y = 4 e^{2t}``. Compute the partial derivative of ``f`` with respect to ``t``, ``\frac{\partial f}{\partial t}``.
 
@@ -603,7 +603,7 @@ The domain includes the encapsulated area between the lines ``y = 3``, ``x = 2``
 
 *Solution E.*
 
-The unit basis vector of ``\overrightarrow{u}`` is equal to ``e_{\overrightarrow{u}} = \frac{\overrightarrow{u}}{|\overrightarrow{u|}``.
+The unit basis vector of ``\overrightarrow{u}`` is equal to ``e_{\overrightarrow{u}} = \frac{\overrightarrow{u}}{|\overrightarrow{u}|}``.
 
 The magnitude of vector ``\overrightarrow{u}`` is equal to ``|\overrightarrow{u}| = \sqrt{1^2 + 1^2 + (-1)^2} = \sqrt(1 + 1 + 1) = \sqrt{3}``.
 
@@ -611,19 +611,19 @@ The unit vector of ``\overrightarrow{u}`` equals ``e_{\overrightarrow{u}} = \fra
 
 The gradient vector of the function ``f(x, y, z)`` equals ``\overrightarrow{\nabla f} = (2z x - y) \overrightarrow{i} + (-x + 2z y) \overrightarrow{j} + (x^2 + y^2) \overrightarrow{k}``.
 
-But, the directional derivative of ``f`` in the direction of ``\overrightarrow{u}`` is the inner product between the gradient of ``f`` and the unit vector of ``\overrightarrow{u}``: ``D_{\overrightarrow{u}} f = \overrightarrow{\nabla f} \cdot e_{\overrightarrow{u}}``.
+But, the directional derivative of ``f`` in the direction of ``\overrightarrow{u}`` is the inner product between the gradient of ``f`` and the unit vector of ``\overrightarrow{u}``: ``Df_{\overrightarrow{u}} = \overrightarrow{\nabla f} \cdot e_{\overrightarrow{u}}``.
 
 Therefore, we compute the value of the gradient ``\overrightarrow{\nabla f}`` at the point ``A = (0, 1, -1)`` for a particular solution. ``\overrightarrow{\nabla f} |_A = (2z x - y) \overrightarrow{i} + (-x + 2z y) \overrightarrow{j} + (x^2 + y^2) \overrightarrow{k} |_{A = (0, 1, -1)}``.
 
-``\overrightarrow{\nabla f} |_{0, 1, -1} = (2 (-1) (0) - 1) \overrightarrow{i} + (0 + 2 (-1) (1)) \overrightarrow{j} + (0^2 + 1^2) \overrightarrow{k}``.
+``\overrightarrow{\nabla f} |_{(0, 1, -1)} = (2 (-1) (0) - 1) \overrightarrow{i} + (0 + 2 (-1) (1)) \overrightarrow{j} + (0^2 + 1^2) \overrightarrow{k}``.
 
-``\overrightarrow{\nabla f} |_{0, 1, -1} = - \overrightarrow{i} - 2 \overrightarrow{j} + \overrightarrow{k}``.
+``\overrightarrow{\nabla f} |_{{0, 1, -1)} = - \overrightarrow{i} - 2 \overrightarrow{j} + \overrightarrow{k}``.
 
-``D_{\overrightarrow{u}} f = (-1, -2, 1) \cdot (\frac{1}{\sqrt{3}}, \frac{1}{\sqrt{3}}, \frac(-1){\sqrt{3}})``.
+``Df_{\overrightarrow{u}} = (-1, -2, 1) \cdot (\frac{1}{\sqrt{3}}, \frac{1}{\sqrt{3}}, \frac{-1}{\sqrt{3}})``.
 
-``D_{\overrightarrow{u}} f = (-1) (\frac{1}{\sqrt{3}}) \overrightarrow{i} + (-2) (\frac{1}{\sqrt{3}}) \overrightarrow{j} + (1) (\frac{-1}{\sqrt{3}}) \overrightarrow{k}``.
+``Df_{\overrightarrow{u}} = (-1) (\frac{1}{\sqrt{3}}) \overrightarrow{i} + (-2) (\frac{1}{\sqrt{3}}) \overrightarrow{j} + (1) (\frac{-1}{\sqrt{3}}) \overrightarrow{k}``.
 
-``D_{\overrightarrow{u}} f = (\frac{-1}{\sqrt{3}}, \frac{-2}{\sqrt{3}}, \frac{-1}{\sqrt{3}}) = (\frac{-\sqrt{3}{3}}, \frac{-2\sqrt{3}}{3}, \frac{-\sqrt{3}}{3})``.
+``Df_{\overrightarrow{u}} = (\frac{-1}{\sqrt{3}}, \frac{-2}{\sqrt{3}}, \frac{-1}{\sqrt{3}}) = (\frac{-\sqrt{3}}{3}, \frac{-2\sqrt{3}}{3}, \frac{-\sqrt{3}}{3})``.
 
 # Double Integrals
 
