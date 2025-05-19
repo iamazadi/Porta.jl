@@ -539,7 +539,7 @@ The domain of the function is the points on the surface ``x^2 + y^2`` except for
 
 The input number to the square root function must be either positive or zero: ``y - 3 \geq 0`` and ``2 - |x| > 0``.
 
-``\left\{ \begin{array}{l} y - 3 \geq 0 &\\ |x| \leq 2 \end{array} \right.``
+``\left\{ \begin{array}{l} y - 3 \geq 0 &\\ |x| < 2 \end{array} \right.``
 
 ``\left\{ \begin{array}{l} y \geq 3 &\\ -2 < x < 2 \end{array} \right.``
 
