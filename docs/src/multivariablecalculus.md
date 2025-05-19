@@ -215,13 +215,13 @@ The steps for determining the extremum points of a twovariable function ``f(x, y
 
 1. Solve the system of equations that is formed with ``\frac{\partial f}{\partial x} = 0`` and ``\frac{\partial f}{\partial y} = 0``. Suppose that the solution of the system is equal to ``(x_0, y_0)``.
 
-2. Compute the equation ``\Delta(x, y) = {f^\prime}_{xx} {f^\prime}{yy} - ({f^\prime}{xy})^2``.
+2. Compute the equation ``\Delta(x, y) = {f^\prime}_{xx} {f^\prime}_{yy} - ({f^\prime}_{xy})^2``.
 
-3. Compute these values: ``\Delta(x_0, y_0)`` and ``{f^\prime}{xx}(x_0, y_0)``.
+3. Calculate these two values: ``\Delta(x_0, y_0)`` and ``{f^\prime}_{xx}(x_0, y_0)``.
 
-4. If ``\Delta(x_0, y_0) > 0`` and ``{f^\prime}{xx}(x_0, y_0) < 0``, then the point ``(x_0, y_0)`` is a local maximum.
+4. If ``\Delta(x_0, y_0) > 0`` and ``{f^\prime}_{xx}(x_0, y_0) < 0``, then the point ``(x_0, y_0)`` is a local maximum.
 
-5. If ``\Delta(x_0, y_0) > 0`` and ``{f^\prime}{xx}(x_0, y_0) > 0``, then the point ``(x_0, y_0)`` is a local minimum.
+5. If ``\Delta(x_0, y_0) > 0`` and ``{f^\prime}_{xx}(x_0, y_0) > 0``, then the point ``(x_0, y_0)`` is a local minimum.
 
 6. If ``\Delta(x_0, y_0) < 0``, then the point ``(x_0, y_0)`` is a saddle point.
 
@@ -233,13 +233,25 @@ The steps for determining the extremum points of a twovariable function ``f(x, y
 
 Find the local extremum points of the function ``f(x, y) = 2x y - 5y^2 + 4x - 2x^2 + 4y - 4``.
 
-``\frac{\partial d}{\partial x} = 0`` and ``\frac{\partial f}{\partial y} = 0`` yields: ``2y + 4 - 4x = 0`` and ``2x - 10y + 4 = 0``. Next, we have: ``2y - 4x = -4`` and ``2x - 10y = -4``. Multiplying the equation ``2x - 10y = -4`` by ``2`` results in ``2y - 4x = -4`` and ``4x - 20y = -8``. Then, ``-18y = -12``. Finally, ``y = \frac{-12}{-18} = \frac{2}{3}``. Subsequently, we solve for ``x`` by substituting the numerical value of ``y`` in the equation ``2(\frac{2}{3}) - 4x = -4``, which siplifies to the equation ``-4x = -4 - \frac{4}{3} = \frac{-16}{3}``. Then, we have ``x = \frac{16}{12} = \frac{4}{3}``. This gives the extremum point ``(x_0, y_0) = (\frac{4}{3}, \frac{2}{3})``. Now, we have to determine the type of ``(\frac{4}{3}, \frac{2}{3})``.
+First, set the partial derivatives of the function ``f`` equal to zero:
+
+``\left\{\begin{array}{@{}l@{}} \frac{\partial f}{\partial x} = 0 \\ \frac{\partial f}{\partial y} = 0 \end{array}\right``.
+
+Next, we have:
+
+``\left\{\begin{array}{@{}l@{}} 2y - 4x = -4 \\ 2x - 10y = -4 \end{array}\right``.
+
+Multiplying the equation ``2x - 10y = -4`` by ``2`` results in:
+
+``\left\{\begin{array}{@{}l@{}} 2y - 4x = -4 \\ 4x - 20y = -8 \end{array}\right``.
+
+Then, summing the two equations in the system gives us: ``-18y = -12``. Finally, we have the value of ``y = \frac{-12}{-18} = \frac{2}{3}``. Subsequently, we solve for ``x`` by substituting the numerical value of ``y`` in the equation ``2(\frac{2}{3}) - 4x = -4``, which siplifies to the equation ``-4x = -4 - \frac{4}{3} = \frac{-16}{3}``. Then, we have ``x = \frac{16}{12} = \frac{4}{3}``. This gives the extremum point ``(x_0, y_0) = (\frac{4}{3}, \frac{2}{3})``. Now, we have to determine the type of ``(\frac{4}{3}, \frac{2}{3})``.
 
 ``{f^\prime}_{xx}(\frac{4}{3}, \frac{2}{3}) = -4`` and ``{f^\prime}_{yy}(\frac{4}{3}, \frac{2}{3}) = -10`` and ``{f^\prime}_{xy}(\frac{4}{3}, \frac{2}{3}) = 2``.
 
 ``\Delta(\frac{4}{3}, \frac{2}{3}) = (-4) (-10) - 2^2 = 40 - 4 = 36``.
 
-Having computed the values of ``{f^\prime}_{xx}(\frac{4}{3}, \frac{2}{3})`` and ``\Delta(\frac{4}{3}, \frac{2}{3})`` we can examine the type of the point ``(\frac{4}{3}, \frac{2}{3})`` next:
+Having computed the values of ``{f^\prime}_{xx}(\frac{4}{3}, \frac{2}{3})`` and ``\Delta(\frac{4}{3}, \frac{2}{3})`` we can examine the type of the point ``(\frac{4}{3}, \frac{2}{3})`` in the end:
 
 ``\Delta(\frac{4}{3}, \frac{2}{3}) > 0`` and ``{f^\prime}_{xx}(\frac{4}{3}, \frac{2}{3}) < 0``, therefore the point ``(\frac{4}{3}, \frac{2}{3})`` is a local maximum according to step four above.
 
@@ -247,47 +259,58 @@ Having computed the values of ``{f^\prime}_{xx}(\frac{4}{3}, \frac{2}{3})`` and 
 
 Find the local extremum points of the function ``f(x, y) = x^2 - 2x y + \frac{1}{3} y^3 - 3y``.
 
-``\frac{\partial f}{\partial x} = 2x - 2y = 0``,
+``\left\{\begin{array}{@{}l@{}} \frac{\partial f}{\partial x} = 2x - 2y = 0 \\ \frac{\partial f}{\partial y} = -2x + y^2 - 3 = 0 \end{array}\right``.
 
-``\frac{\partial f}{\partial y} = -2x + y^2 - 3 = 0``.
+``\left\{\begin{array}{@{}l@{}} 2x - 2y = 0 \\ -2x + y^2 = 3 \end{array}\right``.
 
-``2x - 2y = 0``,
-
-``-2x + y^2 = 3``.
+By summing the two equations in the system of equations, we find a single equation, which is entirely in variable ``y``:
 
 ``y^2 - 2y = 3``.
 
 ``y^2 - 2y - 3 = 0``.
 
-``\frac{-(-2) \pm \sqrt{4 + 12}}{2} = \frac{2 \pm 4}{2} = \frac{1 \pm 2}{1}``. So by solving an equation of order 2 in variable ``y``, the variable ``y`` has two distinguished roots: ``y_1 = 3`` and ``y_2 = -1``.
+The solution of the one equation equals ``\frac{-(-2) \pm \sqrt{4 + 12}}{2} = \frac{2 \pm 4}{2} = \frac{1 \pm 2}{1}``. So by solving an equation of order ``2`` in variable ``y``, we find that the variable ``y`` has two distinguished roots: ``y_1 = 3`` and ``y_2 = -1``.
 
 This is the intermediate step for how to find the values of ``x_1`` and ``x_2`` with the given values of ``y_1`` and ``y_2``.
 
+Solving the equation ``2x - 2y = 0`` for ``x_1``:
+
 ``2x - 2y_1 = 0``,
+
 ``2x - 2(3) = 0``,
+
 ``2x = 6``,
+
 ``x_1 = 3``.
 
+Solving the equation ``2x - 2y = 0`` for ``x_2``:
+
 ``2x - 2y_2 = 0``,
+
 ``2x - 2(-1) = 0``,
+
 ``2x = -2``,
+
 ``x_2 = -1``.
 
 The coordinates of the point ``(x_0, y_0)`` for the extremum examination is equal to ``(x_0, y_0) = (3, 3)``, and ``(x_1, y_1) = (-1, -1)``.
 
+We make a few pieces of computation for finding the value of ``\Delta`` at ``(x, y)``:
 ``{f^\prime}_{xx} = 2``,
+
 ``{f^\prime}_{yy} = 2y``,
+
 ``{f^\prime}_{xy} = -2``.
 
-``\Delta(x, y) = {f^\prime}_{xx} - {f^\prime}{yy} - ({f^\prime}_{xy})^2 = (2) (2y) - (-2)^2 = 4y - 4``.
+``\Delta(x, y) = {f^\prime}_{xx} - {f^\prime}_{yy} - ({f^\prime}_{xy})^2 = (2) (2y) - (-2)^2 = 4y - 4``.
 
-For each point ``(x_0, y_0)`` and ``(x_1, y_1)`` respectively we have: ``\Delta(x_0, y_0) = 4 (3) - 4 = 8`` and ``\Delta(x_1, y_1) = 4 (-1) - 4 = -8``.
+For each point ``(x_0, y_0)`` and ``(x_1, y_1)``, respectively, we have dedicated values: ``\Delta(x_0, y_0) = 4 (3) - 4 = 8`` and ``\Delta(x_1, y_1) = 4 (-1) - 4 = -8``.
 
 ``{f^\prime}_{xx}(x_0, y_0) = 2``.
 
 But, ``(x_0, y_0) = (3, 3)`` yields ``\Delta(3, 3) > 0`` and ``{f^\prime}_{xx}(3, 3) > 3``. Therefore, ``(3, 3)`` is a local minimum point of the function ``f(x, y)``.
 
-Examining the last extremum point, ``(x_1, y_1) = (-1, -1)`` yields ``\Delta(-1, -1) < 0`` and ``{f^\prime}_{xx}(-1, -1) > 0``, which makes ``(-1, -1)`` a saddle point.
+Examining the last extremum point, ``(x_1, y_1) = (-1, -1)`` yields ``\Delta(-1, -1) < 0``, which makes ``(-1, -1)`` a saddle point.
 
 ## The Directional Derivative of Multivariable Functions
 
