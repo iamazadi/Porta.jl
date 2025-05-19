@@ -617,7 +617,7 @@ Therefore, we compute the value of the gradient ``\overrightarrow{\nabla f}`` at
 
 ``\overrightarrow{\nabla f} |_{(0, 1, -1)} = (2 (-1) (0) - 1) \overrightarrow{i} + (0 + 2 (-1) (1)) \overrightarrow{j} + (0^2 + 1^2) \overrightarrow{k}``.
 
-``\overrightarrow{\nabla f} |_{{0, 1, -1)} = - \overrightarrow{i} - 2 \overrightarrow{j} + \overrightarrow{k}``.
+``\overrightarrow{\nabla f} |_{(0, 1, -1)} = - \overrightarrow{i} - 2 \overrightarrow{j} + \overrightarrow{k}``.
 
 ``Df_{\overrightarrow{u}} = (-1, -2, 1) \cdot (\frac{1}{\sqrt{3}}, \frac{1}{\sqrt{3}}, \frac{-1}{\sqrt{3}})``.
 
@@ -653,7 +653,7 @@ The region ``A`` has two boundaries: ``a \leq x \leq b`` and ``c \leq y \leq d``
 
 ### Example
 
-Let ``A`` be a region of the shape: ``A = \{ (x, y) | x, y \in \mathbb{R}, 2 \leq x \leq 4, 1 \leq y \leq 2 \}``. Find the double integral of function ``f(x, y) = x^2 y - x y^3 + x`` on this region.
+Let ``A`` be a region of the shape: ``A = \{ (x, y) | x, y \in \mathbb{R}, \ 2 \leq x \leq 4, \ 1 \leq y \leq 2 \}``. Find the double integral of function ``f(x, y) = x^2 y - x y^3 + x`` on this region.
 
 ![19](./assets/multivariablecalculus/19.jpg)
 
