@@ -191,9 +191,9 @@ The three-variable function ``f(x, y, z) = x y^3 - x^2 z^3 + ln(x y)`` is given,
 
 - The state of the third kind. If ``f(x, y)`` is a two-variable function, and ``x`` and ``y`` are two-variable functions, for example functions of independent variables ``r`` and ``s``, then:
 
-- ``\frac{\partial f}{\partial r} = \frac{\partial f}{\partial x} \frac{\partial x}{\partial r} + \frac{\partial f}{\partial y} \frac{\partial y}{\partial r}``.
+1. ``\frac{\partial f}{\partial r} = \frac{\partial f}{\partial x} \frac{\partial x}{\partial r} + \frac{\partial f}{\partial y} \frac{\partial y}{\partial r}``.
 
-- ``\frac{\partial f}{\partial s} = \frac{\partial f}{\partial x} \frac{\partial x}{\partial s} + \frac{\partial f}{\partial y} \frac{\partial y}{\partial s}``.
+2. ``\frac{\partial f}{\partial s} = \frac{\partial f}{\partial x} \frac{\partial x}{\partial s} + \frac{\partial f}{\partial y} \frac{\partial y}{\partial s}``.
 
 ### Example
 
@@ -235,15 +235,15 @@ Find the local extremum points of the function ``f(x, y) = 2x y - 5y^2 + 4x - 2x
 
 First, set the partial derivatives of the function ``f`` equal to zero:
 
-``\left\{\begin{array}{@{}l@{}} \frac{\partial f}{\partial x} = 0 \\ \frac{\partial f}{\partial y} = 0 \end{array}\right``.
+``\left\{ \begin{array}{l} \frac{\partial f}{\partial x} = 0 &\\ \frac{\partial f}{\partial y} = 0 \end{array} \right.``
 
 Next, we have:
 
-``\left\{\begin{array}{@{}l@{}} 2y - 4x = -4 \\ 2x - 10y = -4 \end{array}\right``.
+``\left\{ \begin{array}{l} 2y - 4x = -4 &\\ 2x - 10y = -4 \end{array} \right.``
 
 Multiplying the equation ``2x - 10y = -4`` by ``2`` results in:
 
-``\left\{\begin{array}{@{}l@{}} 2y - 4x = -4 \\ 4x - 20y = -8 \end{array}\right``.
+``\left\{ \begin{array}{l} 2y - 4x = -4 &\\ 4x - 20y = -8 \end{array} \right.``
 
 Then, summing the two equations in the system gives us: ``-18y = -12``. Finally, we have the value of ``y = \frac{-12}{-18} = \frac{2}{3}``. Subsequently, we solve for ``x`` by substituting the numerical value of ``y`` in the equation ``2(\frac{2}{3}) - 4x = -4``, which siplifies to the equation ``-4x = -4 - \frac{4}{3} = \frac{-16}{3}``. Then, we have ``x = \frac{16}{12} = \frac{4}{3}``. This gives the extremum point ``(x_0, y_0) = (\frac{4}{3}, \frac{2}{3})``. Now, we have to determine the type of ``(\frac{4}{3}, \frac{2}{3})``.
 
@@ -259,9 +259,9 @@ Having computed the values of ``{f^\prime}_{xx}(\frac{4}{3}, \frac{2}{3})`` and 
 
 Find the local extremum points of the function ``f(x, y) = x^2 - 2x y + \frac{1}{3} y^3 - 3y``.
 
-``\left\{\begin{array}{@{}l@{}} \frac{\partial f}{\partial x} = 2x - 2y = 0 \\ \frac{\partial f}{\partial y} = -2x + y^2 - 3 = 0 \end{array}\right``.
+``\left\{ \begin{array}{l} \frac{\partial f}{\partial x} = 2x - 2y = 0 &\\ \frac{\partial f}{\partial y} = -2x + y^2 - 3 = 0 \end{array} \right.``
 
-``\left\{\begin{array}{@{}l@{}} 2x - 2y = 0 \\ -2x + y^2 = 3 \end{array}\right``.
+``\left\{ \begin{array}{l} 2x - 2y = 0 &\\ -2x + y^2 = 3 \end{array} \right.``
 
 By summing the two equations in the system of equations, we find a single equation, which is entirely in variable ``y``:
 
@@ -322,11 +322,11 @@ The plot of the function ``f(x, y)``.
 
 The gradient of the function ``f(x, y)`` at point ``a`` is found as follows:
 
-The gradient vector ``\overrightarrow{\nabla f}`` or ``grad \ f = \frac{\partial f}{\partial x} \overrightarrow{i} + \frac{\partial f}{\partial y} \overrightarrow{j} |_{a}`` evaluated at point ``a``.
+The gradient vector ``\overrightarrow{\nabla f}`` or ``grad \ f = \left| \frac{\partial f}{\partial x} \overrightarrow{i} + \frac{\partial f}{\partial y} \overrightarrow{j} \right|_{a}`` evaluated at point ``a``.
 
-The gradient of the function ``w = f(x, y, z)`` at point ``a`` is equal to ``\frac{\partial f}{\partial x} \overrightarrow{i} + \frac{\partial f}{\partial y} \overrightarrow{j} + \frac{\partial f}{\partial z} \overrightarrow{k} |_{a}``.
+The gradient of the function ``w = f(x, y, z)`` at point ``a`` is equal to ``\left| \frac{\partial f}{\partial x} \overrightarrow{i} + \frac{\partial f}{\partial y} \overrightarrow{j} + \frac{\partial f}{\partial z} \overrightarrow{k} \right|_{a}``.
 
-Here, ``\overrightarrow{i}``, ``\overrightarrow{j}`` and ``\overrightarrow{k}`` are unit vectors, which represent the unit basis vectors in the three-dimensional space. These are the spatial triples. Every two of them are linearly independent. In other words, none of them can be represented as a linear combination of the other two.
+Here, ``\overrightarrow{i}``, ``\overrightarrow{j}`` and ``\overrightarrow{k}`` are unit vectors, which represent the unit basis vectors in the three-dimensional space. These are the spatial triples. Every pair of them are linearly independent in a mutual way. In other words, none of them can be represented as a linear combination of the other two.
 
 - ``\overrightarrow{i} = (1, 0, 0)``
 
@@ -334,7 +334,7 @@ Here, ``\overrightarrow{i}``, ``\overrightarrow{j}`` and ``\overrightarrow{k}`` 
 
 - ``\overrightarrow{k} = (0, 0, 1)``
 
-``|\overrightarrow{i}| + |\overrightarrow{j}| + |\overrightarrow{k}| = 1``.
+``|\overrightarrow{i}| = |\overrightarrow{j}| = |\overrightarrow{k}| = 1``.
 
 ``(3, -2, 1) = 3 \overrightarrow{i} - 2 \overrightarrow{j} + \overrightarrow{k}``.
 
@@ -391,9 +391,9 @@ First, we need to find the gradient of the function.
 
 ``\overrightarrow{\nabla f} = \frac{\partial f}{\partial x} \overrightarrow{i} + \frac{\partial f}{\partial y} \overrightarrow{j} |_{(1, 2)}``,
 
-``\overrightarrow{\nabla f} = (3x^2 y - y^2) \overrightarrow{i} + (x^3 - 2y x) \overrightarrow{j} |_{(1, 2)}``,
+``\overrightarrow{\nabla f} = (3x^2 y - y^2) \overrightarrow{i} + (x^3 - 2y x + 1) \overrightarrow{j} |_{(1, 2)}``,
 
-``\overrightarrow{\nabla f} = (6 - 4) \overrightarrow{i} + (1 - 4) \overrightarrow{j} = 2 \overrightarrow{i} - 3 \overrightarrow{j} = (2, -3)``.
+``\overrightarrow{\nabla f} = (6 - 4) \overrightarrow{i} + (1 - 4 + 1) \overrightarrow{j} = 2 \overrightarrow{i} - 2 \overrightarrow{j} = (2, -2)``.
 
 Second, we need to find the unit vector of ``\overrightarrow{u}``, along which the directional derivative is taken.
 
@@ -401,7 +401,7 @@ Second, we need to find the unit vector of ``\overrightarrow{u}``, along which t
 
 Finally, perform an inner product in order to compute the directional derivative of ``f`` in the direction of ``\overrightarrow{u}``.
 
-``D_{\overrightarrow{u}} f = (2, -3) \cdot (\frac{4}{5}, \frac{-3}{5}) = 2 \frac{4}{5} + -3 \frac{-3}{5} = \frac{8}{5} + \frac{9}{5} = \frac{17}{5}``.
+``Df_{\overrightarrow{u}} = (2, -2) \cdot (\frac{4}{5}, \frac{-2}{5}) = 2 \frac{4}{5} + -3 \frac{-2}{5} = \frac{8}{5} + \frac{6}{5} = \frac{14}{5}``.
 
 ### Example
 
@@ -423,9 +423,9 @@ Next, find the unit vector ``e_{\overrightarrow{u}}`` to determine the direction
 
 In the end, find the directional derivative of ``f`` at ``(1, -1, 1)`` in the direction of ``e_{\overrightarrow{u}}``:
 
-``D_{\overrightarrow{u}} T = (3, -3, 3) \cdot (\frac{2}{\sqrt{6}}, \frac{1}{\sqrt{6}}, \frac{1}{\sqrt{6}}) = \frac{(3) (2)}{\sqrt{6}} + \frac{-3}{\sqrt{6}} + \frac{3}{\sqrt{6}}``.
+``DT_{\overrightarrow{u}} = (3, -3, 3) \cdot (\frac{2}{\sqrt{6}}, \frac{1}{\sqrt{6}}, \frac{1}{\sqrt{6}}) = \frac{(3) (2)}{\sqrt{6}} + \frac{-3}{\sqrt{6}} + \frac{3}{\sqrt{6}}``.
 
-``D_{\overrightarrow{u}} T = \frac{6}{\sqrt{6}} = \frac{6 \sqrt{6}}{\sqrt{6} \sqrt{6}} = \frac{6 \sqrt{6}}{6} = \sqrt{6}``.
+``DT_{\overrightarrow{u}} = \frac{6}{\sqrt{6}} = \frac{6 \sqrt{6}}{\sqrt{6} \sqrt{6}} = \frac{6 \sqrt{6}}{6} = \sqrt{6}``.
 
 ## The Applications of the Gradient
 
