@@ -9,7 +9,8 @@ makedocs(
         "Hopf Fibration" => "hopffibration.md",
         "News Report" => "newsreport.md",
         "Multivariable Calculus" => "multivariablecalculus.md",
-        "Reaction Wheel Unicycle" => "reactionwheelunicycle.md"
+        "Reaction Wheel Unicycle" => "reactionwheelunicycle.md",
+        "The Maxwell field as gauge curvature" => "maxwellfield.md"
     ]
 )
 
