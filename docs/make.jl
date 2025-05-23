@@ -10,7 +10,7 @@ makedocs(
         "News Report" => "newsreport.md",
         "Reaction Wheel Unicycle" => "reactionwheelunicycle.md",
         "Multivariable Calculus" => "multivariablecalculus.md",
-        "The Maxwell Field" => "maxwellfield.md"
+        "The Maxwell Field (Persian)" => "maxwellfield_persian.md"
     ]
 )
 
