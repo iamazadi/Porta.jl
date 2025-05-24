@@ -2202,6 +2202,8 @@ Description = "The Maxwell field as gauge curvature"
 </div>
 ```
 
+![22](./assets/multivariablecalculus/22.jpg)
+
 ```@raw html
 <div dir = "rtl">
 <p>
@@ -2239,6 +2241,8 @@ Description = "The Maxwell field as gauge curvature"
 </div>
 ```
 
+![23](./assets/multivariablecalculus/23.jpg)
+
 ``y = x``, ``y = 2x``, ``x = 1``, ``x = 2``
 
 ``\int \int_A f(x, y) \ dA = \int_1^2 \int_x^{2x} f(x, y) \ dy \ dx``.
@@ -2257,6 +2261,8 @@ Description = "The Maxwell field as gauge curvature"
 </p>
 </div>
 ```
+
+![24](./assets/multivariablecalculus/24.jpg)
 
 ``y = x``, ``y = \frac{1}{x}``, ``y = 5 - x``.
 
