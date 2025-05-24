@@ -16,101 +16,386 @@ Description = "The Maxwell field as gauge curvature"
 </div>
 ```
 
-# Multivariable Functions
+```@raw html
+<div dir = "rtl">
+<p>
 
-In General Mathematics 1, we were introduced to one-variable functions ``y = f(x)``, which had only one independent variable as input, ``x``. But in reality most of the times, we are faced with functions that have more than one independent variable. These functions are called multivariable functions.
+در ریاضی عمومی ۱ با توابع معمولی وای برابر با اف ایکس آشنا شدیم که تنها یک متغیر مستقل به عنوان ورودی (یعنی ایکس) داشت. اما در واقعیت اکثر مواقع با توابعی مواجه هستیم که بیش از یک متغیر مستقل دارند. به این توابع، توابع چندمتغیره گفته می‌شود.
 
-``y = f(x)`` is a univariate function.
+</p>
+</div>
+```
 
-The function sends the input to the output, ``x \mapsto y``.
+``y = f(x)``.
 
-## Notation
+```@raw html
+<div dir = "rtl">
+<p>
 
-- A two-variable function: ``z = f(x, y)``.
+تابع اف ایکس یک تابع تک‌متغیره است که ورودی را به خروجی نگاشت می‌کند.
 
-- A three-variable function is denoted by ``w = f(x, y, z)``.
+</p>
+</div>
+```
 
-- An n-variable function: ``f(x_1, x_2, ..., x_n)``.
+``x \mapsto y``
 
-A few simple examples that show the relevance of multivariable functions.
+```@raw html
+<div dir = "rtl">
+<h2>
 
-### Example
+نمادگان
 
-The area of a rectangle: ``f(x, y) = xy``.
+</h2>
+</div>
+```
 
-The volume of a cuboid: ``V(x, y, z) = xyz``.
+```@raw html
+<div dir = "rtl">
+<p>
 
-The volume of a cylinder: ``V(r, h) = \pi r^2 h``.
+یک تابع دومتغیره
+
+</p>
+</div>
+```
+
+``z = f(x, y)``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+یک تابع سه‌متغیره
+
+</p>
+</div>
+```
+
+``w = f(x, y, z)``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+یک تابع ان‌متغیره
+
+</p>
+</div>
+```
+
+``f(x_1, x_2, ..., x_n)``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+چند مثال ساده که اهمیت استفاده از توابع چندمتغیره را نشان می‌دهد.
+
+</p>
+</div>
+```
+
+```@raw html
+<div dir = "rtl">
+<h3>
+
+مثال
+
+</h3>
+</div>
+```
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+مساحت یک مستطیل
+
+</p>
+</div>
+```
+
+``f(x, y) = xy``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+حجم یک مکعب‌مستطیل
+
+</p>
+</div>
+```
+
+``V(x, y, z) = xyz``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+حجم یک استوانه
+
+</p>
+</div>
+```
+
+``V(r, h) = \pi r^2 h``
 
 ![1](./assets/multivariablecalculus/1.jpg)
 
-### Example
+```@raw html
+<div dir = "rtl">
+<h3>
 
-The average of the ``n`` numbers ``x_1, x_2, ..., x_n``:
+مثال
+
+</h3>
+</div>
+```
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+میانگین ان عدد: ایکس پایین‌نویس ۱، ایکس پایین‌نویس ۲، تا ایکس پایین‌نویس ان.
+
+</p>
+</div>
+```
 
 ``f(x_1, x_2, ..., x_n) = \frac{1}{n} \sum_{i = 1}^n x_i``.
 
-## The Domain of Multivariable Functions
+```@raw html
+<div dir = "rtl">
+<h2>
 
-The domain of the two-variable function ``f(x, y)`` is either a point in the ``x``-``y`` plane, or part of, or the entire ``x``-``y``coordinate system ``\mathbb{R}^2``.
+دامنه‌ی توابع چندمتغیره
+
+</h2>
+</div>
+```
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+دامنه‌ی توابع دومتغیره اف ایکس و وای، یا یک نقطه از صفحه‌ی ایکس-وای است، یا قسمتی از صفحه‌ی مختصات ایکس-وای، یا تمام صفحه دوبعدی اعداد حقیقی است.
+
+</p>
+</div>
+```
 
 ![2](./assets/multivariablecalculus/2.jpg)
 
-### Examples
+```@raw html
+<div dir = "rtl">
+<h3>
 
-Find the domain of the following functions and then plot it as a shape.
+مثال
 
-*Example A.* ``f(x, y) = 2x^3 y + x^2 y^2 - y + 5``
+</h3>
+</div>
+```
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+دامنه‌ی توابع زیر را به دست آورید و با شکل نشان دهید.
+
+</p>
+</div>
+```
+
+```@raw html
+<div dir = "rtl">
+<h4>
+
+مثال الف
+
+</h4>
+</div>
+```
+
+``f(x, y) = 2x^3 y + x^2 y^2 - y + 5``
 
 ``D_f = \{ (x, y) | x \in \mathbb{R}, y \in \mathbb{R} \} = \mathbb{R}^2``.
 
+```@raw html
+<div dir = "rtl">
+<p>
+
+دامنه‌ی تابع شامل تمام صفحه‌ی دوبعدی اعداد حقیقی است.
+
+</p>
+</div>
+```
+
 ![3](./assets/multivariablecalculus/3.jpg)
 
-*Example B.* ``f(x, y) = \frac{1}{x - y}``
+```@raw html
+<div dir = "rtl">
+<h4>
+
+مثال ب
+
+</h4>
+</div>
+```
+
+``f(x, y) = \frac{1}{x - y}``
 
 ``D_f = \{ (x, y) | x, y \in \mathbb{R}, x - y \neq 0 \} = \{ (x, y) | x \neq y \}``.
 
-The whole plane, without the line ``y = x``.
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+دامنه‌ی تابع تمام صفحه‌ی اعداد حقیقی به جز خط همانی وای برابر با ایکس است.
+
+</p>
+</div>
+```
 
 ![4](./assets/multivariablecalculus/4.jpg)
 
-*Example C.* ``f(x, y) = \sqrt{x - y}``
+```@raw html
+<div dir = "rtl">
+<h4>
+
+مثال پ
+
+</h4>
+</div>
+```
+
+``f(x, y) = \sqrt{x - y}``
 
 ``D_f = \{ (x, y) | x, y \in \mathbb{R}, x - y \geq 0 \} = \{ (x, y) | x \geq y \}``.
 
-On and under the line `` y = x``.
+```@raw html
+<div dir = "rtl">
+<p>
+
+دامنه‌ی تابع بخشی از صفحه‌ی اعداد حقیقی است که شامل نقاط روی خط همانی وای برابر با ایکس می‌باشد، به علاوه نقاطی که زیر این خط قرار دارند.
+
+</p>
+</div>
+```
 
 ![5](./assets/multivariablecalculus/5.jpg)
 
-*Example D.* ``f(x, y) = \frac{\sqrt{y - 3}}{\sqrt{5 - x}}``
+```@raw html
+<div dir = "rtl">
+<h4>
+
+مثال ت
+
+</h4>
+</div>
+```
+
+``f(x, y) = \frac{\sqrt{y - 3}}{\sqrt{5 - x}}``
 
 ``D_f = \{ (x, y) | x, y \in \mathbb{R}, y - 3 \geq 0, 5 - x > 0 \} = \{ (x, y) | y \geq 3, x < 5 \}``.
 
+```@raw html
+<div dir = "rtl">
+<p>
+
+دامنه‌ی تابع شامل مساحت محصور بین خط افقی وای برابر با ۳ و خط عمودی ایکس برابر با ۵ است که شامل نقاط روی خط افقی و بالای آن می‌شود، اما شامل نقاط روی خط عمودی نمی‌شود.
+
+</p>
+</div>
+```
+
 ![6](./assets/multivariablecalculus/6.jpg)
 
-*Example E.* ``f(x, y) = \frac{\sqrt{y + 1}}{\sqrt[4]{2 - |x|}}``
+```@raw html
+<div dir = "rtl">
+<h4>
+
+مثال ث
+
+</h4>
+</div>
+```
+
+``f(x, y) = \frac{\sqrt{y + 1}}{\sqrt[4]{2 - |x|}}``
 
 ``D_f = \{ (x, y) | x, y \in \mathbb{R},  y + 1 \geq 0, 2 - |x| > 0 \} = \{ (x, y) | y \geq -1, -2 < x < 2 \}``.
 
+```@raw html
+<div dir = "rtl">
+<p>
+
+دامنه‌ی تابع شامل مساحت محصور بین خط افقی وای برابر با منفی یک، و خط‌های عمودی ایکس برابر با مثبت دو و منفی دو است، به طوری که نقاط روی خط افقی و بالای آن در دامنه هستند، اما خود خط‌های عمودی در بیرون از دامنه‌ی تابع‌اند.
+
+</p>
+</div>
+```
+
 ![7](./assets/multivariablecalculus/7.jpg)
 
-The lines ``x = 2`` and ``x = -2`` are excluded from the domain of the function ``f(x, y)``.
+```@raw html
+<div dir = "rtl">
+<p>
 
-The shape of two-variable functions are surfaces that are embedded in three-dimensional plots.
+نمودار توابع دومتغیره، نمودارهایی سه‌بعدی خواهند بود که به آن‌ها رویه نیز گفته می‌شود.
+
+</p>
+</div>
+```
 
 ![8](./assets/multivariablecalculus/8.jpg)
 
 ``z = f(x, y)``.
 
-The triple ``(x, y, z)``.
+```@raw html
+<div dir = "rtl">
+<p>
 
-Since drawing three-dimensional shapes is time consuming, we just make a few examples of surfaces.
+سه‌تایی ایکس، وای و زد.
+
+</p>
+</div>
+```
+
+``(x, y, z)``.
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+چون رسم اشکال سه‌بعدی زمان‌بر است، فقط به نمونه‌هایی از رویه‌ها اشاره می‌کنیم.
+
+</p>
+</div>
+```
 
 ![9](./assets/multivariablecalculus/9.jpg)
 
-And by induction in this way, the domain of the three-variable function ``w = f(x, y, z)`` is three-dimensional, and the plot of its shape is embedded in the four-dimensional space.
+```@raw html
+<div dir = "rtl">
+<p>
 
-# Partial Derivatives
+به همین ترتیب، دامنه‌ی توابع سه‌متغیره دابلیو برابر با اف ایکس، وای، و زد سه‌بعدی است و نمودار آن چهاربعدی است.
+
+</p>
+</div>
+```
+
+```@raw html
+<div dir = "rtl">
+<h1>
+
+مشتق‌های جزیی
+
+</h1>
+</div>
+```
 
 ``y = f(x)``.
 
@@ -124,22 +409,87 @@ And by induction in this way, the domain of the three-variable function ``w = f(
 
 ``f(x, y)``.
 
-When we want to find the derivative of a multivariable function, we must specify with respect to which variable the derivative is to be applied. Other than the one variable, with respect to which the derivative is computed, the rest of the variables are treated as constant values.
+```@raw html
+<div dir = "rtl">
+<p>
 
-The derivative of the function ``f(x, y)`` with respect to ``x`` is denoted by ``\frac{\partial f}{\partial x}`` or ``{f^\prime}_x``.
-The derivative of the function ``f(x, y)`` with respect to ``y`` is denoted by ``\frac{\partial f}{\partial y}`` or ``{f^\prime}_y``.
+در توابع چندمتغیره، وقتی که می‌خواهیم مشتق بگیریم باید مشخص کنیم که نسبت به کدام متغیر مشتق بگیریم. نسبت به هر متغیر که مشتق بگیریم، باید فرض کنیم که سایر متغیرها ثابت (مشابه عدد ثابت) هستند.
 
-### Example
+</p>
+</div>
+```
 
-If the function ``f(x, y) = -3x^4 y^2 + x^3 y - y^3 + xy`` is defined, then calculate the partial derivative of ``f(x, y)`` with respect to ``x`` and the partial derivative of ``f(x, y)`` with respect to ``y``.
+```@raw html
+<div dir = "rtl">
+<p>
+
+مشتق تابع اف نسبت به متغیر ایکس
+
+</p>
+</div>
+```
+
+``\frac{\partial f}{\partial x}`` یا ``{f^\prime}_x``.
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+مشتق تابع اف نسبت به متغیر وای
+
+</p>
+</div>
+```
+
+``\frac{\partial f}{\partial y}`` یا ``{f^\prime}_y``.
+
+```@raw html
+<div dir = "rtl">
+<h3>
+
+مثال
+
+</h3>
+</div>
+```
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+اگر تابع اف به صورت زیر تعریف شده باشد، آن‌گاه مشتق تابع اف را نسبت به متغیر ایکس و مشتق تابع اف را نسبت به متغیر وای به دست آورید.
+
+</p>
+</div>
+```
+
+``f(x, y) = -3x^4 y^2 + x^3 y - y^3 + x y``
 
 - ``\frac{\partial f}{\partial x} = -12x^3 y^2 + 3x^2 y + y``.
 
 - ``\frac{\partial f}{\partial y} = -6x^4 y + x^3 -3y^2 + x``.
 
-### Example
+```@raw html
+<div dir = "rtl">
+<h3>
 
-If the function ``f(x, y, z) = x^5 y^2 z^3 + y x^y - sin(y z^3)`` is defined, then take the partial derivative of ``f(x, y)`` with respect to ``x``, the partial derivative of ``f(x, y)`` with respect to ``y``, and the partial derivative of ``f(x, y)`` with respect to ``z``.
+مثال
+
+</h3>
+</div>
+```
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+اگر تابع سه‌متغیره‌ی اف به صورت زیر تعریف شده باشد، آن‌گاه مشتق تابع اف را نسبت به متغیر ایکس، مشتق تابع اف را نسبت به متغیر وای، و مشتق تابع اف را یک بار دیگر نسبت به متغیر زد به دست آورید.
+
+</p>
+</div>
+```
+
+``f(x, y, z) = x^5 y^2 z^3 + x^y - sin(y z^3)``
 
 - ``\frac{\partial f}{\partial x} = 5x^4 y^2 z^3 + y x^{y -1}``.
 
@@ -147,23 +497,75 @@ If the function ``f(x, y, z) = x^5 y^2 z^3 + y x^y - sin(y z^3)`` is defined, th
 
 - ``\frac{\partial f}{\partial z} = 3z^2 x^5 y^2 - 3y z^2 \ cos(y z^3)``.
 
-*Reminder:* ``(a^u)^\prime = u^\prime a^u ln(a)``.
+```@raw html
+<div dir = "rtl">
+<p>
 
-## Higher Order Partial Derivatives
+یادآوری:
 
-For a two-variable function ``f(x, y)``, higher order partial derivatives are as follows:
+</p>
+</div>
+```
 
-- ``\frac{\partial^2 f}{\partial x^2} = \frac{\partial}{\partial x} (\frac{\partial f}{\partial x})`` or ``{f^\prime}_{xx}``.
+``(a^u)^\prime = u^\prime a^u ln(a)``.
 
-- ``\frac{\partial^2 f}{\partial y^2} = \frac{\partial}{\partial y} (\frac{\partial f}{\partial y})`` or ``{f^\prime}_{yy}``.
+```@raw html
+<div dir = "rtl">
+<h2>
 
-- ``\frac{\partial^2 f}{\partial x \partial y} = \frac{\partial}{\partial x} (\frac{\partial f}{\partial y})`` or ``{f^\prime}_{yx}``.
+مشتق‌های جزیی مراتب بالاتر
 
-- ``\frac{\partial^2 f}{\partial y \partial x} = \frac{\partial}{\partial y} (\frac{\partial f}{\partial x})`` or ``{f^\prime}_{xy}``.
+</h2>
+</div>
+```
 
-### Exercise
+```@raw html
+<div dir = "rtl">
+<p>
 
-With the given function ``f(x, y) = ln(x^4 y^2) - y``, find the second partial derivative of ``f(x, y)``: **(a)** both with respect to ``x``, **(b)** both with respect to ``y``, **(c)** first taken with respect to ``y`` and then with respect to ``x``, and **(d)** with respect to first ``x`` and then ``y``.
+برای تابع دومتغیره‌ی اف ایکس و وای مشتق‌های مراتب بالاتر به صورت زیر است:
+
+</p>
+</div>
+```
+
+- ``\frac{\partial^2 f}{\partial x^2} = \frac{\partial}{\partial x} (\frac{\partial f}{\partial x})`` یا ``{f^\prime}_{xx}``.
+
+- ``\frac{\partial^2 f}{\partial y^2} = \frac{\partial}{\partial y} (\frac{\partial f}{\partial y})`` یا ``{f^\prime}_{yy}``.
+
+- ``\frac{\partial^2 f}{\partial x \partial y} = \frac{\partial}{\partial x} (\frac{\partial f}{\partial y})`` یا ``{f^\prime}_{yx}``.
+
+- ``\frac{\partial^2 f}{\partial y \partial x} = \frac{\partial}{\partial y} (\frac{\partial f}{\partial x})`` یا ``{f^\prime}_{xy}``.
+
+```@raw html
+<div dir = "rtl">
+<h3>
+
+مثال
+
+</h3>
+</div>
+```
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+اگر تابع دومتغیره‌ی اف ایکس و وای به صورت زیر تعریف شده باشد، آن‌گاه مطلوبست:
+
+</p>
+<ul>
+
+<li>مشتق دوم تابع اف نسبت به متغیر ایکس</li>
+<li>مشتق دوم تابع اف نسبت به متغیر وای</li>
+<li>مشتق دوم تابع اف، اول نسبت به متغیر وای و سپس نسبت به متغیر ایکس</li>
+<li>مشتق دوم تابع اف، اول نسبت به متغیر ایکس و دوم نسبت به متغیر وای</li>
+
+</ul>
+</div>
+```
+
+``f(x, y) = ln(x^4 y^2) - y``.
 
 - ``\frac{\partial^2 f}{\partial x^2} = \frac{\partial}{\partial x}(\frac{4x^3 y^2}{x^4 y^2}) = \frac{\partial}{\partial x}(\frac{4}{x}) = \frac{-4}{x^2}``.
 
@@ -173,121 +575,535 @@ With the given function ``f(x, y) = ln(x^4 y^2) - y``, find the second partial d
 
 - ``\frac{\partial^2 f}{\partial y \partial x} = \frac{\partial}{\partial y}(\frac{4x^3 y^2}{x^4 y^2}) = \frac{\partial}{\partial y}(\frac{4}{x}) = 0``.
 
-*Reminder:* ``(ln(u))^\prime = \frac{u^\prime}{u}``.
+```@raw html
+<div dir = "rtl">
+<p>
 
-## The Chain Rule
+یادآوری:
 
-There are a few states for the chain rule:
+</p>
+</div>
+```
 
-- The first state. Suppose the function ``f(x, y)`` is defined. The variables ``x`` and ``y`` are on their own functions of other variables, such as ``t``. In this state:
+``(ln(u))^\prime = \frac{u^\prime}{u}``.
+
+```@raw html
+<div dir = "rtl">
+<h2>
+
+قاعده‌ی زنجیره‌ای
+
+</h2>
+</div>
+```
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+چند حالت از قاعده‌ی زنجیره‌ای:
+
+<br>
+
+۱. حالت اول. فرض کنید که تابع اف ایکس و وای را داشته باشیم و خود متغیرهای ایکس و وای توابعی بر حسب متغیر دیگیری مانند تی باشند. در این حالت:
+
+</p>
+</div>
+```
 
 ``\frac{\partial f}{\partial t} = \frac{\partial f}{\partial x} \frac{\partial x}{\partial t} + \frac{\partial f}{\partial y} \frac{\partial y}{\partial t}``.
 
-### Example
+```@raw html
+<div dir = "rtl">
+<h3>
 
-If ``f(x, y) = x^3 y - y^2 x + 4x`` and ``x = sin(t)`` and ``y = 2e^t``, then find ``\frac{\partial f}{\partial t}``.
+مثال
+
+</h3>
+</div>
+```
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+اگر تابع دومتغیره‌ی اف ایکس و وای با ضابطه‌ی زیر تعریف شده باشد و تعریف متغیرهای ایکس و وای به شکل زیر باشد، آن‌گاه مطلوبست مشتق جزیی تابع اف نسبت به متغیر مستقل تی.
+
+</p>
+</div>
+```
+
+``f(x, y) = x^3 y - y^2 x + 4x``.
+
+``x = sin(t)``.
+
+``y = 2e^t``.
 
 ``\frac{\partial f}{\partial t} = (3x^2 y - y^2 + 4) cos(t) + 2(x^3 - 2yx) e^t``.
 
-*Reminder:* ``(e^u)^\prime = u^\prime e^u``.
+```@raw html
+<div dir = "rtl">
+<p>
 
-- The second state. If we have ``f(x, y, z)`` a three-variable function and ``x, y, z`` three functions of ``t``, then we have:
+یادآوری:
+
+</p>
+</div>
+```
+
+``(e^u)^\prime = u^\prime e^u``.
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+۲. حالت دوم. داشته باشیم اف ایکس، وای، و زد یک تابع سه‌متغیره، و ایکس، وای، و زد توابعی بر حسب متغیر مستقل تی باشند. آن‌گاه داریم:
+
+</p>
+</div>
+```
 
 ``\frac{\partial f}{\partial t} = \frac{\partial f}{\partial x} \frac{\partial x}{\partial t} + \frac{\partial f}{\partial y} \frac{\partial y}{\partial t} + \frac{\partial f}{\partial z} \frac{\partial z}{\partial t}``.
 
-### Example
+```@raw html
+<div dir = "rtl">
+<h3>
 
-The three-variable function ``f(x, y, z) = x y^3 - x^2 z^3 + ln(x y)`` is given,  where ``x = t^2``, ``y = cos(4t)`` and ``z = \sqrt{t}``. Find the partial derivative of ``f`` with respect to ``t``.
+مثال
+
+</h3>
+</div>
+```
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+ضابطه‌ی تابع سه‌متغیره‌ی اف ایکس، وای، و زد به شکل زیر تعریف شده است. متغیرهای ایکس، وای، و زد نیز بر حسب متغیر تی به صورت زیر تعریف شده‌اند. مطلوب است مشتق جزیی تابع اف نسبت به متغیر تی.
+
+</p>
+</div>
+```
+
+``f(x, y, z) = x y^3 - x^2 z^3 + ln(x y)``.
+
+``x = t^2``.
+
+``y = cos(4t)``,
+
+``z = \sqrt{t}``.
 
 ``\frac{\partial f}{\partial t} = (y^3 - 2x z^3 + \frac{y}{x y}) (2t) + (3y^2 x + \frac{x}{x y})(-4sin(4t)) + (-3z^2 x^2)(\frac{1}{2 \sqrt{t}})``.
 
-*Reminder:* ``(ln(u))^\prime = \frac{u^\prime}{u}``.
+```@raw html
+<div dir = "rtl">
+<p>
 
-- The state of the third kind. If ``f(x, y)`` is a two-variable function, and ``x`` and ``y`` are two-variable functions, for example functions of independent variables ``r`` and ``s``, then:
+یادآوری:
+
+</p>
+</div>
+```
+
+``(ln(u))^\prime = \frac{u^\prime}{u}``.
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+۳. حالت سوم. اگر ضابطه‌ی تابع دومتغیره‌ی اف ایکس و وای را داشته باشیم و متغیرهای ایکس و وای توابعی دومتغیره بر حسب متغیرهای مستقل دیگری مانند آر و اس باشند، آن‌گاه:
+
+</p>
+</div>
+```
 
 1. ``\frac{\partial f}{\partial r} = \frac{\partial f}{\partial x} \frac{\partial x}{\partial r} + \frac{\partial f}{\partial y} \frac{\partial y}{\partial r}``.
 
 2. ``\frac{\partial f}{\partial s} = \frac{\partial f}{\partial x} \frac{\partial x}{\partial s} + \frac{\partial f}{\partial y} \frac{\partial y}{\partial s}``.
 
-### Example
+```@raw html
+<div dir = "rtl">
+<h3>
 
-The partial derivative of ``f(x, y) = 3x^2 y - y^2 x + x y + y`` with respect to ``s``, where ``y = r + s`` and ``x = s^r``:
+مثال
+
+</h3>
+</div>
+```
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+مشتق جزیی تابع اف ایکس و وای نسبت به متغیرهای آر و اس چیست، اگر که متغیرهای ایکس و وای بر حسب متغیرهای آر و اس به صورت زیر تعریف شده باشند.
+
+</p>
+</div>
+```
+
+``f(x, y) = 3x^2 y - y^2 x + x y + y``
+
+``x = s^r``
+
+``y = r + s``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+مشتق تابع اف نسبت به متغیر اس برابر است با:
+
+</p>
+</div>
+```
 
 ``\frac{\partial f}{\partial s} = (6x y - y^2 + y) (r s^{r - 1}) + (3x^2 - 2y x + x + 1)(1)``.
 
-The partial derivative of the function ``f(x, y)`` with respect to ``r``:
+```@raw html
+<div dir = "rtl">
+<p>
+
+مشتق تابع اف نسبت به متغیر آر برابر است با:
+
+</p>
+</div>
+```
 
 ``\frac{\partial f}{\partial r} = (6x y - y^2 + y) (s^r ln(s)) + (3x^2 - 2y x + x + 1)(1)``.
 
-*Reminder:* ``\frac{d}{dx} a^x = \frac{d}{dx} e^{x ln(a)} = e^{x ln(a)} (\frac{d}{dx} x ln(a)) = e^{x ln(a)} ln(a) = a^x ln(a)``.
+```@raw html
+<div dir = "rtl">
+<p>
 
-# The Applications of Partial Derivatives
+یادآوری:
 
-## Determining the Maximum and Minimum Values of Multivariable Functions
+</p>
+</div>
+```
 
-The steps for determining the extremum points of a twovariable function ``f(x, y)``:
+``\frac{d}{dx} a^x = \frac{d}{dx} e^{x ln(a)} = e^{x ln(a)} (\frac{d}{dx} x ln(a)) = e^{x ln(a)} ln(a) = a^x ln(a)``.
 
-1. Solve the system of equations that is formed with ``\frac{\partial f}{\partial x} = 0`` and ``\frac{\partial f}{\partial y} = 0``. Suppose that the solution of the system is equal to ``(x_0, y_0)``.
 
-2. Compute the equation ``\Delta(x, y) = {f^\prime}_{xx} {f^\prime}_{yy} - ({f^\prime}_{xy})^2``.
+```@raw html
+<div dir = "rtl">
+<h2>
 
-3. Calculate these two values: ``\Delta(x_0, y_0)`` and ``{f^\prime}_{xx}(x_0, y_0)``.
+کاربرد مشتق‌های جزیی
 
-4. If ``\Delta(x_0, y_0) > 0`` and ``{f^\prime}_{xx}(x_0, y_0) < 0``, then the point ``(x_0, y_0)`` is a local maximum.
+</h2>
+</div>
+```
 
-5. If ``\Delta(x_0, y_0) > 0`` and ``{f^\prime}_{xx}(x_0, y_0) > 0``, then the point ``(x_0, y_0)`` is a local minimum.
+```@raw html
+<div dir = "rtl">
+<h3>
 
-6. If ``\Delta(x_0, y_0) < 0``, then the point ``(x_0, y_0)`` is a saddle point.
+تعیین مینیمم و ماکزیمم توابع چندمتغیره
 
-7. If ``\Delta(x_0, y_0) = 0``, then this test does not succeed at determining the type of the point ``(x_0, y_0)``.
+</h3>
+
+<p>
+
+روش تعیین اکسترمم توابع دومتغیره اف ایکس و وای:
+
+</p>
+</div>
+```
+
+```@raw html
+<div dir = "rtl">
+<h4>گام اول</h4>
+<p>
+
+دستگاه دو معادله‌ای مشتق تابع اف نسبت به متغیر ایکس برابر با صفر، و مشتق تابع اف نسبت به متغیر وای برابر با صفر را حل می‌کنیم و فرض می‌کنیم که زوج مرتب ایکس پایین‌نویس صفر و وای پایین‌نویس صفر جواب این دستگاه باشد.
+
+</p>
+</div>
+```
+
+``\left\{ \begin{array}{l} \frac{\partial f}{\partial x} = 0 &\\ \frac{\partial f}{\partial y} = 0 \end{array} \right.``.
+
+``(x_0, y_0)``.
+
+```@raw html
+<div dir = "rtl">
+<h4>گام دوم</h4>
+<p>
+
+تابع دلتای ایکس و وای را به دست می‌آوریم.
+
+</p>
+</div>
+```
+
+``\Delta(x, y) = {f^\prime}_{xx} {f^\prime}_{yy} - ({f^\prime}_{xy})^2``
+
+```@raw html
+<div dir = "rtl">
+<h4>گام سوم</h4>
+<p>
+
+مقدار تابع دلتا را در مختصات جواب معادله‌ی بالا یعنی ایکس صفر و وای صفر حساب می‌کنیم. همچنین مقدار مشتق دوم تابع اف نسبت به متغیر ایکس را در نقطه‌ی زوج مرتب ایکس صفر و وای صفر محاسبه می‌کنیم.
+
+</p>
+</div>
+```
+
+``\Delta(x_0, y_0)``.
+
+``{f^\prime}_{xx}(x_0, y_0)``.
+
+```@raw html
+<div dir = "rtl">
+<h4>گام چهارم</h4>
+<p>
+
+اگر مقدار ارزیابی شده‌ی تابع دلتا بزرگ‌تر از صفر باشد و مقدار مشتق دوم تابع اف نسبت به متغیر ایکس در همان نقطه کوچک‌تر از صفر باشد، آن‌گاه نقطه‌ی ایکس صفر و وای صفر یک ماکزیمم نسبی است.
+
+</p>
+</div>
+```
+
+``\Delta(x_0, y_0) > 0``
+
+``{f^\prime}_{xx}(x_0, y_0) < 0``
+
+```@raw html
+<div dir = "rtl">
+<h4>گام پنجم</h4>
+<p>
+
+اگر مقدار ارزیابی شده‌ی تابع دلتا بزرگ‌تر از صفر باشد و مقدار مشتق دوم تابع اف نسبت به متغیر ایکس در آن نقطه بزرگ‌تر از صفر باشد، آن‌گاه نقطه‌ی ایکس صفر و وای صفر یک مینیمم نسبی است.
+
+</p>
+</div>
+```
+
+``\Delta(x_0, y_0) > 0``
+
+``{f^\prime}_{xx}(x_0, y_0) > 0``
+
+```@raw html
+<div dir = "rtl">
+<h4>گام ششم</h4>
+<p>
+
+اگر مقدار ارزیابی شده‌ی تابع دلتا کوچک‌تر از صفر باشد، آن‌گاه نقطه‌ی ایکس صفر و وای صفر یک نقطه‌ی زینی است.
+
+</p>
+</div>
+```
+
+``\Delta(x_0, y_0) < 0``
+
+```@raw html
+<div dir = "rtl">
+<h4>گام هفتم</h4>
+<p>
+
+اگر مقدار ارزیابی شده‌ی تابع دلتا برابر با صفر باشد، آن‌گاه به طور قطعی نمی‌توان گفت که نقطه‌ی ایکس صفر و وای صفر چه نقطه‌ای است.
+
+</p>
+</div>
+```
+
+``\Delta(x_0, y_0) = 0``
 
 ![10](./assets/multivariablecalculus/10.jpg)
 
-### Example
+```@raw html
+<div dir = "rtl">
+<h3>
 
-Find the local extremum points of the function ``f(x, y) = 2x y - 5y^2 + 4x - 2x^2 + 4y - 4``.
+مثال
 
-First, set the partial derivatives of the function ``f`` equal to zero:
+</h3>
+</div>
+```
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+اکسترمم‌های نسبی تابع زیر را به دست آورید.
+
+</p>
+</div>
+```
+
+``f(x, y) = 2x y - 5y^2 + 4x - 2x^2 + 4y - 4``.
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+برای حل، ابتدا مشتق‌های جزیی تابع اف ایکس و وای را برابر با صفر قرار می‌دهیم تا نقطه‌ی اکسترمم به دست آید.
+
+</p>
+</div>
+```
 
 ``\left\{ \begin{array}{l} \frac{\partial f}{\partial x} = 0 &\\ \frac{\partial f}{\partial y} = 0 \end{array} \right.``
 
-Next, we have:
+```@raw html
+<div dir = "rtl">
+<p>
+
+سپس به دستگاه معادلات زیر می‌رسیم:
+
+</p>
+</div>
+```
 
 ``\left\{ \begin{array}{l} 2y - 4x = -4 &\\ 2x - 10y = -4 \end{array} \right.``
 
-Multiplying the equation ``2x - 10y = -4`` by ``2`` results in:
+```@raw html
+<div dir = "rtl">
+<p>
+
+با ضرب کردن معادله‌ی پایینی در عدد ۲ به نتیجه‌ی زیر می‌رسیم:
+
+</p>
+</div>
+```
 
 ``\left\{ \begin{array}{l} 2y - 4x = -4 &\\ 4x - 20y = -8 \end{array} \right.``
 
-Then, summing the two equations in the system gives us: ``-18y = -12``. Finally, we have the value of ``y = \frac{-12}{-18} = \frac{2}{3}``. Subsequently, we solve for ``x`` by substituting the numerical value of ``y`` in the equation ``2(\frac{2}{3}) - 4x = -4``, which siplifies to the equation ``-4x = -4 - \frac{4}{3} = \frac{-16}{3}``. Then, we have ``x = \frac{16}{12} = \frac{4}{3}``. This gives the extremum point ``(x_0, y_0) = (\frac{4}{3}, \frac{2}{3})``. Now, we have to determine the type of ``(\frac{4}{3}, \frac{2}{3})``.
+```@raw html
+<div dir = "rtl">
+<p>
 
-A few partial derivatives are evaluated at the point: ``{f^\prime}_{xx}(\frac{4}{3}, \frac{2}{3}) = -4``, ``{f^\prime}_{yy}(\frac{4}{3}, \frac{2}{3}) = -10`` and ``{f^\prime}_{xy}(\frac{4}{3}, \frac{2}{3}) = 2``.
+سپس، دو معادله در دستگاه معادلات را با یکدیگر جمع می‌کنیم تا به مقدار نقطه‌ی اکسترمم در مختصات محور وای برسیم.
+
+</p>
+</div>
+```
+
+``-18y = -12``
+
+``y = \frac{-12}{-18} = \frac{2}{3}``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+در ادامه با جایگذاری مقدار به دست آمده‌ی وای در یکی از معادله‌ها مقدار مختصات ایکس نقطه‌ی اکسترمم نسبی را محاسبه می‌کنیم:
+
+</p>
+</div>
+```
+
+``2(\frac{2}{3}) - 4x = -4``
+
+``-4x = -4 - \frac{4}{3} = \frac{-16}{3}``
+
+``x = \frac{16}{12} = \frac{4}{3}``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+حالا که مختصات نقطه‌ی اکسترمم نسبی تابع اف را داریم، در مرحله‌ی بعدی نسبت به تعیین کردن نوع آن اقدام می‌کنیم.
+
+</p>
+</div>
+```
+
+``(x_0, y_0) = (\frac{4}{3}, \frac{2}{3})``
+
+``(\frac{4}{3}, \frac{2}{3})``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+برای تعیین نوع اکسترمم نسبی، مقدار تابع دلتا را در نقطه‌ی اکسترمم و مشتق مرتبه‌ی دوم تابع اف را در همان نقطه حساب می‌کنیم:
+
+</p>
+</div>
+```
+
+``{f^\prime}_{xx}(\frac{4}{3}, \frac{2}{3}) = -4``
+
+``{f^\prime}_{yy}(\frac{4}{3}, \frac{2}{3}) = -10``
+
+``{f^\prime}_{xy}(\frac{4}{3}, \frac{2}{3}) = 2``.
 
 ``\Delta(\frac{4}{3}, \frac{2}{3}) = (-4) (-10) - 2^2 = 40 - 4 = 36``.
 
-Having computed the values of ``{f^\prime}_{xx}(\frac{4}{3}, \frac{2}{3})`` and ``\Delta(\frac{4}{3}, \frac{2}{3})`` we can examine the type of the point ``(\frac{4}{3}, \frac{2}{3})`` in the end:
+```@raw html
+<div dir = "rtl">
+<p>
 
-``\Delta(\frac{4}{3}, \frac{2}{3}) > 0`` and ``{f^\prime}_{xx}(\frac{4}{3}, \frac{2}{3}) < 0``, therefore the point ``(\frac{4}{3}, \frac{2}{3})`` is a local maximum according to step four above.
+در پایان ارزیابی می‌بینیم که مقدار تابع دلتا بزرگ‌تر از صفر می‌باشد و مقدار مشتق مرتبه‌ی دوم تابع اف در نقطه‌ی چهار سوم و دو سوم کوچک‌تر از صفر است. بنا بر گام چهارم در روش بالا، نقطه‌ی چهار سوم و دو سوم یک نقطه‌ی ماکزیمم نسبی است.
 
-### Exercise
+</p>
+</div>
+```
 
-Find the local extremum points of the function ``f(x, y) = x^2 - 2x y + \frac{1}{3} y^3 - 3y``.
+```@raw html
+<div dir = "rtl">
+<h3>
+
+مثال
+
+</h3>
+</div>
+```
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+اکسترمم‌های نسبی تابع زیر را به دست آورید.
+
+</p>
+</div>
+```
+
+``f(x, y) = x^2 - 2x y + \frac{1}{3} y^3 - 3y``.
 
 ``\left\{ \begin{array}{l} \frac{\partial f}{\partial x} = 2x - 2y = 0 &\\ \frac{\partial f}{\partial y} = -2x + y^2 - 3 = 0 \end{array} \right.``
 
 ``\left\{ \begin{array}{l} 2x - 2y = 0 &\\ -2x + y^2 = 3 \end{array} \right.``
 
-By summing the two equations in the system of equations, we find a single equation, which is entirely in variable ``y``:
+```@raw html
+<div dir = "rtl">
+<p>
+
+با جمع کردن دو معادله در دستگاه معادلات بالا به یک معادله می‌رسیم که به طور کامل بر حسب متغیر وای تعریف شده است.
+
+</p>
+</div>
+```
 
 ``y^2 - 2y = 3``.
 
 ``y^2 - 2y - 3 = 0``.
 
-The solution of the one equation equals ``\frac{-(-2) \pm \sqrt{4 + 12}}{2} = \frac{2 \pm 4}{2} = \frac{1 \pm 2}{1}``. So by solving an equation of order ``2`` in variable ``y``, we find that the variable ``y`` has two distinguished roots: ``y_1 = 3`` and ``y_2 = -1``.
+```@raw html
+<div dir = "rtl">
+<p>
 
-This is the intermediate step for how to find the values of ``x_1`` and ``x_2`` with the given values of ``y_1`` and ``y_2``.
+جواب معادله‌ی بالا دو عدد متمایز ۳ و -۱ برای متغیر وای می‌باشد.
 
-Solving the equation ``2x - 2y = 0`` for ``x_1``:
+</p>
+</div>
+```
+
+``\frac{-(-2) \pm \sqrt{4 + 12}}{2} = \frac{2 \pm 4}{2} = \frac{1 \pm 2}{1}``
+
+``y_1 = 3`` و ``y_2 = -1``.
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+این گام میانی برای پیدا کردن مختصات محور ایکس مرتبط با نقطه‌های وای صفر و وای یک در بالاست:
+
+</p>
+</div>
+```
 
 ``2x - 2y_1 = 0``,
 
@@ -297,8 +1113,6 @@ Solving the equation ``2x - 2y = 0`` for ``x_1``:
 
 ``x_1 = 3``.
 
-Solving the equation ``2x - 2y = 0`` for ``x_2``:
-
 ``2x - 2y_2 = 0``,
 
 ``2x - 2(-1) = 0``,
@@ -307,9 +1121,28 @@ Solving the equation ``2x - 2y = 0`` for ``x_2``:
 
 ``x_2 = -1``.
 
-The coordinates of the point ``(x_0, y_0)`` for the extremum examination is equal to ``(x_0, y_0) = (3, 3)``, and ``(x_1, y_1) = (-1, -1)``.
+```@raw html
+<div dir = "rtl">
+<p>
 
-We make a few pieces of computation for finding the value of ``\Delta`` at ``(x, y)``:
+مختصات دو نقطه‌ی اکسترمم نسبی به صورت زیر است:
+
+</p>
+</div>
+```
+
+``(x_0, y_0) = (3, 3)`` و ``(x_1, y_1) = (-1, -1)``.
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+مقدار تابع دلتا را در مختصات عمومی ایکس و وای به دست می‌اوریم:
+
+</p>
+</div>
+```
+
 ``{f^\prime}_{xx} = 2``,
 
 ``{f^\prime}_{yy} = 2y``,
@@ -318,29 +1151,112 @@ We make a few pieces of computation for finding the value of ``\Delta`` at ``(x,
 
 ``\Delta(x, y) = {f^\prime}_{xx} - {f^\prime}_{yy} - ({f^\prime}_{xy})^2 = (2) (2y) - (-2)^2 = 4y - 4``.
 
-For each point ``(x_0, y_0)`` and ``(x_1, y_1)``, respectively, we have dedicated values: ``\Delta(x_0, y_0) = 4 (3) - 4 = 8`` and ``\Delta(x_1, y_1) = 4 (-1) - 4 = -8``.
+```@raw html
+<div dir = "rtl">
+<p>
+
+برای هر کدام از نقطه‌های اکسترمم نسبی به ترتیب مقادیر دلتای متمایزی به دست آوردیم:
+
+</p>
+</div>
+```
+
+``\Delta(x_0, y_0) = 4 (3) - 4 = 8`` و ``\Delta(x_1, y_1) = 4 (-1) - 4 = -8``.
 
 ``{f^\prime}_{xx}(x_0, y_0) = 2``.
 
-But, ``(x_0, y_0) = (3, 3)`` yields ``\Delta(3, 3) > 0`` and ``{f^\prime}_{xx}(3, 3) > 3``. Therefore, ``(3, 3)`` is a local minimum point of the function ``f(x, y)``.
+```@raw html
+<div dir = "rtl">
+<p>
 
-Examining the last extremum point, ``(x_1, y_1) = (-1, -1)`` yields ``\Delta(-1, -1) < 0``, which makes ``(-1, -1)`` a saddle point.
+اما مقدار تابع دلتا در نقطه‌ی با مختصات ایکس صفر و وای صفر بزرگ‌تر از صفر است و مقدار مشتق مرتبه ی دوم تابع اف در همان نقطه تیز بزرگ‌تر از صفر است. این شرایط نقطه‌ی ایکس برابر با سه و وای برابر با سه را از نوع مینیمم نسبی برای تابع اف دسته‌بندی می‌کند.
 
-## The Directional Derivative of Multivariable Functions
+</p>
+</div>
+```
 
-The gradient vector of function ``f(x, y)`` at point ``(x_0, y_0)`` is a vector that is orthogonal to the surface of the function ``f(x, y)`` at the point ``(x_0, y_0)``.
+``(x_0, y_0) = (3, 3)``
+
+``\Delta(3, 3) > 0`` و ``{f^\prime}_{xx}(3, 3) > 3``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+آزمودن نقطه‌ی دیگر با مختصات ایکس یک و وای یک به ما نتیجه‌ی دلتا کوچک‌تر از صفر را می‌دهد. بنابر گام ششم در روش بالا، نقطه‌ی اکسترمم با مختصات ایکس برابر با منفی یک و وای برابر با منفی یک، نفطه‌ای زینی برای تابع اف به شمار می‌رود.
+
+</p>
+</div>
+```
+
+
+```@raw html
+<div dir = "rtl">
+<h2>
+
+مشتق جهتی توابع چندمتغیره
+
+</h2>
+</div>
+```
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+بردار گرادیان تابع اف ایکس و وای در نقطه‌ی ایکس پایین‌نویس صفر و وای پایین‌نویس صفر برداری است که بر سطح رویه تابع اف ایکس و وای در نقطه‌ی ایکس صفر و وای صفر عمود است.
+
+<br>
+
+نمودار تابع اف ایکس و وای:
+
+</p>
+</div>
+```
+
+``f(x, y)``
+
+``(x_0, y_0)``
 
 ![11](./assets/multivariablecalculus/11.jpg)
 
-The plot of the function ``f(x, y)``.
+```@raw html
+<div dir = "rtl">
+<p>
 
-The gradient of the function ``f(x, y)`` at point ``a`` is found as follows:
+گرادیان تابع اف ایکس و وای در نقطه‌ی آ به صورت زیر به دست می‌آید:
 
-The gradient vector ``\overrightarrow{\nabla f}`` or ``grad \ f = \left| \frac{\partial f}{\partial x} \overrightarrow{i} + \frac{\partial f}{\partial y} \overrightarrow{j} \right|_{a}`` evaluated at point ``a``.
+</p>
+</div>
+```
 
-The gradient of the function ``w = f(x, y, z)`` at point ``a`` is equal to ``\left| \frac{\partial f}{\partial x} \overrightarrow{i} + \frac{\partial f}{\partial y} \overrightarrow{j} + \frac{\partial f}{\partial z} \overrightarrow{k} \right|_{a}``.
+``f(x, y)``
 
-Here, ``\overrightarrow{i}``, ``\overrightarrow{j}`` and ``\overrightarrow{k}`` are unit vectors, which represent the unit basis vectors in the three-dimensional space. These are the spatial triples. Every pair of them are linearly independent in a mutual way. In other words, none of them can be represented as a linear combination of the other two.
+``\overrightarrow{\nabla f}`` یا ``grad \ f = \left| \frac{\partial f}{\partial x} \overrightarrow{i} + \frac{\partial f}{\partial y} \overrightarrow{j} \right|_{a}``.
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+و گرادیان تابع دابلیو برابر با اف ایکس، وای و زد در نقطه‌ی آ به صورت زیر به دست می‌آید:
+
+</p>
+</div>
+```
+
+``w = f(x, y, z)``
+
+``\left| \frac{\partial f}{\partial x} \overrightarrow{i} + \frac{\partial f}{\partial y} \overrightarrow{j} + \frac{\partial f}{\partial z} \overrightarrow{k} \right|_{a}``.
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+در اینجا آی، جی و کی بردارهای یکه در فضای سه‌بعدی هستند. این سه‌تایی‌های فضایی طولی برابر یا یک واحد دارند، با هم مستقل خطی اند و دو به دو متعامد‌ند. یعنی این‌که نمی‌توان هیچ‌کدام از آن‌ها را به شکل ترکیب خطی از دوتای دیگر نوشت.
+
+</p>
+</div>
+```
 
 - ``\overrightarrow{i} = (1, 0, 0)``
 
@@ -352,9 +1268,29 @@ Here, ``\overrightarrow{i}``, ``\overrightarrow{j}`` and ``\overrightarrow{k}`` 
 
 ``(3, -2, 1) = 3 \overrightarrow{i} - 2 \overrightarrow{j} + \overrightarrow{k}``.
 
-### Example
+```@raw html
+<div dir = "rtl">
+<h3>
 
-Find the gradient of the function ``f(x, y) = -x^4 y^3 + x^2 y - x`` at point ``(2, 3)``.
+مثال
+
+</h3>
+</div>
+```
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+گرادیان تابع اف ایکس و وای را در نقطه‌ی ایکس برابر با ۲ و وای برابر با ۳ به دست آورید.
+
+</p>
+</div>
+```
+
+``f(x, y) = -x^4 y^3 + x^2 y - x``.
+
+``(2, 3)``.
 
 ``\overrightarrow{\nabla f} |_{(2, 3)} = (-4x^3 y^3 + 2x y - 1) \overrightarrow{i} + (-3x^4 y^2 + x^2) \overrightarrow{j}``,
 
@@ -364,8 +1300,15 @@ Find the gradient of the function ``f(x, y) = -x^4 y^3 + x^2 y - x`` at point ``
 
 ``\overrightarrow{\nabla f} |_{(2, 3)} = -853 \overrightarrow{i} - 428 \overrightarrow{j} = (-853, -428)``.
 
+```@raw html
+<div dir = "rtl">
+<p>
 
-Remember how we compute the slope ``m_L`` of the line ``L`` in the ``x-y`` plane at point ``x_0``:
+به یاد آورید که برای محاسبه‌ی شیب خط ال در نقطه‌ای با طول ایکس پایین‌نویس صفر، در صفحه‌ی مختصات ایکس-وای، که با حرف ام پایین‌نویس ال نمایش داده می‌شود، حد زیر را حساب می‌کنیم:
+
+</p>
+</div>
+```
 
 ``f^\prime (x_0) = m_L``.
 
@@ -373,35 +1316,136 @@ Remember how we compute the slope ``m_L`` of the line ``L`` in the ``x-y`` plane
 
 ![12](./assets/multivariablecalculus/12.jpg)
 
-Now, the directional derivative of the function ``f(x, y)`` at point ``a`` in the direction of vector ``\overrightarrow{u}``:
+```@raw html
+<div dir = "rtl">
+<p>
+
+حالا، مشتق جهتی تابع دومتغیره‌ی اف ایکس و وای در نقطه‌ی آ در جهت بردار یو از راه زیر به دست می‌اید:
+
+</p>
+</div>
+```
 
 ``Df_{\overrightarrow{u}} = \overrightarrow{\nabla f} \cdot e_{\overrightarrow{u}}``,
 
-where ``\cdot`` denotes the inner product, and ``e_{\overrightarrow{u}}`` denotes the unit vector of ``\overrightarrow{u}``.
+```@raw html
+<div dir = "rtl">
+<p>
 
-In order to compute the unit vector ``e_{\overrightarrow{u}}``, divide the vector ``\overrightarrow{u}`` by its magnitude ``|\overrightarrow{u}|`` by element:
+که در اینجا عملگر نقطه نمایان‌گر ضرب داخلی دو بردار است، و ای پایین‌نویس یو بردار یکه‌ی بردار یو را نمایش می‌دهد.
+
+<br>
+
+برای محاسبه کردن بردار یکه‌ی بردار یو، عنصرهای بردار یو را تک به تک بر اندازه‌ی بردار یو تقسیم می‌کنیم:
+
+</p>
+</div>
+```
 
 ``e_{\overrightarrow{u}} = \frac{\overrightarrow{u}}{|\overrightarrow{u}|}``.
 
-The magnitude of a vector such as ``a = (a_1, a_2, a_3)`` equals ``|\overrightarrow{a}| = \sqrt{{a_1}^2 + {a_2}^2 + {a_3}^2}`` in the three-dimensional case. However, in the two-dimensional case where ``a = (a_1, a_2)`` is a tuple, the length of ``a`` is equal to ``|\overrightarrow{a}| = \sqrt{{a_1}^2 + {a_2}^2}``.
+```@raw html
+<div dir = "rtl">
+<p>
 
-The inner product of a pair of vectors such as ``\overrightarrow{a} = (a_1, a_2)`` and ``\overrightarrow{b} = (b_1, b_2)`` is computed either as ``\overrightarrow{a} \cdot \overrightarrow{b} = a_1 b_1 + a_2 b_2`` or ``\overrightarrow{a} \cdot \overrightarrow{b} = |\overrightarrow{a}| |\overrightarrow{b}| cos(\alpha)``, where ``\alpha`` denotes the angle between the two vectors ``\overrightarrow{a}`` and ``\overrightarrow{b}``.
+اندازه‌ی بردار یو برابر است با ریشه‌ی دوم مجموع مجذور مولفه‌های بردار.
 
-The three-dimensional inner product of vectors ``\overrightarrow{a} = (a_1, a_2, a_3)`` and ``\overrightarrow{b} = (b_1, b_2, b_3)`` is eqaul to:
+</p>
+</div>
+```
+
+``a = (a_1, a_2)``
+
+``|\overrightarrow{a}| = \sqrt{{a_1}^2 + {a_2}^2}``.
+
+``a = (a_1, a_2, a_3)``
+
+``|\overrightarrow{a}| = \sqrt{{a_1}^2 + {a_2}^2 + {a_3}^2}``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+ضرب داخلی یک جفت بردار مانند آ و ب به دو شکل زیر قابل انجام شدن است، که در اینجا آلفا زاویه‌ی بین دو بردار را نمایش می‌دهد:
+
+</p>
+</div>
+```
+
+``\overrightarrow{a} = (a_1, a_2)`` و ``\overrightarrow{b} = (b_1, b_2)``
+
+``\overrightarrow{a} \cdot \overrightarrow{b} = a_1 b_1 + a_2 b_2`` یا ``\overrightarrow{a} \cdot \overrightarrow{b} = |\overrightarrow{a}| |\overrightarrow{b}| cos(\alpha)``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+این روش ضرب داخلی برای بردارهایی که در فضای سه‌بعدی تعریف شده‌اند نیز کاربرد دارد:
+
+</p>
+</div>
+```
+
+``\overrightarrow{a} = (a_1, a_2, a_3)`` و ``\overrightarrow{b} = (b_1, b_2, b_3)``
 
 ``\overrightarrow{a} \cdot \overrightarrow{b} = a_1 b_1 + a_2 b_2 + a_3 b_3``.
 
-For example, the coordinates of vector ``\overrightarrow{a}`` equals its head minus its tail as an arrow, which is equal to ``(6, 4) - (2, 1) = (4, 3)``.
+```@raw html
+<div dir = "rtl">
+<p>
+
+برای مثال، جابجایی بردار آ به عنوان یک پیکان برابر است با مختصات سر آن منهای مختصات دم آن.
+
+</p>
+</div>
+```
+
+``(6, 4) - (2, 1) = (4, 3)``.
 
 ![13](./assets/multivariablecalculus/13.jpg)
 
-Also, the magnitude of ``\overrightarrow{a}`` equals ``\overrightarrow{a} = \sqrt{4^2 + 3^2} = \sqrt{25} = 5``.
+```@raw html
+<div dir = "rtl">
+<p>
 
-### Example
+همچنین اندازه‌ی طول بردار آ از راه زیر به دست می‌آید:
 
-Find the directional derivative of the function ``f(x, y) = x^3 y - y^2 x + y - 1`` at point ``p = (1, 2)`` in the direction of vector ``\overrightarrow{u} = 4 \overrightarrow{i} - 3 \overrightarrow{j}``.
+</p>
+</div>
+```
 
-First, we need to find the gradient of the function.
+``\overrightarrow{a} = \sqrt{4^2 + 3^2} = \sqrt{25} = 5``.
+
+```@raw html
+<div dir = "rtl">
+<h3>
+
+مثال
+
+</h3>
+<p>
+
+مشتق جهتی تابع اف ایکس و وای را در نقطه‌ی پی در جهت بردار یو به دست آورید.
+
+</p>
+</div>
+```
+
+``f(x, y) = x^3 y - y^2 x + y - 1``
+
+``p = (1, 2)``
+
+``\overrightarrow{u} = 4 \overrightarrow{i} - 3 \overrightarrow{j}``.
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+در ابتدا باید بردار گرادیان تابع اف را محاسبه کنیم.
+
+</p>
+</div>
+```
 
 ``\overrightarrow{\nabla f} = \frac{\partial f}{\partial x} \overrightarrow{i} + \frac{\partial f}{\partial y} \overrightarrow{j} |_{(1, 2)}``,
 
@@ -409,21 +1453,70 @@ First, we need to find the gradient of the function.
 
 ``\overrightarrow{\nabla f} = (6 - 4) \overrightarrow{i} + (1 - 4 + 1) \overrightarrow{j} = 2 \overrightarrow{i} - 2 \overrightarrow{j} = (2, -2)``.
 
-Second, we need to find the unit vector of ``\overrightarrow{u}``, along which the directional derivative is taken.
+```@raw html
+<div dir = "rtl">
+<p>
+
+در گام دوم، باید بردار یکه‌ی بردار یو را محاسبه کنیم که در جهت آن مشتق‌گیری انجام می‌شود.
+
+</p>
+</div>
+```
 
 ``e_{\overrightarrow{u}} = \frac{4 \overrightarrow{i} - 3 \overrightarrow{j}}{\sqrt{4^2 + (-3)^2}} = \frac{(4, -3)}{\sqrt{25}} = (\frac{4}{5}, \frac{-3}{5})``.
 
-Finally, perform an inner product in order to compute the directional derivative of ``f`` in the direction of ``\overrightarrow{u}``.
+```@raw html
+<div dir = "rtl">
+<p>
+
+در پایان، یک ضرب داخلی میان گرادیان تابع اف و بردار یکه‌ی یو انجام می‌دهیم تا مقدار مشتق جهتی تابع اف در نقطه‌ی پی در جهت بردار یو به دست آید.
+
+</p>
+</div>
+```
 
 ``Df_{\overrightarrow{u}} = (2, -2) \cdot (\frac{4}{5}, \frac{-2}{5}) = 2 \frac{4}{5} + -3 \frac{-2}{5} = \frac{8}{5} + \frac{6}{5} = \frac{14}{5}``.
 
-### Example
+```@raw html
+<div dir = "rtl">
+<h3>
 
-The temperature of each point in the three-dimensional space of a room is computed using the relation: ``T(x, y, z) = x^2 y^2 + z x - z^2 y``. If we move starting from the point ``(1, -1, 1)`` in this room, in the direction of the vector ``\overrightarrow{u} = (2, 1, 1)``, then how much temperature change is experienced?
+مثال
 
-This question asks us to find the directional derivative of the function ``T`` at the point ``p`` in the direction of the vector ``\overrightarrow{u}``.
+</h3>
+<p>
 
-Find the gradient of the function ``f(x, y, z)`` first.
+دمای هر نقطه در فضای سه‌بعدی یک اتاق با استفاده از رابطه‌ی زیر به دست می آید:
+
+</p>
+</div>
+```
+
+``T(x, y, z) = x^2 y^2 + z x - z^2 y``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+اگر از نقطه‌‌ی پی با طول یک، عرض منفی یک و ارتفاع یک در این اتاق در جهت بردار یو حرکت کنیم، مقدار تغییرات دما چقدر احساس می‌شود؟
+
+</p>
+</div>
+```
+
+``p = (1, -1, 1)`` 
+
+``\overrightarrow{u} = (2, 1, 1)``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+این سوال از ما مشتق جهتی تابع تی در نقطه‌ی پی در حهت بردار یو را می‌پرسد. پس اول گرادیان تابع تی را حساب می‌کنیم. دوم، بردار یکه‌ی یو را برای دانستن جهت مشتق به دست می‌آوریم. و در پایان، مشتق جهتی تابع اف را با استفاده از ضرب داخلی پیدا می‌کنیم.
+
+</p>
+</div>
+```
 
 ``\overrightarrow{\nabla T} = \frac{\partial T}{\partial x} \overrightarrow{i} + \frac{\partial T}{\partial y} \overrightarrow{j} + \frac{\partial T}{\partial z} \overrightarrow{k} |_{(1, -1, 1)}``.
 
@@ -431,51 +1524,135 @@ Find the gradient of the function ``f(x, y, z)`` first.
 
 ``\overrightarrow{\nabla T} = (2 + 1) \overrightarrow{i} + (-2 - 1) \overrightarrow{j} + (1 + 2) \overrightarrow{k} = 3 \overrightarrow{i} - 3 \overrightarrow{j} + 3 \overrightarrow{k}``.
 
-Next, find the unit vector ``e_{\overrightarrow{u}}`` to determine the direction of the derivative.
-
 ``e_{\overrightarrow{u}} = \frac{(2, 1, 1)}{\sqrt{4 + 1 + 1}} = \frac{(2, 1, 1)}{\sqrt{6}} = (\frac{2}{\sqrt{6}}, \frac{1}{\sqrt{6}}, \frac{1}{\sqrt{6}})``.
-
-In the end, find the directional derivative of ``f`` at ``(1, -1, 1)`` in the direction of ``e_{\overrightarrow{u}}``:
 
 ``DT_{\overrightarrow{u}} = (3, -3, 3) \cdot (\frac{2}{\sqrt{6}}, \frac{1}{\sqrt{6}}, \frac{1}{\sqrt{6}}) = \frac{(3) (2)}{\sqrt{6}} + \frac{-3}{\sqrt{6}} + \frac{3}{\sqrt{6}}``.
 
 ``DT_{\overrightarrow{u}} = \frac{6}{\sqrt{6}} = \frac{6 \sqrt{6}}{\sqrt{6} \sqrt{6}} = \frac{6 \sqrt{6}}{6} = \sqrt{6}``.
 
-## The Applications of the Gradient
+```@raw html
+<div dir = "rtl">
+<h2>
 
-Writing the equation of a plane in the three-dimensional space ``\mathbb{R}^3``. In order to write the equation of the plane in three-dimensional space, we need a point of the plane and a vector perpendicular to the plane, called the normal vector.
+کاربرد گرادیان
+
+</h2>
+<h3>
+
+نوشتن معادله‌ی صفحه در فضای سه‌بعدی حقیقی
+
+</h3>
+<p>
+
+برای نوشتن معادله‌ی صفحه در فضای سه‌بعدی به یک نقطه از صفحه و یک بردار عمود بر صفحه (به اسم بردار نرمال صفحه) نیاز داریم.
+
+</p>
+</div>
+```
 
 ![14](./assets/multivariablecalculus/14.jpg)
 
+``A = (x, y, z)``.
+
 ``A_0 = (x_0, y_0, z_0)``.
 
-For writing the equation of the plane, specify another point in the plane, like ``A = (x, y, z)``, and plot the vector ``\overrightarrow{A_0 A}``.
+``\overrightarrow{n} = (a, b, c)``.
 
-Let ``\overrightarrow{n} = (a, b, c)`` be the vector normal to the plane. Both points ``A`` and ``A_0`` being in the plane, implies that the vectors ``\overrightarrow{n}`` and ``\overrightarrow{A_0 A}`` are perpendicular. Therefore, their inner product vanishes.
+```@raw html
+<div dir = "rtl">
+<p>
+
+برای نوشتن معادله‌ی صفحه، یک نقطه‌ی دیگر روی صفحه مانند آ در نظر می‌گیریم و بردار بین دو نقطه‌ی آ پایین‌نویس صفر و آ را رسم می‌کنیم. فرض کنیم ان بردار نرمال صفحه باشد. واضح است که بردارهای ان و آ-آ صفر بر هم عمود هستند. بنابراین ضرب داخلی آن‌ها صفر می‌شود.
+
+</p>
+</div>
+```
 
 ``\overrightarrow{A_0 A} = (x - x_0, y - y_0, z - z_0)``, ``\overrightarrow{n} = (a, b, c)``.
 
-The equation of the plane with the vector normal to the plane ``\overrightarrow{n} = (a, b, c)`` that passes through the point ``A_0 = (x_0, y_0, z_0)``.
+```@raw html
+<div dir = "rtl">
+<p>
+
+معادله‌ی صفحه با بردار نرمال صفحه ان که از نقطه‌ی آ پایین‌نویس صفر می‌گذرد.
+
+</p>
+</div>
+```
 
 ``\overrightarrow{A_0 A} \cdot \overrightarrow{n} = a (x - x_0) + b (y - y_0) + c (z - z_0) = 0``.
 
-### Example
+```@raw html
+<div dir = "rtl">
+<h3>
 
-Write the equation of a plane that passes through point ``(3, -2, 1)`` and its normal vector equals ``(5, 2, 3)``.
+مثال
+
+</h3>
+<p>
+
+معادله‌ی صفحه‌ای بنویسید که از نقطه‌ی پی با طول ۳، عرض منفی ۲ و ارتفاع ۱ بگذرد و بردار نرمال آن ان باشد.
+
+</p>
+</div>
+```
+
+``p = (3, -2, 1)``
+
+``\overrightarrow{n} = (5, 2, 3)``.
 
 ``5 (x - 3) + 2 (y + 2) + 3 (z - 1) = 0``.
 
-In addition to finding the equation of the plane, another application of the gradient is to find the equation of the *tangent plane* of the surface of a multivariable function ``f``, at a point on the surface.
+```@raw html
+<div dir = "rtl">
+<p>
+
+بعد از دانستن معادله‌ی صفحه می‌توان گفت که یکی دیگر از کاربردهای گرادیان، به دست آوردن معادله‌ی صفحه‌ی مماس بر رویه‌ی تابع چندمتغیره‌ی اف، در نقطه‌ای روی آن است.
+
+</p>
+</div>
+```
 
 ![15](./assets/multivariablecalculus/15.jpg)
 
-The plane ``P`` is tangent to the surface at point ``A``.
+```@raw html
+<div dir = "rtl">
+<p>
 
-### Example
+صفحه‌ی پی بر رویه در نقطه‌ی آ مماس شده است.
 
-Calculate the equation of the tangent plane of the function ``f(x, y, z) = 3z - x \ cos(y) + e^x`` at point ``P = (0, 0, 0)``.
+</p>
+</div>
+```
 
-Here, we do not know the plane's normal vector at point ``(0, 0, 0)``. However, according to the definition of the gradient vector, the plane's normal vector at this point, is the same as the gradient vector at this point.
+```@raw html
+<div dir = "rtl">
+<h3>
+
+مثال
+
+</h3>
+<p>
+
+معادله‌ی صفحه مماس بر رویه‌ی تابع اف ایکس، وای و زد را در نقطه‌ی پی به دست آورید.
+
+</p>
+</div>
+```
+
+``f(x, y, z) = 3z - x \ cos(y) + e^x``
+
+``P = (0, 0, 0)``.
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+در این‌جا بردار نرمال صفحه را در نقطه‌ی پی نداریم، اما طبق تعریف بردار گرادیان، بردار نرمال صفحه در این نقطه، همان بردار گرادیان در این نقطه است.
+
+</p>
+</div>
+```
 
 ``\overrightarrow{\nabla f} = \frac{\partial f}{\partial x} \overrightarrow{i} + \frac{\partial f}{\partial y} \overrightarrow{j} + \frac{\partial f}{\partial z} \overrightarrow{k} |_{(0, 0, 0)}``.
 
@@ -483,11 +1660,46 @@ Here, we do not know the plane's normal vector at point ``(0, 0, 0)``. However, 
 
 ``\overrightarrow{\nabla f} = (-1 + 1) \overrightarrow{i} + 0 \overrightarrow{j} + 3 \overrightarrow{k} = (0, 0, 3)``.
 
-The equation of the plane: ``0 (x - 0) + 0 (y - 0) + 3 (z - 0) = 0`` or ``z = 0``.
+```@raw html
+<div dir = "rtl">
+<p>
 
-### Example
+معادله‌ی صفحه:
 
-Find the equation of the plane tangent to the surface of ``f(x, y, z) = x z^2 - y z + y^2 x`` at point ``A = (1, 1, 1)``.
+</p>
+</div>
+```
+
+``0 (x - 0) + 0 (y - 0) + 3 (z - 0) = 0`` یا ``z = 0``.
+
+```@raw html
+<div dir = "rtl">
+<h3>
+
+مثال
+
+</h3>
+<p>
+
+معادله‌ی صفحه‌ی مماس بر رویه‌ی تابع اف ایکس، وای و زد را در نقطه‌ی آ به دست آورید.
+
+</p>
+</div>
+```
+
+``f(x, y, z) = x z^2 - y z + y^2 x``
+
+``A = (1, 1, 1)``.
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+بردار نرمال صفحه همان بردار گرادیان تابع اف در نقطه‌ی آ است.
+
+</p>
+</div>
+```
 
 ``\overrightarrow{\nabla f} = \frac{\partial f}{\partial x} \overrightarrow{i} + \frac{\partial f}{\partial y} \overrightarrow{j} + \frac{\partial f}{\partial z} \overrightarrow{k} |_{(1, 1, 1)}``.
 
@@ -495,11 +1707,33 @@ Find the equation of the plane tangent to the surface of ``f(x, y, z) = x z^2 - 
 
 ``\overrightarrow{\nabla f} = 2 \overrightarrow{i} + \overrightarrow{j} + \overrightarrow{k} = (2, 1, 1)``.
 
-The equation of the tangent plane: ``2 (x - 1) + (y - 1) + (z - 1) = 0``.
+```@raw html
+<div dir = "rtl">
+<p>
 
-### Exercises
+معادله‌ی صفحه برابر است با:
 
-*Exercise A.* Find the domain of the functions below and plot the result.
+</p>
+</div>
+```
+
+``2 (x - 1) + (y - 1) + (z - 1) = 0``.
+
+```@raw html
+<div dir = "rtl">
+<h3>
+
+تمرین
+
+</h3>
+<h4>تمرین ۱</h4>
+<p>
+
+دامنه‌ی توابع زیر را به دست آورید و با رسم شکل نشان دهید.
+
+</p>
+</div>
+```
 
 1. ``f(x, y) = \frac{x + y + 1}{x - y}``.
 
@@ -509,9 +1743,16 @@ The equation of the tangent plane: ``2 (x - 1) + (y - 1) + (z - 1) = 0``.
 
 4. ``f(x, y) = \frac{\sqrt{y - 3}}{\sqrt{2 - |x|}}``.
 
-*Solution A.1*
+```@raw html
+<div dir = "rtl">
+<h4>حل تمرین ۱ قسمت اول</h4>
+<p>
 
-The roots of the denominator are not in the domain of the function.
+ریشه‌های مخرج نباید در دامنه‌ی تابع باشند.
+
+</p>
+</div>
+```
 
 ``f(x, y) = \frac{x + y + 1}{x - y}``.
 
@@ -519,55 +1760,151 @@ The roots of the denominator are not in the domain of the function.
 
 ``y \neq x``.
 
-The domain of the function includes the whole plane, excluding the points that are on the line ``y = x``.
+```@raw html
+<div dir = "rtl">
+<p>
+
+دامنه‌ی تابع شامل تمام صفحه‌ی مختصات می‌شود، به جز نقطه‌هایی که روی خط همانی وای برابر با ایکس قرار دارند.
+
+</p>
+</div>
+```
 
 ``D_f = \{ (x, y) | x, y \in \mathbb{R}, x \neq y \}``.
 
 ![ex1](./assets/multivariablecalculus/ex1.JPG)
 
-*Solution A.2*
+```@raw html
+<div dir = "rtl">
+<h4>حل تمرین ۱ قسمت دوم</h4>
+<p>
 
-The roots of the function's denominator are not in the domain. ``z \neq 0``.
+ریشه‌های مخرج نباید در دامنه‌ی تابع باشند.
 
-The argument of the square root function must be greater than or equal to zero. ``x - y \geq 0``.
+</p>
+</div>
+```
+
+``z \neq 0``.
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+ورودی تابع رادیکال با فرجه‌ی زوج نباید منفی باشد.
+
+</p>
+</div>
+```
+
+``x - y \geq 0``.
 
 ``x \geq y``.
 
-The domain of the function includes the whole space at one side of the plane ``x = y`` in the ``x``-``y``-``z`` space, except for the points that are on the plane ``z = 0``, which is the ``x``-``y`` plane.
+```@raw html
+<div dir = "rtl">
+<p>
+
+دامنه‌ی تابع شامل تمام فضای سه‌بعدی یک سمت صفحه‌ی همانی وای برابر با ایکس می‌باشد، به جز نقاطی که روی صفحه‌ی زد برابر با صفر قرار دارند.
+
+</p>
+</div>
+```
 
 ``D_f = \{ (x, y, z) | x, y, z \in \mathbb{R}, x \geq y, z \neq 0 \}``.
 
 ![ex2](./assets/multivariablecalculus/ex2.JPG)
 
-*Solution A.3*
+```@raw html
+<div dir = "rtl">
+<h4>حل تمرین ۱ قسمت سوم</h4>
+<p>
 
-The argument of the square root must be non-negative: ``x^2 + y^2 - 3 \geq 0``. ``x^2 + y^2 \geq 3``.
+آرگومان تابع ریشه‌ی دوم باید غیر منفی باشد.
+
+</p>
+</div>
+```
+
+``x^2 + y^2 - 3 \geq 0``. ``x^2 + y^2 \geq 3``.
 
 ``D_f = \{ (x, y) | x, y \in \mathbb{R}, x^2 + y^2 \geq 3 \}``.
 
-The domain of the function is the points on the surface ``x^2 + y^2`` except for parts that are under the plane ``z = 3`` in the negative direction.
+```@raw html
+<div dir = "rtl">
+<p>
+
+دامنه‌ی تابع اف برابر است با نقاطی که روی رویه‌ی سهمی‌گون حاصل‌جمع مجذور ایکس و مجذور وای قرار دارند، به جز بخش‌هایی از رویه که ارتفاع آن‌ها کمتر یا مساوی ۳ باشد.
+
+</p>
+</div>
+```
 
 ![ex3](./assets/multivariablecalculus/ex3.JPG)
 
-*Solution A.4*
+```@raw html
+<div dir = "rtl">
+<h4>حل تمرین ۱ قسمت چهارم</h4>
+<p>
 
-The input number to the square root function must be either positive or zero: ``y - 3 \geq 0`` and ``2 - |x| > 0``.
+آرگومان تابع ریشه‌ی دوم باید غیر منفی باشد.
+
+</p>
+</div>
+```
+
+``y - 3 \geq 0`` و ``2 - |x| > 0``.
 
 ``\left\{ \begin{array}{l} y - 3 \geq 0 &\\ |x| < 2 \end{array} \right.``
 
 ``\left\{ \begin{array}{l} y \geq 3 &\\ -2 < x < 2 \end{array} \right.``
 
-Also, the roots of the denominator are not in the domain: ``2 - |x| \neq 0``.
+```@raw html
+<div dir = "rtl">
+<p>
 
-The domain includes the encapsulated area between the lines ``y = 3``, ``x = 2`` and ``x = -2``, in the positive direction, excluding the two lines ``x = 2`` and ``x = -2``.
+همچنین، ریشه‌های مخرج در دامنه نیستند.
+
+</p>
+</div>
+```
+
+``2 - |x| \neq 0``.
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+دامنه‌ی تابع اف شامل مساحت محصور بین خط‌های وای برابر ۳، ایکس برابر ۲ و ایکس برابر منفی ۲ است، به جز نقاطی که روی خط‌های ایکس برابر ۲ و ایکس برابر منفی ۲ قرار دارند.
+
+</p>
+</div>
+```
 
 ``D_f, \{ (x, y) | x, y \in \mathbb{R}, y \geq 3, -2 < x < 2 \}``.
 
 ![ex4](./assets/multivariablecalculus/ex4.JPG)
 
-*Exercise B.* Let ``f(x, y) = -x^3 y^2 + sin(x y)`` be a two-variable function. Compute ``\frac{\partial^2 f}{\partial y^2}`` and ``\frac{\partial^2 f}{\partial x \partial y}``.
+```@raw html
+<div dir = "rtl">
+<h4>تمرین ۲</h4>
+<p>
 
-*Solution B.1*
+اگر ضابطه‌ی تابع اف ایکس و وای به شکل زیر داده شود، مطلوبست مشتق مرتبه دوم تابع اف نسبت به متغیر وای، و همچنین مشتق مرتبه دوم تابع اف اول نسبت به متغیر وای و سپس نسبت به متغیر ایکس.
+
+</p>
+</div>
+```
+
+``f(x, y) = -x^3 y^2 + sin(x y)``
+
+``\frac{\partial^2 f}{\partial y^2}`` و ``\frac{\partial^2 f}{\partial x \partial y}``.
+
+```@raw html
+<div dir = "rtl">
+<h4>حل تمرین ۲ قسمت اول</h4>
+</div>
+```
 
 ``\frac{\partial^2 f}{\partial y^2} = \frac{\partial}{\partial y} (\frac{\partial f}{\partial y})``.
 
@@ -575,7 +1912,11 @@ The domain includes the encapsulated area between the lines ``y = 3``, ``x = 2``
 
 ``\frac{\partial^2 f}{\partial y^2} = \frac{\partial}{\partial y} (-2x^3 y + x \ cos(xy)) = -2x^3 - x^2 \ sin(x y)``.
 
-*Solution B.2*
+```@raw html
+<div dir = "rtl">
+<h4>حل تمرین ۲ قسمت دوم</h4>
+</div>
+```
 
 ``\frac{\partial^2 f}{\partial x \partial y} = \frac{\partial}{\partial x} (\frac{\partial f}{\partial y})``.
 
@@ -583,9 +1924,28 @@ The domain includes the encapsulated area between the lines ``y = 3``, ``x = 2``
 
 ``\frac{\partial^2 f}{\partial x \partial y} = \frac{\partial}{\partial x} (-2x^3 y + x \ cos(x y)) = -6x^2 y + cos(x y) - x y \ sin(x y)``.
 
-*Exercise C.* The chain rule. Let ``f(x, y) = x^2 y^2 - x^3 y`` be a function and ``x = cos(t)`` and ``y = 4 e^{2t}``. Compute the partial derivative of ``f`` with respect to ``t``, ``\frac{\partial f}{\partial t}``.
+```@raw html
+<div dir = "rtl">
+<h4>تمرین ۳</h4>
+<p>
 
-*Solution C.*
+قاعده‌ی زنجیره‌ای. اگر تابع اف ایکس و وای با ضابطه‌ی زیر باشد و متغیر ایکس و متغیر وای نیز بر حسب متغیر تی داده شده باشند، آن‌گاه مطلوبست مشتق تابع اف نسبت به متغیر تی.
+
+</p>
+</div>
+```
+
+``f(x, y) = x^2 y^2 - x^3 y``.
+
+``x = cos(t)`` و ``y = 4 e^{2t}``.
+
+``\frac{\partial f}{\partial t}``.
+
+```@raw html
+<div dir = "rtl">
+<h4>حل تمرین ۳</h4>
+</div>
+```
 
 ``\frac{\partial f}{\partial t} = \frac{\partial f}{\partial x} \frac{\partial x}{\partial t} + \frac{\partial f}{\partial y} \frac{\partial y}{\partial t}``.
 
@@ -601,33 +1961,71 @@ The domain includes the encapsulated area between the lines ``y = 3``, ``x = 2``
 
 ``\frac{\partial f}{\partial t} = (2y^2 x - 3y x^2) (-sin(t)) + (2x^2 y - x^3) (8e^{2t})``.
 
-*Exercise D.* Let ``f(x, y) = x y^2 - y x`` be a multivariable function and ``x = s + 5r`` and ``y = s^r`` its parameters in terms of independent variables ``s`` and ``r``. Find ``\frac{\partial f}{\partial s}``.
+```@raw html
+<div dir = "rtl">
+<h4>تمرین ۴</h4>
+<p>
 
-*Solution D.*
+اگر ضابطه‌ی تابع اف ایکس و وای به شکل زیر باشد و متغیرهای ایکس و وای نیز توابعی بر حسب متغیرهای آر و اس باشند، آنگاه مشتق تابع اف نسبت به متغیر اس را حساب کنید.
+
+</p>
+</div>
+```
+
+``f(x, y) = x y^2 - y x``.
+
+``x = s + 5r`` و ``y = s^r``.
+
+``\frac{\partial f}{\partial s}``.
+
+```@raw html
+<div dir = "rtl">
+<h4>حل تمرین ۴</h4>
+</div>
+```
 
 ``\frac{\partial f}{\partial s} = \frac{\partial f}{\partial x} \frac{\partial x}{\partial s} + \frac{\partial f}{\partial y} \frac{\partial y}{\partial s}``.
 
-``\frac{\partial f}{\partial x} = y^2 - y`` and ``\frac{\partial f}{\partial y} = 2x y - x``.
+``\frac{\partial f}{\partial x} = y^2 - y`` و ``\frac{\partial f}{\partial y} = 2x y - x``.
 
-``\frac{\partial x}{\partial s} = \frac{\partial (s + 5r)}{\partial s} = 1`` and ``\frac{\partial y}{\partial s} = \frac{\partial s^r}{\partial s} = r \ s^{r - 1}``.
+``\frac{\partial x}{\partial s} = \frac{\partial (s + 5r)}{\partial s} = 1`` و ``\frac{\partial y}{\partial s} = \frac{\partial s^r}{\partial s} = r \ s^{r - 1}``.
 
 ``\frac{\partial f}{\partial s} = (y^2 - y) (1) + (2x y - x) (r \ s^{r - 1})``.
 
-*Exercise E.* Find the directional derivative of the function ``f(x, y, z) = z x^2 - y x + y^2 z`` at point ``A = (0, 1, -1)``, and in the direction of the vector ``\overrightarrow{u} = (1, 1, -1)``.
+```@raw html
+<div dir = "rtl">
+<h4>تمرین ۵</h4>
+<p>
 
-*Solution E.*
+مشتق جهتی تابع اف ایکس، وای و زد را در نقطه‌ی آ و در جهت بردار یو به دست آورید.
 
-The unit basis vector of ``\overrightarrow{u}`` is equal to ``e_{\overrightarrow{u}} = \frac{\overrightarrow{u}}{|\overrightarrow{u}|}``.
+</p>
+</div>
+```
 
-The magnitude of vector ``\overrightarrow{u}`` is equal to ``|\overrightarrow{u}| = \sqrt{1^2 + 1^2 + (-1)^2} = \sqrt(1 + 1 + 1) = \sqrt{3}``.
+``f(x, y, z) = z x^2 - y x + y^2 z``
 
-The unit vector of ``\overrightarrow{u}`` equals ``e_{\overrightarrow{u}} = \frac{(1, 1, -1)}{\sqrt{3}} = (\frac{1}{\sqrt{3}}, \frac{1}{\sqrt{3}}, \frac{-1}{\sqrt{3}})``.
+``A = (0, 1, -1)``
 
-The gradient vector of the function ``f(x, y, z)`` equals ``\overrightarrow{\nabla f} = (2z x - y) \overrightarrow{i} + (-x + 2z y) \overrightarrow{j} + (x^2 + y^2) \overrightarrow{k}``.
+``\overrightarrow{u} = (1, 1, -1)``.
 
-But, the directional derivative of ``f`` in the direction of ``\overrightarrow{u}`` is the inner product between the gradient of ``f`` and the unit vector of ``\overrightarrow{u}``: ``Df_{\overrightarrow{u}} = \overrightarrow{\nabla f} \cdot e_{\overrightarrow{u}}``.
+```@raw html
+<div dir = "rtl">
+<h4>حل تمرین ۵</h4>
+</div>
+```
 
-Therefore, we compute the value of the gradient ``\overrightarrow{\nabla f}`` at the point ``A = (0, 1, -1)`` for a particular solution. ``\overrightarrow{\nabla f} |_A = (2z x - y) \overrightarrow{i} + (-x + 2z y) \overrightarrow{j} + (x^2 + y^2) \overrightarrow{k} |_{A = (0, 1, -1)}``.
+``e_{\overrightarrow{u}} = \frac{\overrightarrow{u}}{|\overrightarrow{u}|}``.
+
+``|\overrightarrow{u}| = \sqrt{1^2 + 1^2 + (-1)^2} = \sqrt(1 + 1 + 1) = \sqrt{3}``.
+
+``e_{\overrightarrow{u}} = \frac{(1, 1, -1)}{\sqrt{3}} = (\frac{1}{\sqrt{3}}, \frac{1}{\sqrt{3}}, \frac{-1}{\sqrt{3}})``.
+
+``\overrightarrow{\nabla f} = (2z x - y) \overrightarrow{i} + (-x + 2z y) \overrightarrow{j} + (x^2 + y^2) \overrightarrow{k}``.
+
+``Df_{\overrightarrow{u}} = \overrightarrow{\nabla f} \cdot e_{\overrightarrow{u}}``.
+
+``\overrightarrow{\nabla f} |_A = (2z x - y) \overrightarrow{i} + (-x + 2z y) \overrightarrow{j} + (x^2 + y^2) \overrightarrow{k} |_{A = (0, 1, -1)}``.
 
 ``\overrightarrow{\nabla f} |_{(0, 1, -1)} = (2 (-1) (0) - 1) \overrightarrow{i} + (0 + 2 (-1) (1)) \overrightarrow{j} + (0^2 + 1^2) \overrightarrow{k}``.
 
@@ -639,35 +2037,108 @@ Therefore, we compute the value of the gradient ``\overrightarrow{\nabla f}`` at
 
 ``Df_{\overrightarrow{u}} = (\frac{-1}{\sqrt{3}}, \frac{-2}{\sqrt{3}}, \frac{-1}{\sqrt{3}}) = (\frac{-\sqrt{3}}{3}, \frac{-2\sqrt{3}}{3}, \frac{-\sqrt{3}}{3})``.
 
-# Double Integrals
+```@raw html
+<div dir = "rtl">
+<h2>
 
-The area between the plot of ``f(x)`` and the ``x``-axis, from point ``a`` to point ``b``, equals the integral ``S = \int_{a}^{b} f(x) \ dx``.
+انتگرال دوگانه
+
+</h2>
+<p>
+
+در حالت تک‌بعدی حاصل انتگرال برابر است با مساحت بین نمودار تابع اف ایکس و محور ایکس‌ها از نقطه‌ی آ تا نقطه‌ی بی.
+
+</p>
+</div>
+```
+
+``S = \int_{a}^{b} f(x) \ dx``.
 
 ![16](./assets/multivariablecalculus/16.jpg)
 
-By extending that idea, the double integral ``\int \int_A f(x, y) \ dA`` is the volume of a three-dimensional shape that is bounded from above by the surface of ``f(x, y)`` and from below by the region ``A`` on the ``xy`` plane.
+```@raw html
+<div dir = "rtl">
+<p>
+
+به طور تعمیم یافته، منظور از انتگرال دوگانه‌ی تابع اف ایکس و وای حجم شکل سه‌بعدی که از بالا به رویه‌ی تابع اف ایکس و وای و از پایین به ناحیه‌ی آ روی صفحه‌ی ایکس-وای محدود است، می‌باشد.
+
+</p>
+</div>
+```
+
+``\int \int_A f(x, y) \ dA``
 
 ![17](./assets/multivariablecalculus/17.jpg)
 
-## Types of Integral Region
 
-- This domain type is normal to both ``x`` and ``y`` (rectangular regions). For the region ``A`` to be normal to ``x``, it is required that a line passing through any of the corner points of region ``A``, and parallel to the ``x``-axis, must not pass through the region. Similarly, the region ``A`` is normal to ``y`` when a line passing through any of the corner points of region ``A``, and parallel to the ``y``-axis, does not pass through the region.
+```@raw html
+<div dir = "rtl">
+<h3>
+
+انواع ناحیه‌ی انتگرال‌گیری
+
+</h3>
+<p>
+
+۱. ناحیه هم نسبت به متغیر ایکس منظم است و هم نسبت به متغیر وای منظم است. (ناحیه‌های مستطیلی شکل) 
+می‌گوییم ناحیه‌ی آ نسبت به متغیر ایکس منظم است، هرگاه که هر خط گذرنده از نقاط گوشه‌ای ناحیه‌ی آ، و موازی محور ایکس‌ها، از داخل ناحیه عبور نکند. و می‌گوییم که ناحیه‌ی آ نسبت به متغیر وای منظم است، هرگاه که هر خط گذرنده از نقاط گوشه‌ای ناحیه‌ی آ، و موازی محور وای‌ها، از داخل ناحیه عبور نکند.
+
+</p>
+</div>
+```
 
 ![18](./assets/multivariablecalculus/18.jpg)
 
-This region is both normal to ``x`` and ``y``.
+```@raw html
+<div dir = "rtl">
+<p>
 
-*Fact:* If the region is normal to ``x``, then we can replace ``dA`` with ``dx \ dy``. Bringing ``dx`` to left. If the region is normal to ``y``, then we can replace ``dA`` with ``dy \ dx``. Bringing ``dy`` to left. And if the region is not normal to ``x`` we are not allowed to write ``dx \ dy`` instead of ``dA``. Or if the region is not normal to ``y`` we are not allowed to write ``dy \ dx`` instead of ``dA``.
+این ناحیه هم نسبت به متغیر ایکس منظم است و هم نسبت به متغیر وای منظم است.
 
-Here, the region is normal to both ``x`` and ``y``. So:
+<br>
+
+نکته‌ی مهم: اگر ناحیه‌ای نسبت به متغیر ایکس منظم باشد، آن‌گاه می‌توانیم به جای دیفرانسیل آ مقدار حاصل‌ضرب دیفرانسیل ایکس در دیفرانسیل وای را قرار دهیم. (یعنی دیفرانسیل ایکس را اول بیاوریم.) و اگر ناحیه‌ای نسبت به متغیر وای منظم باشد، آن‌گاه می‌توانیم به جای دیفرانسیل آ مقدار حاصل‌ضرب دیفرانسیل وای در دیفرانسیل ایکس را قرار دهیم. (یعنی دیفرانسیل وای را اول بیاوریم.) و اگر ناحیه نسبت به متغیر ایکس منظم نبود، هیچ‌وقت نمی‌توانیم حاصل‌ضرب دیفرانسیل ایکس در دیفرانسیل وای را بنویسیم. یا اگر ناحیه نسبت به متغیر وای منظم نبود، هیچ‌وقت نمی‌توانیم حاصل‌ضرب دیفرانسیل وای در دیفرانسیل ایکس را بنویسیم.
+
+<br>
+
+در این‌جا ناحیه‌ی آ هم نسبت به متغیر ایکس منظم است و هم نسبت به متغیر وای منظم است. پس:
+
+</p>
+</div>
+```
 
 ``\int \int_A f(x, y) \ dA = \int_c^d \int_a^b f(x, y) dx \ dy = \int_a^b \int_c^d f(x, y) dy \ dx``.
 
-The region ``A`` has two boundaries: ``a \leq x \leq b`` and ``c \leq y \leq d``.
+```@raw html
+<div dir = "rtl">
+<p>
 
-### Example
+ناحیه‌ی آ دو مرز دارد:
 
-Let ``A`` be a region of the shape: ``A = \{ (x, y) | x, y \in \mathbb{R}, \ 2 \leq x \leq 4, \ 1 \leq y \leq 2 \}``. Find the double integral of function ``f(x, y) = x^2 y - x y^3 + x`` on this region.
+</p>
+</div>
+```
+
+``a \leq x \leq b`` و ``c \leq y \leq d``.
+
+```@raw html
+<div dir = "rtl">
+<h3>
+
+مثال
+
+</h3>
+<p>
+
+اگر ناحیه‌ای به شکل آ به همراه دو ضابطه باشد، انتگرال دوگانه‌ی تابع دومتغیره‌ی اف ایکس و وای را روی این ناحیه به دست آورید.
+
+</p>
+</div>
+```
+
+``A = \{ (x, y) | x, y \in \mathbb{R}, \ 2 \leq x \leq 4, \ 1 \leq y \leq 2 \}``.
+
+``f(x, y) = x^2 y - x y^3 + x``.
 
 ![19](./assets/multivariablecalculus/19.jpg)
 
@@ -681,21 +2152,125 @@ Let ``A`` be a region of the shape: ``A = \{ (x, y) | x, y \in \mathbb{R}, \ 2 \
 
 ``S = (\frac{4^3}{2} - (5) \frac{4^2}{2} + \frac{4^2}{8}) - (\frac{2^3}{2} - (5) \frac{2^2}{2} + \frac{2^2}{8})``.
 
-The volume is equal to: ``S = (32 - 8 + 2) - (4 - 10 + 0.5) = 26 - (-5.5) = 26 + 5.5 = 31.5``.
+```@raw html
+<div dir = "rtl">
+<p>
 
-- The second type of region. The region is normal to ``x`` and not normal to ``y``.
+حجم شکل برابر است با:
+
+</p>
+</div>
+```
+
+``S = (32 - 8 + 2) - (4 - 10 + 0.5) = 26 - (-5.5) = 26 + 5.5 = 31.5``.
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+۲. ناحیه‌ی دوم. ناحیه‌ای است که نسبت به متغیر ایکس منظم است در حالی که نسبت به متغیر وای نامنظم است.
+
+</p>
+</div>
+```
 
 ![20](./assets/multivariablecalculus/20.jpg)
 
 ``\int \int_A f(x, y) dA = \int_c^d \int_{h(y)}^{g(y)} dx \ dy``.
 
-- The third type of region. The region is normal to ``y`` and not normal to ``x``.
+```@raw html
+<div dir = "rtl">
+<p>
+
+۳. ناحیه‌ی سوم. ناحیه‌ای است که نسبت به متغیر وای منظم است اما نسبت به متغیر ایکس نامنظم است.
+
+</p>
+</div>
+```
 
 ![21](./assets/multivariablecalculus/21.jpg)
 
 ``\int \int_A f(x, y) dA = \int_a^b \int_c^{h(x)} f(x,y) dy \ dx``.
 
-# The Applications of Double Integrals
+```@raw html
+<div dir = "rtl">
+<p>
+
+۴. ناحیه‌ی چهارم. ناحیه‌ای است که نه نسبت به متغیر ایکس منظم است و نه نسبت به متغیر وای منظم است.
+
+</p>
+</div>
+```
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+در این حالت ناحیه را به دو یا چند ناحیه کوچک‌تر تقسیم می‌کنیم. به طوری که هر ناحیه‌ی کوچک حداقل نسبت به یک متغیر منظم باشد.
+
+</p>
+</div>
+```
+
+``\int \int_A f(x, y) = \int \int_{A_1} f(x, y) \ dy \ dx + \int \int_{A_2} f(x, y) \ dy \ dx``.
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+آ پایین‌نویس ۱ و آ پایین‌نویس ۲، ناحیه‌های منظم نسبت به متغیر وای هستند.
+
+</p>
+</div>
+```
+
+```@raw html
+<div dir = "rtl">
+<h4>
+
+مثال
+
+</h4>
+<p>
+
+اگر ناحیه‌ی آ محصور به خطوط زیر باشد، حجم حاصل از رویه‌ی تابع اف ایکس و وای روی این ناحیه را به شکل انتگرال دوگانه بنویسید.
+
+</p>
+</div>
+```
+
+``y = x``, ``y = 2x``, ``x = 1``, ``x = 2``
+
+``\int \int_A f(x, y) \ dA = \int_1^2 \int_x^{2x} f(x, y) \ dy \ dx``.
+
+```@raw html
+<div dir = "rtl">
+<h4>
+
+مثال
+
+</h4>
+<p>
+
+اگر ناحیه‌ی آ محصور به خطوط زیر باشد، حجم حاصل از رویه‌ی تابع اف ایکس و وای و این ناحیه را به شکل انتگرال دوگانه بنویسید.
+
+</p>
+</div>
+```
+
+``y = x``, ``y = \frac{1}{x}``, ``y = 5 - x``.
+
+``\int \int_A f(x, y) \ dA = \int \int_{A_1} f(x, y) \ dy \ dx + \int \int_{A_2} f(x, y) \ dy \ dx = \int_0^{\frac{5}{2}} \int_{\frac{1}{2} x}^{x} f(x, y) \ dy \ dx + \int_{\frac{5}{2}}^{\frac{10}{3}} \int_{\frac{1}{2} x}^{5 - x} f(x, y) \ dy \ dx``
+
+```@raw html
+<div dir = "rtl">
+<h2>
+
+کاربرد انتگرال دوگانه
+
+</h2>
+</div>
+```
 
 
 # Holonomy
@@ -862,7 +2437,7 @@ The volume is equal to: ``S = (32 - 8 + 2) - (4 - 10 + 0.5) = 26 - (-5.5) = 26 +
 <div dir = "rtl">
 <p>
 
-همان طور که در آینده خواهیم دید، این موضوع برای هر حلقه‌ی ساده‌ی ال بر روی هر رویه‌ی اس درست می‌باشد! ساختن این نتیجه (در فصل بعدی) به ما کلیدی به ظاهر جهانی می‌دهد، که قابلیت گشودن بعضی از عمیق‌ترین رازهایی را دارد که با آن‌ها مواجه شده‌ایم. این کلید قفل قضیه‌ی خارق‌العاده‌ی کارل فریدریش گاوس را باز می‌کند. کلید قفل طبیعت ذاتی قضیه‌ی گاوس-بونت سراسری را باز می‌کند. قفل فرمول انحنای متریک ۴.۱۰ را باز می‌کند، فازور پیشتازان فضایی که از آینده به ما رسیده است. و تعمیم دادن آن به ابعاد بالاتر قفل انحنای ریمانی را باز خواهد کرد که در قلب نظریه‌ی جاذبه‌ی فضازمان خمیده‌ی انیشتین قرار دارد.
+همان طور که در آینده خواهیم دید، این موضوع برای هر حلقه‌ی ساده‌ی ال بر روی هر رویه‌ی اس درست می‌باشد! ساختن این نتیجه (در فصل بعدی) به ما کلیدی به ظاهر جهانی می‌دهد، که قابلیت گشودن بعضی از عمیق‌ترین رازهایی را دارد که با آن‌ها مواجه شده‌ایم. این کلید قفل قضیه‌ی خارق‌العاده‌ی کارل فریدریش گاوس را باز می‌کند. کلید قفل طبیعت درونزاد قضیه‌ی گاوس-بونت سراسری را باز می‌کند. قفل فرمول انحنای متریک ۴.۱۰ را باز می‌کند، فازور پیشتازان فضایی که از آینده به ما رسیده است. و تعمیم دادن آن به ابعاد بالاتر قفل انحنای ریمانی را باز خواهد کرد که در قلب نظریه‌ی جاذبه‌ی فضازمان خمیده‌ی انیشتین قرار دارد.
 
 <br>
 
@@ -1090,7 +2665,7 @@ The volume is equal to: ``S = (32 - 8 + 2) - (4 - 10 + 0.5) = 26 - (-5.5) = 26 +
 <div dir = "rtl">
 <p>
 
-این فصل را با به کار بردن مفهوم انتقال موازی برای شبه‌کره به پایان می‌رسانیم (به وسیله‌ی مدل نیم‌صفحه‌ای بلترامی-پوانکاره)، تا یک اثبات هندسی ذاتی ساده و جدید برای انحنای ثابت منفی صفحه‌ی هذلولوی به دست آوریم. برای این که این کار را انجام دهیم فرض خواهیم کرد، برای حالا، نکته‌ی بنیادی ۲۴.۲، که در فصل آینده اثبات خواهد شد، که هولونومی یک حلقه انحنای کل درونش را اندازه‌گیری می‌کند.
+این فصل را با به کار بردن مفهوم انتقال موازی برای شبه‌کره به پایان می‌رسانیم (به وسیله‌ی مدل نیم‌صفحه‌ای بلترامی-پوانکاره)، تا یک اثبات هندسی درونزاد ساده و جدید برای انحنای ثابت منفی صفحه‌ی هذلولوی به دست آوریم. برای این که این کار را انجام دهیم فرض خواهیم کرد، برای حالا، نکته‌ی بنیادی ۲۴.۲، که در فصل آینده اثبات خواهد شد، که هولونومی یک حلقه انحنای کل درونش را اندازه‌گیری می‌کند.
 
 <br>
 
@@ -1244,7 +2819,7 @@ The volume is equal to: ``S = (32 - 8 + 2) - (4 - 10 + 0.5) = 26 - (-5.5) = 26 +
 <div dir = "rtl">
 <p>
 
-این نکته که این جواب مستقل از اندازه، شکل، و مکان مستطیل است ثابت می‌کند، با استفاده از رابطه‌ی ۲۴.۹، که صفحه‌ی هذلولوی در واقعیت انحنای ذاتی منفی ثابتی دارد که نشان داده شد.
+این نکته که این جواب مستقل از اندازه، شکل، و مکان مستطیل است ثابت می‌کند، با استفاده از رابطه‌ی ۲۴.۹، که صفحه‌ی هذلولوی در واقعیت انحنای درونزاد منفی ثابتی دارد که نشان داده شد.
 
 <br>
 
@@ -1484,6 +3059,10 @@ The volume is equal to: ``S = (32 - 8 + 2) - (4 - 10 + 0.5) = 26 - (-5.5) = 26 +
 
 <li>
 تریستان نیدهام، هندسه دیفرانسیل بصری و شکل‌ها: یک نمایش ریاضیاتی پنج پرده‌ای، انتشارات دانشگاه پرینستون، سال ۱۳۹۹، شابک 9780691203690
+</li>
+
+<li>
+جان ام. لی، مقدمه‌ای بر منیفلد ریمانی، انتشارات بین‌المللی اسپرینگر، سال ۱۳۹۷، چاپ دوم، شابک  9783319917542, 3319917544
 </li>
 
 </ol>
