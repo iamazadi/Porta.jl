@@ -381,7 +381,7 @@ Description = "The Maxwell field as gauge curvature"
 <div dir = "rtl">
 <p>
 
-به همین ترتیب، دامنه‌ی توابع سه‌متغیره دابلیو برابر با اف ایکس، وای، و زد سه‌بعدی است و نمودار آن چهاربعدی است.
+به همین ترتیب، دامنه‌ی توابع سه‌متغیره دابلیو برابر با اف ایکس، وای، و زد سه‌بعدی است و نمودار آن چهاربعدی است، مانند کلاف تاری هوپف یا دایره‌های موازی کلیفورد.
 
 </p>
 </div>
@@ -493,7 +493,7 @@ Description = "The Maxwell field as gauge curvature"
 
 - ``\frac{\partial f}{\partial x} = 5x^4 y^2 z^3 + y x^{y -1}``.
 
-- ``\frac{\partial f}{\partial y} = 2 x^5 y z^3 + x^y + y x^y \ ln(x) - z^3 \ cos(y z^3)``.
+- ``\frac{\partial f}{\partial y} = 2 x^5 y z^3 + x^y \ ln(x) - z^3 \ cos(y z^3)``.
 
 - ``\frac{\partial f}{\partial z} = 3z^2 x^5 y^2 - 3y z^2 \ cos(y z^3)``.
 
@@ -569,7 +569,7 @@ Description = "The Maxwell field as gauge curvature"
 
 - ``\frac{\partial^2 f}{\partial x^2} = \frac{\partial}{\partial x}(\frac{4x^3 y^2}{x^4 y^2}) = \frac{\partial}{\partial x}(\frac{4}{x}) = \frac{-4}{x^2}``.
 
-- ``\frac{\partial^2 f}{\partial y^2} = \frac{\partial}{\partial y}(\frac{2x^4 y}{x^4 y^2} - 1) = \frac{\partial}{\partial y}(\frac{2}{y} - 1) = \frac{\partial}{\partial y}(2y^{-1}) = -2y^{-2} = \frac{-2}{y^2}``.
+- ``\frac{\partial^2 f}{\partial y^2} = \frac{\partial}{\partial y}(\frac{2x^4 y}{x^4 y^2} - 1) = \frac{\partial}{\partial y}(\frac{2}{y} - 1) = \frac{\partial}{\partial y}(2y^{-1} - 1) = -2y^{-2} = \frac{-2}{y^2}``.
 
 - ``\frac{\partial^2 f}{\partial x \partial y} = \frac{\partial}{\partial x}(\frac{2y x^4}{x^4 y^2} - 1) = \frac{\partial}{\partial x}(\frac{2}{y} - 1) = 0``.
 
@@ -657,7 +657,7 @@ Description = "The Maxwell field as gauge curvature"
 <div dir = "rtl">
 <p>
 
-۲. حالت دوم. داشته باشیم اف ایکس، وای، و زد یک تابع سه‌متغیره، و ایکس، وای، و زد توابعی بر حسب متغیر مستقل تی باشند. آن‌گاه داریم:
+۲. حالت دوم. داشته باشیم اف ایکس، وای، و زد یک تابع سه‌متغیره، و متغیرهای ایکس، وای، و زد توابعی بر حسب متغیر مستقل تی باشند. آن‌گاه داریم:
 
 </p>
 </div>
@@ -769,7 +769,7 @@ Description = "The Maxwell field as gauge curvature"
 </div>
 ```
 
-``\frac{\partial f}{\partial r} = (6x y - y^2 + y) (s^r ln(s)) + (3x^2 - 2y x + x + 1)(1)``.
+``\frac{\partial f}{\partial r} = (6x y - y^2 + y) (s^r \ ln(s)) + (3x^2 - 2y x + x + 1)(1)``.
 
 ```@raw html
 <div dir = "rtl">
@@ -1085,7 +1085,7 @@ Description = "The Maxwell field as gauge curvature"
 <div dir = "rtl">
 <p>
 
-جواب معادله‌ی بالا دو عدد متمایز ۳ و -۱ برای متغیر وای می‌باشد.
+جواب معادله‌ی بالا دو عدد متمایز ۳ و منفی ۱ برای متغیر وای می‌باشد.
 
 </p>
 </div>
@@ -1475,7 +1475,7 @@ Description = "The Maxwell field as gauge curvature"
 </div>
 ```
 
-``Df_{\overrightarrow{u}} = (2, -2) \cdot (\frac{4}{5}, \frac{-2}{5}) = 2 \frac{4}{5} + -3 \frac{-2}{5} = \frac{8}{5} + \frac{6}{5} = \frac{14}{5}``.
+``Df_{\overrightarrow{u}} = (2, -2) \cdot (\frac{4}{5}, \frac{-2}{5}) = 2 \frac{4}{5} + -2 \frac{-2}{5} = \frac{8}{5} + \frac{4}{5} = \frac{12}{5}``.
 
 ```@raw html
 <div dir = "rtl">
@@ -1512,7 +1512,7 @@ Description = "The Maxwell field as gauge curvature"
 <div dir = "rtl">
 <p>
 
-این سوال از ما مشتق جهتی تابع تی در نقطه‌ی پی در حهت بردار یو را می‌پرسد. پس اول گرادیان تابع تی را حساب می‌کنیم. دوم، بردار یکه‌ی یو را برای دانستن جهت مشتق به دست می‌آوریم. و در پایان، مشتق جهتی تابع اف را با استفاده از ضرب داخلی پیدا می‌کنیم.
+این سوال از ما مشتق جهتی تابع تی در نقطه‌ی پی در جهت بردار یو را می‌پرسد. پس اول گرادیان تابع تی را حساب می‌کنیم. دوم، بردار یکه‌ی یو را برای دانستن جهت مشتق به دست می‌آوریم. و در پایان، مشتق جهتی تابع اف را با استفاده از ضرب داخلی پیدا می‌کنیم.
 
 </p>
 </div>
@@ -1656,7 +1656,7 @@ Description = "The Maxwell field as gauge curvature"
 
 ``\overrightarrow{\nabla f} = \frac{\partial f}{\partial x} \overrightarrow{i} + \frac{\partial f}{\partial y} \overrightarrow{j} + \frac{\partial f}{\partial z} \overrightarrow{k} |_{(0, 0, 0)}``.
 
-``\overrightarrow{\nabla f} = (-cos(y) + e^x) \overrightarrow{i} (x \ sin(y)) \overrightarrow{j} + 3 \overrightarrow{k} |_{(0, 0, 0)}``.
+``\overrightarrow{\nabla f} = (-cos(y) + e^x) \overrightarrow{i} + (x \ sin(y)) \overrightarrow{j} + 3 \overrightarrow{k} |_{(0, 0, 0)}``.
 
 ``\overrightarrow{\nabla f} = (-1 + 1) \overrightarrow{i} + 0 \overrightarrow{j} + 3 \overrightarrow{k} = (0, 0, 3)``.
 
@@ -1834,7 +1834,7 @@ Description = "The Maxwell field as gauge curvature"
 <div dir = "rtl">
 <p>
 
-دامنه‌ی تابع اف برابر است با نقاطی که روی رویه‌ی سهمی‌گون حاصل‌جمع مجذور ایکس و مجذور وای قرار دارند، به جز بخش‌هایی از رویه که ارتفاع آن‌ها کمتر یا مساوی ۳ باشد.
+دامنه‌ی تابع اف برابر است با نقاطی که روی رویه‌ی سهمی‌گون حاصل‌جمع مجذور ایکس و مجذور وای قرار دارند، به جز بخش‌هایی از رویه که ارتفاع آن‌ها کمتر از ۳ باشد.
 
 </p>
 </div>
@@ -2017,7 +2017,7 @@ Description = "The Maxwell field as gauge curvature"
 
 ``e_{\overrightarrow{u}} = \frac{\overrightarrow{u}}{|\overrightarrow{u}|}``.
 
-``|\overrightarrow{u}| = \sqrt{1^2 + 1^2 + (-1)^2} = \sqrt(1 + 1 + 1) = \sqrt{3}``.
+``|\overrightarrow{u}| = \sqrt{1^2 + 1^2 + (-1)^2} = \sqrt{1 + 1 + 1} = \sqrt{3}``.
 
 ``e_{\overrightarrow{u}} = \frac{(1, 1, -1)}{\sqrt{3}} = (\frac{1}{\sqrt{3}}, \frac{1}{\sqrt{3}}, \frac{-1}{\sqrt{3}})``.
 
@@ -2146,11 +2146,11 @@ Description = "The Maxwell field as gauge curvature"
 
 ``S = \int_2^4 ((2x^2 - 4x + 2x) - (\frac{x^2}{2} - \frac{x}{4} + x)) dx``.
 
-``S = \int_2^4 (\frac{3}{2} x^2 - 5x + \frac{x}{4}) dx``.
+``S = \int_2^4 (\frac{3}{2} x^2 - 3x + \frac{x}{4}) dx``.
 
-``S = \left| (\frac{x^3}{2} - 5 \frac{x^2}{2} + \frac{x^2}{8}) \right|_2^4``.
+``S = \left| (\frac{x^3}{2} - 3 \frac{x^2}{2} + \frac{x^2}{8}) \right|_2^4``.
 
-``S = (\frac{4^3}{2} - (5) \frac{4^2}{2} + \frac{4^2}{8}) - (\frac{2^3}{2} - (5) \frac{2^2}{2} + \frac{2^2}{8})``.
+``S = (\frac{4^3}{2} - (3) \frac{4^2}{2} + \frac{4^2}{8}) - (\frac{2^3}{2} - (3) \frac{2^2}{2} + \frac{2^2}{8})``.
 
 ```@raw html
 <div dir = "rtl">
@@ -2162,7 +2162,7 @@ Description = "The Maxwell field as gauge curvature"
 </div>
 ```
 
-``S = (32 - 8 + 2) - (4 - 10 + 0.5) = 26 - (-5.5) = 26 + 5.5 = 31.5``.
+``S = (32 - 24 + 2) - (4 - 6 + 0.5) = 22 - (-1.5) = 22 + 1.5 = 23.5``.
 
 ```@raw html
 <div dir = "rtl">
@@ -2241,9 +2241,9 @@ Description = "The Maxwell field as gauge curvature"
 </div>
 ```
 
-![23](./assets/multivariablecalculus/23.jpg)
-
 ``y = x``, ``y = 2x``, ``x = 1``, ``x = 2``
+
+![23](./assets/multivariablecalculus/23.jpg)
 
 ``\int \int_A f(x, y) \ dA = \int_1^2 \int_x^{2x} f(x, y) \ dy \ dx``.
 
@@ -2262,9 +2262,9 @@ Description = "The Maxwell field as gauge curvature"
 </div>
 ```
 
-![24](./assets/multivariablecalculus/24.jpg)
+``y = x``, ``y = \frac{1}{2}x``, ``y = 5 - x``.
 
-``y = x``, ``y = \frac{1}{x}``, ``y = 5 - x``.
+![24](./assets/multivariablecalculus/24.jpg)
 
 ``\int \int_A f(x, y) \ dA = \int \int_{A_1} f(x, y) \ dy \ dx + \int \int_{A_2} f(x, y) \ dy \ dx = \int_0^{\frac{5}{2}} \int_{\frac{1}{2} x}^{x} f(x, y) \ dy \ dx + \int_{\frac{5}{2}}^{\frac{10}{3}} \int_{\frac{1}{2} x}^{5 - x} f(x, y) \ dy \ dx``
 
