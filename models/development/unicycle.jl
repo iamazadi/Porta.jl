@@ -10,7 +10,7 @@ segments = 30
 frames_number = 360
 modelname = "unicycle"
 maxplotnumber = 300
-headers = ["j", "k", "roll", "pitch", "enc0", "enc1", "v1", "v2"]
+headers = ["r", "p", "v", "a"]
 dimension = 10
 beginninglabel = "z: "
 endinglabel = "j: "
@@ -79,9 +79,9 @@ chassis_stl_path = joinpath("data", "unicycle", "unicycle_chassis.STL")
 rollingwheel_stl_path = joinpath("data", "unicycle", "unicycle_main_wheel.STL")
 reactionwheel_stl_path = joinpath("data", "unicycle", "unicycle_reaction_wheel.STL")
 
-chassis_colormap = :inferno
+chassis_colormap = :jet
 rollingwheel_colormap = :rainbow
-reactionwheel_colormap = :plasma
+reactionwheel_colormap = :darkrainbow
 
 makefigure() = Figure(size = figuresize)
 fig = with_theme(makefigure, theme_black())
@@ -154,12 +154,12 @@ on(buttons[1].clicks) do n
         systemstate = parsevector(filtered, beginninglabel, endinglabel, delimiter, dimension)
         # calculate(readings)
         allkeys = keys(readings)
-        flag = all([x ∈ allkeys for x in headers]) && all([!isnothing(readings[x]) for x in headers]) && length(systemstate) == dimension
+        flag = all([x ∈ allkeys for x in headers]) && all([!isnothing(readings[x]) for x in headers])
         if flag
-            roll = readings["roll"] / 180.0 * π
-            pitch = -readings["pitch"] / 180.0 * π
-            encoder1 = readings["enc0"] / (255.0 * 255.0)
-            encoder2 = readings["enc1"] / (255.0 * 255.0)
+            roll = -readings["r"] * 10.0 / 180.0 * π
+            pitch = -readings["p"] * 10.0 / 180.0 * π
+            encoder1 = readings["v"]
+            encoder2 = readings["a"] * 2π
             # plot the system state graph
             _graphpoints = graphpoints[]
             _rollpoints = _graphpoints[1]
@@ -184,8 +184,8 @@ on(buttons[1].clicks) do n
             end
             xlims!(ax1, timestamp - maxplotnumber, timestamp)
             #######
-            v1 = readings["v1"]
-            v2 = readings["v2"]
+            v1 = readings["v"]
+            v2 = readings["a"]
             q = ℍ(roll, x̂) * ℍ(pitch, ŷ)
             O_B_R = mat3(q)
     
@@ -195,8 +195,8 @@ on(buttons[1].clicks) do n
     
             pivot_ps[] = [Point3f(pivot_observable[]...), Point3f(pivot_observable[]...), Point3f(pivot_observable[]...)]
     
-            global reaction_angle = reaction_angle + float(v1) * 0.1 # readings["enc"] / 50.0 * 2π
-            global rolling_angle = rolling_angle + float(v2) * 0.01
+            global reaction_angle = reaction_angle + float(v1) * 1.0 # readings["enc"] / 50.0 * 2π
+            global rolling_angle = v2 * π
             rq = Quaternion(ℍ(reaction_angle, x̂))
             mq = Quaternion(ℍ(rolling_angle, ẑ))
             GLMakie.rotate!(rollingwheel, mq)
