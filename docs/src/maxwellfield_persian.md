@@ -2334,6 +2334,8 @@ Description = "The Maxwell field as gauge curvature"
 
 ``\left\{ \begin{array}{l} x = y, y = 1 &\\ x = 0, x = 1 \end{array} \right.``
 
+![25](./assets/multivariablecalculus/25.jpg)
+
 ```@raw html
 <div dir = "rtl">
 <p>
@@ -2397,6 +2399,8 @@ Description = "The Maxwell field as gauge curvature"
 
 ``\left\{ \begin{array}{l} x^2 = y, x = 1 &\\ y = 0, y = 1 \end{array} \right.``
 
+![26](./assets/multivariablecalculus/26.jpg)
+
 ```@raw html
 <div dir = "rtl">
 <p>
@@ -2425,6 +2429,8 @@ Description = "The Maxwell field as gauge curvature"
 </p>
 </div>
 ```
+
+![27](./assets/multivariablecalculus/27.jpg)
 
 ``A = (x, y) = (r \ cos(\theta), r \ sin(\theta))``
 
@@ -2465,6 +2471,8 @@ Description = "The Maxwell field as gauge curvature"
 
 ``x^2 + y^2 = r^2``
 
+![28](./assets/multivariablecalculus/28.jpg)
+
 ```@raw html
 <div dir = "rtl">
 <p>
@@ -2476,6 +2484,8 @@ Description = "The Maxwell field as gauge curvature"
 ```
 
 ``(x - \alpha)^2 + (y - \beta)^2 = r^2``
+
+![29](./assets/multivariablecalculus/29.jpg)
 
 ```@raw html
 <div dir = "rtl">
@@ -2523,6 +2533,8 @@ Description = "The Maxwell field as gauge curvature"
 
 ``\int \int_A e^{x^2 + y^2} \ dx \ dy``
 
+![30](./assets/multivariablecalculus/30.jpg)
+
 ``\int \int_A e^{x^2 + y^2} \ dx \ dy = \int_0^{\pi} \int_1^2 e^{r^2} \ r \ dr \ d\theta = \int_0^{\pi} (\frac{1}{2} e^{r^2} |_1^2) d\theta``
 
 ``\int_0^{\pi} (\frac{1}{2} e^{r^2} |_1^2) d\theta = \int_0^{\pi} \frac{1}{2} (e^{2^2} - e^{1^2}) d\theta``
@@ -2547,6 +2559,8 @@ Description = "The Maxwell field as gauge curvature"
 ```
 
 ``\int_0^1 \int_0^{\sqrt{1 - y^2}} sin(x^2 + y^2) \ dx \ dy``
+
+![31](./assets/multivariablecalculus/31.jpg)
 
 ``\left\{ \begin{array}{l} 0 \leq x \leq \sqrt{1 - y^2} &\\ 0 \leq y \leq 1 \end{array} \right.``
 
@@ -2617,7 +2631,7 @@ Description = "The Maxwell field as gauge curvature"
 </div>
 ```
 
-![25](./assets/multivariablecalculus/25.jpg)
+![32](./assets/multivariablecalculus/32.jpg)
 
 ```@raw html
 <div dir = "rtl">
@@ -2775,7 +2789,7 @@ Description = "The Maxwell field as gauge curvature"
 </div>
 ```
 
-![26](./assets/multivariablecalculus/26.jpg)
+![33](./assets/multivariablecalculus/33.jpg)
 
 ```@raw html
 <div dir = "rtl">
@@ -2963,7 +2977,7 @@ Description = "The Maxwell field as gauge curvature"
 </div>
 ```
 
-![27](./assets/multivariablecalculus/27.jpg)
+![34](./assets/multivariablecalculus/34.jpg)
 
 ``R(\Delta) = R(\Delta_1) + R(\Delta_2)``.
 
@@ -3047,7 +3061,7 @@ Description = "The Maxwell field as gauge curvature"
 </div>
 ```
 
-![28](./assets/multivariablecalculus/28.jpg)
+![35](./assets/multivariablecalculus/35.jpg)
 
 ```@raw html
 <div dir = "rtl">
@@ -3095,7 +3109,7 @@ Description = "The Maxwell field as gauge curvature"
 </div>
 ```
 
-![29](./assets/multivariablecalculus/29.jpg)
+![36](./assets/multivariablecalculus/36.jpg)
 
 ```@raw html
 <div dir = "rtl">
@@ -3272,7 +3286,7 @@ Description = "The Maxwell field as gauge curvature"
 </div>
 ```
 
-![30](./assets/multivariablecalculus/30.jpg)
+![37](./assets/multivariablecalculus/37.jpg)
 
 ```@raw html
 <div dir = "rtl">
@@ -3330,7 +3344,7 @@ Description = "The Maxwell field as gauge curvature"
 </div>
 ```
 
-![31](./assets/multivariablecalculus/31.jpg)
+![38](./assets/multivariablecalculus/38.jpg)
 
 ```@raw html
 <div dir = "rtl">
@@ -3355,7 +3369,7 @@ Description = "The Maxwell field as gauge curvature"
 </div>
 ```
 
-![32](./assets/multivariablecalculus/32.jpg)
+![39](./assets/multivariablecalculus/39.jpg)
 
 ```@raw html
 <div dir = "rtl">
@@ -3378,7 +3392,7 @@ Description = "The Maxwell field as gauge curvature"
 </div>
 ```
 
-![33](./assets/multivariablecalculus/33.jpg)
+![40](./assets/multivariablecalculus/40.jpg)
 
 ```@raw html
 <div dir = "rtl">
@@ -3399,7 +3413,7 @@ Description = "The Maxwell field as gauge curvature"
 </div>
 ```
 
-![34](./assets/multivariablecalculus/34.jpg)
+![41](./assets/multivariablecalculus/41.jpg)
 
 ```@raw html
 <div dir = "rtl">
@@ -3451,7 +3465,7 @@ Description = "The Maxwell field as gauge curvature"
 </div>
 ```
 
-![35](./assets/multivariablecalculus/35.jpg)
+![42](./assets/multivariablecalculus/42.jpg)
 
 ```@raw html
 <div dir = "rtl">
@@ -3476,7 +3490,7 @@ Description = "The Maxwell field as gauge curvature"
 </div>
 ```
 
-![36](./assets/multivariablecalculus/36.jpg)
+![43](./assets/multivariablecalculus/43.jpg)
 
 ```@raw html
 <div dir = "rtl">
