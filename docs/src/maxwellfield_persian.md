@@ -2268,15 +2268,319 @@ Description = "The Maxwell field as gauge curvature"
 
 ``\int \int_A f(x, y) \ dA = \int \int_{A_1} f(x, y) \ dy \ dx + \int \int_{A_2} f(x, y) \ dy \ dx = \int_0^{\frac{5}{2}} \int_{\frac{1}{2} x}^{x} f(x, y) \ dy \ dx + \int_{\frac{5}{2}}^{\frac{10}{3}} \int_{\frac{1}{2} x}^{5 - x} f(x, y) \ dy \ dx``
 
+
 ```@raw html
 <div dir = "rtl">
 <h2>
 
-کاربرد انتگرال دوگانه
+تغییر ترتیب در انتگرال‌گیری دوگانه
 
 </h2>
+<p>
+
+بعضی اوقات انتگرال دوگانه‌ی داده شده با ترتیب موجود قابل حل شدن نمی‌باشد. برای مثال انتگرال زیر قابل حل شدن نمی‌باشد:
+
+</p>
 </div>
 ```
+
+``\int \int e^{y^2} \ dy \ dx``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+زیرا انتگرال داخلی جواب ندارد:
+
+</p>
+</div>
+```
+
+``\int e^{y^2} \ dy``
+
+```@raw html
+<div dir = "rtl">
+<h3>
+
+مثال
+
+</h3>
+<p>
+
+انتگرال زیر را با تغییر ترتیب در صورت امکان حل کنید.
+
+</p>
+</div>
+```
+
+‍‍``\int_0^1 \int_x^1 e^{y^2} \ dy \ dx``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+اول باید بررسی کنیم که ناحیه‌ی انتگرال‌گیری آیا نسبت به متغیر ایکس منظم است. زیرا می‌خواهیم در ترتیب انتگرال‌گیری دیفرانسیل ایکس را اول بیاوریم.
+
+</p>
+<p>
+
+ناحیه‌ی انتگرال‌گیری:
+
+</p>
+</div>
+```
+
+``\left\{ \begin{array}{l} x \leq y \leq 1 &\\ 0 \leq x \leq 1 \end{array} \right.``
+
+``\left\{ \begin{array}{l} x = y, y = 1 &\\ x = 0, x = 1 \end{array} \right.``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+این ناحیه نسبت به متغیر ایکس منظم است.
+
+</p>
+</div>
+```
+
+``\int_0^1 \int_0^y e^{y^2} \ dx \ dy = \int_0^1 (xe^{y^2}|_0^y) dy = \int_0^1 (ye^{y^2} - 0) dy = \frac{1}{2} e^{y^2}|_0^1 = \frac{1}{2} (e - 1)``
+
+```@raw html
+<div dir = "rtl">
+<h3>
+
+یادآوری
+
+</h3>
+</div>
+```
+
+``\int xe^{x^2} \ dx``,
+
+``u = x^2``,
+
+``du = 2x \ dx``,
+
+``\frac{1}{2} \int e^u \ du = \frac{1}{2} e^u = \frac{1}{2} e^{x^2}``.
+
+```@raw html
+<div dir = "rtl">
+<h3>
+
+مثال
+
+</h3>
+<p>
+
+انتگرال زیر را با تغییر ترتیب انتگرال‌گیری در صورت امکان حل کنید.
+
+</p>
+</div>
+```
+
+``\int_0^1 \int_{\sqrt{y}}^1 sin(\pi x^3) \ dx \ dy``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+ناحیه‌ی انتگرال‌گیری:
+
+</p>
+</div>
+```
+
+``\left\{ \begin{array}{l} \sqrt{y} \leq x \leq 1 &\\ 0 \leq y \leq 1 \end{array} \right.``
+
+``\left\{ \begin{array}{l} x = \sqrt{y}, x = 1 &\\ y = 0, y = 1 \end{array} \right.``
+
+``\left\{ \begin{array}{l} x^2 = y, x = 1 &\\ y = 0, y = 1 \end{array} \right.``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+این ناحیه نسبت به متغیر وای منظم است.
+
+</p>
+</div>
+```
+
+``\int_0^1 \int_0^{x^2} sin(\pi x^3) \ dy \ dx = \int_0^1 (y \ sin(\pi x^3)|_0^{x^2}) \ dx = \int_0^1 (x^2 \ sin(\pi x^3) - 0) \ dx``
+
+``\int_0^1 (x^2 \ sin(\pi x^3) - 0) \ dx = -\frac{1}{3 \pi} cos(\pi x^3)|_0^1 = -\frac{1}{3 \pi} (cos(\pi) - cos(0)) = -\frac{1}{3 \pi} (-1 - 1) = \frac{2}{3 \pi}``
+
+```@raw html
+<div dir = "rtl">
+<h2>
+
+مختصات قطبی
+
+</h2>
+<p>
+
+دستگاه مختصات باید سازگار باشد و در آن تناقض وجود نداشته باشد.همچنین رابطه‌ی بین مختصات و نقطه یک به یک باشد. نشان دادن مختصات نقطه با متغیرهای آر و تتا، دستگاه مختصات جدیدی به اسم دستگاه مختصات قطبی است. در دستگاه مختصات قطبی متغیر آر فاصله‌ی نقطه‌ی آ تا مبدا مختصات را مشخص می‌کند. و متغیر تتا زاویه‌ای که خط واصل از نقطه‌ی آ تا مبدا مختصات با جهت مثبت محور ایکس‌ها می‌سازد، را مشخص می‌کند.
+
+</p>
+</div>
+```
+
+``A = (x, y) = (r \ cos(\theta), r \ sin(\theta))``
+
+``A = (r, \theta)``
+
+``sin(\theta) = \frac{y}{r}``
+
+``cos(\theta) = \frac{x}{r}``
+
+``\tan(\theta) = \frac{y}{x}``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+قضیه‌ی فیثاغورس:
+
+</p>
+</div>
+```
+
+``r^2 = x^2 + y^2``
+
+```@raw html
+<div dir = "rtl">
+<h3>
+
+یادآوری
+
+</h3>
+<p>
+
+فرمول دایره‌ای به مرکز مبدا مختصات و شعاع آر:
+
+</p>
+</div>
+```
+
+``x^2 + y^2 = r^2``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+فرمول دایره‌ای به مرکز آلفا و بتا و شعاع آر:
+
+</p>
+</div>
+```
+
+``(x - \alpha)^2 + (y - \beta)^2 = r^2``
+
+```@raw html
+<div dir = "rtl">
+<h3>
+
+نکته
+
+</h3>
+<p>
+
+برای تبدیل انتگرال دوگانه از دستگاه مختصات دکارتی به دستگاه مختصات قطبی، به جای ترتیب انتگرال‌گیری قرار می‌دهیم:
+
+</p>
+</div>
+```
+
+``r \ dr \ d\theta``
+
+```@raw html
+<div dir = "rtl">
+<h3>
+
+مثال
+
+</h3>
+<p>
+
+اگر آ ناحیه‌ی محدود به دو دایره‌ی زیر باشد، واقع در ربع اول و دوم،
+
+</p>
+</div>
+```
+
+``\left\{ \begin{array}{l} x^2 + y^2 = 1 &\\ x^2 + y^2 = 4 \end{array} \right.``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+آن‌گاه انتگرال زیر را در دستگاه مختصات قطبی حل کنید.
+
+</p>
+</div>
+```
+
+``\int \int_A e^{x^2 + y^2} \ dx \ dy``
+
+``\int \int_A e^{x^2 + y^2} \ dx \ dy = \int_0^{\pi} \int_1^2 e^{r^2} \ r \ dr \ d\theta = \int_0^{\pi} (\frac{1}{2} e^{r^2} |_1^2) d\theta``
+
+``\int_0^{\pi} (\frac{1}{2} e^{r^2} |_1^2) d\theta = \int_0^{\pi} \frac{1}{2} (e^{2^2} - e^{1^2}) d\theta``
+
+``\int_0^{\pi} \frac{1}{2} (e^{2^2} - e^{1^2}) d\theta = \int_0^{\pi} \frac{1}{2} (e^4 - e^1) d\theta = (\frac{\theta}{2} (e^4 - e) |_0^{\pi})``
+
+``(\frac{\theta}{2} (e^4 - e) |_0^{\pi}) = \frac{\pi}{2} (e^4 - e) - 0 = \frac{\pi}{2} (e^4 - e)``.
+
+```@raw html
+<div dir = "rtl">
+<h3>
+
+مثال
+
+</h3>
+<p>
+
+انتگرال زیر را در دستگاه مختصات قطبی حل کنید.
+
+</p>
+</div>
+```
+
+``\int_0^1 \int_0^{\sqrt{1 - y^2}} sin(x^2 + y^2) \ dx \ dy``
+
+``\left\{ \begin{array}{l} 0 \leq x \leq \sqrt{1 - y^2} &\\ 0 \leq y \leq 1 \end{array} \right.``
+
+``\left\{ \begin{array}{l} x = 0, x = \sqrt{1 - y^2} &\\ y = 0, y = 1 \end{array} \right.``
+
+``\left\{ \begin{array}{l} x = 0, x^2 + y^2 = 1 &\\ y = 0, y = 1 \end{array} \right.``
+
+``\int_0^{\frac{\pi}{2}} \int_0^1 sin(r^2) r \ dr \ d\theta = \int_0^{\frac{\pi}{2}} -\frac{1}{2} cos(r^2) |_0^1 d\theta``
+
+``\int_0^{\frac{\pi}{2}} -\frac{1}{2} cos(r^2) |_0^1 d\theta = \int_0^{\frac{\pi}{2}} ((-\frac{1}{2} cos(1)) - (-\frac{1}{2} cos(0))) d\theta``
+
+``\int_0^{\frac{\pi}{2}} ((-\frac{1}{2} cos(1)) - (-\frac{1}{2} cos(0))) d\theta = \int_0^\frac{\pi}{2} (-\frac{1}{2} cos(1) + \frac{1}{2}) d\theta``
+
+``\int_0^\frac{\pi}{2} (-\frac{1}{2} cos(1) + \frac{1}{2}) d\theta = (\frac{1}{2} - \frac{1}{2} cos(1)) \theta |_0^\frac{\pi}{2}``
+
+``(\frac{1}{2} - \frac{1}{2} cos(1)) \theta |_0^\frac{\pi}{2} = \frac{\pi}{2} (\frac{1}{2} - \frac{1}{2} cos(1)) = \frac{\pi}{4} (1 - cos(1))``.
+
+```@raw html
+<div dir = "rtl">
+<h3>
+
+روش تغییر متغیر:
+
+</h3>
+</div>
+```
+
+``sin(x^2) dx``,
+
+``u = x^2``,
+
+``du = 2x \ dx``,
+
+``\int x \ sin(x^2) dx = \frac{1}{2} \int sin(u) du = \frac{1}{2} (-cos(u)) = -\frac{1}{2} cos(x^2)``.
 
 
 # Holonomy
