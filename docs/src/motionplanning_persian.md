@@ -838,9 +838,14 @@ Description = "Nonholonomic motion planning: steering using sinusoids."
 
 ```@raw html
 <div dir = "rtl">
+<h3>
+
+یادآوری
+
+</h3>
 <p>
 
-یادآوری: به طور کلی متغیر وای عبارتیست بر حسب متغیر ایکس.
+به طور کلی متغیر وای عبارتیست بر حسب متغیر ایکس.
 
 </p>
 </div>
@@ -875,11 +880,39 @@ Description = "Nonholonomic motion planning: steering using sinusoids."
 </div>
 ```
 
-- ``(x + y) y^\prime = x (y^2 + 1)``
-
 - ``y^\prime = \frac{5x}{2y^2}``
 
+``\frac{dy}{dx} = \frac{5x}{2y^2} \longrightarrow 5x \ dx = 2y^2 \ dy``
+
+``\int 5x \ dx = \int 2y^2 \ dy \longrightarrow \frac{5x^2}{2} = \frac{2y^3}{3} + c``
+
+``\frac{2y^3}{3} = c - \frac{5x^2}{2} \longrightarrow y^3 = \frac{3}{2} (c - \frac{5x^2}{2})``
+
+``y = \sqrt[3]{\frac{3}{2} (c - \frac{5x^2}{2})}``.
+
 - ``xy^\prime + y = y^2``
+
+``x \frac{dy}{dx} + y = y^2 \longrightarrow \frac{x}{dx} + \frac{y}{dy} = \frac{y^2}{dy}``
+
+``\frac{x}{dx} = \frac{y^2}{dy} - \frac{y}{dy} \longrightarrow \frac{x}{dx} = \frac{y^2 - y}{dy}``
+
+``\frac{dx}{x} = \frac{dy}{y^2 - y} \longrightarrow \frac{dx}{x} = \frac{dy}{y (y - 1)}``
+
+``\frac{dx}{x} = dy (\frac{A}{y} + \frac{B}{y - 1}) \longrightarrow \frac{dx}{x} = \frac{-dy}{y} + \frac{dy}{y - 1}``
+
+``\frac{A (y - 1) + B y}{y (y - 1)} = \frac{1}{y (y - 1)}``
+
+``Ay - A + By = 1``
+
+``\left\{ \begin{array}{l} A + B = 0 &\\ -A = 1 \end{array} \right.``
+
+``\left\{ \begin{array}{l} A = -1 &\\ B = 1 \end{array} \right.``
+
+``\int \frac{dx}{x} = - \int \frac{dy}{y} + \int \frac{dy}{y - 1} \longrightarrow ln|x| = -ln|y| + ln|y - 1| + c``
+
+``ln|x| = ln|\frac{y - 1}{y}| + c \longrightarrow e^{ln|x|} = e^{ln|\frac{y - 1}{y}| + c} \longrightarrow x = \frac{y - 1}{y} + c_1``
+
+``y = \frac{y - 1}{x} + c_1``.
 
 ```@raw html
 <div dir = "rtl">
@@ -893,9 +926,47 @@ Description = "Nonholonomic motion planning: steering using sinusoids."
 
 - ``(x^2 + y^2) dx + 2xy \ dy = 0``
 
-- ``(x e^{\frac{y}{x}} + y) dx - 3x \ dy = 0``
+``u = \frac{y}{x} \longrightarrow y = ux \longrightarrow dy = u \ dx + x \ du``
+
+``(x^2 + u^2 x^2) dx + 2x ux \ dy = 0``
+
+``x^2 (u^2 + 1) dx + 2x^2 u \ dy = 0 \longrightarrow x^2 (u^2 + 1) dx + 2x^2 u (u \ dx + x \ du) = 0``
+
+``(u^2 + 1) dx + 2u^2 \ dx + 2ux \ du = 0``
+
+``dx(u^2 + 1 + 2u^2) + 2ux \ du = 0 \longrightarrow (3u^2 + 1) dx + 2ux \ du = 0``
+
+``\frac{3u^2 + 1}{x} dx + 2u \ du = 0 \longrightarrow \frac{dx}{x} + \frac{2u}{3u^2 + 1} du = 0``
+
+``\frac{dx}{x} = \frac{-2u}{3u^2 + 1} du \longrightarrow \int \frac{dx}{x} = \int \frac{-2u}{3u^2 + 1} du``
+
+``ln|x| = \frac{-1}{3} \int \frac{2u}{u^2 + 1} du \longrightarrow ln|x| = \frac{-1}{3} ln|u^2 +1| + c``
+
+``e^{ln|x|} = e^{\frac{-1}{3} ln|u^2 + 1| + c}``
+
+``x = e^{ln|(u^2 + 1)^{\frac{-1}{3}}| + c} \longrightarrow x = \frac{1}{\sqrt[3]{u^2 + 1}} + c_1``
+
+``\frac{1}{x} = \sqrt[3]{u^2 + 1} + c_1 \longrightarrow \frac{1}{x^3} = u^2 + 1 + c_1``
+
+``u^2 = \frac{1}{x^3} - 1 - c_1 \longrightarrow u = \sqrt{\frac{1}{x^3} - 1 - c_1}``
+
+``\frac{y}{x} = \sqrt{\frac{1}{x^3} - 1 - c_1}``
+
+``y = x \sqrt{\frac{1}{x^3} - 1 - c_1}``.
 
 - ``y^\prime = 2 + \frac{y}{x}``
+
+``u = \frac{y}{x} \longrightarrow y = ux \longrightarrow dy = u \ dx + x \ du``
+
+``\frac{dy}{dx} = u + x \frac{du}{dx} \longrightarrow y^\prime = u + x u^\prime``
+
+``u + xu^\prime = 2 + u \longrightarrow x u^\prime = 2 \longrightarrow u^\prime = \frac{2}{x}``
+
+``\frac{du}{dx} = \frac{2}{x} \longrightarrow du = \frac{2 dx}{x}``
+
+``\int du = \int 2 \frac{dx}{x} \longrightarrow u = 2 ln|x| + c``
+
+``\frac{y}{x} = ln(x^2) + c \longrightarrow y = x \ ln(x^2) + cx``.
 
 ```@raw html
 <div dir = "rtl">
@@ -909,9 +980,35 @@ Description = "Nonholonomic motion planning: steering using sinusoids."
 
 - ``(x + y + 2) dx + (x - y^2 + 1) dy = 0``
 
+``f(x, y) = \int (x + y + 2) dx + h(y) = \frac{x^2}{2} + xy + 2x + c + h(y)``
+
+``\frac{\partial f}{\partial y} = N(x, y)``
+
+``x + h^\prime (y) = x - y^2 + 1 \longrightarrow h^\prime (y) = \int h(y) dy = \int (1 - y^2) dy = y - \frac{y^3}{3} + c_1``
+
+``f(x, y) = \frac{x^2}{2} + xy + 2x + y - \frac{y^3}{3} + c_2``.
+
 - ``(2x^2 + 4y) dx + (4x - 3y^2) dy = 0``
 
+``f(x, y) = \int M(x, y) dx + h(y) \longrightarrow f(x, y) = \int (2x^2 + 4y) dx + h(y) = \frac{2x^3}{3} + 4xy + h(y)``
+
+``\frac{\partial f(x, y)}{\partial y} = N(x, y) \longrightarrow 4x + h^\prime (y) = 4x - 3y^2 \longrightarrow h^\prime (y) = -3y^2``
+
+``h(y) = \int h^\prime (y) dy \longrightarrow h(y) = \int -3y^2 \ dy \longrightarrow h(y) = -3 \frac{y^3}{3} + c \longrightarrow h(y) = -y^3 + c``
+
+``f(x, y) = \frac{2}{3} x^3 + 4xy - y^3 + c``.
+
 - ``(2xe^y + e^x) dx + (x^2 + 1) e^y dy = 0``
+
+``f(x, y) = \int M(x, y) dx + h(y) = \int (2xe^y + e^x) dx + h(y) = \frac{2x^2}{2} e^y + e^x + c + h(y)``
+
+``\frac{\partial f(x, y)}{\partial y} = N(x, y) \longrightarrow x^2 e^y + h^\prime (y) = e^y (x^2 + 1)``
+
+``h^\prime (y) = e^y (x^2 + 1) - x^2 e^y = e^y x^2 + e^y - e^y x^2 = e^y``
+
+``h(y) = \int h^\prime (y) dy = \int e^y dy = e^y + c_1``
+
+``f(x, y) = x^2 e^y + e^x + e^y + c_2``
 
 ```@raw html
 <div dir = "rtl">
@@ -925,7 +1022,37 @@ Description = "Nonholonomic motion planning: steering using sinusoids."
 
 - ``\frac{dy}{dx} + y = e^x``
 
+``\left\{ \begin{array}{l} p(x) = 1 &\\ q(x) = e^x \end{array} \right.``
+
+``\int p(x) dx = \int dx = x``
+
+``y = \frac{1}{e^{\int p(x) dx}} (\int e^{\int p(x) dx} q(x) dx + c)``
+
+``y = \frac{1}{e^x} (\int e^x e^x dx + c) \longrightarrow y = e^{-x} (\int e^{2x} dx + c)``
+
+``y = e^{-x} (\frac{e^{2x}}{2} + c) \longrightarrow y = \frac{e^x}{2} + c e^{-x}``.
+
 - ``\frac{dy}{dx} = \frac{e^{2y}}{xe^{2y} - y}``
+
+``\frac{dx}{dy} = \frac{x e^{2y} - y}{e^{2y}} = \frac{x e^{2y}}{e^{2y}} - \frac{y}{e^{2y}}``
+
+``\frac{dx}{dy} = x - \frac{y}{e^{2y}} \longrightarrow x^\prime - x = -\frac{y}{e^{2y}}``
+
+``\left\{ \begin{array}{l} p(y) = -1 &\\ q(y) = \frac{-y}{e^{2y}} \end{array} \right.``
+
+``\int p(y) dy = \int -dy = -y``
+
+``x = \frac{1}{e^{\int p(y) dy}} (\int e^{\int p(y) dy} q(y) dy + c)``
+
+``x = \frac{1}{e^{-y}} (\int e^{-y} \frac{-y}{e^{2y}} dy + c) \longrightarrow x = e^y (\int -e^{-3y} y \ dy + c)``
+
+``\left\{ \begin{array}{l} u = y \longrightarrow du = dy &\\ dv = -e^{-3y} dy \longrightarrow v = \frac{e^{-3y}}{3} \end{array} \right.``
+
+``\int -e^{-3y} y \ dy = \int u \ dv = uv - \int v \ du = y \frac{e^{-3y}}{3} - \int \frac{e^{-3y}}{3} dy``
+
+``\int -e^{-3y} y \ dy = \frac{y}{3e^{3y}} - (-3) \frac{e^{-3y}}{3} = \frac{y}{3e^{3y}} + e^{-3y}``
+
+``x = e^y (\frac{y}{3} e^{-3y} + e^{-3y} + c) \longrightarrow x = e^{-2y} (\frac{y}{3} + 1) + c e^y``.
 
 ```@raw html
 <div dir = "rtl">
@@ -939,8 +1066,57 @@ Description = "Nonholonomic motion planning: steering using sinusoids."
 
 - ``y^\prime - \frac{y}{x} = y^2``
 
+``n = 2``
+
+``u = \frac{1}{y^{2 - 1}} = \frac{1}{y} \longrightarrow y = \frac{1}{u} \longrightarrow y^\prime = (u^{-1})^\prime = -u^{-2} u^\prime``
+
+``y^\prime y^{-2} - \frac{1}{xy} = 1``
+
+``u^\prime (-u^{-2}) (u^2) - \frac{u}{x} = 1``
+
+``-u^\prime - \frac{u}{x} = 1 \longrightarrow u^\prime + \frac{u}{x} = -1``
+
+``\left\{ \begin{array}{l} p(x) = \frac{1}{x} &\\ q(x) = -1 \end{array} \right.``
+
+``\int p(x) dx = \int \frac{dx}{x} = ln|x|``
+
+``u = \frac{1}{e^{\int p(x) dx}} (\int e^{\int p(x) dx} q(x) dx + c)``
+
+``u = \frac{1}{e^{ln|x|}} (\int e^{ln|x|} (-1) dx + c)``
+
+``u = \frac{1}{x} (\int \frac{dx}{x} + c) = \frac{1}{x} (ln|x| + c)``
+
+``\frac{1}{y} = \frac{ln|x| + c}{x}``
+
+``y = \frac{x}{ln|x| + c}``.
+
 - ``y^\prime + xy = \frac{x}{y^3}``
 
+``n = 3``
+
+``u = \frac{1}{y^{3 - 1}} = \frac{1}{y^2} \longrightarrow y^{-2} = u \longrightarrow -2y^{-3}dy = du \longrightarrow dy = \frac{du}{-2}y^3``
+
+``y^\prime y^{-3} + xy^{-2} = x``
+
+``\frac{-u^\prime}{2} + xu = x \longrightarrow u^\prime - 2xu = -2x``
+
+``\left\{ \begin{array}{l} p(x) = -2x &\\ q(x) = -2x \end{array} \right.``
+
+``\int p(x) dx = \int -2x \ dx = -x^2``
+
+``u = \frac{1}{e^{\int p(x) dx}} (\int e^{\int p(x) dx} q(x) dx + c)``
+
+``u = \frac{1}{e^{-x^2}} (\int e^{-x^2} (-2x) dx + c)``
+
+``\left\{ \begin{array}{l} v = -x^2 &\\ dv = -2x \ dx \end{array} \right.``
+
+``\int -e^{-x^2} 2x \ dx = \int e^v dv = e^v = e^{-x^2}``
+
+``u = \frac{1}{e^{-x^2}} (e^{-x^2} + c) = 1 + c e^{x^2}``
+
+``\frac{1}{y^2} = 1 + c e^{x^2} \longrightarrow y^2 = \frac{1}{1 + c e^{x^2}}``
+
+``y = \sqrt{\frac{1}{1 + c e^{x^2}}}``.
 
 ```@raw html
 <div dir = "rtl">
