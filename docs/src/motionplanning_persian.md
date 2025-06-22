@@ -1207,11 +1207,11 @@ Description = "Nonholonomic motion planning: steering using sinusoids."
 
 ``\Delta = 1^2 - 4 (1) (-2) = 9 > 0``,
 
-``r_1 = \frac{-1 + \sqrt{9}}{2 (1)} = -1``,
+``r_1 = \frac{-1 + \sqrt{9}}{2 (1)} = 2``,
 
 ``r_2 = \frac{-1 - \sqrt{9}}{2 (1)} = -2``,
 
-``y = c_1 e^{-x} + c_2 e^{-2x}``.
+``y = c_1 e^{2x} + c_2 e^{-2x}``.
 
 ```@raw html
 <div dir = "rtl">
@@ -1664,7 +1664,7 @@ Description = "Nonholonomic motion planning: steering using sinusoids."
 
 ``\frac{\partial M_1}{\partial y} = -2y x^{-3}``
 
-``\frac{\partial N_1}{\partial x} = -2x^-3 y``
+``\frac{\partial N_1}{\partial x} = -2x^{-3} y``
 
 ```@raw html
 <div dir = "rtl">
@@ -1680,9 +1680,9 @@ Description = "Nonholonomic motion planning: steering using sinusoids."
 
 ``f(x, y) = \int M_1(x, y) dx + h(y) = \int x^{-1} + x^{-2} - y^2 x^{-3} \ dx + h(y)``
 
-``f(x, y) = ln|x| - x + y^2 \frac{x^{-2}}{2} + c + h(y)``
+``f(x, y) = ln|x| - \frac{1}{x} + y^2 \frac{x^{-2}}{2} + c + h(y)``
 
-``N_1(x, y) = \frac{\partial f(x, y)}{\partial y} = \frac{\partial}{\partial y} (ln|x| - x + y^2 \frac{x^{-2}}{2} + c + h(y))``
+``N_1(x, y) = \frac{\partial f(x, y)}{\partial y} = \frac{\partial}{\partial y} (ln|x| - \frac{1}{x} + y^2 \frac{x^{-2}}{2} + c + h(y))``
 
 ```@raw html
 <div dir = "rtl">
@@ -1698,9 +1698,9 @@ Description = "Nonholonomic motion planning: steering using sinusoids."
 
 ``h^{\prime}(y) = 0 \longrightarrow h(y) = \int h^{\prime}(y) dy = \int 0 dy = c_1``,
 
-``f(x, y) = ln|x| - x + y^2 \frac{x^{-2}}{2} + c + c_1``,
+``f(x, y) = ln|x| - \frac{1}{x} + y^2 \frac{x^{-2}}{2} + c + c_1``,
 
-``f(x, y) = ln|x| - x + y^2 \frac{x^{-2}}{2} + c_2``.
+``f(x, y) = ln|x| - \frac{1}{x} + y^2 \frac{x^{-2}}{2} + c_2``.
 
 ```@raw html
 <div dir = "rtl">
