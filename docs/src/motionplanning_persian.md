@@ -1711,7 +1711,7 @@ Description = "Nonholonomic motion planning: steering using sinusoids."
 </h2>
 <p>
 
-در ریاضیات تبدیل‌هایی داریم که یک تابع را به تابع دیگری تبدیل می‌کند. برای مثال، مشتق‌گیری یک تبدیل است که تابع اف بر حسب متغیر ایکس را به تابع اف پریم بر حسب متغیر ایکس بدیل می‌کند.
+در ریاضیات تبدیل‌هایی داریم که یک تابع را به تابع دیگری تبدیل می‌کند. برای مثال، مشتق‌گیری یک تبدیل است که تابع اف بر حسب متغیر ایکس را به تابع اف پریم بر حسب متغیر ایکس تبدیل می‌کند.
 
 </p>
 </div>
@@ -1825,17 +1825,17 @@ Description = "Nonholonomic motion planning: steering using sinusoids."
 
 ``f(t) \to L \{ f(t) \} = F(s)``:
 
-``f(t) = 1 \to L\{ 1 \} = F(s) = \frac{1}{s}, \ D_f: s > 0``,
+``f(t) = 1 \to L\{ 1 \} = F(s) = \frac{1}{s}, \ D_F: s > 0``,
 
-``f(t) = e^at \to L\{ e^at \} = F(s) = \frac{1}{s - a}, \ D_f: s > 0``,
+``f(t) = e^{at} \to L\{ e^{at} \} = F(s) = \frac{1}{s - a}, \ D_F: s > 0``,
 
-``f(t) = t \to L\{ t \} = F(s) = \frac{1}{s^2}, \ D_f: s > 0``,
+``f(t) = t \to L\{ t \} = F(s) = \frac{1}{s^2}, \ D_F: s > 0``,
 
-``f(t) = t^n \ (n \in \mathbb{N}) \to L\{ t^n \} = F(s) = \frac{n!}{s^{n + 1}}, \ D_f: s > 0``,
+``f(t) = t^n \ (n \in \mathbb{N}) \to L\{ t^n \} = F(s) = \frac{n!}{s^{n + 1}}, \ D_F: s > 0``,
 
-``f(t) = cos(at) \to L\{ cos(at) \} = F(s) = \frac{s}{s^2 + a^2}, \ D_f: s > 0``,
+``f(t) = cos(at) \to L\{ cos(at) \} = F(s) = \frac{s}{s^2 + a^2}, \ D_F: s > 0``,
 
-``f(t) = sin(at) \to L\{ sin(at) \} = F(s) = \frac{a}{s^2 + a^2}, \ D_f: s > 0``.
+``f(t) = sin(at) \to L\{ sin(at) \} = F(s) = \frac{a}{s^2 + a^2}, \ D_F: s > 0``.
 
 ```@raw html
 <div dir = "rtl">
@@ -2266,7 +2266,7 @@ Description = "Nonholonomic motion planning: steering using sinusoids."
 <div dir = "rtl">
 <p>
 
-به یک دستگاه معادله‌ی دیفرانسیل خطی مرتبه‌ی دوم با ضرایب ثابت رسیدیم. حالا معادله‌ی مفسر را تشکیل می‌دهیم.
+به یک معادله‌ی دیفرانسیل خطی مرتبه‌ی دوم با ضرایب ثابت رسیدیم. حالا معادله‌ی مفسر را تشکیل می‌دهیم.
 
 </p>
 </div>
@@ -2325,11 +2325,11 @@ Description = "Nonholonomic motion planning: steering using sinusoids."
 
 ``y = f(x)``
 
-``y_1^{\prime \prime} = y_1^\prime + y_2^\prime \longrightarrow y_1^{\prime \prime} = y_1 + (4y_1 - 2y_2)``
+``y_1^{\prime \prime} = y_1^\prime + y_2^\prime \longrightarrow y_1^{\prime \prime} = y_1^\prime + (4y_1 - 2y_2)``
 
-``y_1^{\prime \prime} = y_1^\prime + 4y_1 - 2(y_1^\prime - y_1) \longrightarrow y_1^{\prime \prime} = -y_1^\prime + 3y_1``
+``y_1^{\prime \prime} = y_1^\prime + 4y_1 - 2(y_1^\prime - y_1) \longrightarrow y_1^{\prime \prime} = -y_1^\prime + 6y_1``
 
-``y_1^{\prime \prime} + y_1^\prime - 3y_1 = 0``.
+``y_1^{\prime \prime} + y_1^\prime - 6y_1 = 0``.
 
 ```@raw html
 <div dir = "rtl">
@@ -2343,21 +2343,23 @@ Description = "Nonholonomic motion planning: steering using sinusoids."
 
 ``\left\{ \begin{array}{l} r^2 + ar + b = 0 &\\ y^{\prime \prime} + ay^\prime + by = 0 \end{array} \right.``
 
-``\left\{ \begin{array}{l} a = 1 &\\ b = -3 \end{array} \right.``
+``\left\{ \begin{array}{l} a = 1 &\\ b = -6 \end{array} \right.``
 
-``r^2 + r - 3 = 0``
+``r^2 + r - 6 = 0``
 
-``r_{1, 2} = \frac{-1 \pm \sqrt{(1)^2 - 4 (1) (-3)}}{2} = \frac{-1 \pm \sqrt{1 + 12}}{2} = \frac{-1 \pm \sqrt{13}}{2}``
+``r_{1, 2} = \frac{-1 \pm \sqrt{(1)^2 - 4 (1) (-6)}}{2} = \frac{-1 \pm \sqrt{1 - (-24)}}{2} = \frac{-1 \pm \sqrt{25}}{2}``
 
-``\Delta = 13 > 0``
+``\left\{ \begin{array}{l} r_1 = -3 &\\ r_2 = 2 \end{array} \right.``
 
-``y_1 = c_1 e^{r_1 x} + c_2 e^{r_2 x} \longrightarrow y_1 = c_1 e^{\frac{-1 + \sqrt{13}}{2} x} + c_2 e^{\frac{-1 - \sqrt{13}}{2} x}``
+``\Delta = 25 > 0``
 
-``y_1^\prime = \frac{-1 + \sqrt{13}}{2} c_1 e^{\frac{-1 + \sqrt{13}}{2} x} + \frac{-1 - \sqrt{13}}{2} c_2 e^{\frac{-1 - \sqrt{13}}{2} x}``
+``y_1 = c_1 e^{r_1 x} + c_2 e^{r_2 x} \longrightarrow y_1 = c_1 e^{2 x} + c_2 e^{-3 x}``
 
-``y_2 = y_1^\prime - y_1 = \frac{-1 + \sqrt{13}}{2} c_1 e^{\frac{-1 + \sqrt{13}}{2} x} + \frac{-1 - \sqrt{13}}{2} c_2 e^{\frac{-1 - \sqrt{13}}{x} x} - y_1``
+``y_1^\prime = 2 c_1 e^{2 x} - 3 c_2 e^{-3 x}``
 
-``y_2 = \frac{-1 + \sqrt{13}}{2} c_1 e^{\frac{-1 + \sqrt{13}}{2} x} + \frac{-1 - \sqrt{13}}{2} c_2 e^{\frac{-1 - \sqrt{13}}{2} x} - c_1 e^{\frac{-1 + \sqrt{13}}{2} x} - c_2 e^{\frac{-1 - \sqrt{13}}{2} x}``.
+``y_2 = y_1^\prime - y_1 = 2 c_1 e^{2 x} - 3 c_2 e^{-3 x} - y_1``
+
+``y_2 = 2 c_1 e^{2 x} - 3 c_2 e^{-3 x} - c_1 e^{2 x} - c_2 e^{-3 x}``.
 
 ```@raw html
 <div dir = "rtl">
@@ -2462,7 +2464,7 @@ Description = "Nonholonomic motion planning: steering using sinusoids."
 
 ``y_1^\prime = 2y_1 - 5y_2 \longrightarrow y_2 = \frac{-1}{5} y_1^\prime + \frac{2}{5}y_1``,
 
-``y_2 = \frac{-1}{5}(-2e^{-2x}(c_1cos(3x) + c_2sin(3x)) + e^{-2x}(-3c_1sin(3x) + 3c_2cos(3x)) + \frac{2}{5} e^{-2x}(c_1cos(3x) + c_2sin(3x))``.
+``y_2 = \frac{-1}{5}(-2e^{-2x}(c_1cos(3x) + c_2sin(3x)) + e^{-2x}(-3c_1sin(3x) + 3c_2cos(3x))) + \frac{2}{5} e^{-2x}(c_1cos(3x) + c_2sin(3x))``.
 
 
 
