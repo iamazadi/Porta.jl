@@ -260,7 +260,7 @@ Description = "Nonholonomic motion planning: steering using sinusoids."
 
 ``\int \frac{u^{\prime}}{u} du = ln|u| + c``
 
-``(tan(x))^{\prime} = sec(x)``
+``(tan(x))^{\prime} = sec^2(x)``
 
 ``(tan(u))^{\prime} = u^{\prime} (1 + tan^2(u)) \longrightarrow (tan(x))^{\prime} = 1 + tan^2(x)``
 
@@ -351,7 +351,7 @@ Description = "Nonholonomic motion planning: steering using sinusoids."
 
 ``\left\{ \begin{array}{l} \frac{\partial M(x, y)}{\partial y} = 1 &\\ \frac{\partial N(x, y)}{\partial x} = 1 \end{array} \right.``
 
-``f(x, y) = \int (x + y + 1) dx + h(y) = \frac{x^2}{2} + y x + x + h(y)``
+``f(x, y) = \int (x + y + 1) dx + h(y) = \frac{x^2}{2} + y x + x + c + h(y)``
 
 ``\frac{\partial f(x, y)}{\partial y} = x + h^{\prime}(y)``
 
@@ -359,7 +359,7 @@ Description = "Nonholonomic motion planning: steering using sinusoids."
 
 ``h(y) = \int (-y^2 + 3) dy = \frac{-y^3}{3} + 3y``
 
-``f(x, y) = \frac{x^2}{2} + yx + x - \frac{y^3}{3} + 3y``.
+``f(x, y) = \frac{x^2}{2} + yx + x - \frac{y^3}{3} + 3y + c``.
 
 ```@raw html
 <div dir = "rtl">
@@ -384,19 +384,17 @@ Description = "Nonholonomic motion planning: steering using sinusoids."
 
 ``f(x, y) = \int (2x^2 + 2xy^2 + 4y) dx + h(y)``
 
-``f(x, y) = \frac{2}{3} x^3 + xy^2 + 4yx + c + h(y)``
+``f(x, y) = \frac{2}{3} x^3 + x^2y^2 + 4yx + c + h(y)``
 
-``N(x, y) = \frac{\partial f}{\partial y} = \frac{\partial}{\partial y} (\frac{2}{3} x^3 + xy^2 + 4yx + c + h(y))``
+``N(x, y) = \frac{\partial f}{\partial y} = \frac{\partial}{\partial y} (\frac{2}{3} x^3 + x^2y^2 + 4yx + c + h(y))``
 
-``N(x, y) = 2xy + 4x + h^{\prime}(y) = 2x^2 y + 4x + 5y^4``
+``N(x, y) = 2x^2y + 4x + h^{\prime}(y) = 2x^2 y + 4x + 5y^4``
 
-``h^{\prime}(y) = 2x^2 y + 4x + 5y^4 - 4x - 2xy = 2x^2 y + 5y^4 - 2xy``
+``h^{\prime}(y) = 2x^2 y + 4x + 5y^4 - 4x - 2x^2y = 5y^4``
 
-``h(y) = \int h^{\prime}(y) dy = \int (2x^2y + 5y^4 - 2xy) dy = x^2 y^2 + y^5 - xy^2 + c``
+``h(y) = \int h^{\prime}(y) dy = \int 5y^4 dy = y^5 + c``
 
-``f(x, y) = \frac{2}{3} x^3 + xy^2 + 4yx + x^2y^2 + y^5 - xy^2 + c``
-
-``f(x, y) = \frac{2}{3}x^3 + 4yx + x^2 y^2 + y^5 + c``.
+``f(x, y) = \frac{2}{3} x^3 + x^2y^2 + 4yx + y^5 + c``.
 
 ```@raw html
 <div dir = "rtl">
@@ -407,7 +405,7 @@ Description = "Nonholonomic motion planning: steering using sinusoids."
 </h3>
 <p>
 
-تابع اف ایکس و وای را همگن ار درجه‌ی ان (ان عضوی از اعداد صحیح) می‌گویند، هرگاه عدد غیر صفری مانند تی وجود داشته باشد، به طوری که:
+تابع اف ایکس و وای را همگن از درجه‌ی ان (ان عضوی از اعداد صحیح) می‌گویند، هرگاه عدد غیر صفری مانند تی وجود داشته باشد، به طوری که:
 
 </p>
 </div>
@@ -508,11 +506,11 @@ Description = "Nonholonomic motion planning: steering using sinusoids."
 </div>
 ```
 
+``M(tx, ty) = tx + ty = t(x + y) = t^1 M(x, y)``
+
 ``\left\{ \begin{array}{l} M(x, y) dx = N(x, y) dy &\\ (x + y) dx = (x) dy \end{array} \right.``
 
 ``y = ux \longrightarrow dy = x \ du + u \ dx``
-
-``M(tx, ty) = tx + ty = t(x + y) = t^1 M(x, y)``
 
 ``(x + ux) dx - x(x \ du + u \ dx) = 0``
 
@@ -749,6 +747,13 @@ Description = "Nonholonomic motion planning: steering using sinusoids."
 و سپس با تغییر متغیر زیر، معادله را به یک معادله‌ی خطی مرتبه‌ی اول بر حسب ایکس و یو تبدیل می‌کنیم و بعد آن راحل می‌کنیم.
 
 </p>
+</div>
+```
+
+``u = \frac{1}{y^{n - 1}}``
+
+```@raw html
+<div dir = "rtl">
 <h3>
 
 مثال
@@ -790,24 +795,6 @@ Description = "Nonholonomic motion planning: steering using sinusoids."
 
 ``\left\{ \begin{array}{l} u = \frac{1}{y} = y^{-1} &\\ du = d(y^{-1}) = -y^{-2} dy \end{array} \right.``
 
-``y^{\prime} u^2 + \frac{u}{x} = 1``
-
-``\left\{ \begin{array}{l} -du = dy \ y^{-2} &\\ u^{\prime} = - y^{\prime} y^{-2} \end{array} \right.``
-
-``-u^{\prime} + \frac{u}{x} = 1``
-
-``u^{\prime} - \frac{u}{x} = -1 \longrightarrow u^{\prime} - \frac{u}{x} + 1 = 0``
-
-``\left\{ \begin{array}{l} p(x) = \frac{-1}{x} &\\ q(x) = -1 \end{array} \right.``
-
-``e^{\int p(x) dx} = e^{\int -\frac{1}{x} dx} = e^{-ln|x|} = \frac{1}{x}``
-
-``u = \frac{1}{e^{\int p(x) dx}} (\int q(x) e^{\int p(x) dx} dx + c)``
-
-``u = x (\int (-1) \frac{1}{x} dx + c) = x(\int -\frac{1}{x} dx + c)``
-
-``u = x (-ln|x| + c)``
-
 ```@raw html
 <div dir = "rtl">
 <p>
@@ -820,7 +807,13 @@ Description = "Nonholonomic motion planning: steering using sinusoids."
 
 ``\frac{y^{\prime}}{y^2} + \frac{1}{x} \frac{1}{y} = 1``
 
-``u^{\prime} - \frac{1}{x} u = -1``
+``y^{\prime} u^2 + \frac{u}{x} = 1``
+
+``\left\{ \begin{array}{l} -du = dy \ y^{-2} &\\ u^{\prime} = - y^{\prime} y^{-2} \end{array} \right.``
+
+``-u^{\prime} + \frac{u}{x} = 1``
+
+``u^{\prime} - \frac{u}{x} = -1 \longrightarrow u^{\prime} - \frac{u}{x} + 1 = 0``
 
 ```@raw html
 <div dir = "rtl">
@@ -831,6 +824,16 @@ Description = "Nonholonomic motion planning: steering using sinusoids."
 </p>
 </div>
 ```
+
+``\left\{ \begin{array}{l} p(x) = \frac{-1}{x} &\\ q(x) = -1 \end{array} \right.``
+
+``e^{\int p(x) dx} = e^{\int -\frac{1}{x} dx} = e^{-ln|x|} = \frac{1}{x}``
+
+``u = \frac{1}{e^{\int p(x) dx}} (\int q(x) e^{\int p(x) dx} dx + c)``
+
+``u = x (\int (-1) \frac{1}{x} dx + c) = x(\int -\frac{1}{x} dx + c)``
+
+``u = x (-ln|x| + c)``
 
 ``u = \frac{1}{y}``
 
@@ -886,9 +889,9 @@ Description = "Nonholonomic motion planning: steering using sinusoids."
 
 ``\int 5x \ dx = \int 2y^2 \ dy \longrightarrow \frac{5x^2}{2} = \frac{2y^3}{3} + c``
 
-``\frac{2y^3}{3} = c - \frac{5x^2}{2} \longrightarrow y^3 = \frac{3}{2} (c - \frac{5x^2}{2})``
+``\frac{2y^3}{3} = \frac{5x^2}{2} + c \longrightarrow y^3 = \frac{3}{2} (\frac{5x^2}{2} - c)``
 
-``y = \sqrt[3]{\frac{3}{2} (c - \frac{5x^2}{2})}``.
+``y = \sqrt[3]{\frac{3}{2} (\frac{5x^2}{2} - c)}``.
 
 - ``xy^\prime + y = y^2``
 
@@ -912,7 +915,9 @@ Description = "Nonholonomic motion planning: steering using sinusoids."
 
 ``ln|x| = ln|\frac{y - 1}{y}| + c \longrightarrow e^{ln|x|} = e^{ln|\frac{y - 1}{y}| + c} \longrightarrow x = \frac{y - 1}{y} + c_1``
 
-``y = \frac{y - 1}{x} + c_1``.
+``x = 1 - \frac{1}{y} + c_1 \longrightarrow \frac{1}{y} = 1 - x + c_1``
+
+``y = \frac{1}{1 - x + c_1}``.
 
 ```@raw html
 <div dir = "rtl">
@@ -1050,9 +1055,9 @@ Description = "Nonholonomic motion planning: steering using sinusoids."
 
 ``\int -e^{-3y} y \ dy = \int u \ dv = uv - \int v \ du = y \frac{e^{-3y}}{3} - \int \frac{e^{-3y}}{3} dy``
 
-``\int -e^{-3y} y \ dy = \frac{y}{3e^{3y}} - (-3) \frac{e^{-3y}}{3} = \frac{y}{3e^{3y}} + e^{-3y}``
+``\int -e^{-3y} y \ dy = \frac{y}{3e^{3y}} - (\frac{-1}{3})) \frac{e^{-3y}}{3} = \frac{y}{3e^{3y}} + \frac{1}{9} e^{-3y}``
 
-``x = e^y (\frac{y}{3} e^{-3y} + e^{-3y} + c) \longrightarrow x = e^{-2y} (\frac{y}{3} + 1) + c e^y``.
+``x = e^y (\frac{y}{3} e^{-3y} + \frac{1}{9} e^{-3y} + c) \longrightarrow x = e^{-2y} (\frac{y}{3} + \frac{1}{9}) + c e^y``.
 
 ```@raw html
 <div dir = "rtl">
@@ -1068,9 +1073,9 @@ Description = "Nonholonomic motion planning: steering using sinusoids."
 
 ``n = 2``
 
-``u = \frac{1}{y^{2 - 1}} = \frac{1}{y} \longrightarrow y = \frac{1}{u} \longrightarrow y^\prime = (u^{-1})^\prime = -u^{-2} u^\prime``
-
 ``y^\prime y^{-2} - \frac{1}{xy} = 1``
+
+``u = \frac{1}{y^{2 - 1}} = \frac{1}{y} \longrightarrow y = \frac{1}{u} \longrightarrow y^\prime = (u^{-1})^\prime = -u^{-2} u^\prime``
 
 ``u^\prime (-u^{-2}) (u^2) - \frac{u}{x} = 1``
 
@@ -1084,11 +1089,11 @@ Description = "Nonholonomic motion planning: steering using sinusoids."
 
 ``u = \frac{1}{e^{ln|x|}} (\int e^{ln|x|} (-1) dx + c)``
 
-``u = \frac{1}{x} (\int \frac{dx}{x} + c) = \frac{1}{x} (ln|x| + c)``
+``u = \frac{1}{x} (\int -\frac{dx}{x} + c) = \frac{1}{x} (-ln|x| + c)``
 
-``\frac{1}{y} = \frac{ln|x| + c}{x}``
+``\frac{1}{y} = \frac{-ln|x| + c}{x}``
 
-``y = \frac{x}{ln|x| + c}``.
+``y = \frac{x}{-ln|x| + c}``.
 
 - ``y^\prime + xy = \frac{x}{y^3}``
 
@@ -2458,3 +2463,29 @@ Description = "Nonholonomic motion planning: steering using sinusoids."
 ``y_1^\prime = 2y_1 - 5y_2 \longrightarrow y_2 = \frac{-1}{5} y_1^\prime + \frac{2}{5}y_1``,
 
 ``y_2 = \frac{-1}{5}(-2e^{-2x}(c_1cos(3x) + c_2sin(3x)) + e^{-2x}(-3c_1sin(3x) + 3c_2cos(3x)) + \frac{2}{5} e^{-2x}(c_1cos(3x) + c_2sin(3x))``.
+
+
+
+# References
+
+```@raw html
+<div dir = "rtl">
+<h1>
+
+منابع
+
+</h1>
+
+<ol start=1>
+
+<li>
+محمد علی کرایه چیان، ریاضی عمومی ۲، انتشارات تمرین، سال ۱۴۰۱، شابک 978-964-7695-64-0
+</li>
+
+<li>
+ریچارد ام. موری، اس. شانکار ساستری، برنامه‌ریزی حرکت غیرمقید: هدایت با استفاده از موج سینوسی، در رسالات کنترل خودکار موسسه‌ی مهندسان برق و الکترونیک، جلد ۳۸، شماره‌ی ۵، ماه اردیبهشت، سال ۱۳۷۲.
+</li>
+
+</ol>
+</div>
+```
