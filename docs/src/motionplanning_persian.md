@@ -2467,7 +2467,6 @@ Description = "Nonholonomic motion planning: steering using sinusoids."
 ``y_2 = \frac{-1}{5}(-2e^{-2x}(c_1cos(3x) + c_2sin(3x)) + e^{-2x}(-3c_1sin(3x) + 3c_2cos(3x))) + \frac{2}{5} e^{-2x}(c_1cos(3x) + c_2sin(3x))``.
 
 
-
 # References
 
 ```@raw html
@@ -2481,7 +2480,7 @@ Description = "Nonholonomic motion planning: steering using sinusoids."
 <ol start=1>
 
 <li>
-محمد علی کرایه چیان، ریاضی عمومی ۲، انتشارات تمرین، سال ۱۴۰۱، شابک 978-964-7695-64-0
+محمد علی کرایه چیان، ریاضی عمومی ۲، انتشارات تمرین، سال ۱۴۰۱، شابک ۹۷۸۹۶۴۷۶۹۵۶۴۰
 </li>
 
 <li>
