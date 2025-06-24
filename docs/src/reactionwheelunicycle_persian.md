@@ -74,6 +74,8 @@ Description = "Describes the mathematical model of a reaction wheel unicycle rob
 </div>
 ```
 
+![1](./assets/reactionwheelunicycle/1.jpeg)
+
 ``\alpha = tan^{-1}(\frac{A_X}{A_Y})``
 
 ```@raw html
@@ -85,6 +87,8 @@ Description = "Describes the mathematical model of a reaction wheel unicycle rob
 </p>
 </div>
 ```
+
+![2](./assets/reactionwheelunicycle/2.jpeg)
 
 ``\left\{ \begin{array}{l} \alpha = tan^{-1}(\frac{A_X}{\sqrt{A_Y^2 + A_Z^2}}) &\\ \beta = tan^{-1}(\frac{A_Y}{\sqrt{A_X^2 + A_Z^2}}) &\\ \gamma = tan^{-1} (\frac{\sqrt{A_X^2 + A_Y^2}}{A_Z}) \end{array} \right.``
 
@@ -102,6 +106,8 @@ Description = "Describes the mathematical model of a reaction wheel unicycle rob
 </p>
 </div>
 ```
+
+![3](./assets/reactionwheelunicycle/3.jpeg)
 
 ```@raw html
 <div dir = "rtl">
@@ -148,11 +154,13 @@ Description = "Describes the mathematical model of a reaction wheel unicycle rob
 </div>
 ```
 
+![4](./assets/reactionwheelunicycle/4.jpeg)
+
 ```@raw html
 <div dir = "rtl">
 <p>
 
-یک ژیروسکوپ سه‌محوره سرعت دوران حول سه محور عمود بر هم (ایکس، ایگرگ و زد) را اندازه‌گیری می‌کند. به طور معمول، چرخش راست‌گرد به دور هر محور با علامت مثبت و چرخش چپ‌گرد با علامت منفی مشخص می‌گردد. سرعت دوران اغلب در واحد درجه بر ثانیه بیان می‌شود. در ماشین‌های پرنده مانند موشک و هواپیما و همچنین برخی از ربات‌های متحرک، واژه‌های رول، یا و پیچ برای مشخص کردن محور دوران به کار گرفته می‌شود. محورهای رول، یا و پیچ به طور الزامی منطبق بر محورهای ایکس، ایگرگ و زد نمی‌باشند. و این مساله بستگی به نحوه‌ی تخصیص محورهای مختصات به جسم متحرک دارد.
+یک ژیروسکوپ سه‌محوره سرعت دوران حول سه محور عمود بر هم (ایکس، ایگرگ و زد) را اندازه‌گیری می‌کند. به طور معمول، چرخش راست‌گرد به دور هر محور با علامت مثبت و چرخش چپ‌گرد با علامت منفی مشخص می‌گردد. سرعت دوران اغلب در واحد درجه بر ثانیه بیان می‌شود. در ماشین‌های پرنده مانند موشک و هواپیما و همچنین برخی از ربات‌های متحرک، واژه‌های غلت، سمت‌گشت و تاب برای مشخص کردن محور دوران به کار گرفته می‌شود. محورهای غلت، سمت‌گشت و تاب به طور الزامی منطبق بر محورهای ایکس، ایگرگ و زد نمی‌باشند. و این مساله بستگی به نحوه‌ی تخصیص محورهای مختصات به جسم متحرک دارد.
 
 </p>
 </div>
@@ -192,6 +200,8 @@ Description = "Describes the mathematical model of a reaction wheel unicycle rob
 </p>
 </div>
 ```
+
+![5](./assets/reactionwheelunicycle/5.jpeg)
 
 ```@raw html
 <div dir = "rtl">
@@ -295,6 +305,8 @@ Description = "Describes the mathematical model of a reaction wheel unicycle rob
 </p>
 </div>
 ```
+
+![6](./assets/reactionwheelunicycle/6.jpeg)
 
 ```@raw html
 <div dir = "rtl">
@@ -402,6 +414,8 @@ Description = "Describes the mathematical model of a reaction wheel unicycle rob
 
 ``\omega_{enc} = \omega_{W} - \dot{\theta} = \frac{\dot{x}}{r} - \dot{\theta}``
 
+![7](./assets/reactionwheelunicycle/7.jpeg)
+
 ```@raw html
 <div dir = "rtl">
 <p>
@@ -464,6 +478,8 @@ Description = "Describes the mathematical model of a reaction wheel unicycle rob
 </p>
 </div>
 ```
+
+![8](./assets/reactionwheelunicycle/8.jpeg)
 
 ```@raw html
 <div dir = "rtl">
@@ -538,6 +554,10 @@ Description = "Describes the mathematical model of a reaction wheel unicycle rob
 </p>
 </div>
 ```
+
+![9](./assets/reactionwheelunicycle/9.jpeg)
+
+![schematics](./assets/reactionwheelunicycle/schematics.jpeg)
 
 # References
 
