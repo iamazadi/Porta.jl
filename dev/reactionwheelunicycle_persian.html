@@ -1349,7 +1349,7 @@
 در این بخش، با در نظر گرفتن حرکت ربات حول دو محور عمود بر هم، دو مدل ریاضی متفاوت برای آن استخراج کردیم. با توجه به معادلاتی که هر یک از این حرکت‌ها را توصیف می‌کنند، (رابطه‌های ۷ و ۸ یا رابطه‌های ۱۲ و ۱۳) می‌توانیم تابع تبدیل سیستم را در آن حرکت استخراج کرده و یا مدل فضای حالت آن را به دست آوریم. در نهایت، حفظ تعادل در دو راستای مختلف به دو کنترلر مجزا احتیاج خواهد داشت. کنترلری که زاویه‌ی تتا و حرکت ایکس را کنترل می‌کند، به موتور اصلی ربات فرمان می‌دهد. و کنترلری که زاویه ی فی را تحت کنترل دارد به موتور مربوط به چرخ عکس‌العملی فرمان می‌دهد.
 
 </p>
-</div><p><img src="assets/reactionwheelunicycle/9.jpeg" alt="9"/></p><p><img src="assets/reactionwheelunicycle/schematics.jpeg" alt="schematics"/></p><div dir = "rtl">
+</div><p><img src="assets/reactionwheelunicycle/9.jpeg" alt="9"/></p><div dir = "rtl">
 <h2>
 
 کنترل‌کننده‌ی تطبیق‌پذیر برای یافتن جواب برخط سامانگر مربعی خطی زمان‌گسسته با استفاده از یادگیری کیفیت
@@ -1531,13 +1531,7 @@ typedef struct
   IMU imu;
   Encoder ReactionEncoder;
   Encoder RollingEncoder;
-} LinearQuadraticRegulator;</code></pre><div dir = "rtl">
-<p>
-
-در هر بار اجرا شدن حلقه‌ی کنترلی یک بردار تصفیه‌شده‌ی اطلاعاتی تولید می‌شود، که با ضرب کردن ماتریس معکوس خودهمبستگی در بردار حالت سامانه به دست می‌آید. سپس، ماتریس بهره برابر است با نسخه‌ای از بردار تصفیه‌شده‌ی اطلاعاتی که تغییر مقیاس داده شده است. اگر ضریب‌های صافی به‌روزرسانی نشده باشند، پس خطایی رخ خواهد داد، که برابر است با حاصل‌ضرب ضریب‌های صافی در فاصله‌ی میان یک جفت مجموعه‌ی پایه. قالب کلی مجموعه‌ی پایه به شکل زیر است:
-
-</p>
-</div><p><span>$(x_k, u_k, x_{k + 1}, u_{k + 1})$</span>.</p><pre><code class="language-c hljs">// feeback policy
+} LinearQuadraticRegulator;</code></pre><p><img src="assets/reactionwheelunicycle/schematics.jpeg" alt="schematics"/></p><pre><code class="language-c hljs">// feeback policy
   for (int i = 0; i &lt; model-&gt;m; i++)
   {
     for (int j = 0; j &lt; model-&gt;n; j++)
@@ -1547,10 +1541,10 @@ typedef struct
   }</code></pre><div dir = "rtl">
 <p>
 
-نخستین مجموعه‌ی پایه شامل عضوهای زیر است: زاویه ی غلت شاسی ربات، زاویه‌ی تاب شاسی، سرعت زاویه‌ای غلت شاسی، سرعت زاویه‌ای تاب شاسی، زاویه‌ی چرخ اصلی ربات، شتاب دورانی چرخ اصلی، سرعت زاویه‌ای چرخ عکس‌العملی، شتاب تغییرات جریان عبورکننده از سیم‌پیچ موتور راه‌انداز چرخ اصلی، شتاب تغییرات جریان عبورکننده از موتور راه‌انداز چرخ عکس‌العملی، و دامنه‌ی سیگنال‌های ورودی موتورها. پس از اینکه اولین مجموعه‌ی پایه اندازه‌گیری شد، یک تدبیر پس‌خور با ارسال کردن سیگنال‌های کنترلی به موتورها اعمال می‌شود. پس از این که کار انجام شد، حالت سامانه از جمله: داده‌های واحد موقعیت‌یاب اینرسیایی، انکودر موتورها، و جریان مصرفی موتورها به روزرسانی می‌شود.
+در هر بار اجرا شدن حلقه‌ی کنترلی یک بردار تصفیه‌شده‌ی اطلاعاتی تولید می‌شود، که با ضرب کردن ماتریس معکوس خودهمبستگی در بردار حالت سامانه به دست می‌آید. سپس، ماتریس بهره برابر است با نسخه‌ای از بردار تصفیه‌شده‌ی اطلاعاتی که تغییر مقیاس داده شده است. اگر ضریب‌های صافی به‌روزرسانی نشده باشند، پس خطایی رخ خواهد داد، که برابر است با حاصل‌ضرب ضریب‌های صافی در فاصله‌ی میان یک جفت مجموعه‌ی پایه. قالب کلی مجموعه‌ی پایه به شکل زیر است:
 
 </p>
-</div><p><span>$x_k \in \mathbb{R^{10}}$</span></p><p><span>$u_k \in \mathbb{R^2}$</span></p><pre><code class="language-c hljs">  // act!
+</div><p><span>$(x_k, u_k, x_{k + 1}, u_{k + 1})$</span>.</p><pre><code class="language-c hljs">  // act!
   model-&gt;dataset.x0 = model-&gt;imu.calibrated_roll;
   model-&gt;dataset.x1 = model-&gt;imu.calibrated_roll_velocity;
   model-&gt;dataset.x2 = 0.0;
@@ -1565,10 +1559,10 @@ typedef struct
   model-&gt;dataset.x11 = u_k[1];</code></pre><div dir = "rtl">
 <p>
 
-دومین مجموعه‌ی پایه همانند اولین مجموعه می‌باشد، با این تفاوت که مقدار آن پس از اعمال فرمان کنترلی اندازه‌گیری می‌شود. بنابراین، یک خطای استدلال قیاسی با استفاده از همان ضریب‌های صافی محاسبه می‌شود، که به طور مستقیم با میزان تغییرات در دو مجموعه‌ی پایه (پیش و پس از اعمال فرمان کنترلی) متناسب است. هرگاه خطای استدلال قیاسی نابرابر با صفر باشد، ماتریس صافی باید به‌روزرسانی شود. برای به‌روزرسانی ماتریس صافی، ابتدا خطای استدلال قیاسی در ماتریس بهره ضرب می‌شود و سپس حاصل‌ضرب از ضریب‌های صافی کم می‌شود.
+نخستین مجموعه‌ی پایه شامل عضوهای زیر است: زاویه ی غلت شاسی ربات، زاویه‌ی تاب شاسی، سرعت زاویه‌ای غلت شاسی، سرعت زاویه‌ای تاب شاسی، زاویه‌ی چرخ اصلی ربات، شتاب دورانی چرخ اصلی، سرعت زاویه‌ای چرخ عکس‌العملی، شتاب تغییرات جریان عبورکننده از سیم‌پیچ موتور راه‌انداز چرخ اصلی، شتاب تغییرات جریان عبورکننده از موتور راه‌انداز چرخ عکس‌العملی، و دامنه‌ی سیگنال‌های ورودی موتورها. پس از اینکه اولین مجموعه‌ی پایه اندازه‌گیری شد، یک تدبیر پس‌خور با ارسال کردن سیگنال‌های کنترلی به موتورها اعمال می‌شود. پس از این که کار انجام شد، حالت سامانه از جمله: داده‌های واحد موقعیت‌یاب اینرسیایی، انکودر موتورها، و جریان مصرفی موتورها به روزرسانی می‌شود.
 
 </p>
-</div><pre><code class="language-c hljs">if (model-&gt;active == 1)
+</div><p><span>$x_k \in \mathbb{R^{10}}$</span></p><p><span>$u_k \in \mathbb{R^2}$</span></p><pre><code class="language-c hljs">if (model-&gt;active == 1)
   {
     reaction_wheel_pwm += 16.0 * u_k[0];
     rolling_wheel_pwm += 2.0 * u_k[1];
@@ -1612,7 +1606,7 @@ typedef struct
   }</code></pre><div dir = "rtl">
 <p>
 
-در پایان، ماتریس معکوس خودهمبستگی به روزرسانی می‌شود. برای به‌روزرسانی ماتریس معکوس خودهمبستگی، حاصل‌ضرب ماتریس بهره در بردار تصفیه‌شده‌ی اطلاعاتی از مقدار قبلی ماتریس معکوس خودهمبستگی کم می‌شود. همچنین برای کاهش دادن اثر به‌روزرسانی‌های قدیمی‌تر بر ماتریس‌های بهره و معکوس خودهمبستگی، باید اندازه‌ی هر به‌روزرسانی را با استفاده از یک ضریب وزنی نمایی تعدیل کرد. به این ترتیب، پس از انجام دادن چندین به‌روزرسانی متوالی، ضریب کاهشی (که مقداری بین صفر تا یک دارد) به تعداد به روزرسانی‌های انجام شده در خودش ضرب می‌شود و این باعث می‌شود که ضریب موثر به‌روزرسانی‌های قدیمی بسیار کوچک شود.
+دومین مجموعه‌ی پایه همانند اولین مجموعه می‌باشد، با این تفاوت که مقدار آن پس از اعمال فرمان کنترلی اندازه‌گیری می‌شود. بنابراین، یک خطای استدلال قیاسی با استفاده از همان ضریب‌های صافی محاسبه می‌شود، که به طور مستقیم با میزان تغییرات در دو مجموعه‌ی پایه (پیش و پس از اعمال فرمان کنترلی) متناسب است. هرگاه خطای استدلال قیاسی نابرابر با صفر باشد، ماتریس صافی باید به‌روزرسانی شود. برای به‌روزرسانی ماتریس صافی، ابتدا خطای استدلال قیاسی در ماتریس بهره ضرب می‌شود و سپس حاصل‌ضرب از ضریب‌های صافی کم می‌شود.
 
 </p>
 </div><pre><code class="language-c hljs">// dataset = (xₖ, uₖ, xₖ₊₁, uₖ₊₁)
@@ -1632,7 +1626,7 @@ typedef struct
   model-&gt;dataset.x21 = rolling_wheel_current_acceleration;</code></pre><div dir = "rtl">
 <p>
 
-وضعیت ربات پس از یک یا چند بار اجرا شدن حلقه‌ی کنترلی، بالاخره از شرط‌های مرزی اولیه بیش از حد دور می‌شود، که این شرایط توسط کاربر و برای ایمنی و کارایی تعیین شده‌اند. در این صورت، ربات باید به کار خود پایان دهد و متوقف شود. این زمان، بهترین زمان برای به‌روزرسانی تدبیر پس‌خوری می‌باشد. به‌روزرسانی تدبیر پس‌خوری بعد از به‌روزرسانی‌های متعدد بر روی ضریب‌های صافی و  ماتریس معکوس خودهمبستگی در طول چندین بار اجرای حلقه ی کنترلی انجام می‌شود.
+در پایان، ماتریس معکوس خودهمبستگی به روزرسانی می‌شود. برای به‌روزرسانی ماتریس معکوس خودهمبستگی، حاصل‌ضرب ماتریس بهره در بردار تصفیه‌شده‌ی اطلاعاتی از مقدار قبلی ماتریس معکوس خودهمبستگی کم می‌شود. همچنین برای کاهش دادن اثر به‌روزرسانی‌های قدیمی‌تر بر ماتریس‌های بهره و معکوس خودهمبستگی، باید اندازه‌ی هر به‌روزرسانی را با استفاده از یک ضریب وزنی نمایی تعدیل کرد. به این ترتیب، پس از انجام دادن چندین به‌روزرسانی متوالی، ضریب کاهشی (که مقداری بین صفر تا یک دارد) به تعداد به روزرسانی‌های انجام شده در خودش ضرب می‌شود و این باعث می‌شود که ضریب موثر به‌روزرسانی‌های قدیمی بسیار کوچک شود.
 
 </p>
 </div><pre><code class="language-c hljs">for (int i = 0; i &lt; model-&gt;m; i++)
@@ -1646,7 +1640,7 @@ typedef struct
   model-&gt;dataset.x23 = u_k1[1];</code></pre><div dir = "rtl">
 <p>
 
-از آنجایی که ضریب‌های صافی کیفیت عملکرد ربات را ایجاد می‌کنند، تدبیر پس‌خوری به عنوان تابعی از هسته‌ی ورودی-ورودی و هسته‌ی ورودی-حالت به‌روزرسانی می‌شود. هسته‌ی ورودی-ورودی یک بلوک ماتریسی است که در گوشه‌ی پایین و سمت راست ماتریس صافی قرار دارد. اما هسته‌ی ورودی-حالت یک بلوک در گوشه‌ی پایین و سمت چپ ماتریس صافی است. هسته‌ی ورودی-حالت از سمت راست در معکوس هسته‌ی ورودی-ورودی ضرب می‌شود تا ماتریس تدبیر پس‌خوری به دست آید.
+وضعیت ربات پس از یک یا چند بار اجرا شدن حلقه‌ی کنترلی، بالاخره از شرط‌های مرزی اولیه بیش از حد دور می‌شود، که این شرایط توسط کاربر و برای ایمنی و کارایی تعیین شده‌اند. در این صورت، ربات باید به کار خود پایان دهد و متوقف شود. این زمان، بهترین زمان برای به‌روزرسانی تدبیر پس‌خوری می‌باشد. به‌روزرسانی تدبیر پس‌خوری بعد از به‌روزرسانی‌های متعدد بر روی ضریب‌های صافی و  ماتریس معکوس خودهمبستگی در طول چندین بار اجرای حلقه ی کنترلی انجام می‌شود.
 
 </p>
 </div><pre><code class="language-c hljs">// Now perform a one-step update in the parameter vector W by applying RLS to equation (S27).
@@ -1697,14 +1691,106 @@ typedef struct
     {
       P_n[i][j] = (1.0 / model-&gt;lambda) * (P_n[i][j] - g_n[i] * z_n[j]); // checked manually
     }
+  }
+  // Repeat at the next time k + 1 and continue until RLS converges and the new parameter vector Wⱼ₊₁ is found.
+  model-&gt;k = k + 1;</code></pre><div dir = "rtl">
+<p>
+
+از آنجایی که ضریب‌های صافی کیفیت عملکرد ربات را ایجاد می‌کنند، تدبیر پس‌خوری به عنوان تابعی از هسته‌ی ورودی-ورودی و هسته‌ی ورودی-حالت به‌روزرسانی می‌شود. هسته‌ی ورودی-ورودی یک بلوک ماتریسی است که در گوشه‌ی پایین و سمت راست ماتریس صافی قرار دارد. اما هسته‌ی ورودی-حالت یک بلوک در گوشه‌ی پایین و سمت چپ ماتریس صافی است. هسته‌ی ورودی-حالت از سمت راست در معکوس هسته‌ی ورودی-ورودی ضرب می‌شود تا ماتریس تدبیر پس‌خوری به دست آید.
+
+</p>
+</div><pre><code class="language-c hljs">  // npack the vector Wⱼ₊₁ into the kernel matrix
+  // Q(xₖ, uₖ) ≡ 0.5 * transpose([xₖ; uₖ]) * S * [xₖ; uₖ] = 0.5 * transpose([xₖ; uₖ]) * [Sₓₓ Sₓᵤ; Sᵤₓ Sᵤᵤ] * [xₖ; uₖ]
+  model-&gt;k = 1;
+  model-&gt;j = model-&gt;j + 1;
+
+   // Perform the control update using (S24), which is uₖ = -S⁻¹ᵤᵤ * Sᵤₓ * xₖ
+  // uₖ = -S⁻¹ᵤᵤ * Sᵤₓ * xₖ
+  float determinant = S_uu[1][1] * S_uu[2][2] - S_uu[1][2] * S_uu[2][1];
+  // check the rank S_uu to see if it&#39;s equal to 2 (invertible matrix)
+  if (fabs(determinant) &gt; 0.001) // greater than zero
+  {
+    S_uu_inverse[0][0] = S_uu[1][1] / determinant;
+    S_uu_inverse[0][1] = -S_uu[0][1] / determinant;
+    S_uu_inverse[1][0] = -S_uu[1][0] / determinant;
+    S_uu_inverse[1][1] = S_uu[0][0] / determinant;
+    // initialize the gain matrix
+    for (int i = 0; i &lt; model-&gt;m; i++)
+    {
+      for (int j = 0; j &lt; model-&gt;n; j++)
+      {
+        K_j[i][j] = 0.0;
+      }
+    }
+    for (int i = 0; i &lt; model-&gt;m; i++)
+    {
+      for (int j = 0; j &lt; model-&gt;n; j++)
+      {
+        for (int k = 0; k &lt; model-&gt;m; k++)
+        {
+          K_j[i][j] += S_uu_inverse[i][k] * S_ux[k][j];
+        }
+      }
+    }
+    model-&gt;updated = 1;
   }</code></pre><div dir = "rtl">
 <p>
 
 زیربرنامه‌ای بر روی میکروکنترلر اجرا می‌شود که شرایط خارج شدن از حلقه‌ی کنترلی را تشخیص می‌دهد. هرگاه که شرایط توقف برقرار شود، این زیربرنامه به طور خودکار تدبیر پس‌خور را به‌روزرسانی می‌کند. سپس، ربات منتظر می‌ماند تا کاربر دکمه‌ای مخصوص را بر روی آن فشار دهد تا اجرا شدن حلقه ی کنترلی دوباره از سر گرفته شود. این مرحله‌ها تکرار می‌شوند تا ربات کیفیت کارهایش را بهبود دهد، در حالی که به کاربر خدمت می‌کند.
 
 </p>
-</div><pre><code class="language-c hljs">// Repeat at the next time k + 1 and continue until RLS converges and the new parameter vector Wⱼ₊₁ is found.
-  model-&gt;k = k + 1;</code></pre><h1 id="References"><a class="docs-heading-anchor" href="#References">References</a><a id="References-1"></a><a class="docs-heading-anchor-permalink" href="#References" title="Permalink"></a></h1><div dir = "rtl">
+</div><pre><code class="language-c hljs">if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_0) == 0)
+    {
+      model.active = 1;
+    }
+    else
+    {
+      model.active = 0;
+      reaction_wheel_pwm = 0.0;
+      rolling_wheel_pwm = 0.0;
+      TIM2-&gt;CCR1 = 0;
+      TIM2-&gt;CCR2 = 0;
+    }
+
+    if (fabs(model.imu.calibrated_roll) &gt; reaction_wheel_safety_angle || fabs(model.imu.calibrated_pitch) &gt; rolling_wheel_safety_angle || model.k &gt; max_episode_length)
+    {
+      model.terminated = 1;
+      model.active = 0;
+      HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
+    }
+
+    if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13) == 0)
+    {
+      HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
+      model.terminated = 0;
+      model.active = 1;
+      model.updated = 0;
+    }
+    // Rinse and repeat :)
+
+    if (model.terminated == 0)
+    {
+      stepForward(&amp;model);
+    }
+    else
+    {
+      reaction_wheel_pwm = 0.0;
+      rolling_wheel_pwm = 0.0;
+      TIM2-&gt;CCR1 = 0;
+      TIM2-&gt;CCR2 = 0;
+      HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_RESET);
+      HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_RESET);
+      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2, GPIO_PIN_RESET);
+      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, GPIO_PIN_RESET);
+      updateEncoder(&amp;model.ReactionEncoder, reactionEncoderWindow, TIM3-&gt;CNT);
+      updateEncoder(&amp;model.RollingEncoder, rollingEncoderWindow, TIM4-&gt;CNT);
+      updateIMU(&amp;(model.imu));
+      updateCurrentSensing();
+    }
+    if (model.terminated == 1 &amp;&amp; model.updated == 0)
+    {
+      updateControlPolicy(&amp;model);
+    }</code></pre><h1 id="References"><a class="docs-heading-anchor" href="#References">References</a><a id="References-1"></a><a class="docs-heading-anchor-permalink" href="#References" title="Permalink"></a></h1><div dir = "rtl">
 <h1>
 
 منابع
@@ -1742,4 +1828,4 @@ typedef struct
 </li>
 
 </ol>
-</div></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="motionplanning_persian.html">« Motion Planning (Persian)</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.13.0 on <span class="colophon-date" title="Friday 27 June 2025 20:06">Friday 27 June 2025</span>. Using Julia version 1.10.9.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+</div></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="motionplanning_persian.html">« Motion Planning (Persian)</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.13.0 on <span class="colophon-date" title="Friday 27 June 2025 20:27">Friday 27 June 2025</span>. Using Julia version 1.10.9.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
