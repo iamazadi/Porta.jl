@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>The Unicycle (Persian) · Porta.jl</title><meta name="title" content="The Unicycle (Persian) · Porta.jl"/><meta property="og:title" content="The Unicycle (Persian) · Porta.jl"/><meta property="twitter:title" content="The Unicycle (Persian) · Porta.jl"/><meta name="description" content="Describes the mathematical model of a reaction wheel unicycle robot."/><meta property="og:description" content="Describes the mathematical model of a reaction wheel unicycle robot."/><meta property="twitter:description" content="Describes the mathematical model of a reaction wheel unicycle robot."/><script data-outdated-warner src="assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="assets/documenter.js"></script><script src="search_index.js"></script><script src="siteinfo.js"></script><script src="../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="index.html"><img class="docs-light-only" src="assets/logo.gif" alt="Porta.jl logo"/><img class="docs-dark-only" src="assets/logo-dark.png" alt="Porta.jl logo"/></a><div class="docs-package-name"><span class="docs-autofit"><a href="index.html">Porta.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="index.html">Home</a></li><li><a class="tocitem" href="hopffibration.html">Hopf Fibration</a></li><li><a class="tocitem" href="newsreport.html">News Report</a></li><li><a class="tocitem" href="reactionwheelunicycle.html">Reaction Wheel Unicycle</a></li><li><a class="tocitem" href="multivariablecalculus.html">Multivariable Calculus</a></li><li><a class="tocitem" href="maxwellfield_persian.html">The Maxwell Field (Persian)</a></li><li class="is-active"><a class="tocitem" href="reactionwheelunicycle_persian.html">The Unicycle (Persian)</a><ul class="internal"><li class="toplevel"><a class="tocitem" href="#Square-Roots-of-Definite-Matrices"><span>Square Roots of Definite Matrices</span></a></li><li class="toplevel"><a class="tocitem" href="#Linear-Quadratic-Regulator"><span>Linear Quadratic Regulator</span></a></li><li class="toplevel"><a class="tocitem" href="#The-Reaction-Wheel-Unicycle-Robot"><span>The Reaction Wheel Unicycle Robot</span></a></li><li class="toplevel"><a class="tocitem" href="#References"><span>References</span></a></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href="reactionwheelunicycle_persian.html">The Unicycle (Persian)</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href="reactionwheelunicycle_persian.html">The Unicycle (Persian)</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/iamazadi/Porta.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/iamazadi/Porta.jl/blob/master/docs/src/reactionwheelunicycle_persian.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Ordinary-Differential-Equations"><a class="docs-heading-anchor" href="#Ordinary-Differential-Equations">Ordinary Differential Equations</a><a id="Ordinary-Differential-Equations-1"></a><a class="docs-heading-anchor-permalink" href="#Ordinary-Differential-Equations" title="Permalink"></a></h1><div dir = "rtl">
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>The Unicycle (Persian) · Porta.jl</title><meta name="title" content="The Unicycle (Persian) · Porta.jl"/><meta property="og:title" content="The Unicycle (Persian) · Porta.jl"/><meta property="twitter:title" content="The Unicycle (Persian) · Porta.jl"/><meta name="description" content="Describes the mathematical model of a reaction wheel unicycle robot."/><meta property="og:description" content="Describes the mathematical model of a reaction wheel unicycle robot."/><meta property="twitter:description" content="Describes the mathematical model of a reaction wheel unicycle robot."/><script data-outdated-warner src="assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="assets/documenter.js"></script><script src="search_index.js"></script><script src="siteinfo.js"></script><script src="../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="index.html"><img class="docs-light-only" src="assets/logo.gif" alt="Porta.jl logo"/><img class="docs-dark-only" src="assets/logo-dark.png" alt="Porta.jl logo"/></a><div class="docs-package-name"><span class="docs-autofit"><a href="index.html">Porta.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="index.html">Home</a></li><li><a class="tocitem" href="hopffibration.html">Hopf Fibration</a></li><li><a class="tocitem" href="newsreport.html">News Report</a></li><li><a class="tocitem" href="reactionwheelunicycle.html">Reaction Wheel Unicycle</a></li><li><a class="tocitem" href="multivariablecalculus.html">Multivariable Calculus</a></li><li><a class="tocitem" href="maxwellfield_persian.html">The Maxwell Field (Persian)</a></li><li class="is-active"><a class="tocitem" href="reactionwheelunicycle_persian.html">The Unicycle (Persian)</a><ul class="internal"><li class="toplevel"><a class="tocitem" href="#Square-Roots-of-Definite-Matrices"><span>Square Roots of Definite Matrices</span></a></li><li class="toplevel"><a class="tocitem" href="#Linear-Quadratic-Regulator"><span>Linear Quadratic Regulator</span></a></li><li class="toplevel"><a class="tocitem" href="#Unicycle-Balance-Control"><span>Unicycle Balance Control</span></a></li><li class="toplevel"><a class="tocitem" href="#References"><span>References</span></a></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href="reactionwheelunicycle_persian.html">The Unicycle (Persian)</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href="reactionwheelunicycle_persian.html">The Unicycle (Persian)</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/iamazadi/Porta.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/iamazadi/Porta.jl/blob/master/docs/src/reactionwheelunicycle_persian.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Ordinary-Differential-Equations"><a class="docs-heading-anchor" href="#Ordinary-Differential-Equations">Ordinary Differential Equations</a><a id="Ordinary-Differential-Equations-1"></a><a class="docs-heading-anchor-permalink" href="#Ordinary-Differential-Equations" title="Permalink"></a></h1><div dir = "rtl">
 <h1>
 
 معادله‌ی دیفرانسیل معمولی
@@ -1825,23 +1825,704 @@
 
 </p>
 </div><p><span>$\hat{J}(x_0) &lt; \infty$</span>.</p><p><span>$\square$</span></p><div dir = "rtl">
+<p>
+
+حالا یک لم ساده درباره‌ی تابعک هزینه بیان می‌کنیم.
+
+</p>
+<h3>
+
+لم ۴
+
+</h3>
+<p>
+
+اگر ماتریس آر کلاه‌دار بزرگ‌تر مساوی با صفر باشد
+
+</p>
+</div><p><span>$\hat{R} \geq 0$</span></p><div dir = "rtl">
+<p>
+
+و ماتریس آر بزرگ‌تر از صفر باشد
+
+</p>
+</div><p><span>$R &gt; 0$</span></p><div dir = "rtl">
+<p>
+
+آنگاه تصویر ماتریس اس زیرمجموعه‌ی تصویر ماتریس کیو است.
+
+</p>
+</div><p><span>$Im \ S \subseteq Im \ Q$</span></p><div dir = "rtl">
+<h3>
+
+اثبات
+
+</h3>
+<p>
+
+اگر نتیجه نادرست باشد آنگاه یک بردار غیر صفر ایکس وجود دارد که متعلق به مجموعه‌ی اشتراک تصویر ماتریس اس و فضای مکمل تصویر ماتریس کیو است که برابر است با مجموعه‌ی اشتراک تصویر ماتریس اس و هسته‌ی ماتریس کیو.
+
+</p>
+</div><p><span>$x \in Im \ S \cap (Im \ Q)^\perp = Im \ S \cap Ker \ Q$</span></p><div dir = "rtl">
+<p>
+
+سپس
+
+</p>
+</div><p><span>$0 \leq \begin{bmatrix} x^* &amp; -x^* S R^{-1} \end{bmatrix} \begin{bmatrix} Q &amp; S \\ S^* &amp; R \end{bmatrix} \begin{bmatrix} x \\ -R^{-1} S^* x \end{bmatrix} = -x^* S R^{-1} S^* x$</span></p><div dir = "rtl">
+<p>
+
+همان طور که تعلق داشتن بردار ایکس به مجموعه‌ی تصویر ماتریس اس نتیجه می‌دهد که بردار ایکس به هسته‌ی مکمل ماتریس اس تعلق ندارد، داریم که
+
+</p>
+</div><p><span>$x \in Im \ S \longrightarrow x \notin Ker \ S^*$</span></p><p><span>$x^* S R^{-1} S^* x &lt; 0$</span></p><div dir = "rtl">
+<p>
+
+که در تناقض با بزرگ‌تر از صفر بودن ماتریس آر است.
+</p>
+</div><p><span>$R &gt; 0$</span></p><p><span>$\square$</span></p><div dir = "rtl">
+<h3>
+
+زوج‌مرتب‌های کنترل‌پذیر
+
+</h3>
+<p>
+
+یک جفت ماتریس در نظر بگیرید
+
+</p>
+</div><p><span>$A \in \mathbb{C}^{n \times n}$</span></p><p><span>$B \in \mathbb{C}^{n \times m}$</span></p><div dir = "rtl">
+<p>
+
+به طوری که حاصل‌ضرب این دو ماتریس همیشه تعریف شده باشد. 
+
+</p>
+</div><p><span>$AB \in \mathbb{C}^{n \times m}$</span></p><div dir = "rtl">
+<p>
+
+یک دنباله از زیرفضاهای ان‌بعدی مختلط بر حسب ماتریس‌های آ و ب تعریف کنید
+
+</p>
+</div><p><span>$\mathbb{C}^n$</span></p><p><span>$\mathcal{C}_0, \mathcal{C}_1, \mathcal{C}_2, ...$</span></p><p><span>$\mathcal{C}_0 = Im \ B, \mathcal{C}_1 = Im \begin{bmatrix} B &amp; AB \end{bmatrix}, \mathcal{C}_2 = Im \begin{bmatrix} B &amp; AB &amp; A^2 B \end{bmatrix}, ...$</span></p><div dir = "rtl">
+<p>
+
+به طور استقرایی داریم
+
+</p>
+</div><p><span>$\mathcal{C}_0 = Im \ B$</span></p><div dir = "rtl">
+<p>
+
+و سپس
+
+</p>
+</div><p><span>$\mathcal{C}_{p + 1} = \mathcal{C}_p + Im(A^{p + 1} B), p = 0, 1, 2, ...$</span></p><div dir = "rtl">
+<p>
+
+واضح است که داریم
+
+</p>
+</div><p><span>$\mathcal{C}_0 \subseteq \mathcal{C}_1 \subseteq \mathcal{C}_2 \subseteq ...$</span></p><div dir = "rtl">
+<p>
+
+ابتدا نشان می‌دهیم که این شمول‌ها تا اندیس مشخصی به نام کا درست هستند (که به ماتریس‌های آ و ب بستگی دارد) و پس از آن برابری به دست می‌آید. در هر حالت، به این دلیل که در فضای ان‌بعدی کار می‌کنیم، بیشتر از ان شمول درست وجود ندارد.
+
+</p>
 <h3>
 
 گزاره
 
 </h3>
+<p>
+
+اگر به ازای متغیر عدد صحیحی به نام کا تساوی زیر برقرار باشد
+
+</p>
+</div><p><span>$\mathcal{C}_{k + 1} = \mathcal{C}$</span></p><div dir = "rtl">
+<p>
+
+آنگاه
+
+</p>
+</div><p><span>$\mathcal{C}_j = \mathcal{C}_k \ for \ all \ j \geq k$</span>.</p><div dir = "rtl">
+<h3>
+
+اثبات
+
+</h3>
+<p>
+
+کافی است که ثابت کنیم
+
+</p>
+</div><p><span>$\mathcal{C}_{k + 2} = \mathcal{C}_{k + 1}$</span></p><div dir = "rtl">
+<p>
+
+و نتیجه به طور استقرایی به دست می‌آید. بردار ایکس را تعریف کنید
+
+</p>
+</div><p><span>$x \in \mathcal{C}_{k + 2}$</span></p><div dir = "rtl">
+<p>
+
+سپس برای بردارهای زیر داریم:
+
+</p>
+</div><p><span>$x_0, x_1, ..., x_{k + 2} \in \mathbb{C}^m$</span></p><p><span>$x = \begin{bmatrix} B &amp; AB &amp; \ldots &amp; A^{k + 2}B \end{bmatrix} \begin{bmatrix} x_0 \\ x_1 \\ \vdots \\ x_{k + 2} \end{bmatrix} = Bx_0 + A \begin{bmatrix} B &amp; AB &amp; \ldots &amp; A^{k + 1} B \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \\ \vdots \\ x_{k + 2} \end{bmatrix}$</span></p><div dir = "rtl">
+<p>
+
+به خاطر اینکه
+
+</p>
+</div><p><span>$\mathcal{C}_{k + 1} = \mathcal{C}_k$</span></p><div dir = "rtl">
+<p>
+
+بردارهای زیر وجود دارند
+
+</p>
+</div><p><span>$y_1, y_2, ..., y_{k+ 1} \in \mathbb{C}^m$</span></p><div dir = "rtl">
+<p>
+
+به طوری که
+
+</p>
+</div><p><span>$\begin{bmatrix} B &amp; AB &amp; \ldots &amp; A^{k + 1} B \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \\ \vdots \\ x_{k + 2} \end{bmatrix} = \begin{bmatrix} B &amp; AB &amp; \ldots &amp; A^k B \end{bmatrix} \begin{bmatrix} y_1 \\ y_2 \\ \vdots \\ y_{k + 1} \end{bmatrix}$</span></p><div dir = "rtl">
+<p>
+
+در نتیجه
+
+</p>
+</div><p><span>$x = \begin{bmatrix} B &amp; AB &amp; \ldots \ A^{k + 1}B \end{bmatrix} \begin{bmatrix} x_0 \\ y_1 \\ y_2 \\ \vdots \\ y_{k + 1} \end{bmatrix} \in \mathcal{C}_{k + 1}$</span></p><div dir = "rtl">
+<p>
+
+بنابراین
+
+</p>
+</div><p><span>$\mathcal{C}_{k + 2} \subseteq \mathcal{C}_{k + 1}$</span></p><div dir = "rtl">
+<p>
+
+و در نتیجه
+
+</p>
+</div><p><span>$\mathcal{C}_{k + 2} = \mathcal{C}_{k + 1}$</span>.</p><p><span>$\square$</span></p><div dir = "rtl">
+<p>
+
+کوچک‌ترین عدد صحیح کا که برای آن گزاره‌ی بالا صدق می‌کند یک مشخصه‌ی زوج‌مرتب (آ، ب) است.
+
+</p>
+</div><p><span>$(A, B)$</span></p><div dir = "rtl">
+<p>
+
+با استفاده از این مقدار کا می‌نویسیم
+
+</p>
+</div><p><span>$\mathcal{C}_k = \mathcal{C}_{A, B}$</span></p><div dir = "rtl">
+<p>
+
+و این را «زیرفضای کنترل‌پذیر» زوج‌مرتب (آ، ب) می‌نامیم. اگر
+
+</p>
+</div><p><span>$\mathcal{C}_{A, B} = \mathbb{C}^n$</span></p><div dir = "rtl">
+<p>
+
+آنگاه به زوج‌مرتب (آ، ب) کنترل‌پذیر گفته می‌شود.
+
+</p>
+<p>
+
+به این دلیل که مقدار کا کمتر مساوی ان منهای یک است
+
+</p>
+</div><p><span>$k \leq n - 1$</span></p><div dir = "rtl">
+<p>
+
+می‌توانیم بنویسیم
+
+</p>
+</div><p><span>$\mathcal{C}_{A, B} = Im \begin{bmatrix} B &amp; AB &amp; A^2 B &amp; \ldots &amp; A^{n - 1} B \end{bmatrix} = \sum_{r = 0}^{n - 1} Im(A^r B)$</span></p><div dir = "rtl">
+<p>
+
+از این تساوی، ویژگی تعریف‌کننده‌ی کلاسیک یک زوج‌مرتب کنترل‌پذیراستنتاج می‌شود: زوج‌مرتب (آ، ب) کنترل‌پذیر است اگر و فقط اگر
+
+</p>
+</div><p><span>$rank \ \begin{bmatrix} B &amp; AB &amp; A^2 B &amp; \ldots &amp; A^{n - 1}B \end{bmatrix} = n$</span></p><p><span>$\mathbb{C}^{n \times m n}$</span></p><div dir = "rtl">
+<p>
+
+یعنی هنگامی که ردیف‌های این ماتریس با ابعاد ان در حاصل‌ضرب ام و ان به طور خطی مستقل باشند.
+
+</p>
+<p>
+
+گزاره‌ی بعدی یک مشخصه‌ی هندسی مفید درباره‌ی زیرفضاهای قابل کنترل ارایه می‌دهد.
+
+</p>
+<h3>
+
+گزاره
+
+</h3>
+<p>
+
+زیرفضای کنترل‌پذیر زیر
+
+</p>
+</div><p><span>$\mathcal{C}_{A,B}$</span></p><div dir = "rtl">
+<p>
+
+کوچک‌ترین زیرفضای ناوردا تحت تبدیل ماتریس آ است که شامل تصویر ماتریس ب می‌باشد.
+
+</p>
+</div><p><span>$Im \ B$</span></p><div dir = "rtl">
+<h3>
+
+اثبات
+
+</h3>
 </div><div dir = "rtl">
+<p>
+
+یک دنباله تعریف کنید
+
+</p>
+</div><p><span>$\{ \mathcal{C}_r \}_{r = 0}^\infty$</span></p><div dir = "rtl">
+<p>
+
+و بگذارید متغیری از نوع عدد صحیح به نام کا همانند گزاره‌ی بالا داشته باشیم. اگر
+
+</p>
+</div><p><span>$x \in \mathcal{C}_k$</span></p><p><span>$k \in \mathbb{Z}$</span></p><div dir = "rtl">
+<p>
+
+معلوم است که
+
+</p>
+</div><p><span>$Ax \in \mathcal{C}_{r + 1}$</span></p><div dir = "rtl">
+<p>
+
+بنابراین، اگر
+
+</p>
+</div><p><span>$x \in \mathcal{C}_k$</span></p><div dir = "rtl">
+<p>
+
+آنگاه
+
+</p>
+</div><p><span>$Ax \in \mathcal{C}_{k + 1} = \mathcal{C}_k$</span></p><div dir = "rtl">
+<p>
+
+و بنابراین
+
+</p>
+</div><p><span>$\mathcal{C}_k = \mathcal{C}_{A, B}$</span></p><div dir = "rtl">
+<p>
+
+یک زیرفضای ناوردا تحت تبدیل ماتریس آ است. همچنین به طور بدیهی داریم
+
+</p>
+</div><p><span>$Im \ B \subseteq \mathcal{C}_{A, B}$</span>.</p><div dir = "rtl">
+<p>
+
+در پایان، بگذارید ماتریس اس زیرفضایی از فضای برداری ان‌بعدی مختلط باشد
+
+</p>
+</div><p><span>$S$</span></p><p><span>$\mathbb{C}^n$</span></p><div dir = "rtl">
+<p>
+
+که برای آن گزاره‌های زیر صادق است
+
+</p>
+</div><p><span>$AS \subseteq S$</span></p><p><span>$Im \ B \subseteq S$</span></p><div dir = "rtl">
+<p>
+
+نشان خواهیم داد که
+
+</p>
+</div><p><span>$\mathcal{C}_{A, B} \subseteq S$</span>.</p><div dir = "rtl">
+<p>
+
+به ازای متغیر عدد طبیعی آر داریم
+
+</p>
+</div><p><span>$r = 1, 2, ...$</span></p><p><span>$Im(A^{r - 1}B) = A^{r - 1} \ Im \ B \subseteq A^{r - 1} S \subseteq S$</span></p><p><span>$\mathcal{C}_{A, B} = Im \begin{bmatrix} B &amp; AB &amp; A^2B &amp; \ldots &amp; A^{n - 1}B \end{bmatrix} = \sum_{r = 0}^{n - 1} Im(A^rB)$</span></p><div dir = "rtl">
+<p>
+
+از معادله‌ی بالا نتیجه می‌شود که
+
+</p>
+</div><p><span>$\mathcal{C}_{A, B} \subseteq S$</span></p><p><span>$\square$</span></p><div dir = "rtl">
+<p>
+
+روشن است که برای ماتریس ب پایین‌نویس ۱ و ماتریس ب پایین‌نویس ۲
+
+</p>
+</div><p><span>$B_1, B_2$</span></p><div dir = "rtl">
+<p>
+
+که دارای تصویرهای مساوی هستند
+
+</p>
+</div><p><span>$Im \ B_1 = Im \ B_2$</span></p><div dir = "rtl">
+<p>
+
+داریم
+
+</p>
+</div><p><span>$\mathcal{C}_{A, B_1} = \mathcal{C}_{A, B_2}$</span>.</p><div dir = "rtl">
+<p>
+
+به طور ویژه، اگر ماتریس ث بزرگ‌تر از صفر باشد
+
+</p>
+</div><p><span>$C &gt; 0$</span></p><div dir = "rtl">
+<p>
+
+آنگاه داریم
+
+</p>
+</div><p><span>$Im (B C B^*) = Im \ B$</span></p><div dir = "rtl">
+<p>
+
+یا به طور معادل داریم
+
+</p>
+</div><p><span>$Ker(BCB^*) = Ker \ B^*$</span>.</p><div dir = "rtl">
+<p>
+
+برای دیدن این حقیقت، مشاهده کنید که شمول زیر معلوم است
+
+</p>
+</div><p><span>$Ker \ B^* \subseteq Ker(BCB^*)$</span></p><div dir = "rtl">
+<p>
+
+سپس، اگر بردار ایکس متعلق به مجموعه‌ی هسته‌ی حاصل‌ضرب ماتریس ب در ث در مکمل ب باشد
+
+</p>
+</div><p><span>$x \in Ker(BCB^*)$</span></p><div dir = "rtl">
+<p>
+
+داریم
+
+</p>
+</div><p><span>$x^* BCB^* x = 0$</span>.</p><div dir = "rtl">
+<p>
+
+ریشه‌ی دوم معین مثبت ماتریس ث را تعریف کنید
+
+</p>
+</div><p><span>$C^{1 / 2}$</span></p><div dir = "rtl">
+<p>
+
+تا به تساوی زیر برسیم
+
+</p>
+</div><p><span>$|| C^{1 / 2} B^* x || = 0$</span>.</p><div dir = "rtl">
+<p>
+
+بنابراین، حاصل‌ضرب ریشه‌ی دوم ماتریس ث در مکمل ماتریس ب برابر با صفر است
+
+</p>
+</div><p><span>$C^{1 / 2} B^* = 0$</span></p><div dir = "rtl">
+<p>
+
+و چون ریشه‌ی دوم ماتریس ث غیر تکینه است (یعنی دترمینان آن غیر صفر است)، بردار ایکس در هسته‌ی مکمل ماتریس ب است.
+
+</p>
+</div><p><span>$det(C^{1 / 2}) \neq 0 \longrightarrow x \in Ker \ B^*$</span>.</p><div dir = "rtl">
+<p>
+
+در ادامه نتیجه می‌شود که
+
+</p>
+</div><p><span>$Ker \ B^* = Ker(BCB^*)$</span>.</p><div dir = "rtl">
+<p>
+
+با استفاده از این نتیجه ما به نتیجه‌گیری مفیدی از گزاره‌ی قبلی می‌رسیم:
+
+</p>
+<h3>
+
+نتیجه‌گیری
+
+</h3>
+<p>
+
+اگر ماتریس ث بزرگ‌تر از صفر باشد آنگاه زوج‌مرتب‌های ماتریسی زیر داراری یک زیرفضای کنترل‌پذیر مشترک هستند:
+
+</p>
+</div><p><span>$\left\{ \begin{array}{l} (A, B) &amp;\\ (A, BCB^*) \end{array} \right.$</span></p><div dir = "rtl">
+<p>
+
+به طور ویژه، زوج ماتریسی (آ، ب) کنترل‌پذیر است اگر و فقط اگر زوج ماتریسی (آ، حاصل‌ضرب ب در ث در مکمل ب) کنترل‌پذیر باشد که در اینجا ماتریس ث بزرگ‌تر از صفر می‌باشد.
+
+</p>
+</div><p><span>$(A, B)$</span></p><p><span>$(A, BCB^*)$</span></p><p><span>$C &gt; 0$</span>.</p><div dir = "rtl">
+<p>
+
+حالا اجازه دهید تا به طور مختصر به خاستگاه مفهوم کنترل‌پذیری در نظریه‌ی سامانه‌ها اشاره کنیم. بگذارید ماتریس‌های آ و ب به صورت زیر تعریف شوند:
+
+</p>
+</div><p><span>$A \in \mathbb{C}^{n \times n}$</span></p><p><span>$B \in \mathbb{C}^{n \times m}$</span></p><div dir = "rtl">
+<p>
+
+و مساله‌ی مقدار اولیه‌ی دیفرانسیلی زیر را در نظر بگیرید
+
+</p>
+</div><p><span>$\dot{x}(t) = Ax(t) + Bu(t), \ x(0) = x_0$</span>.</p><div dir = "rtl">
+<p>
+
+اینجا، تابع برداری یو بر حسب متغیر تی به عنوان یک تابع کنترل یا ورودی دیده می‌شود. به چنین دستگاهی کنترل‌پذیر گفته می‌شود اگر، به ازای هر بردار اولیه‌ی داده‌شده ایکس پایین‌نویس صفر، بردار پایانی ایکس پایین‌نویس ۱ و زمان ت بزرگ‌تر از صفر، یک تابع کنترل پیوسته به نام یو بر حسب متغیر تی وجود داشته باشد که برای آن بردار حالت ایکس بر حسب متغیر تی مقدار ایکس پایین‌نویس ۱ را در زمان ت بگیرد.
+
+</p>
+</div><p><span>$\forall x_0, \ T &gt; 0 \longrightarrow \ \exists \ u(t), \ x(T) = x_1$</span></p><div dir = "rtl">
+<h3>
+
+قضیه
+
+</h3>
+<p>
+
+دستگاه زیر کنترل‌پذیر است اگر و فقط اگر زوج ماتریسی (آ، ب) کنترل‌پذیر باشد.
+
+</p>
+</div><p><span>$\dot{x}(t) = Ax(t) + Bu(t), \ x(0) = x_0$</span>.</p><p><span>$(A, B)$</span></p><div dir = "rtl">
+<p>
+
+خواننده به یکی از منابع موجود برای اثبات این سنگ‌بنای نظریه‌ی سامانه‌ها ارجاع داده می‌شود. (برای مثال وونهام (۱۳۵۷) یا لانکاستر و تیسمانتسکی (۱۳۶۳) را ببینید).
+
+</p>
+</div><p><span>$x_0 \to x_1 \in \mathcal{C}_{A, B}$</span></p><div dir = "rtl">
+<p>
+
+هنگامی که زوج ماتریسی (آ، ب) یک جفت کنترل‌پذیر نباشد، زیرفضای ث پایین‌نویس آ و ب معنی فیزیکی مهمی با عنوان «زیرفضای قابل دستیابی» دارد، یعنی مجموعه‌ی تمام بردارهای پایانی ایکس پایین‌نویس ۱ که می‌توانند از مبدا بردار ایکس پایین‌نویس صفر در مدت زمان متناهی قابل دستیابی باشند.
+
+</p>
+</div><div dir = "rtl">
+<h3>
+
+زوج‌مرتب‌های مشاهده‌پذیر
+
+</h3>
+</div><div dir = "rtl">
+<h3>
+
+نتیجه‌گیری
+
+</h3>
+<p>
+
+گزاره‌های زیر برای یک جفت ماتریس به نام‌های ث و آ معادل هستند:
+
+</p>
+</div><p><span>$C \in \mathbb{C}^{m \times n}$</span></p><p><span>$A \in \mathbb{C}^{n \times n}$</span></p><ul><li><span>$(C, A)$</span></li></ul><div dir = "rtl">
+<p>
+
+زوج ماتریسی (ث، آ) مشاهده‌پذیر است.
+
+</p>
+</div><ul><li><p><span>$Ker \ C \cap Ker(\lambda I - A) = \{ 0 \} for \ all \ \lambda \in \mathbb{C}$</span></p></li><li><p><span>$rank \begin{bmatrix} C \\ \lambda I - A \end{bmatrix} = n \ for \ all \ \lambda \in \mathbb{C}$</span>.</p></li></ul><div dir = "rtl">
+<h3>
+
+لم ۵
+
+</h3>
+<p>
+
+اگر ماتریس آر کلاه‌دار غیرتبهگن باشد و زوج ماتریس (کیو، آ) یک جفت مشاهده‌پذیر باشد، آنگاه جفت ماتریسی زیر نیز یک جفت مشاهده‌پذیر است.
+
+</p>
+</div><p><span>$(Q - S R^{-1} S^*, A - B R^{-1} S^*)$</span></p><div dir = "rtl">
+<p>
+
+پیش از همه به این نکته توجه کنید که خاصیت غیرتبهگنی ماتریس آر کلاه‌دار اساسی است، زیرا اگر
+
+</p>
+</div><p><span>$\hat{R} = \begin{bmatrix} 0 &amp; 0 &amp; \vdots &amp; 0 \\ 0 &amp; 1 &amp; \vdots  &amp; 1 \\ \ldots &amp; \ldots &amp; \ldots &amp; \ldots \\ 0 &amp; 1 &amp; \vdots &amp; 1 \end{bmatrix}$</span></p><div dir = "rtl">
+<p>
+
+آنگاه مرتبه‌ی ماتریس آر کلاه‌دار کوچک‌تر از مجموع مرتبه‌ی ماتریس کیو و مرتبه‌ی ماتریس آر می‌شود.
+
+</p>
+</div><p><span>$rank \ \hat{R} &lt; rank \ Q + rank \ R$</span></p><div dir = "rtl">
+<p>
+
+و ماتریس زیر صفر می‌شود.
+
+</p>
+</div><p><span>$Q - S R^{-1} S^* = 0$</span></p><div dir = "rtl">
+<h3>
+
+اثبات
+
+</h3>
+<p>
+
+بر پایه‌ی لم ۴ داریم که مجموعه‌ی تصویر ماتریس اس زیرمجموعه‌ای از مجموعه‌ی تصویر ماتریس کیو است.
+
+</p>
+</div><p><span>$Im \ S \subseteq Im \ Q$</span></p><div dir = "rtl">
+<p>
+
+و به همین خاطر
+
+</p>
+</div><p><span>$Im(Q - SR^{-1}S^*) \subseteq Im \ Q + Im \ S = Im \ Q$</span></p><div dir = "rtl">
+<p>
+
+اما دو ماتریس زیر متجانس هستند
+
+</p>
+</div><p><span>$\left\{ \begin{array}{l} M_1 = \begin{bmatrix} Q &amp; S \\ S^* &amp; R \end{bmatrix} &amp;\\ M_2 = \begin{bmatrix} Q - SR^{-1}S^* &amp; 0 \\ 0 &amp; R \end{bmatrix} \end{array} \right.$</span></p><div dir = "rtl">
+<p>
+
+زیرا یک ماتریس قابل معکوس شدن به نام پی در گروه خطی عمومی وجود دارد به طوری که
+
+</p>
+</div><p><span>$P \in GL(n, \mathbb{C})$</span></p><p><span>$M_2 = P^T M_1 P$</span></p><div dir = "rtl">
+<p>
+
+و از آنجایی که ماتریس آر کلاه‌دار غیرتبهگن است، دو ماتریس زیر هم‌مرتبه‌اند:
+
+</p>
+</div><p><span>$rank \ Q = rank \ (Q - SR^{-1}S^*)$</span></p><div dir = "rtl">
+<p>
+
+در تساوی مرتبط با تصویر ماتریس کیو رابطه‌ی برابری نیز برقرار است و تساوی مرتبط با هسته‌ی ماتریس کیو نیز برقرار است
+
+</p>
+</div><p><span>$Ker(Q - S R^{-1} S^*) = Ker \ Q$</span></p><div dir = "rtl">
+<p>
+
+برای هر عدد مختلطی به نام لاندا بگذارید بردار ایکس متعلق به مجموعه‌ی زیر باشد
+
+</p>
+</div><p><span>$x \in Ker(\lambda I - (A - BR^{-1}S^*)) \cap Ker(Q - SR^{-1}S^*)$</span></p><p><span>$\lambda \in \mathbb{C}$</span></p><div dir = "rtl">
+<p>
+
+آنگاه، بردار ایکس متعلق به مجموعه‌ی هسته‌ی ماتریس کیو است. همچنین، این حقیقت که تصویر ماتریس اس زیرمجموعه‌ی تصویر ماتریس کیو است نتیجه می‌دهد که هسته‌ی ماتریس مکمل اس فرامجموعه‌ی هسته‌ی ماتریس کیو است. پس ضرب ماتریس در بردار مکمل اس در ایکس برابر است با صفر.
+
+</p>
+</div><p><span>$x \in Ker \ Q$</span></p><p><span>$Im \ S \subseteq Im \ Q \longrightarrow Ker \ S^* \supset Ker \ Q$</span></p><p><span>$S^* x = 0$</span></p><div dir = "rtl">
+<p>
+
+در نتیجه همچنین داریم
+
+</p>
+</div><p><span>$x \in Ker(\lambda I - A)$</span></p><div dir = "rtl">
+<p>
+
+بنابراین
+
+</p>
+</div><p><span>$x \in Ker(\lambda I - A) \cap Ker \ Q$</span></p><div dir = "rtl">
+<p>
+
+به دلیل اینکه زوج ماتریسی (کیو، آ) مشاهده‌پذیر است، از نتیجه‌گیری بالا درمی‌یابیم که بردار ایکس برابر با صفر است و نتیجه از عبارت زیر و نتیجه‌گیری بالا به دست می‌آید.
+
+</p>
+</div><p><span>$(Q, A)$</span></p><p><span>$x = 0$</span></p><p><span>$x \in Ker(\lambda I - (A - BR^{-1}S^*)) \cap Ker(Q - SR^{-1}S^*)$</span></p><p><span>$\square$</span></p><div dir = "rtl">
+<h3>
+
+گزاره
+
+</h3>
+<p>
+
+اگر ماتریس آر کلاه‌دار غیرتبهگن باشد (یعنی مرتبه‌ی ماتریس آر کلاه‌دار برابر باشد با مجموع مرتبه‌ی ماتریس کیو و مرتبه‌ی ماتریس آر) و زوج (کیو و آ) یک بایستنی جفتی است، سپس تابعک هزینه‌ی بهینه بر حسب بردار اولیه بزرگ‌تر از صفر است هر وقت که بردار اولیه غیر صفر باشد.
+
+</p>
+</div><p><span>$rank \ \hat{R} = rank \ Q + rank \ R$</span></p><p><span>$(Q, A)$</span></p><p><span>$\hat{J}(x_0) &gt; 0$</span>, <span>$\ x_0 \neq 0$</span></p><div dir = "rtl">
+<h3>
+
+اثبات
+
+</h3>
+<p>
+
+با یک تعریف قالب صورت سوال را ویرایش کنید.
+
+</p>
+</div><p><span>$\tilde{v} \in \large{\textrm{u}}$</span></p><p><span>$\tilde{u} \in \large{\textrm{u}}$</span></p><p><span>$v_k = R^{-1} S^* x_k + u_k$</span></p><div dir = "rtl">
+<p>
+
+سپس می‌یابیم که
+
+</p>
+</div><p><span>$J(\tilde{u}, x_0) = \sum_{k = 0}^\infty (x_k^* \hat{Q} x_k + v_k^* R v_k)$</span></p><div dir = "rtl">
+<p>
+
+که در این جا طبق معمول ماتریس کیو را تعریف می‌کنیم
+
+</p>
+</div><p><span>$\hat{Q} = Q - SR^{-1}S^*$</span></p><div dir = "rtl">
+<p>
+
+و همچنین
+
+</p>
+</div><p><span>$x_{k + 1} = \hat{A} x_k + B v_k$</span></p><div dir = "rtl">
+<p>
+
+ماتریس آ کلاه‌دار تعریف می‌شود
+
+</p>
+</div><p><span>$\hat{A} = A - BR^{-1}S^*$</span></p><div dir = "rtl">
+<p>
+
+طبق قضیه‌ی بالا، اگر تایعک هزینه‌ی بهینه به ازای یک بردار اولیه‌ی غیر صفر، برابر با صفر باشد، آنگاه یک دنباله‌ی کنترلی وجود دارد به طوری که تابعک هزینه بر حسب آن دنباله و بردار اولیه برابر با صفر باشد.
+
+</p>
+</div><p><span>$\hat{J}(x_0) = 0, \ x_0 \neq 0 \longrightarrow J(\tilde{u}, x_0) = 0, \ \exists \ \tilde{u} \in \large{\textrm{u}}$</span></p><div dir = "rtl">
+<p>
+
+از آن جا که ماتریس آر بزرگ‌تر از صفر است و ماتریس کیو کلاه‌دار بزرگ‌تر مساوی با صفر است، از تعریف تابعک هزینه‌ای که در بالا یافتیم نتیجه می‌شود که دنباله‌ی وی کلاه‌دار برابر با صفر است و به ازای هر مقدار متغیر کا، حاصل‌ضرب ماتریس کیو کلاه‌دار در بردار ایکس پایین‌نویس کا برابر با صفر است.
+
+</p>
+</div><p><span>$R &gt; 0$</span></p><p><span>$\hat{Q} \geq 0$</span></p><p><span>$\tilde{v} = 0$</span></p><p><span>$\hat{Q} x_k = 0$</span></p><p><span>$k$</span></p><div dir = "rtl">
+<p>
+
+پیامد این است که
+
+</p>
+</div><p><span>$\hat{Q} \hat{A}^k x_0 = 0$</span>, <span>$\ k = 0, 1, 2, ...$</span></p><div dir = "rtl">
+<p>
+
+و زوج ماتریس (کیو کلاه‌دار و آ کلاه‌دار) مشاهده‌پذیر نیست.
+
+</p>
+</div><p><span>$(\hat{Q}, \hat{A})$</span></p><div dir = "rtl">
+<p>
+
+اما این در تناقض است با لم ۵ و پس مقدار تابعک هزینه‌ی بهینه بزرگ‌تر از صفر است.
+
+</p>
+</div><p><span>$\hat{J}(x_0) &gt; 0$</span></p><p><span>$\square$</span></p><div dir = "rtl">
 <h2>
 
 جواب مساله‌ی سامانگر درجه دوم خطی گسسته
 
 </h2>
-</div><h1 id="The-Reaction-Wheel-Unicycle-Robot"><a class="docs-heading-anchor" href="#The-Reaction-Wheel-Unicycle-Robot">The Reaction Wheel Unicycle Robot</a><a id="The-Reaction-Wheel-Unicycle-Robot-1"></a><a class="docs-heading-anchor-permalink" href="#The-Reaction-Wheel-Unicycle-Robot" title="Permalink"></a></h1><div dir = "rtl">
+</div><h1 id="Unicycle-Balance-Control"><a class="docs-heading-anchor" href="#Unicycle-Balance-Control">Unicycle Balance Control</a><a id="Unicycle-Balance-Control-1"></a><a class="docs-heading-anchor-permalink" href="#Unicycle-Balance-Control" title="Permalink"></a></h1><div dir = "rtl">
 <h1>
 
-ربات تعادلی تک چرخ با چرخ عکس‌العملی
+کنترل وضعیت ربات تعادلی
 
 </h1>
+<p>
+
+در اینجا ما با سامانه‌های کنترل غیرخطی سر و کار داریم که یا با معادلات دیفرانسیل معمولی یا معادلات تفریقی بیان می‌شوند. به این معنی که دو نوع زیر مورد توجه ماست:
+
+</p>
+</div><p><span>$\left\{ \begin{array}{l} \dot{x}(t) = f(x(t), u(t)) &amp;\\ y(t) = h(x(t), u(t)) \end{array} \right.$</span></p><p><span>$\left\{ \begin{array}{l} x(k + 1) = f(x(k), u(k)) &amp;\\ y(k) = h(x(k), u(k)) \end{array} \right.$</span></p><div dir = "rtl">
+<p>
+
+که در اینجا متغیر ایکس حالت سامانه را بیان می‌کند، متغیر یو بیانگر کنترل و متغیر ایگرگ خروجی سامانه است. در ادامه یک مثال کاربردی در زمینه‌ی رباتیک مطرح می‌کنیم. در این بخش نحوه‌ی کارکرد این سامانه را بررسی می‌کنیم و در بخش بعدی می‌توانیم نسبت به طراحی یک سامان‌گر و ساختن ربات اقدام کنیم.
+
+</p>
+<h2>
+
+مثال
+
+</h2>
+</div><div dir = "rtl">
 <p>
 
 رباتی که در اینجا می‌سازیم، یک ربات تعادلی تک چرخ است. همان‌طور که از نام آن پیداست، این ربات تنها دارای یک چرخ بوده و بنابراین یک نقطه‌ی تماس با زمین دارد. به همین دلیل پیچیدگی آن بیشتر از ربات‌های تعادلی دوچرخ است. در حقیقت این ربات باید تعادل خود را در دو راستا و حول دو محور حفظ کند. در این ربات حرکت به جلو و عقب و حفظ تعادل در این جهت‌ها همانند یک ربات تعادلی دوچرخ است و بر پایه‌ی همان اصول فیزیکی استوار است. اما با توجه به این که چرخ ربات هیچ حرکتی در جهت‌های چپ و راست ندارد، برای حفظ کردن تعادل در این راستا باید از مولد گشتاور دیگری استفاده شود. به این منظور از یک جرم چرخان که به طور معمول چرخ عکس‌العملی خوانده می‌شود کمک می‌گیریم. اصول عملکرد این جرم چرخان که در قسمت بالای ربات نصب شده است، به این صورت است که اگر به آن گشتاوری وارد کنیم تا به چرخش درآید، آن جرم نیز گشتاوری که از نظر اندازه برابر با گشتاور وارد شده است به عنوان عکس‌العمل بر ربات وارد می‌کند. یکی از اصل‌های فیزیکی به نام پایستگی اندازه‌ی حرکت دورانی این رخداد را توجیه می‌کند. طبق این اصل، مجموع اندازه‌ی حرکت دورانی یک مجموعه به دور یک محور مشخص بدون تغییر باقی می‌ماند، مگر آنکه یک گشتاور خارجی به آن وارد شود. بنابراین اگر یکی از اجزای این مجموعه در اثر گشتاور داخلی شروع به چرخش کند، بقیه‌ی اجزای مجموعه با چرخش در جهت عکس، تاثیر آن را خنثی می‌کنند. در غیر این صورت اندازه‌ی حرکت دورانی پایسته نخواهد ماند. با کمک این گشتاور عکس‌العمل می‌توانیم زاویه‌ی ربات را به دو طرف چپ یا راست تحت کنترل بگیریم.
@@ -2671,5 +3352,21 @@ typedef struct
 احمد فیض دیزجی، آنالیز تابعی کاربردی، انتشارات دانشگاه تهران، سال ۱۳۹۳، چاپ دوم، شابک 978-9640363263
 </li>
 
+<li>
+آ. ایزیدوری، سامانه‌های کنترل غیرخطی، انتشارات اسپرینگر-ورلاگ نیویورک، چاپ دوم، سال ۱۳۶۷.
+</li>
+
+<li>
+ایچ. نیجمایجر و ای. جی. وان در شافت، سامانه‌های کنترل پویای غیرخطی، انتشارات اسپرینگر-ورلاگ نیویورک، سال ۱۳۶۸.
+</li>
+
+<li>
+لانکاستر، پی. و تیسمانتسکی، ام.، نظریه‌ی ماتریس‌ها (چاپ دوم) به همراه کاربردها، انتشارات آکادمیک اورلاندو، سال ۱۳۶۳.
+</li>
+
+<li>
+وونهام، دابلیو. ام.، کنترل چندمتغیره‌ی خطی، انتشارات اسپرینگر ورلاگ، برلین، سال ۱۳۴۸ و ۱۳۵۷.
+</li>
+
 </ol>
-</div></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="maxwellfield_persian.html">« The Maxwell Field (Persian)</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.13.0 on <span class="colophon-date" title="Monday 30 June 2025 20:35">Monday 30 June 2025</span>. Using Julia version 1.10.9.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+</div></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="maxwellfield_persian.html">« The Maxwell Field (Persian)</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.13.0 on <span class="colophon-date" title="Wednesday 2 July 2025 12:09">Wednesday 2 July 2025</span>. Using Julia version 1.10.10.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
