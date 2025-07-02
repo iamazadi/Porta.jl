@@ -3,7 +3,7 @@ using Porta
 
 makedocs(
     sitename = "Porta.jl",
-    format = Documenter.HTML(prettyurls = false),  # optional
+    format = Documenter.HTML(prettyurls = false, size_threshold = nothing),  # optional
     pages = [
         "Home" => "index.md",
         "Hopf Fibration" => "hopffibration.md",
@@ -12,7 +12,7 @@ makedocs(
         "Multivariable Calculus" => "multivariablecalculus.md",
         "The Maxwell Field (Persian)" => "maxwellfield_persian.md",
         "The Unicycle (Persian)" => "reactionwheelunicycle_persian.md"
-    ]
+    ],
 )
 
 # Documenter can also automatically deploy documentation to gh-pages.
