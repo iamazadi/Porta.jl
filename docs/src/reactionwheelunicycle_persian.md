@@ -3691,7 +3691,7 @@ Description = "Describes the mathematical model of a reaction wheel unicycle rob
 </p>
 <h3>
 
-قضیه
+قضیه ۲
 
 </h3>
 <p>
@@ -4284,7 +4284,7 @@ Description = "Describes the mathematical model of a reaction wheel unicycle rob
 </p>
 <h3>
 
-گزاره
+گزاره ۱
 
 </h3>
 <p>
@@ -4519,7 +4519,7 @@ Description = "Describes the mathematical model of a reaction wheel unicycle rob
 </p>
 <h3>
 
-گزاره
+گزاره ۲
 
 </h3>
 <p>
@@ -4956,46 +4956,11 @@ Description = "Describes the mathematical model of a reaction wheel unicycle rob
 
 ```@raw html
 <div dir = "rtl">
-<h3>
-
-قضیه
-
-</h3>
 <p>
 
-بردار زد متعلق به فضای برداری ان‌بعدی مختلط قابل دسترسی از بردار ایگرگ در فضای برداری ان‌بعدی مختلط در مدت زمان ت می‌باشد اگر و فقط اگر
+این لم توصیفی مفید از زیرفضای کنترل‌پذیر زوج ماتریسی (آ، ب) فراهم می‌کند.
 
 </p>
-</div>
-```
-
-``z - e^{At} y \in \mathcal{C}_{A, B}``.
-
-``y \in \mathbb{C}^n``
-
-``z \in \mathbb{C}^n``
-
-``t \in \mathbb{R}``
-
-```@raw html
-<div dir = "rtl">
-<h3>
-
-اثبات
-
-</h3>
-<p>
-
-اثبات با کمک یک لم دیگر به اجزای کوچک‌تر شکسته می‌شود، که توصیفی مفید از زیرفضای کنترل‌پذیر زوج ماتریسی (آ، ب) فراهم می‌کند.
-
-</p>
-</div>
-```
-
-``(A, B)``
-
-```@raw html
-<div dir = "rtl">
 <h3>
 
 لم ۷
@@ -5127,6 +5092,174 @@ Description = "Describes the mathematical model of a reaction wheel unicycle rob
 ```
 
 ``t^j e^{\lambda_k t}``.
+
+``\square``
+
+```@raw html
+<div dir = "rtl">
+<h3>
+
+قضیه
+
+</h3>
+<p>
+
+بردار زد متعلق به فضای برداری ان‌بعدی مختلط قابل دسترسی از بردار ایگرگ در فضای برداری ان‌بعدی مختلط در مدت زمان ت می‌باشد اگر و فقط اگر
+
+</p>
+</div>
+```
+
+``z - e^{At} y \in \mathcal{C}_{A, B}``.
+
+``y \in \mathbb{C}^n``
+
+``z \in \mathbb{C}^n``
+
+``t \in \mathbb{R}``
+
+``(A, B)``
+
+```@raw html
+<div dir = "rtl">
+<h3>
+
+اثبات
+
+</h3>
+<p>
+
+اگر بردار زد از بردار ایگرگ در زمان ت قابل دسترسی باشد، آنگاه با استفاده از معادله‌ی زیر
+
+</p>
+</div>
+```
+
+``x(t; x_0, u) = e^{At} x_0 + \int_0^t e^{(t - s)A} Bu(s) ds``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+نتیجه می‌گیریم که
+
+</p>
+</div>
+```
+
+``z - e^{At}y = \int_0^t e^{(t - s)A} Bu(s) ds``
+
+``u \in \large{\textrm{u}}``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+از لم ۷ استفاده کنید تا بنویسید
+
+</p>
+</div>
+```
+
+``z - e^{At}y = \overset{n}{\underset{j = 1}{\sum}} A^{j - 1}B \int_0^t \psi_j(t - s) u(s) ds``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+و با تعریف زیر
+
+</p>
+</div>
+```
+
+``\mathcal{C}_{A, B} = \overset{n - 1}{\underset{r = 0}{\sum}} Im(A^rB)``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+بلافاصله نتیجه می‌شود که
+
+</p>
+</div>
+```
+
+``z - e^{At} y \in \mathcal{C}_{A, B}``.
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+برای عکی قضیه، تعریف کنید
+
+</p>
+</div>
+```
+
+``z - e^{At}y \in \mathcal{C}_{A, B}``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+باید یک ورودی (یا کنترل) به نام یو بر حسب متغیر ت بسازیم، که سامانه را از بردار ایگرگ به بردار زد «هدایت» کند. با استفاده از لم ۵ بنویسید
+
+</p>
+</div>
+```
+
+``z - e^{At}y = W(t) w = \int_0^t e^{As}BB^* e^{A^*s}w \ ds``
+
+``w \in \mathbb{C}^n``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+قرار دهید
+
+</p>
+</div>
+```
+
+``s = t - \tau``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+تا معادله‌ی زیر را به دست بیاورید
+
+</p>
+</div>
+```
+
+``z - e^{At}y = \int_0^t e^{A(t - \tau)} BB^* e^{A^*(t - \tau)}w \ d \tau = \int_0^t e^{A(t - \tau)}B u(\tau) d \tau``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+که در اینجا تابع یو بر حسب متغیر تاو را به صورت زیر تعریف می‌کنیم:
+
+</p>
+</div>
+```
+
+``u(\tau) = B^* e^{A^*(t - \tau)}w \in \large{\textrm{u}}``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+با مقایسه کردن این و معادله‌ی زیر می‌بینیم که بردار زد از بردار ایگرگ در زمان ت قابل دسترسی است.
+
+</p>
+</div>
+```
+
+``x(t; x_0, u) = e^{At} x_0 + \int_0^t e^{(t - s)A} Bu(s) ds``
 
 ``\square``
 
@@ -5505,6 +5638,309 @@ Description = "Describes the mathematical model of a reaction wheel unicycle rob
 زوج‌های ماتریسی مشاهده‌پذیر
 
 </h3>
+<p>
+
+بگذارید ماتریس‌های ث و آ به صورت زیر تعریف شوند
+
+</p>
+</div>
+```
+
+``C \in \mathbb{C}^{m \times n}``
+
+``A \in \mathbb{C}^{n \times n}``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+و دنباله‌ای از زیرفضاها بر حسب زوج ماتریسی (ث، آ) در فضای برداری مختلط ان‌بعدی تعریف کنید
+
+</p>
+</div>
+```
+
+``\mathcal{K}_0, \mathcal{K}_1, \mathcal{K}_2, ...``
+
+``\mathbb{C}^n``
+
+``(C, A)``
+
+``\mathcal{K}_0 = Ker \ C``, ``\mathcal{K}_1 = Ker \begin{bmatrix} C \\ CA \end{bmatrix}``, ``\mathcal{K}_2 = Ker \begin{bmatrix} C \\ CA \\ CA^2 \end{bmatrix}``, ...
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+به عبارت دیگر
+
+</p>
+</div>
+```
+
+``\mathcal{K}_p = \overset{p}{\underset{r = 0}{\cap}} Ker(CA^r)``, ``p = 0, 1, 2, ...``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+و داریم که
+
+</p>
+</div>
+```
+
+``\mathcal{K}_0 \supseteq \mathcal{K}_1 \supseteq \mathcal{K}_2 \supseteq ...``
+
+```@raw html
+<div dir = "rtl">
+<h3>
+
+گزاره
+
+</h3>
+<p>
+
+اگر به ازای یک متغیر از نوع عدد صحیح به نام کا دو زیرفضای زیر برابر باشند
+
+</p>
+</div>
+```
+
+``\mathcal{K}_{k + 1} = \mathcal{K}_k``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+آنگاه برای همه‌ی مقدارهای متغیر جی بزرگ‌تر از متغیر کا داریم
+
+</p>
+</div>
+```
+
+``\mathcal{K}_j = \mathcal{K}_k`` for all ``j \geq k``.
+
+```@raw html
+<div dir = "rtl">
+<h3>
+
+اثبات
+
+</h3>
+<p>
+
+داریم
+
+</p>
+</div>
+```
+
+``\mathcal{K}_p = Ker \begin{bmatrix} C \\ CA \\ \vdots \\ CA^p \end{bmatrix} = (Im \begin{bmatrix} C^* & A^*C^* & \ldots & (A^*)^pC^* \end{bmatrix})^\perp = \mathcal{C}_p^\perp``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+که در اینجا زیرفضای ث پایین‌نویس پ برای زوج ماتریسی (مکمل آ، مکمل ث) تعریف شده است. همان طور که زیرفضای کا پایین‌نویس پ مکمل متعامد زیرفضای ث پایین‌نویس پ است، نتیجه از استفاده کردن گزاره ۱ بر زوج ماتریسی (مکمل آ، مکمل ث) به دست می‌آید.
+
+</p>
+</div>
+```
+
+``(A^*, C^*)``.
+
+``\square``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+این زیرفضا
+
+</p>
+</div>
+```
+
+``\large{\textrm{u}}_{C, A} = \overset{\infty}{\underset{r = 0}{\cap}} Ker(CA^r) = \overset{n - 1}{\underset{r = 0}{\cap}} Ker(CA^r) = (\mathcal{C}_{A^*, C^*})^\perp``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+با عنوان «زیرفضای نامشاهده‌پذیر» زوج ماتریسی (ث، آ) شناخته می‌شود و هنگامی که این زیرفضا به عنوان یک مجموعه برابر با مجموعه‌ی تک‌عضوی صفر باشد، آنگاه به زوج ماتریسی (ث، آ) «مشاهده‌پذیر» گفته می‌شود.
+
+</p>
+</div>
+```
+
+``\large{\textrm{u}}_{C, A} = \{ 0 \}``
+
+``(C, A)``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+گونه‌ای از دوگانگی در میان زوج‌های ماتریسی مشاهده‌پذیر و زوج‌های ماتریسی کنترل‌پذیر دیده می‌شود که به رابطه‌ی زیر وابسته است:
+
+</p>
+</div>
+```
+
+``\mathcal{K}_p = \mathcal{C}_p^\perp``, ``\ p = 0, 1, 2, ...``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+به طور ویژه نتیجه می‌گیریم که
+
+</p>
+<h3>
+
+گزاره
+
+</h3>
+<p>
+
+زوج ماتریسی (ث، آ) مشاهده‌پذیر است اگر و فقط اگر زوج ماتریسی (مکمل آ، مکمل ث) کنترل‌پذیر باشد.
+
+</p>
+</div>
+```
+
+``\left\{ \begin{array}{l} (C, A) &\\ (A^*, C^*) \end{array} \right.``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+دوگان گزاره‌ی ۲ به شکل زیر می‌باشد:
+
+</p>
+<h3>
+
+گزاره
+
+</h3>
+<p>
+
+زیرفضای نامشاهده‌پذیر برای زوج ماتریسی (ث، آ) یک زیرفضای بیشینه‌ی ناوردا تحت تبدیل ماتریس آ است که در هسته‌ی ماتریس ث قرار دارد.
+
+</p>
+</div>
+```
+
+``\large{\textrm{u}}_{C, A}``
+
+``Ker \ C``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+برای پیدا کردن تعبیر فیزیکی این ایده‌ها یک سامانه به صورت زیر در نظر بگیرید
+
+</p>
+</div>
+```
+
+``x(t) = Ax(t)``, ``\ x(0) = x_0``, ``\ y(t) = Cx(t)``
+
+``C \in \mathbb{C}^{m \times n}``
+
+``A \in \mathbb{C}^{n \times n}``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+در اینجا تابع ایگرگ بر حسب متغیر ت به عنوان بردار تابع خروجی توصیف می‌شود. به این سامانه مشاهده‌پذیر گفته می‌شود هرگاه تابع ایگرگ بر حسب متغیر ت معادل با صفر باشد اگر و فقط اگر بردار اولیه‌ی ایکس پایین‌نویس صفر برابر با صفر باشد.
+
+</p>
+</div>
+```
+
+``y(t) \equiv 0``
+
+``x_0 = 0``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+سپس می‌توان ثابت کرد که:
+
+</p>
+<h3>
+
+قضیه
+
+</h3>
+<p>
+
+سامانه‌ی زیر مشاهده‌پذیر است اگر و فقط اگر زوج ماتریسی (ث، آ) مشاهده‌پذیر باشد.
+
+</p>
+</div>
+```
+
+``x(t) = Ax(t)``, ``\ x(0) = x_0``, ``\ y(t) = Cx(t)``
+
+``C \in \mathbb{C}^{m \times n}``
+
+``A \in \mathbb{C}^{n \times n}``
+
+``(C, A)``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+پس برای یک سامانه‌ی مشاهده‌پذیر مجموعه‌ی زیر شامل تک‌عضوی صفر است
+
+</p>
+</div>
+```
+
+``\large{\textrm{u}}_{C, A} = \{ 0 \}``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+و هر بردار اولیه‌ی غیر صفری به نام ایکس پایین‌نویس صفر یک خروجی غیر صفر را تعیین می‌کند
+
+</p>
+</div>
+```
+
+``y(t) = Ce^{At}x_0``.
+
+``x_0 \neq 0 \longrightarrow y(t) \neq 0``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+وقتی که مجموعه‌ی دنباله‌های کنترلی  برای زوج ماتریسی (ث، آ) برابر با مجموعه‌ی تک‌عضوی صفر نباشد، آنگاه هر بردار اولیه‌ی غیر صفر به نام ایکس پایین‌نویس صفر در این مجموعه مشاهده‌ناپذیر است، به این معنی که یک خروجی برابر با صفر تولید می‌کند.
+
+</p>
+</div>
+```
+
+``\large{\textrm{u}}_{C, A} \neq \{ 0 \}``
+
+``x_0 \in \large{\textrm{u}}_{C, A} \longrightarrow y(t) = 0``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+دوباره برای اثبات قضیه‌ی بالا شما را به وونهام (۱۳۵۷) یا لانکاستر و تیسمانتسکی (۱۳۶۳) ارجاع می‌دهیم.
+
+</p>
 </div>
 ```
 
@@ -5905,6 +6341,234 @@ Description = "Describes the mathematical model of a reaction wheel unicycle rob
 ```
 
 ``\hat{J}(x_0) > 0``
+
+``\square``
+
+```@raw html
+<div dir = "rtl">
+<h3>
+
+گزاره
+
+</h3>
+<p>
+
+بگذارید ماتریس آر کلاه‌دار غیرتبهگن باشد و زوج ماتریسی (کیو، آ) یک جفت مشاهده‌پذیر باشد. آنگاه این حقیقت که تابعک هزینه بر حسب دنباله‌ی کنترلی یو و بردار اولیه‌ی ایکس پایین‌نویس صفر کوچک‌تر از بینهایت است نتیجه می‌دهد که بردار ایکس پایین‌نویس کا بر حسب دنباله‌ی کنترلی یو و بردار اولیه‌ی ایکس پایین‌نویس صفر به صفر نزدیک می‌شود هنگامی که متغیر کا به سمت بینهایت میل می‌کند.
+
+</p>
+</div>
+```
+
+``\hat{R}``
+
+``(Q, A)``
+
+``J(\tilde{u}, x_0) < \infty \longrightarrow x_k(\tilde{u}, x_0) \to 0, \ k \to \infty``
+
+```@raw html
+<div dir = "rtl">
+<h3>
+
+اثبات
+
+</h3>
+<p>
+
+فرض کنید اندازه‌ی بردار اولیه‌ی ایکس پایین‌نویس صفر برابر با یک واحد باشد.
+
+</p>
+</div>
+```
+
+``||x_0|| = 1``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+سپس، این حقیقت که تابعک هزینه کوچک‌تر از بینهایت است نتیجه می‌دهد که تابعک هزینه‌ی بهینه نیز کوچک‌تر از بینهایت است:
+
+</p>
+</div>
+```
+
+``J(\tilde{u}, x_0) < \infty \longrightarrow \hat{J}(x_0) < \infty``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+و قضیه‌ی ۲ نتیجه می‌دهد که یک عدد متناهی به نام ام بزرگ‌تر از صفر وجود دارد به طوری که
+
+</p>
+</div>
+```
+
+``m > 0``
+
+``min_{||x|| = 1} \hat{J}(x) = m``.
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+بنابراین برای هر بردار ایگرگ در فضای ان‌بعدی مختلط داریم
+
+</p>
+</div>
+```
+
+``y \in \mathbb{C}^n``
+
+``\hat{J}(y) = ||y||^2 \hat{J}(\frac{1}{||y||}y) \geq ||y||^2 m``.
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+دنباله‌ی کنترلی وی را بر حسب دنباله‌ی یو تعریف کنید
+
+</p>
+</div>
+```
+
+``v_k = u_{k + K}``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+و با استفاده از رابطه‌ی زیر
+
+</p>
+</div>
+```
+
+``x_k = A^k x_0 + \overset{k - 1}{\underset{r = 0}{\sum}}A^{k - r - 1}Bu_r``, ``\ k = 1, 2, 3, ...``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+به آسانی بررسی می‌شود که
+
+</p>
+</div>
+```
+
+``x_k(\tilde{v}, x_K(\tilde{u}, x_0)) = x_{k + K}(\tilde{u}, x_0)``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+پس
+
+</p>
+</div>
+```
+
+``\hat{J}(x_K(\tilde{u}, x_0)) \leq J(\tilde{v}, x_K(\tilde{u}, x_0)) = \overset{\infty}{\underset{k = 0}{\sum}}||\begin{bmatrix} x_k(\tilde{v}, x_K(\tilde{u}, x_0)) \\ v_k \end{bmatrix}||_{\hat{R}}^2 = \overset{\infty}{\underset{k = 0}{\sum}} ||\begin{bmatrix} x_{k + K} (\tilde{u}, x_0) \\ u_{k + K} \end{bmatrix}||_{\hat{R}}^2 = \overset{\infty}{\underset{r = K}{\sum}} || \begin{bmatrix} x_r(\tilde{u}, x_0) \\ u_r \end{bmatrix} ||_{\hat{R}}^2``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+در اثر آن، هنگامی که متغیر کا به سمت بینهایت میل می‌کند، داریم
+
+</p>
+</div>
+```
+
+``K \to \infty``
+
+``\hat{J} (x_K(\tilde{u}, x_0)) \to 0``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+با استفاده از این ویژگی و استفاده کردن از نابرابری زیر
+
+</p>
+</div>
+```
+
+``\hat{J}(y) = ||y||^2 \hat{J}(\frac{1}{||y||}y) \geq ||y||^2 m``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+بر روی عضوهای این مجموعه
+
+</p>
+</div>
+```
+
+``\{ x_K(\tilde{u}, x_0) : K \geq 0 \}``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+می‌بینیم که مجموعه کران‌دار است. پس یک زیردنباله‌ی همگرا به بردار ایکس وجود دارد، برای مثال
+
+</p>
+</div>
+```
+
+``x_s(\tilde{u}, x_0) \to x``,
+
+``s \to \infty``.
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+حالا قضیه‌ی ۲ نتیجه می‌دهد
+
+</p>
+</div>
+```
+
+``\hat{J}(x) \leq \hat{J}(x_s(\tilde{u}, x_0))``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+و بنابراین از رابطه‌ی
+
+</p>
+</div>
+```
+
+``\hat{J} (x_K(\tilde{u}, x_0)) \to 0``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+نتیجه می‌گیریم که
+
+</p>
+</div>
+```
+
+``\hat{J}(x) = 0``.
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+در پایان، شرط مشاهده‌پذیری و گزاره‌ی پیشین نتیجه می‌دهند که بردار ایکس برار است با صفر.
+
+</p>
+</div>
+```
+
+``x = 0``.
 
 ``\square``
 
