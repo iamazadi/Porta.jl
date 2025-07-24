@@ -2579,7 +2579,7 @@ Description = "Describes the mathematical model of a reaction wheel unicycle rob
 </p>
 <h3>
 
-قضیه
+قضیه ۱
 
 </h3>
 <p>
@@ -2717,7 +2717,7 @@ Description = "Describes the mathematical model of a reaction wheel unicycle rob
 </p>
 <h3>
 
-قضیه
+قضیه ۲
 
 </h3>
 <p>
@@ -3691,7 +3691,7 @@ Description = "Describes the mathematical model of a reaction wheel unicycle rob
 </p>
 <h3>
 
-قضیه ۲
+قضیه ۳
 
 </h3>
 <p>
@@ -4887,7 +4887,7 @@ Description = "Describes the mathematical model of a reaction wheel unicycle rob
 </p>
 <h3>
 
-نتیجه‌گیری
+نتیجه‌گیری ۱
 
 </h3>
 <p>
@@ -4963,7 +4963,7 @@ Description = "Describes the mathematical model of a reaction wheel unicycle rob
 </p>
 <h3>
 
-لم ۷
+لم ۵
 
 </h3>
 <p>
@@ -5099,7 +5099,7 @@ Description = "Describes the mathematical model of a reaction wheel unicycle rob
 <div dir = "rtl">
 <h3>
 
-قضیه
+قضیه ۴
 
 </h3>
 <p>
@@ -5267,7 +5267,7 @@ Description = "Describes the mathematical model of a reaction wheel unicycle rob
 <div dir = "rtl">
 <h3>
 
-لم ۵
+لم ۶
 
 </h3>
 <p>
@@ -5457,7 +5457,7 @@ Description = "Describes the mathematical model of a reaction wheel unicycle rob
 </p>
 <h3>
 
-نتیجه‌گیری
+نتیجه‌گیری ۲
 
 </h3>
 <p>
@@ -5530,7 +5530,7 @@ Description = "Describes the mathematical model of a reaction wheel unicycle rob
 <div dir = "rtl">
 <h3>
 
-قضیه
+قضیه ۵
 
 </h3>
 <p>
@@ -5696,7 +5696,7 @@ Description = "Describes the mathematical model of a reaction wheel unicycle rob
 <div dir = "rtl">
 <h3>
 
-گزاره
+گزاره ۳
 
 </h3>
 <p>
@@ -5799,7 +5799,7 @@ Description = "Describes the mathematical model of a reaction wheel unicycle rob
 </p>
 <h3>
 
-گزاره
+گزاره ۴
 
 </h3>
 <p>
@@ -5821,7 +5821,7 @@ Description = "Describes the mathematical model of a reaction wheel unicycle rob
 </p>
 <h3>
 
-گزاره
+گزاره ۵
 
 </h3>
 <p>
@@ -5875,7 +5875,7 @@ Description = "Describes the mathematical model of a reaction wheel unicycle rob
 </p>
 <h3>
 
-قضیه
+قضیه ۶
 
 </h3>
 <p>
@@ -5948,7 +5948,7 @@ Description = "Describes the mathematical model of a reaction wheel unicycle rob
 <div dir = "rtl">
 <h3>
 
-نتیجه‌گیری
+نتیجه‌گیری ۳
 
 </h3>
 <p>
@@ -5983,7 +5983,7 @@ Description = "Describes the mathematical model of a reaction wheel unicycle rob
 <div dir = "rtl">
 <h3>
 
-لم ۶
+لم ۷
 
 </h3>
 <p>
@@ -6187,7 +6187,7 @@ Description = "Describes the mathematical model of a reaction wheel unicycle rob
 <div dir = "rtl">
 <h3>
 
-گزاره
+گزاره ۶
 
 </h3>
 <p>
@@ -6348,7 +6348,7 @@ Description = "Describes the mathematical model of a reaction wheel unicycle rob
 <div dir = "rtl">
 <h3>
 
-گزاره
+گزاره ۷
 
 </h3>
 <p>
