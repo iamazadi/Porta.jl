@@ -2465,6 +2465,276 @@ Description = "Describes the mathematical model of a reaction wheel unicycle rob
 
 ``y_2 = \frac{-1}{5}(-2e^{-2x}(c_1cos(3x) + c_2sin(3x)) + e^{-2x}(-3c_1sin(3x) + 3c_2cos(3x))) + \frac{2}{5} e^{-2x}(c_1cos(3x) + c_2sin(3x))``.
 
+# The Shape Operator
+
+![linear transformaton](./assets/reactionwheelunicycle/The_shape_operator/1.jpg)
+
+![coordinate system](./assets/reactionwheelunicycle/The_shape_operator/2.jpg)
+
+![cartesian plane](./assets/reactionwheelunicycle/The_shape_operator/3.jpg)
+
+![function graph](./assets/reactionwheelunicycle/The_shape_operator/4.jpg)
+
+![map](./assets/reactionwheelunicycle/The_shape_operator/5.jpg)
+
+![function composition](./assets/reactionwheelunicycle/The_shape_operator/6.jpg)
+
+![inverse function](./assets/reactionwheelunicycle/The_shape_operator/7.jpg)
+
+![intercept](./assets/reactionwheelunicycle/The_shape_operator/8.jpg)
+
+![square root](./assets/reactionwheelunicycle/The_shape_operator/9.jpg)
+
+![absolute value](./assets/reactionwheelunicycle/The_shape_operator/10.jpg)
+
+![sine](./assets/reactionwheelunicycle/The_shape_operator/11.jpg)
+
+![pi](./assets/reactionwheelunicycle/The_shape_operator/12.jpg)
+
+![periodic function](./assets/reactionwheelunicycle/The_shape_operator/13.jpg)
+
+![cosine](./assets/reactionwheelunicycle/The_shape_operator/14.jpg)
+
+![tangent](./assets/reactionwheelunicycle/The_shape_operator/15.jpg)
+
+![exponential](./assets/reactionwheelunicycle/The_shape_operator/16.jpg)
+
+![natural logarithm](./assets/reactionwheelunicycle/The_shape_operator/17.jpg)
+
+![polynomial functions](./assets/reactionwheelunicycle/The_shape_operator/18.jpg)
+
+![vertical translation](./assets/reactionwheelunicycle/The_shape_operator/19.jpg)
+
+![horizontal translation](./assets/reactionwheelunicycle/The_shape_operator/20.jpg)
+
+![vertical scaling](./assets/reactionwheelunicycle/The_shape_operator/21.jpg)
+
+![horizontal scaling](./assets/reactionwheelunicycle/The_shape_operator/22.jpg)
+
+![general quadratic functions](./assets/reactionwheelunicycle/The_shape_operator/23.jpg)
+
+![right-angle triangle](./assets/reactionwheelunicycle/The_shape_operator/24.jpg)
+
+![the unit circle](./assets/reactionwheelunicycle/The_shape_operator/25.jpg)
+
+![the unit circle and the sine function](./assets/reactionwheelunicycle/The_shape_operator/26.jpg)
+
+![the unit circle and angles](./assets/reactionwheelunicycle/The_shape_operator/27.jpg)
+
+![non-unit vircles](./assets/reactionwheelunicycle/The_shape_operator/28.jpg)
+
+![triangles](./assets/reactionwheelunicycle/The_shape_operator/29.jpg)
+
+![sum of angles](./assets/reactionwheelunicycle/The_shape_operator/30.jpg)
+
+![sphere](./assets/reactionwheelunicycle/The_shape_operator/31.jpg)
+
+![cylinder](./assets/reactionwheelunicycle/The_shape_operator/32.jpg)
+
+![circle](./assets/reactionwheelunicycle/The_shape_operator/33.jpg)
+
+![polar coordinates](./assets/reactionwheelunicycle/The_shape_operator/34.jpg)
+
+![circumference and arc length](./assets/reactionwheelunicycle/The_shape_operator/35.jpg)
+
+![union](./assets/reactionwheelunicycle/The_shape_operator/36.jpg)
+
+![intersection](./assets/reactionwheelunicycle/The_shape_operator/37.jpg)
+
+![vectors](./assets/reactionwheelunicycle/The_shape_operator/38.jpg)
+
+![vector addition](./assets/reactionwheelunicycle/The_shape_operator/39.jpg)
+
+![vector subtraction](./assets/reactionwheelunicycle/The_shape_operator/40.jpg)
+
+![scaling](./assets/reactionwheelunicycle/The_shape_operator/41.jpg)
+
+![vector representation](./assets/reactionwheelunicycle/The_shape_operator/42.jpg)
+
+![relative motion](./assets/reactionwheelunicycle/The_shape_operator/43.jpg)
+
+![the right-hand rule](./assets/reactionwheelunicycle/The_shape_operator/44.jpg)
+
+![complex numbers in polar representation](./assets/reactionwheelunicycle/The_shape_operator/45.jpg)
+
+![polar representation example](./assets/reactionwheelunicycle/The_shape_operator/46.jpg)
+
+![fundamental theorem of algebra](./assets/reactionwheelunicycle/The_shape_operator/47.jpg)
+
+![the fundamental idea of linear algebra](./assets/reactionwheelunicycle/The_shape_operator/48.jpg)
+
+![vector operations](./assets/reactionwheelunicycle/The_shape_operator/49.jpg)
+
+![matrix times vector](./assets/reactionwheelunicycle/The_shape_operator/50.jpg)
+
+![matrix times vector](./assets/reactionwheelunicycle/The_shape_operator/51.jpg)
+
+![matrix times vector](./assets/reactionwheelunicycle/The_shape_operator/52.jpg)
+
+![matrix times vector](./assets/reactionwheelunicycle/The_shape_operator/53.jpg)
+
+![matrix times matrix](./assets/reactionwheelunicycle/The_shape_operator/54.jpg)
+
+![matrix times matrix](./assets/reactionwheelunicycle/The_shape_operator/55.jpg)
+
+![matrix times matrix](./assets/reactionwheelunicycle/The_shape_operator/56.jpg)
+
+![matrix times matrix variation](./assets/reactionwheelunicycle/The_shape_operator/57.jpg)
+
+![matrix times matrix variation](./assets/reactionwheelunicycle/The_shape_operator/58.jpg)
+
+![matrix times matrix variation](./assets/reactionwheelunicycle/The_shape_operator/59.jpg)
+
+![matrix multiplication](./assets/reactionwheelunicycle/The_shape_operator/60.jpg)
+
+![matrix multiplication](./assets/reactionwheelunicycle/The_shape_operator/61.jpg)
+
+![matrix multiplication rules](./assets/reactionwheelunicycle/The_shape_operator/62.jpg)
+
+![determinant](./assets/reactionwheelunicycle/The_shape_operator/63.jpg)
+
+![area of a parallelogram](./assets/reactionwheelunicycle/The_shape_operator/64.jpg)
+
+![volume of a parallelepiped](./assets/reactionwheelunicycle/The_shape_operator/65.jpg)
+
+![quadratic polynomial in lambda](./assets/reactionwheelunicycle/The_shape_operator/66.jpg)
+
+![cavalieri's principle](./assets/reactionwheelunicycle/The_shape_operator/67.jpg)
+
+![swap rows](./assets/reactionwheelunicycle/The_shape_operator/68.jpg)
+
+![multiply a row by a constant](./assets/reactionwheelunicycle/The_shape_operator/69.jpg)
+
+![points](./assets/reactionwheelunicycle/The_shape_operator/70.jpg)
+
+![three-dimensional points](./assets/reactionwheelunicycle/The_shape_operator/71.jpg)
+
+![lines](./assets/reactionwheelunicycle/The_shape_operator/72.jpg)
+
+![lines](./assets/reactionwheelunicycle/The_shape_operator/73.jpg)
+
+![lines as intersection of planes](./assets/reactionwheelunicycle/The_shape_operator/74.jpg)
+
+![planes](./assets/reactionwheelunicycle/The_shape_operator/75.jpg)
+
+![planes](./assets/reactionwheelunicycle/The_shape_operator/76.jpg)
+
+![distance between a line and the origin](./assets/reactionwheelunicycle/The_shape_operator/77.jpg)
+
+![distance between a plane and the origin](./assets/reactionwheelunicycle/The_shape_operator/78.jpg)
+
+![projection onto a line](./assets/reactionwheelunicycle/The_shape_operator/79.jpg)
+
+![projection onto a plane](./assets/reactionwheelunicycle/The_shape_operator/80.jpg)
+
+![the rank-nullity theorem](./assets/reactionwheelunicycle/The_shape_operator/81.jpg)
+
+![proof](./assets/reactionwheelunicycle/The_shape_operator/82.jpg)
+
+![proof](./assets/reactionwheelunicycle/The_shape_operator/83.jpg)
+
+![proof](./assets/reactionwheelunicycle/The_shape_operator/84.jpg)
+
+![linear transformation](./assets/reactionwheelunicycle/The_shape_operator/85.jpg)
+
+![key properties of a linear transformation](./assets/reactionwheelunicycle/The_shape_operator/86.jpg)
+
+![linearity](./assets/reactionwheelunicycle/The_shape_operator/87.jpg)
+
+![pictorial kernel and image](./assets/reactionwheelunicycle/The_shape_operator/88.jpg)
+
+![x projection](./assets/reactionwheelunicycle/The_shape_operator/89.jpg)
+
+![y projection](./assets/reactionwheelunicycle/The_shape_operator/90.jpg)
+
+![x reflection](./assets/reactionwheelunicycle/The_shape_operator/91.jpg)
+
+![y reflection](./assets/reactionwheelunicycle/The_shape_operator/92.jpg)
+
+![reflection through a line](./assets/reactionwheelunicycle/The_shape_operator/93.jpg)
+
+![reflection through a plane](./assets/reactionwheelunicycle/The_shape_operator/94.jpg)
+
+![rotations](./assets/reactionwheelunicycle/The_shape_operator/95.jpg)
+
+![vector space structure](./assets/reactionwheelunicycle/The_shape_operator/96.jpg)
+
+![orthogonal 3](./assets/reactionwheelunicycle/The_shape_operator/97.jpg)
+
+![the action of a linear transformation T](./assets/reactionwheelunicycle/The_shape_operator/98.jpg)
+
+![the osculating circle](./assets/reactionwheelunicycle/The_shape_operator/99.jpg)
+
+![computing principal curvatures](./assets/reactionwheelunicycle/The_shape_operator/100.jpg)
+
+![not intrinsic](./assets/reactionwheelunicycle/The_shape_operator/101.jpg)
+
+![signed curvature](./assets/reactionwheelunicycle/The_shape_operator/102.jpg)
+
+![departure from tangent](./assets/reactionwheelunicycle/The_shape_operator/103.jpg)
+
+![the rate of turning of the tangent](./assets/reactionwheelunicycle/The_shape_operator/104.jpg)
+
+![the rate of turning of the tangent](./assets/reactionwheelunicycle/The_shape_operator/105.jpg)
+
+![the rate of turning of the normal](./assets/reactionwheelunicycle/The_shape_operator/106.jpg)
+
+![the force needed to hold an object in a circular orbit](./assets/reactionwheelunicycle/The_shape_operator/107.jpg)
+
+![Newton's curvature formula](./assets/reactionwheelunicycle/The_shape_operator/108.jpg)
+
+![travelling at unit speed](./assets/reactionwheelunicycle/The_shape_operator/109.jpg)
+
+![the Frenet frame](./assets/reactionwheelunicycle/The_shape_operator/110.jpg)
+
+![The Frenet-Serret equations](./assets/reactionwheelunicycle/The_shape_operator/111.jpg)
+
+![the principal normal](./assets/reactionwheelunicycle/The_shape_operator/112.jpg)
+
+![Euler's curvature formula](./assets/reactionwheelunicycle/The_shape_operator/113.jpg)
+
+![the principal curvatures of a surface](./assets/reactionwheelunicycle/The_shape_operator/114.jpg)
+
+![Newton's tratrix 1665](./assets/reactionwheelunicycle/The_shape_operator/115.jpg)
+
+![pseudosphere](./assets/reactionwheelunicycle/The_shape_operator/116.jpg)
+
+![surface of revolution](./assets/reactionwheelunicycle/The_shape_operator/117.jpg)
+
+![curvature contraction](./assets/reactionwheelunicycle/The_shape_operator/118.jpg)
+
+![net acceleration](./assets/reactionwheelunicycle/The_shape_operator/119.jpg)
+
+![Meusnier's theorem](./assets/reactionwheelunicycle/The_shape_operator/120.jpg)
+
+![geodesic curvature](./assets/reactionwheelunicycle/The_shape_operator/121.jpg)
+
+![Clairaut's theorem](./assets/reactionwheelunicycle/The_shape_operator/122.jpg)
+
+![the proof of Kepler's second law](./assets/reactionwheelunicycle/The_shape_operator/123.jpg)
+
+![proof of Clairaut's theorem](./assets/reactionwheelunicycle/The_shape_operator/124.jpg)
+
+![proof of Clairaut's theorem](./assets/reactionwheelunicycle/The_shape_operator/125.jpg)
+
+![proof of Clairaut's theorem](./assets/reactionwheelunicycle/The_shape_operator/126.jpg)
+
+![Directional derivatives](./assets/reactionwheelunicycle/The_shape_operator/127.jpg)
+
+![the shape operator](./assets/reactionwheelunicycle/The_shape_operator/128.jpg)
+
+![the geometric effect of the shape operator](./assets/reactionwheelunicycle/The_shape_operator/129.jpg)
+
+![singular value decomposition](./assets/reactionwheelunicycle/The_shape_operator/130.jpg)
+
+![the inverse matrix](./assets/reactionwheelunicycle/The_shape_operator/131.jpg)
+
+![the transpose matrix](./assets/reactionwheelunicycle/The_shape_operator/132.jpg)
+
+![geometric interpretation of the sjape operator](./assets/reactionwheelunicycle/The_shape_operator/133.jpg)
+
+![the curvature of a normal section of a surface](./assets/reactionwheelunicycle/The_shape_operator/134.jpg)
+
 # Square Roots of Definite Matrices
 
 ```@raw html
