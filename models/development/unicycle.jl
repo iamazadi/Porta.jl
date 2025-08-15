@@ -6,34 +6,18 @@ using Porta
 
 
 figuresize = (1920, 1080)
-segments = 30
-frames_number = 360
 modelname = "unicycle"
 maxplotnumber = 300
-headers = ["r", "p", "v", "a"]
-dimension = 10
-beginninglabel = "z: "
-endinglabel = "j: "
-delimiter = ","
+headers = ["aX1", "aY1", "aZ1", "gX1", "gY1", "gZ1", "aX2", "aY2", "aZ2", "gX2", "gY2", "gZ2"]
 clientside = nothing
 run = false
 readings = Dict()
-statedimension = 2 # xₖ ∈ ℝⁿ
-inputdimension = 2 # uₖ ∈ ℝᵐ
-ordernumber = statedimension + inputdimension
-λ = 1.0
-δ = 1e-3
-w₀ = zeros(ordernumber)
-P₀ = LinearAlgebra.I(ordernumber) .* (1.0 / δ)
-wₙ = deepcopy(w₀)
-Pₙ = deepcopy(P₀)
-K⁰ = zeros(Float64, ordernumber, ordernumber)
 
 x̂ = ℝ³([1.0; 0.0; 0.0])
 ŷ = ℝ³([0.0; 1.0; 0.0])
 ẑ = ℝ³([0.0; 0.0; 1.0])
 
-eyeposition = LinearAlgebra.normalize([0.9, 0.3, 1.0]) .* 0.55
+eyeposition = normalize([0.0, 1.0, 1.0]) .* 0.55
 lookat = [-0.1, -0.1, 0.1]
 up = [0.0; 0.0; 1.0]
 arrowsize = Observable(Vec3f(0.02, 0.02, 0.03))
@@ -44,11 +28,24 @@ arrowscale = 0.1
 origin = Point3f(-0.1, -0.1, -0.02)
 # the pivot point B̂ in the inertial frame Ô
 pivot = Point3f(-0.097, -0.1, -0.032)
+# the position of sensors mounted on the body in the body frame of reference
+p1 = Point3f(-0.035, -0.19, -0.04)
+p2 = Point3f(0.025, -0.144, -0.07)
 # the vectors of the standard basis for the input space ℝ³
 ê = [Vec3f(1, 0, 0), Vec3f(0, 1, 0), Vec3f(0, 0, 1)]
 # The rotation of the inertial frame Ô to the body frame B̂
 O_B_R = [ê[1] ê[2] ê[3]]
 B_O_R = inv(O_B_R)
+# The rotation of the local frame of the sensor i to the robot frame B̂
+imu2angle = -30.0 / 180.0 * π
+A1_B_R = [ê[1] ê[2] ê[3]]
+A2_B_R = [ê[1] ê[2] ê[3]]
+# A2_B_R = [(cos(imu2angle) * ê[1] - sin(imu2angle) * ê[2]) (sin(imu2angle) * ê[1] + cos(imu2angle) * ê[2]) ê[3]]
+B_A1_R = inv(A1_B_R)
+B_A2_R = inv(A2_B_R)
+
+P = [[1.0; vec(p1 - pivot)] [1.0; vec(p2 - pivot)]]
+X = transpose(P) * inv(P * transpose(P))
 
 r_w = 75.0 # +-0.1mm
 chassis_scale = 0.001
@@ -82,6 +79,10 @@ reactionwheel_stl_path = joinpath("data", "unicycle", "unicycle_reaction_wheel.S
 chassis_colormap = :jet
 rollingwheel_colormap = :rainbow
 reactionwheel_colormap = :darkrainbow
+
+pivot_observable = Observable(pivot)
+point1_observable = Observable(p1)
+point2_observable = Observable(p2)
 
 makefigure() = Figure(size = figuresize)
 fig = with_theme(makefigure, theme_black())
@@ -120,13 +121,53 @@ reactionwheel = make_sprite(lscene.scene, robot, reactionwheel_origin, reactionw
 
 pivotball = meshscatter!(lscene, pivot_observable, markersize = 0.01, color = :gold)
 
+arrowscale = 0.1
+smallarrowscale = arrowscale * 0.5
+R1_tail = vec(p1)
+R2_tail = vec(p2)
+R1 = [0.0; 0.0; -1.0] .* arrowscale
+R2 = [0.0; 0.0; -1.0] .* arrowscale
+
+ps = Observable([Point3f(R1_tail...), Point3f(R2_tail...)])
+ns = Observable([Vec3f(R1...), Vec3f(R2...)])
+arrowsize = Observable(Vec3f(0.01, 0.02, 0.03))
+linewidth = Observable(0.01)
+arrows!(lscene,
+    ps, ns, fxaa = true, # turn on anti-aliasing
+    color = [:orange, :lime, :pink, :purple],
+    linewidth = linewidth, arrowsize = arrowsize,
+    align = :center
+)
+
+pivotball = meshscatter!(lscene, pivot_observable, markersize = 0.01, color = :gold)
+ball1 = meshscatter!(lscene, point1_observable, markersize = 0.01, color = :orange)
+ball2 = meshscatter!(lscene, point2_observable, markersize = 0.01, color = :lime)
+
 pivot_ps = Observable([pivot_observable[], pivot_observable[], pivot_observable[]])
-pivot_ns = Observable(map(x -> x .* arrowscale, ê))
+pivot_ns = Observable(map(x -> x .* smallarrowscale, ê))
+ps1 = Observable([point1_observable[], point1_observable[], point1_observable[]])
+ps2 = Observable([point2_observable[], point2_observable[], point2_observable[]])
+ns1 = Observable(map(x -> smallarrowscale .* B_O_R * x, [B_A1_R * ê[1], B_A1_R * ê[2], B_A1_R * ê[3]]))
+ns2 = Observable(map(x -> smallarrowscale .* B_O_R * x, [B_A2_R * ê[1], B_A2_R * ê[2], B_A2_R * ê[3]]))
+arrowsize1 = Observable(Vec3f(0.01, 0.02, 0.03))
+linewidth1 = Observable(0.005)
 arrows!(lscene,
     pivot_ps, pivot_ns, fxaa = true, # turn on anti-aliasing
     color = [:red, :green, :blue],
-    linewidth = linewidth, arrowsize = arrowsize,
-    align = :origin
+    linewidth = linewidth1, arrowsize = arrowsize1,
+    align = :center
+)
+arrows!(lscene,
+    ps1, ns1, fxaa = true, # turn on anti-aliasing
+    color = [:red, :green, :blue],
+    linewidth = linewidth1, arrowsize = arrowsize1,
+    align = :center
+)
+arrows!(lscene,
+    ps2, ns2, fxaa = true, # turn on anti-aliasing
+    color = [:red, :green, :blue],
+    linewidth = linewidth1, arrowsize = arrowsize1,
+    align = :center
 )
 
 lookat = deepcopy(pivot)
@@ -142,6 +183,14 @@ disconnect(clientside) = begin
 end
 
 
+mat33(q::ℍ) = begin
+    qw, qx, qy, qz = vec(q)
+    [1.0 - 2(qy^2) - 2(qz^2) 	2qx * qy - 2qz * qw 	2qx * qz + 2qy * qw;
+     2qx * qy + 2qz * qw 	1.0 - 2(qx^2) - 2(qz^2) 	2qy * qz - 2qx * qw;
+     2qx * qz - 2qy * qw 	2qy * qz + 2qx * qw 	1.0 - 2(qx^2) - 2(qy^2)]
+end
+
+
 on(buttons[1].clicks) do n
     global run = true
     errormonitor(@async while (isopen(clientside) && run)
@@ -151,15 +200,52 @@ on(buttons[1].clicks) do n
         filtered = replace(text, "\0" => "")
         filtered = replace(filtered, "\r\n" => "")
         global readings = parsetext(filtered, headers)
-        systemstate = parsevector(filtered, beginninglabel, endinglabel, delimiter, dimension)
         # calculate(readings)
         allkeys = keys(readings)
         flag = all([x ∈ allkeys for x in headers]) && all([!isnothing(readings[x]) for x in headers])
         if flag
-            roll = -readings["r"] * 10.0 / 180.0 * π
-            pitch = -readings["p"] * 10.0 / 180.0 * π
-            encoder1 = readings["v"]
-            encoder2 = readings["a"] * 2π
+            acc1 = [readings["aX1"]; readings["aY1"]; readings["aZ1"]] .* (1.0 / 2048.0)            # acc2 = [-(cos(imu2angle) * readings["aY2"] - sin(imu2angle) * readings["aX2"]); -(sin(imu2angle) * readings["aX2"] + cos(imu2angle) * readings["aY2"]); -readings["aZ2"]] .* (1.0 / 8092.0)
+            acc2 = [-(sin(imu2angle) * readings["aX2"] + cos(imu2angle) * readings["aY2"]);
+                    -(cos(imu2angle) * readings["aY2"] - sin(imu2angle) * readings["aX2"]);
+                    -readings["aZ2"]] .* (1.0 / (5.0 * 2048.0))
+
+            # acc2 = [-(cos(imu2angle) * readings["aY2"] - sin(imu2angle) * readings["aX2"]); -(sin(imu2angle) * readings["aX2"] + cos(imu2angle) * readings["aY2"]); -readings["aZ2"]] .* (1.0 / 8092.0)
+            # gyr1 = [readings["gX1"]; readings["gY1"]; readings["gZ1"]]
+            # gyr2 = [readings["gX2"]; readings["gY2"]; readings["gZ2"]]
+            # rolling_angle = readings["encB"]
+            # reaction_angle = readings["encT"]
+            # delta_time = readings["dt"]
+
+            global R1 = acc1
+            global R2 = acc2
+
+            M = [B_A1_R * R1 B_A2_R * R2]
+            ĝ = (M * X)[:, 1]
+            β = atan(-ĝ[1], √(ĝ[2]^2 + ĝ[3]^2))
+            γ = atan(ĝ[2], ĝ[3])
+            println("β: $β, γ: $γ.")
+            roll = β
+            pitch = -γ
+            q = ℍ(roll, x̂) * ℍ(pitch, ŷ)
+            O_B_R = mat33(q)
+            B_O_R = mat33(-q)
+
+            # g = q * chassis_q0
+            # rotate!(robot, Quaternion(g))
+            pivot_observable[] = Point3f(O_B_R * (pivot - origin) + origin)
+            point1_observable[] = Point3f(O_B_R * (p1 - origin) + origin)
+            point2_observable[] = Point3f(O_B_R * (p2 - origin) + origin)
+
+            ps[] = [Point3f(point1_observable[]...), Point3f(point2_observable[]...)]
+            ns[] = map(x -> x .* arrowscale, [Vec3f(O_B_R * _R1...), Vec3f(O_B_R * _R2...)])
+
+            pivot_ps[] = [Point3f(pivot_observable[]...), Point3f(pivot_observable[]...), Point3f(pivot_observable[]...)]
+            ps1[] = [Point3f(point1_observable[]...), Point3f(point1_observable[]...), Point3f(point1_observable[]...)]
+            ps2[] = [Point3f(point2_observable[]...), Point3f(point2_observable[]...), Point3f(point2_observable[]...)]
+
+            ns1[] = map(x -> x .* norm(R1) .* smallarrowscale, [B_O_R * B_A1_R * ê[1], B_O_R * B_A1_R * ê[2], B_O_R * B_A1_R * ê[3]])
+            ns2[] = map(x -> x .* norm(R2) .* smallarrowscale, [B_O_R * B_A2_R * ê[1], B_O_R * B_A2_R * ê[2], B_O_R * B_A2_R * ê[3]])
+
             # plot the system state graph
             _graphpoints = graphpoints[]
             _rollpoints = _graphpoints[1]
@@ -169,8 +255,8 @@ on(buttons[1].clicks) do n
             timestamp = vec(_rollpoints[end])[1] + 1.0
             push!(_rollpoints, Point2f(timestamp, roll))
             push!(_pitchpoints, Point2f(timestamp, pitch))
-            push!(_encoder1points, Point2f(timestamp, encoder1))
-            push!(_encoder2points, Point2f(timestamp, encoder2))
+            push!(_encoder1points, Point2f(timestamp, rolling_angle))
+            push!(_encoder2points, Point2f(timestamp, reaction_angle))
             number = length(_rollpoints)
             if number > maxplotnumber
                 _rollpoints = _rollpoints[number - maxplotnumber + 1:end]
@@ -184,8 +270,6 @@ on(buttons[1].clicks) do n
             end
             xlims!(ax1, timestamp - maxplotnumber, timestamp)
             #######
-            v1 = readings["v"]
-            v2 = readings["a"]
             q = ℍ(roll, x̂) * ℍ(pitch, ŷ)
             O_B_R = mat3(q)
     
@@ -194,13 +278,10 @@ on(buttons[1].clicks) do n
             pivot_observable[] = Point3f(O_B_R * (pivot - origin) + origin)
     
             pivot_ps[] = [Point3f(pivot_observable[]...), Point3f(pivot_observable[]...), Point3f(pivot_observable[]...)]
-    
-            global reaction_angle = reaction_angle + float(v1) * 1.0 # readings["enc"] / 50.0 * 2π
-            global rolling_angle = v2 * π
-            rq = Quaternion(ℍ(reaction_angle, x̂))
-            mq = Quaternion(ℍ(rolling_angle, ẑ))
-            GLMakie.rotate!(rollingwheel, mq)
-            GLMakie.rotate!(reactionwheel, rq)
+            # rq = Quaternion(ℍ(reaction_angle, x̂))
+            # mq = Quaternion(ℍ(rolling_angle, ẑ))
+            # rotate!(rollingwheel, mq)
+            # rotate!(reactionwheel, rq)
         end
     end)
 end
