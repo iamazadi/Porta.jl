@@ -485,7 +485,7 @@
 معادله‌ی مفسر را تشکیل می‌دهیم.
 
 </p>
-</div><p><span>$r^2 + r - 2 = 0$</span>,</p><p><span>$\Delta = 1^2 - 4 (1) (-2) = 9 &gt; 0$</span>,</p><p><span>$r_1 = \frac{-1 + \sqrt{9}}{2 (1)} = 2$</span>,</p><p><span>$r_2 = \frac{-1 - \sqrt{9}}{2 (1)} = -2$</span>,</p><p><span>$y = c_1 e^{2x} + c_2 e^{-2x}$</span>.</p><div dir = "rtl">
+</div><p><span>$r^2 + r - 2 = 0$</span>,</p><p><span>$\Delta = 1^2 - 4 (1) (-2) = 9 &gt; 0$</span>,</p><p><span>$r_1 = \frac{-1 + \sqrt{9}}{2 (1)} = 1$</span>,</p><p><span>$r_2 = \frac{-1 - \sqrt{9}}{2 (1)} = -2$</span>,</p><p><span>$y = c_1 e^{x} + c_2 e^{-2x}$</span>.</p><div dir = "rtl">
 <h3>
 
 حالت دوم
@@ -962,7 +962,7 @@
 در نتیجه برای حل معادله داریم:
 
 </p>
-</div><p><span>$y_1 = c_1 e^{r_1 x} + c_2 e^{r_2 x} = c_1 e^{4x} + c_2 e^{-4x}$</span></p><p><span>$y_1^\prime = 4c_1 e^{4x} - 4c_2 e^{-4x} = 2(c_1 e^{4x} + c_2 e^{-4x}) + 3y_2$</span></p><p><span>$y_2 = \frac{1}{3} (4c_1 e^{4x} - 4c_2 e^{-4x} - 2(c_1 e^{4x} + c_2 e^{-4x}))$</span></p><p><span>$y_2 = \frac{1}{3} ((4c_1 - 2c_1) e^{4x} + (-2 c_2 - 4 c_2) e^{-4x})$</span></p><p><span>$y_2 = \frac{2}{3} c_1 e^{4x} - 2e^{-4x}$</span></p><div dir = "rtl">
+</div><p><span>$y_1 = c_1 e^{r_1 x} + c_2 e^{r_2 x} = c_1 e^{4x} + c_2 e^{-4x}$</span></p><p><span>$y_1^\prime = 4c_1 e^{4x} - 4c_2 e^{-4x} = 2(c_1 e^{4x} + c_2 e^{-4x}) + 3y_2$</span></p><p><span>$y_2 = \frac{1}{3} (4c_1 e^{4x} - 4c_2 e^{-4x} - 2(c_1 e^{4x} + c_2 e^{-4x}))$</span></p><p><span>$y_2 = \frac{1}{3} ((4c_1 - 2c_1) e^{4x} + (-2 c_2 - 4 c_2) e^{-4x})$</span></p><p><span>$y_2 = \frac{2}{3} c_1 e^{4x} - 2c_2e^{-4x}$</span></p><div dir = "rtl">
 <h3>
 
 تمرین
@@ -3267,7 +3267,141 @@
 فشارسنج جهت اندازه‌گیری ارتفاع از سطح دریا به کار گرفته می‌شود که با تلفیق داده‌های آن با شتاب‌سنج (شتاب دینامیک) و ژیروسکوپ، تخمین خوبی از ارتفاع کنونی و سرعت تغییر ارتفاع به دست می‌آید. جهت‌یابی در فضای سه‌بعدی نیز با کمک شتاب‌سنج (شتاب استاتیک)، ژیروسکوپ، و قطب‌نما انجام می‌شود. از میان این حسگرها تنها شتاب‌سنج و ژیروسکوپ اساس کارشان بر اینرسی استوار است و واحد موقعیت‌یاب اینرسی نامیده می‌شود. در حسگرهای بر پایه‌ی اینرسی، نیروهای وارد شده بر یک جرم ثابت یا چرخان اندازه‌گیری می‌شوند.
 
 </p>
-</div><div dir = "rtl">
+</div><p><img src="assets/reactionwheelunicycle/theproblemsetup.jpeg" alt="theproblemsetup"/></p><div dir = "rtl">
+<h3>
+
+برآورد شیب با شتاب‌سنج
+
+</h3>
+<p>
+
+در این بخش، یک برآوردگر برای زاویه‌های تاب و غلت یک جسم صلب به دست می‌آوریم که تنها درجه‌ی آزادی چرخشی دارد. این برآورد، بر پایه‌ی اندازه‌گیری‌های چند شتاب‌سنج است که بر روی جسم صلب نصب شده‌اند، به طوری که فرض می‌شود محل نصب و موقعیت قرارگیری آن‌ها را می‌دانیم. ابتدا مشکل را به طور رسمی بیان می‌کنیم. سپس، یک برآورد از بردار جاذبه در چهارچوب بدنه‌ی ربات به دست می‌آوریم. در انتها از بردار جاذبه استفاده می‌کنیم تا زاویه‌های تاب و غلت را محاسبه کنیم.
+
+</p>
+<h4>
+
+بیان مشکل
+
+</h4>
+<p>
+
+یک جسم صلب را در نظر می‌گیریم که با یک تکیه‌گاه ثابت و بدون اصطکاک استوار شده است. بنابراین، جسم سه درجه‌ی آزادی چرخشی دارد، اما هیچ‌گونه درجه‌ی آزادی انتقالی ندارد. مبدا دستگاه مختصات بدنه که با حرف ب کلاه‌دار بیان می‌شود در مرکز چرخش قرار دارد. چهارچوب مرجع اینرسیایی با حرف او کلاه‌دار نشان داده می‌شود، که مبدا آن با مبدا چهارچوب ب کلاه‌دار مصادف است. بر روی بدنه، به تعداد ال حسگر (شتاب‌سنج) وجود دارد که در مکان‌های مشخصی نصب شده اند:
+
+</p>
+</div><p><span>$\hat{B}, \ \hat{O}$</span></p><p><span>$p_i, \ i = 1, ..., L$</span></p><div dir = "rtl">
+<p>
+
+فرض می‌شود که محل حسگرها در چهارچوب مرجع بدنه شناخته شده اند.
+
+</p>
+</div><p><span>$^{B}p_i$</span></p><div dir = "rtl">
+<p>
+
+هر حسگر شتاب محلی را در راستای سه محور چهارچوب محلی خود اندازه‌گیری می‌کند.
+
+</p>
+</div><p><span>$\hat{A}_i$</span></p><div dir = "rtl">
+<p>
+
+دو ماتریس چرخش معرفی می‌شود که چرخش بدنه‌ی صلب و موقعیت نصب‌شدن حسگرها را دربر می‌گیرد: ماتریس اول چرخش قاب اینرسی او کلاه‌دار را نسبت به قاب بدنه ب کلاه‌دار مشخص می‌کند، و ماتریس دوم چرخش قاب محلی حسگر آی را نسبت به قاب بدنه مشخص می‌کند.
+
+</p>
+</div><p><span>$\left\{ \begin{array}{l} ^{O}_{B}R &amp;\\ ^{A_i}_{B}R \end{array} \right.$</span></p><div dir = "rtl">
+<p>
+
+به این نکته توجه کنید که مقدار بردار وی در چهارچوب ب کلاه‌دار
+
+</p>
+</div><p><span>$^{B}v$</span></p><div dir = "rtl">
+<p>
+
+را می‌توان در چهارچوب او کلاه‌دار به شکل زیر نمایش داد:
+
+</p>
+</div><p><span>$^{O}v = ^{O}_{B}R \ ^{B}v$</span></p><div dir = "rtl">
+<p>
+
+یک شتاب‌سنج، شتاب «پ نقطه نقطه» را در محل نصب خود «پ» به علاوه بردار جاذبه «جی» را اندازه‌گیری می‌کند که نسبت به چهارچوب محلی خود «آ کلاه‌دار» چرخانده شده است:
+
+</p>
+</div><p><span>$^{A_i}m_i = ^{A_i}_{B}R \ ^{B}_{O}R (^{O}\ddot{p}_i + ^{O}g) + ^{A_i}n_i$</span>  (1)</p><div dir = "rtl">
+<p>
+
+که در اینجا اندازه‌گیری شتاب‌سنج آی با «ام پایین‌نویس آی» بیان شده است و نماد «ان پایین‌نویس آی» نویز اندازه‌گیری را نشان می‌دهد.
+
+</p>
+</div><p><span>$\left\{ \begin{array}{l} ^{A_i}m_i \in \mathbb{R}^3 &amp;\\ ^{A_i}n_i \in \mathbb{R}^3 \end{array} \right.$</span></p><div dir = "rtl">
+<p>
+
+فرض می‌شود که نویز از نوع سفید است و مقدار آن به صورت نواری با میانگین صفر و انحراف معیار «سیگما پایین‌نویس ان» محدود شده است. یعنی
+
+</p>
+</div><p><span>$\sigma_n$</span></p><p><span>$\mathbb{E}[^{A}n_i] = 0$</span></p><p><span>$\mathbb{E}[^{A}n_i \ (^{A}n_i)^T] = \sigma_n^2 I_3$</span></p><div dir = "rtl">
+<p>
+
+که حرف ای بزرگ امید ریاضی را بیان می‌کند و حرف آی پایین‌نویس ۳ ماتریس همانی با ابعاد ۳ در ۳ را نمایش می‌دهد. این مدل‌سازی نویز برای بسیاری از شتاب‌سنج‌های بر پایه‌ی سامانه‌های میکروالکترومکانیکی معقول است به شرطی که مقدار سوگیری از آن کم شده باشد.
+
+</p>
+<p>
+
+با استفاده از این رابطه:
+
+</p>
+</div><p><span>$^{O}p_i = ^{O}_{B}R \ ^{B}p_i$</span></p><div dir = "rtl">
+<p>
+
+و این حقیقت که مقدار پ پایین‌نویس آی در زمان ثابت می‌باشد، نتیجه می‌گیریم که شتاب نقطه‌ی پ پایین‌نویس آی در مرجع مختصات او به این شکل است:
+
+</p>
+</div><p><span>$^{O}\ddot{p}_i = ^{O}_{B}\ddot{R} \ ^{B}p_i$</span>  (2)</p><div dir = "rtl">
+<p>
+
+که در اینجا ماتریس آر نقطه نقطه بیانگر مشتق مرتبه دوم ماتریس چرخش آر نسبت به زمان است.
+
+</p>
+</div><p><span>$\frac{d \ ^{B}p_i}{dt} = 0$</span></p><p><span>$\frac{d^2 \ ^{O}_{B}R}{dt^2} = ^{O}_{B}\ddot{R}$</span></p><div dir = "rtl">
+<p>
+
+ماتریس آر نقطه نقطه عبارت‌های پویای حرکت جسم صلب را دربر دارد، یعنی عبارت‌های شتاب چرخشی و مرکزگرا. با استفاده از رابطه‌ی ۲ می‌توان معادله‌ی اندازه‌گیری شتاب ۱ را به صورت زیر بازنویسی کرد:
+
+</p>
+</div><p><span>$^{A_i}m_i = ^{A_i}_{B}R \ ^{B}_{O}R (^{O}_{B}\ddot{R} \ ^{B}p_i + ^{O}g) + ^{A_i}n_i$</span>  (3)</p><div dir = "rtl">
+<p>
+
+به خاطر اینکه همه‌ی موقعیت‌های چرخشی حسگرها که با ماتریس آر نشان داده می‌شود، شناخته‌شده در نظر گرفته می‌شوند، می‌توان با ضرب کردن معادله ی ۳ در ترانهاده‌ی ماتریس از سمت چپ، اندازه‌گیری همه‌ی شتاب‌سنج‌ها را در مختصات بدنه بیان کرد.
+
+</p>
+</div><p><span>$^{B}_{A_i} R = ^{A_i}_{B} R^T$</span></p><p><span>$^{B}m_i = \tilde{R} ^{B}p_i + ^{B}g + ^{B}n_i$</span>  (4)</p><div dir = "rtl">
+<p>
+
+که در اینجا ماتریس آر مد دار (تیلدا) چرخش بدنه و عبارت‌های پویای حرکت بدنه را ترکیب می‌کند
+
+</p>
+</div><p><span>$\tilde{R} := ^{B}_{O}R \ ^{O}_{B}\ddot{R}$</span></p><div dir = "rtl">
+<p>
+
+و جی بردار جاذبه در مختصات بدنه است و ان بردار نویز چرخانده شده به قاب بدنه است:
+
+</p>
+</div><p><span>$^{B}g = ^{B}_{O}R \ ^{O}g$</span>  (5)</p><p><span>$^{B}n_i = ^{B}_{A_i}R \ ^{A_i}n_i$</span></p><div dir = "rtl">
+<p>
+
+میانگین و انحراف نویز هنوز در رابطه‌های زیر صدق می‌کنند:
+
+</p>
+</div><p><span>$\mathbb{E}[^{B}n_i] = 0$</span></p><p><span>$\mathbb{E}[^{B}n_i (^{B}n_i)^T] = \sigma_n^2 I_3$</span></p><div dir = "rtl">
+<p>
+
+فرض کنید که اندازه‌گیری‌ها با آهنگ تی بزرگ انجام می‌شوند، که اندیس زمان کا کوچک را معرفی می‌کند. پس معادله‌ی ۴ را می‌توان بازنویسی کرد:
+
+</p>
+</div><p><span>$T, k$</span></p><p><span>$^{B}m_i(k) = \tilde{R}(k) \ ^{B}p_i + ^{B}g(k) + ^{B}n_i(k)$</span>  (6)</p><div dir = "rtl">
+<p>
+
+با اندازه‌گیری‌های انجام شده در رابطه ی ۶ به ازای حسگرهای آی الی ال در زمان کا، هدف نهایی این است که شیب جسم صلب را (که با ماتریس آر بیان می‌شود) در زمان کا برآورد کرد. به عنوان یک گام میانی، برآوردی از بردار جاذبه جی بر حسب زمان کا (و به عنوان فراورده‌ی جانبی) برآوردی برای ماتریس آر تیلدا استنباط می‌شود. سپس از برآورد بردار جاذبه برای پیدا کردن زاویه‌های تاب و غلت بدنه‌ی صلب استفاده می‌شود.
+
+</p>
+</div><p><span>$i = 1, ..., L$</span></p><p><span>$k$</span></p><p><span>$^{B}_{O}R$</span></p><p><span>$^{B}g(k)$</span></p><p><span>$\tilde{R}(k)$</span>.</p><div dir = "rtl">
 <h2>
 
 مدل‌سازی و استخراج رابطه‌های ریاضی حاکم بر ربات
@@ -3973,4 +4107,4 @@ typedef struct
 </li>
 
 </ol>
-</div></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="maxwellfield_persian.html">« The Maxwell Field (Persian)</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.14.1 on <span class="colophon-date" title="Saturday 6 September 2025 16:02">Saturday 6 September 2025</span>. Using Julia version 1.10.10.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+</div></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="maxwellfield_persian.html">« The Maxwell Field (Persian)</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.14.1 on <span class="colophon-date" title="Monday 8 September 2025 17:13">Monday 8 September 2025</span>. Using Julia version 1.10.10.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
