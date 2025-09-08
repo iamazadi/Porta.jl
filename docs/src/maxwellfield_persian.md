@@ -2162,7 +2162,7 @@ Description = "The Maxwell field as gauge curvature"
 </div>
 ```
 
-``S = (32 - 24 + 2) - (4 - 6 + 0.5) = 22 - (-1.5) = 22 + 1.5 = 23.5``.
+``S = (32 - 24 + 2) - (4 - 6 + \frac{1}{2}) = (10) - (-2 + \frac{1}{2}) = 10 + \frac{3}{2} = \frac{20 + 3}{2} = \frac{23}{2}``.
 
 ```@raw html
 <div dir = "rtl">
@@ -2176,7 +2176,7 @@ Description = "The Maxwell field as gauge curvature"
 
 ![20](./assets/multivariablecalculus/20.jpg)
 
-``\int \int_A f(x, y) dA = \int_c^d \int_{h(y)}^{g(y)} dx \ dy``.
+``\int \int_A f(x, y) dA = \int_c^d \int_{h(y)}^{g(y)} f(x, y) dx \ dy``.
 
 ```@raw html
 <div dir = "rtl">
