@@ -7508,7 +7508,7 @@ Description = "Describes the mathematical model of a reaction wheel unicycle rob
 </p>
 <h4>
 
-لم (مشکل برآورد کامل)
+لم مشکل برآورد کامل)
 
 </h4>
 <p>
@@ -7619,7 +7619,7 @@ Description = "Describes the mathematical model of a reaction wheel unicycle rob
 <div dir = "rtl">
 <p>
 
-که در اینجا اس پایین‌نویس آی بر حسب ماتریس پی، بیانگر «آی‌»مین بزرگ‌ترین مقدار تکینه‌ی ماتریس پی می‌باشد.
+که در اینجا اس پایین‌نویس آی بر حسب ماتریس پی، بیانگر «آی‌»مین بزرگ‌ترین مقدار منفرد ماتریس پی می‌باشد.
 
 </p>
 </div>
@@ -7636,11 +7636,299 @@ Description = "Describes the mathematical model of a reaction wheel unicycle rob
 </h4>
 <p>
 
-
+به این دلیل:
 
 </p>
 </div>
 ```
+
+``\mathbb{E}[MX] = \mathbb{E}[M]X = QPX``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+لازم است که تساوی زیر برقرار باشد:
+
+</p>
+</div>
+```
+
+``PX = I``  (15)
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+تا برابری زیر درست باشد:
+
+</p>
+</div>
+```
+
+``\mathbb{E}[MX] = Q``.
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+سپس، تجزیه مقدارهای منفرد ماتریس پی را در نظر بگیرید،
+
+</p>
+</div>
+```
+
+``P = U \begin{bmatrix} \Sigma & 0 \end{bmatrix} \begin{bmatrix} V_1^T \\ V_2^T \end{bmatrix}``  (16)
+
+``U \in \mathbb{R}^{4 \times 4}``
+
+``\Sigma \in \mathbb{R}^{4 \times 4}``
+
+``V_1 \in \mathbb{R}^{L \times 4}``
+
+``V_2 \in \mathbb{R}^{L \times (L - 4)}``
+
+``V = \begin{bmatrix} V_1 & V_2 \end{bmatrix}``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+که در اینجا ماتریس یو یکانی است، ماتریس سیگما قطری است، ماتریس وی پایین‌نویس ۱ و وی پایین‌نویس ۲ و ماتریس وی یکانی می‌باشند. طبق فرض تمام‌رتبه بودن سطرهای ماتریس پی، داریم که ماتریس سیگما مثبت معین است. بنابراین، همه‌ی مقداردهی‌های ماتریس ایکس که در رابطه‌ی ۱۵ صدق می‌کنند با رابطه‌ی زیر داده شده است
+
+</p>
+</div>
+```
+
+``X = V_1 \Sigma^{-1}U^T + V_2 \bar{X}``  (17)
+
+``\bar{X} \in \mathbb{R}^{(L - 4) \times 4}``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+که در اینجا ماتریس ایکس خط‌دار یک ماتریس عامل متغیر آزاد است. پس نیاز است که ماتریس ایکس خط‌دار به طوری انتخاب شود که رابطه‌ی ۱۲ کمینه شود: با استفاده از معادله‌های ۷ و ۱۵ و خاصیت‌های پایه‌ی عملگر اثر، نتیجه گرفته می‌شود که
+
+</p>
+</div>
+```
+
+``\mathbb{E} \ [||MX - Q||_F^2] = \mathbb{E} \ [||NX||_F^2]``
+
+``= \mathbb{E} \ [trace(X^T N^T N X)] = trace(\mathbb{E} \ [N^T N] X X^T)``
+
+``= \sigma_N^2 \ trace(X X^T) = \sigma_N^2 \ trace(V^T X (V^T X)^T)``
+
+``= \sigma_N^2 ||\begin{bmatrix} \Sigma^{-1} U^T \\ \bar{X} \end{bmatrix}||_F^2``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+که مقدار نتیجه با تساوی زیر کمینه می‌شود:
+
+</p>
+</div>
+```
+
+``\bar{X} = 0``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+بنابراین،
+
+</p>
+</div>
+```
+
+``X^* = V_1 \Sigma^{-1} U^T = P^T (P P^T)^{-1}``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+که با جایگذاری رابطه‌ی ۱۶ برای ماتریس پی به دست می‌آید، و در نتیجه
+
+</p>
+</div>
+```
+
+``\mathbb{E}[||MX^* - Q||_F^2] = \sigma_N^2 ||\Sigma^{-1} U^T||_F^2 = \sigma_N^2 ||\Sigma^{-1}||_F^2``.
+
+``\square``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+برآورد بهینه‌ی کیو کلاه‌دار شامل هر دو برآورد بهینه‌ی بردار جاذبه جی و ماتریس پویایی آر تیلدا می‌باشد.
+
+</p>
+</div>
+```
+
+``\hat{Q} = M X^*``
+
+``\left\{ \begin{array}{l} ^{B}g &\\ \tilde{R} \end{array} \right.``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+به خاطر اینکه برای برآورد کردن شیب، تنها به اولی نیاز داریم، باید پرسید که آیا ماتریس ایکس ستاره‌دار همچنان بهینه است اگر کسی تنها به دنبال برآورد جزیی از ماتریس مجهول کیو باشد. لم ریاضی زیر بیان می‌کند که در واقعیت این مورد درست می‌باشد.
+
+</p>
+</div>
+```
+
+``X^*, \ Q``
+
+```@raw html
+<div dir = "rtl">
+<h4>
+
+لم مشکل برآورد جزیی
+
+</h4>
+<p>
+
+فرض کنید ماتریس‌های کیو، پی، ان و ام مانند لم مشکل برآورد کامل تعریف شده باشند. همچنین، ماتریس کیو را با دو ماتریس کیو پایین‌نویس ۱ و کیو پایین‌نویس ۲ نام‌گذاری کنید.
+
+</p>
+</div>
+```
+
+``Q, \ P, \ N, \ M``
+
+``Q = \begin{bmatrix} Q_1 & Q_2 \end{bmatrix}``
+
+``\left\{ \begin{array}{l} Q_1 \in \mathbb{R}^{3 \times q} &\\ Q_2 \in \mathbb{R}^{3 \times (4 - q)} \end{array} \right.``
+
+``1 \leq q \leq 4``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+با فرض اینکه ماتریس پی دارای رتبه‌ی کامل در سطرهایش باشد، ماتریس ایگرگ ستاره‌دار که کمینه‌کننده‌ی (منحصر به فرد) عبارت بعدی است
+
+</p>
+</div>
+```
+
+``Y^* \in \mathbb{R}^{L \times q}``
+
+``\underset{Y}{min} \ \mathbb{E} \ [|| MY - Q ||_F^2]``  (19)
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+به شرط
+
+</p>
+</div>
+```
+
+``\mathbb{E} \ [MY] = Q_1``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+برابر است با:
+
+</p>
+</div>
+```
+
+``Y^* = X_1^*``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+که در اینجا ماتریس ایکس ستاره‌دار، حل لم مشکل برآورد کامل است.
+
+</p>
+</div>
+```
+
+``X^* = \begin{bmatrix} X_1^* & X_2^* \end{bmatrix}``
+
+```@raw html
+<div dir = "rtl">
+<h4>
+
+اثبات
+
+</h4>
+<p>
+
+باید نشان داد که ماتریس ایگرگ در رابطه ی ۱۹ صدق می‌کند.
+
+</p>
+</div>
+```
+
+``Y = X_1^*``
+
+``X^* = \begin{bmatrix} X_1^* & X_2^* \end{bmatrix}``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+ابتدا، به خاطر اینکه ماتریس ایکس ستاره‌دار
+
+</p>
+</div>
+```
+
+``\mathbb{E} \ [M X] = Q``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+در رابطه‌ی امید ریاضی در معادله‌ی ۱۲ صدق می‌کند،
+
+</p>
+</div>
+```
+
+``\mathbb{E} \ [ \begin{bmatrix} M X_1^* & M X_2^* \end{bmatrix} ] = \mathbb{E} \ [M X^*] = Q = \begin{bmatrix} Q_1 & Q_2 \end{bmatrix} \longrightarrow``
+
+``\left\{ \begin{array}{l} \mathbb{E} \ [M X_1^*] = Q_1 &\\ \mathbb{E} \ [M X_2^*] = Q_2 \end{array} \right.``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+سپس،
+
+</p>
+</div>
+```
+
+``|| M X^* - Q ||_F^2 = || \begin{bmatrix} M X_1^* - Q_1 & M X_2^* - Q_2 \end{bmatrix} ||_F^2 = || M X_1^* - Q_1 ||_F^2 + || M X_2^* - Q_2 ||_F^2``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+یعنی، ماتریس ایکس ستاره‌دار هر دو عبارت در خط آخر را به طور جداگانه کمینه می‌کند و پس ماتریس ایکس ستاره‌دار پایین‌نویس ۱ تنها نرم زیر را کمینه می‌کند:
+
+</p>
+</div>
+```
+
+``|| M X_1^* - Q_1 ||_F^2``.
+
+``\square``
 
 
 ```@raw html
