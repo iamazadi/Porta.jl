@@ -3472,7 +3472,7 @@
 </p>
 <h4>
 
-لم مشکل برآورد کامل)
+لم مشکل برآورد کامل
 
 </h4>
 <p>
@@ -3642,7 +3642,7 @@
 </h4>
 <p>
 
-باید نشان داد که ماتریس ایگرگ در رابطه ی ۱۹ صدق می‌کند.
+باید نشان داد که ماتریس ایگرگ در رابطه‌ی ۱۹ صدق می‌کند.
 
 </p>
 </div><p><span>$Y = X_1^*$</span></p><p><span>$X^* = \begin{bmatrix} X_1^* &amp; X_2^* \end{bmatrix}$</span></p><div dir = "rtl">
@@ -3670,6 +3670,73 @@
 
 </p>
 </div><p><span>$|| M X_1^* - Q_1 ||_F^2$</span>.</p><p><span>$\square$</span></p><div dir = "rtl">
+<p>
+
+با به کار بردن لم برآورد جزیی، با قرار دادن کیو برابر با یک، به برآورد بهینه‌ی بردار جاذبه جی کلاه‌دار در زمان کا می‌رسیم، که به ازای همه‌ی اندازه‌گیری‌های حسگرها در ماتریس ام است.
+
+</p>
+</div><p><span>$q = 1$</span></p><p><span>$^{B}\hat{g}(k)$</span></p><p><span>$M(k)$</span></p><p><span>$^{B}\hat{g}(k) = M(k) X_1^*$</span>  (20)</p><p><span>$X_1^* \in \mathbb{R}^{L \times 1}$</span></p><div dir = "rtl">
+<p>
+
+ماتریس تلفیق بهینه ایکس پایین‌نویس ۱ ستاره‌دار ثابت است و به طور کامل به وسیله‌ی هندسه‌ی مشکل تعریف می‌شود (به وسیله‌ی ماتریس پی) و می‌تواند به صورت برون‌خطی محاسبه شود.
+
+</p>
+<p>
+
+توجه کنید که برآورد بردار جاذبه در رابطه‌ی ۲۰ از پویایی جسم صلب مستقل است، که در ماتریس آر نقطه نقطه (و در نتیجه در ماتریس آر تیلدا) دربر گرفته شده است. این حقیقت به صورت زیر قابل مشاهده است:
+
+</p>
+</div><p><span>$^{B}\hat{g} = M X_1^* = Q P X_1^* + N X_1^*$</span></p><p><span>$= \begin{bmatrix} ^{B}g &amp; \tilde{R} \end{bmatrix} \ U \Sigma V_1^T \ V_1 \Sigma^{-1} U_1^T \ + N X_1^*$</span></p><p><span>$= \begin{bmatrix} ^{B}g &amp; \tilde{R} \end{bmatrix} \ P \ X_1^* \ + N X_1^*$</span></p><p><span>$= \begin{bmatrix} ^{B}g &amp; \tilde{R} \end{bmatrix} \begin{bmatrix} U_1 \\ U_2 \end{bmatrix} U_1^T + N X_1^*$</span></p><p><span>$= \begin{bmatrix} ^{B}g &amp; \tilde{R} \end{bmatrix} \begin{bmatrix} 1 \\ 0 \end{bmatrix} + N X_1^* = ^{B}g + N X_1^*$</span></p><div dir = "rtl">
+<p>
+
+که در اینجا تجزیه‌ی مقدارهای منفرد ماتریس پی در رابطه‌ی ۱۶ به کار برده شده است. روشن است که ماتریس آر تیلدا در برآورد ظاهر نمی‌شود، یعنی مشاهده‌ی بردار جاذبه با هیچ یک از عبارت‌های پویا تخریب نمی‌شود. همان طوری که انتظار می‌رود، نویز حسگر در معادله‌ی برآورد وارد می‌شود.
+
+</p>
+<p>
+
+در هر دو لم مشکل برآورد کامل و جزیی، ماتریس پی، که محتوی مکان حسگرها بر روی جسم صلب می‌باشد، رتبه‌کامل فرض می‌شود. در ادامه، تعبیری فیزیکی از این شرط رتبه داده شده است.
+
+</p>
+<p>
+
+موردی را در نظر بگیرید که در آن ماتریس پی دارای رتبه‌ی کامل در سطرهایش نباشد. سپس، یک ترکیب خطی غیربدیهی از سطرهای ماتریس پی وجود دارد،
+
+</p>
+</div><p><span>$\exists \lambda \neq 0 \in \mathbb{R}^4 : \lambda_1 p_x + \lambda_2 p_y + \lambda_3 p_z + \lambda_4 \textbf{1} = 0$</span>  (21)</p><div dir = "rtl">
+<p>
+
+که در اینجا بردارهای پی کوچک بیان‌گر سه سطر آخر ماتریس پی هستند (بردارهای مختصات ایکس، ایگرگ و زد مکان همه‌ی حسگرها) و نماد عدد ۱ با خط درشت برداریست که همه‌ی عنصرهای آن از عدد یک تشکیل شده است، که همان سطر اول ماتریس پی می‌باشد.
+
+</p>
+</div><p><span>$p_x^T, \ p_y^T, \ p_z^T \in \mathbb{R}^{1 \times L}$</span></p><p><span>$\textbf{1}^T \in \mathbb{R}^{1 \times L}$</span></p><div dir = "rtl">
+<p>
+
+عبارت ۲۱ معادل است با
+
+</p>
+</div><p><span>$\exists \lambda \neq 0 \in \mathbb{R}^4 : \forall i = 1, ..., L$</span></p><p><span>$\lambda_1 \ ^{B}p_{i, x} + \lambda_2 \ ^{B}p_{i, y} + \lambda_3 \ ^{B}p_{i, z} = -\lambda_4$</span></p><p><span>$^{B}p_{i, x}, \ ^{B}p_{i, y}, \ ^{B}p_{i, z} \in \mathbb{R}$</span></p><div dir = "rtl">
+<p>
+
+که در اینجا بردارهای پی کوچک بیان‌گر مختصات ایکس، ایگرگ و زد حسگر «آی»م در چهارچوب بدنه هستند. به خاطر اینکه معادله
+
+</p>
+</div><p><span>$\lambda_1 x + \lambda_2 y + \lambda_3 z = -\lambda_4$</span></p><div dir = "rtl">
+<p>
+
+یک صفحه را در فضای (ایکس-ایگرگ-زد) تعریف می‌کند، شرط (۲۲) معادل است با حالتی که همه‌ی حسگرها بر روی یک صفحه قرار گرفته باشند. بنابراین، شرط رتبه‌کامل بودن ماتریس پی در سطرهایش برقرار است اگر و فقط اگر همه‌ی حسگرها بر روی یک صفحه قرار نداشته باشند. همچنین، چون سه نقطه همواره بر روی یک صفحه قرار می‌گیرند، این نیز نتیجه گرفته می‌شود که برای روش پیشنهاد داده شده حداقل به چهار شتاب‌سنج سه‌محوره نیاز داریم.
+
+</p>
+<p>
+
+توجه کنید که برآورد بردار جاذبه در لم مشکل برآورد جزیی با این فرض بهینه است که سطرهای ماتریس پی رتبه‌کامل باشند. این نتیجه‌ها می‌تواند تعمیم داده شود و هنگامی که فردی تنها به دنبال بردار جاذبه است در شرط رتبه‌کامل بودن ماتریس پی  می‌توان کمی تخفیف داد. برای مثال، می‌توان با استفاده از یک شتاب‌سنج سه‌محوره در نقطه‌ی چرخش به طور مستقیم جاذبه را اندازه گرفت، جایی که عبارت‌های پویا در اندازه‌گیری وارد نمی‌شوند. اما، این کار برای ربات تعادلی تک‌چرخ امکان‌پذیر نمی‌باشد.
+
+</p>
+<h4>
+
+برآورد شیب
+
+</h4>
+</div><div dir = "rtl">
 <h2>
 
 مدل‌سازی و استخراج رابطه‌های ریاضی حاکم بر ربات
@@ -3689,7 +3756,7 @@
 </div><div dir = "rtl">
 <p>
 
-مرکز ثقل چند جرم نقطه‌ای که در موقعیت مشخصی نسبت به یک مرجع مختصات قرار گرفته‌اند، از رابطه ی زیر قابل محاسبه کردن است، که در آن عبارت ام پایین‌نویس کا جرم شماره ی کا را نشان می‌دهد. و عبارت آر پایین‌نویس کا بردار موقعیت این جرم از مرجع مختصات است.
+مرکز ثقل چند جرم نقطه‌ای که در موقعیت مشخصی نسبت به یک مرجع مختصات قرار گرفته‌اند، از رابطه‌ی زیر قابل محاسبه کردن است، که در آن عبارت ام پایین‌نویس کا جرم شماره‌ی کا را نشان می‌دهد. و عبارت آر پایین‌نویس کا بردار موقعیت این جرم از مرجع مختصات است.
 
 </p>
 </div><p><span>$r_{CM} = \frac{\sum m_k r_k}{\sum m_k}$</span></p><div dir = "rtl">
@@ -4375,4 +4442,4 @@ typedef struct
 </li>
 
 </ol>
-</div></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="maxwellfield_persian.html">« The Maxwell Field (Persian)</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.14.1 on <span class="colophon-date" title="Wednesday 10 September 2025 15:09">Wednesday 10 September 2025</span>. Using Julia version 1.10.10.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+</div></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="maxwellfield_persian.html">« The Maxwell Field (Persian)</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.14.1 on <span class="colophon-date" title="Thursday 11 September 2025 08:53">Thursday 11 September 2025</span>. Using Julia version 1.10.10.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
