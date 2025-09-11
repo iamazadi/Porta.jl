@@ -8162,6 +8162,278 @@ Description = "Describes the mathematical model of a reaction wheel unicycle rob
 </div>
 ```
 
+```C
+typedef struct
+{
+  int16_t accX_offset;
+  int16_t accY_offset;
+  int16_t accZ_offset;
+  double accX_scale;
+  double accY_scale;
+  double accZ_scale;
+  int16_t gyrX_offset;
+  int16_t gyrY_offset;
+  int16_t gyrZ_offset;
+  double gyrX_scale;
+  double gyrY_scale;
+  double gyrZ_scale;
+  int16_t rawAccX;
+  int16_t rawAccY;
+  int16_t rawAccZ;
+  int16_t rawGyrX;
+  int16_t rawGyrY;
+  int16_t rawGyrZ;
+  double accX;
+  double accY;
+  double accZ;
+  double gyrX;
+  double gyrY;
+  double gyrZ;
+  double roll;
+  double pitch;
+  double yaw;
+  double roll_velocity;
+  double pitch_velocity;
+  double yaw_velocity;
+  double roll_acceleration;
+  double pitch_acceleration;
+  double yaw_acceleration;
+} IMU;
+```
+
+```c
+
+// tilt estimation
+// the pivot point B̂ in the inertial frame Ô
+float pivot[3] = {-0.097, -0.1, -0.032};
+// the position of sensors mounted on the body in the body frame of reference
+float p1[3] = {-0.035, -0.19, -0.04};
+float p2[3] = {0.025, -0.144, -0.07};
+// the vectors of the standard basis for the input space ℝ³
+float e1[3] = {1.0, 0.0, 0.0};
+float e2[3] = {0.0, 1.0, 0.0};
+float e3[3] = {0.0, 0.0, 1.0};
+// The rotation of the inertial frame Ô to the body frame B̂
+float O_B_R[3][3] = {{1.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, {0.0, 0.0, 1.0}};
+float B_O_R[3][3] = {{1.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, {0.0, 0.0, 1.0}};
+// The rotation of the local frame of the sensor i to the robot frame B̂
+float A1_B_R[3][3] = {{1.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, {0.0, 0.0, 1.0}}; // [ê[2] ê[1] ê[3]]
+float A2_B_R[3][3] = {{1.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, {0.0, 0.0, 1.0}}; // [ê[1] ê[2] ê[3]]
+float B_A1_R[3][3] = {{1.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, {0.0, 0.0, 1.0}}; // LinearAlgebra.inv(A1_B_R)
+float B_A2_R[3][3] = {{1.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, {0.0, 0.0, 1.0}}; // LinearAlgebra.inv(A2_B_R)
+// The matrix of unknown parameters
+float Q[3][4] = {{0.0, 0.0, 0.0, 0.0}, {0.0, 0.0, 0.0, 0.0}, {0.0, 0.0, 0.0, 0.0}};
+// The matrix of sensor locations (known parameters)
+float P[4][2] = {{1.0, 1.0}, {-0.043, 0.057}, {0.035, 0.04}, {-0.03, -0.028}}; // [[1.0; vec(p1 - pivot)] [1.0; vec(p2 - pivot)] [1.0; vec(p3 - pivot)] [1.0; vec(p4 - pivot)]]
+// The optimal fusion matrix
+float X[2][4] = {{0.586913, -11.3087, 0.747681, 0.0}, {0.446183, 8.92749, -3.54337, 0.0}}; // transpose(P) * LinearAlgebra.inv(P * transpose(P))
+// accelerometer sensor measurements in the local frame of the sensors
+float R1[3] = {0.0, 0.0, 0.0};
+float R2[3] = {0.0, 0.0, 0.0};
+// accelerometer sensor measurements in the robot body frame
+float _R1[3] = {0.0, 0.0, 0.0};
+float _R2[3] = {0.0, 0.0, 0.0};
+// all sensor measurements combined
+float Matrix[3][2] = {{0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}};
+// The gravity vector
+float g[3] = {0.0, 0.0, 0.0};
+// y-Euler angle (pitch)
+float beta = 0.0;
+float fused_beta = 0.0;
+// x-Euler angle (roll)
+float gamma1 = 0.0;
+float fused_gamma = 0.0;
+// tuning parameters to minimize estimate variance
+float kappa1 = 0.03;
+float kappa2 = 0.03;
+// the average of the body angular rate from rate gyro
+float r[3] = {0.0, 0.0, 0.0};
+// the average of the body angular rate in Euler angles
+float r_dot[3] = {0.0, 0.0, 0.0};
+// gyro sensor measurements in the local frame of the sensors
+float G1[3] = {0.0, 0.0, 0.0};
+float G2[3] = {0.0, 0.0, 0.0};
+// gyro sensor measurements in the robot body frame
+float _G1[3] = {0.0, 0.0, 0.0};
+float _G2[3] = {0.0, 0.0, 0.0};
+// a matrix transfom from body rates to Euler angular rates
+float E[3][3] = {{0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}};
+```
+
+
+```C
+void updateIMU1(IMU *sensor) // GY-25 I2C
+{
+  do
+  {
+    HAL_I2C_Master_Transmit(&hi2c1, (uint16_t)SLAVE_ADDRESS, (uint8_t *)&transferRequest, 1, 10);
+    while (HAL_I2C_GetState(&hi2c1) != HAL_I2C_STATE_READY)
+      ;
+  } while (HAL_I2C_GetError(&hi2c1) == HAL_I2C_ERROR_AF);
+
+  do
+  {
+    HAL_I2C_Master_Receive(&hi2c1, (uint16_t)SLAVE_ADDRESS, (uint8_t *)raw_data, 12, 10);
+    while (HAL_I2C_GetState(&hi2c1) != HAL_I2C_STATE_READY)
+      ;
+    sensor->rawAccX = (raw_data[0] << 8) | raw_data[1];
+    sensor->rawAccY = (raw_data[2] << 8) | raw_data[3];
+    sensor->rawAccZ = (raw_data[4] << 8) | raw_data[5];
+    sensor->rawGyrX = (raw_data[6] << 8) | raw_data[7];
+    sensor->rawGyrY = (raw_data[8] << 8) | raw_data[9];
+    sensor->rawGyrZ = (raw_data[10] << 8) | raw_data[11];
+    sensor->accX = sensor->accX_scale * (sensor->rawAccX - sensor->accX_offset);
+    sensor->accY = sensor->accY_scale * (sensor->rawAccY - sensor->accY_offset);
+    sensor->accZ = sensor->accZ_scale * (sensor->rawAccZ - sensor->accZ_offset);
+    sensor->gyrX = sensor->gyrX_scale * (sensor->rawGyrX - sensor->gyrX_offset);
+    sensor->gyrY = sensor->gyrY_scale * (sensor->rawGyrY - sensor->gyrY_offset);
+    sensor->gyrZ = sensor->gyrZ_scale * (sensor->rawGyrZ - sensor->gyrZ_offset);
+  } while (HAL_I2C_GetError(&hi2c1) == HAL_I2C_ERROR_AF);
+
+  return;
+}
+```
+
+```C
+void updateIMU2(IMU *sensor) // GY-95 USART
+{
+  if (uart_receive_ok == 1)
+  {
+    if (UART1_rxBuffer[0] == UART1_txBuffer[0] && UART1_rxBuffer[1] == UART1_txBuffer[1] && UART1_rxBuffer[2] == UART1_txBuffer[2] && UART1_rxBuffer[3] == UART1_txBuffer[3])
+      {
+      sensor->rawAccX = (UART1_rxBuffer[5] << 8) | UART1_rxBuffer[4];
+      sensor->rawAccY = (UART1_rxBuffer[7] << 8) | UART1_rxBuffer[6];
+      sensor->rawAccZ = (UART1_rxBuffer[9] << 8) | UART1_rxBuffer[8];
+      sensor->rawGyrX = (UART1_rxBuffer[11] << 8) | UART1_rxBuffer[10];
+      sensor->rawGyrY = (UART1_rxBuffer[13] << 8) | UART1_rxBuffer[12];
+      sensor->rawGyrZ = (UART1_rxBuffer[15] << 8) | UART1_rxBuffer[14];
+      sensor->accX = sensor->accX_scale * (sensor->rawAccX - sensor->accX_offset);
+      sensor->accY = sensor->accY_scale * (sensor->rawAccY - sensor->accY_offset);
+      sensor->accZ = sensor->accZ_scale * (sensor->rawAccZ - sensor->accZ_offset);
+      sensor->gyrX = sensor->gyrX_scale * (sensor->rawGyrX - sensor->gyrX_offset);
+      sensor->gyrY = sensor->gyrY_scale * (sensor->rawGyrY - sensor->gyrY_offset);
+      sensor->gyrZ = sensor->gyrZ_scale * (sensor->rawGyrZ - sensor->gyrZ_offset);
+      double dummyx = cos(angle) * sensor->accX - sin(angle) * sensor->accY;
+      double dummyy = sin(angle) * sensor->accX + cos(angle) * sensor->accY;
+      sensor->accX = -dummyy;
+      sensor->accY = dummyx;
+      dummyx = cos(angle) * sensor->gyrX - sin(angle) * sensor->gyrY;
+      dummyy = sin(angle) * sensor->gyrX + cos(angle) * sensor->gyrY;
+      sensor->gyrX = -dummyy;
+      sensor->gyrY = dummyx;
+      uart_receive_ok = 0;
+    }
+  }
+  return;
+}
+```
+
+```C
+void updateIMU(LinearQuadraticRegulator *model)
+{
+  updateIMU1(&(model->imu1));
+  updateIMU2(&(model->imu2));
+  R1[0] = model->imu1.accX;
+  R1[1] = model->imu1.accY;
+  R1[2] = model->imu1.accZ;
+  R2[0] = model->imu2.accX;
+  R2[1] = model->imu2.accY;
+  R2[2] = model->imu2.accZ;
+
+  _R1[0] = 0.0;
+  _R1[1] = 0.0;
+  _R1[2] = 0.0;
+  _R2[0] = 0.0;
+  _R2[1] = 0.0;
+  _R2[2] = 0.0;
+  for (int i = 0; i < 3; i++) {
+    for (int j = 0; j < 3; j++) {
+      _R1[i] += B_A1_R[i][j] * R1[j];
+      _R2[i] += B_A2_R[i][j] * R2[j];
+    }
+  }
+
+  for (int i = 0; i < 3; i++) {
+    Matrix[i][0] = _R1[i];
+    Matrix[i][1] = _R2[i];
+  }
+
+  for (int i = 0; i < 3; i++) {
+    for (int j = 0; j < 4; j++) {
+      Q[i][j] = 0.0;
+      for (int k = 0; k < 2; k++) {
+        Q[i][j] += Matrix[i][k] * X[k][j];
+      }
+    }
+  }
+  g[0] = Q[0][0];
+  g[1] = Q[1][0];
+  g[2] = Q[2][0];
+  beta = atan2(-g[0], sqrt(pow(g[1], 2) + pow(g[2], 2)));
+  gamma1 = atan2(g[1], g[2]);
+
+  G1[0] = model->imu1.gyrX;
+  G1[1] = model->imu1.gyrY;
+  G1[2] = model->imu1.gyrZ;
+  G2[0] = model->imu2.gyrX;
+  G2[1] = model->imu2.gyrY;
+  G2[2] = model->imu2.gyrZ;
+
+  _G1[0] = 0.0;
+  _G1[1] = 0.0;
+  _G1[2] = 0.0;
+  _G2[0] = 0.0;
+  _G2[1] = 0.0;
+  _G2[2] = 0.0;
+  for (int i = 0; i < 3; i++) {
+    for (int j = 0; j < 3; j++) {
+      _G1[i] += B_A1_R[i][j] * G1[j];
+      _G2[i] += B_A2_R[i][j] * G2[j];
+    }
+  }
+  for (int i = 0; i < 3; i++) {
+    r[i] = (_G1[i] + _G2[i]) / 2.0;
+  }
+
+  E[0][0] = 0.0;
+  E[0][1] = sin(gamma1) / cos(beta);
+  E[0][2] = cos(gamma1) / cos(beta);
+  E[1][0] = 0.0;
+  E[1][1] = cos(gamma1);
+  E[1][2] = -sin(gamma1);
+  E[2][0] = 1.0;
+  E[2][1] = sin(gamma1) * tan(beta);
+  E[2][2] = cos(gamma1) * tan(beta);
+
+  r_dot[0] = 0.0;
+  r_dot[1] = 0.0;
+  r_dot[2] = 0.0;
+  for (int i = 0; i < 3; i++) {
+    for (int j = 0; j < 3; j++) {
+      r_dot[i] += E[i][j] * r[j];
+      r_dot[i] += E[i][j] * r[j];
+      r_dot[i] += E[i][j] * r[j];
+      r_dot[i] += E[i][j] * r[j];
+    }
+  }
+
+  fused_beta = kappa1 * beta + (1.0 - kappa1) * (fused_beta + model->dt * (r_dot[1] / 180.0 * M_PI));
+  fused_gamma = kappa2 * gamma1 + (1.0 - kappa2) * (fused_gamma + model->dt * (r_dot[2] / 180.0 * M_PI));
+  model->imu1.yaw += model->dt * r_dot[0];
+
+  float _roll = fused_beta;
+  float _pitch = -fused_gamma;
+  float _roll_velocity = ((r_dot[1] / 180.0 * M_PI) + (_roll - model->imu1.roll) / model->dt) / 2.0;
+  float _pitch_velocity = ((-r_dot[2] / 180.0 * M_PI) + (_pitch - model->imu1.pitch) / model->dt) / 2.0;
+  model->imu1.roll_acceleration = _roll_velocity - model->imu1.roll_velocity;
+  model->imu1.pitch_acceleration = _pitch_velocity - model->imu1.pitch_velocity;
+  model->imu1.roll_velocity = _roll_velocity;
+  model->imu1.pitch_velocity = _pitch_velocity;
+  model->imu1.roll = _roll;
+  model->imu1.pitch = _pitch;
+}
+```
+
 ```@raw html
 <div dir = "rtl">
 <h2>
@@ -8792,13 +9064,36 @@ typedef struct
   int terminated; // has the environment been reset
   int updated;    // whether the policy has been updated since episode termination and parameter convegence
   int active;     // is the model controller active
-  IMU imu;
+  float dt;       // period in seconds
+  IMU imu1;
+  IMU imu2;
   Encoder ReactionEncoder;
   Encoder RollingEncoder;
 } LinearQuadraticRegulator;
 ```
 
 ![schematics](./assets/reactionwheelunicycle/schematics.jpeg)
+
+```c
+// define arrays for matrix-matrix and matrix-vector multiplication
+float x_k[N];
+float u_k[M];
+float x_k1[N];
+float u_k1[M];
+float z_k[N + M];
+float z_k1[N + M];
+float basisset0[N + M];
+float basisset1[N + M];
+float z_n[N + M];
+float W_n[N + M][N + M];
+float P_n[N + M][N + M];
+float K_j[M][N];
+float g_n[N + M];
+float alpha_n[N + M];
+float S_ux[M][N];
+float S_uu[M][M];
+float S_uu_inverse[M][M];
+```
 
 ```c
 // feeback policy
@@ -8825,18 +9120,18 @@ typedef struct
 
 ```c
   // act!
-  model->dataset.x0 = model->imu.calibrated_roll;
-  model->dataset.x1 = model->imu.calibrated_roll_velocity;
-  model->dataset.x2 = 0.0;
-  model->dataset.x3 = model->imu.calibrated_pitch;
-  model->dataset.x4 = model->imu.calibrated_pitch_velocity;
-  model->dataset.x5 = model->RollingEncoder.acceleration;
-  model->dataset.x6 = model->ReactionEncoder.velocity;
-  model->dataset.x7 = model->RollingEncoder.angle;
-  model->dataset.x8 = reaction_wheel_current_acceleration;
-  model->dataset.x9 = rolling_wheel_current_acceleration;
-  model->dataset.x10 = u_k[0];
-  model->dataset.x11 = u_k[1];
+model->dataset.x0 = model->imu1.roll;
+model->dataset.x1 = model->imu1.roll_velocity;
+model->dataset.x2 = model->imu1.roll_acceleration;
+model->dataset.x3 = model->imu1.pitch;
+model->dataset.x4 = model->imu1.pitch_velocity;
+model->dataset.x5 = model->imu1.pitch_acceleration;
+model->dataset.x6 = model->ReactionEncoder.velocity;
+model->dataset.x7 = model->RollingEncoder.velocity;
+model->dataset.x8 = reaction_wheel_current_velocity;
+model->dataset.x9 = rolling_wheel_current_velocity;
+model->dataset.x10 = u_k[0];
+model->dataset.x11 = u_k[1];
 ```
 
 ```@raw html
@@ -8857,7 +9152,7 @@ typedef struct
 if (model->active == 1)
   {
     reaction_wheel_pwm += 16.0 * u_k[0];
-    rolling_wheel_pwm += 2.0 * u_k[1];
+    rolling_wheel_pwm += 16.0 * u_k[1];
     reaction_wheel_pwm = fmin(255.0, reaction_wheel_pwm);
     reaction_wheel_pwm = fmax(-255.0, reaction_wheel_pwm);
     rolling_wheel_pwm = fmin(255.0, rolling_wheel_pwm);
@@ -8866,23 +9161,23 @@ if (model->active == 1)
     TIM2->CCR2 = 255 * (int)fabs(reaction_wheel_pwm);
     if (reaction_wheel_pwm < 0)
     {
-      HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_SET);
-      HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_RESET);
-    }
-    else
-    {
       HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_RESET);
       HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_SET);
     }
-    if (rolling_wheel_pwm < 0)
-    {
-      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2, GPIO_PIN_SET);
-      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, GPIO_PIN_RESET);
-    }
     else
+    {
+      HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_SET);
+      HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_RESET);
+    }
+    if (rolling_wheel_pwm < 0)
     {
       HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2, GPIO_PIN_RESET);
       HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, GPIO_PIN_SET);
+    }
+    else
+    {
+      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2, GPIO_PIN_SET);
+      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, GPIO_PIN_RESET);
     }
   }
   else
@@ -8910,20 +9205,20 @@ if (model->active == 1)
 
 ```c
 // dataset = (xₖ, uₖ, xₖ₊₁, uₖ₊₁)
-  updateEncoder(&(model->ReactionEncoder), reactionEncoderWindow, TIM3->CNT);
-  updateEncoder(&(model->RollingEncoder), rollingEncoderWindow, TIM4->CNT);
-  updateIMU(&(model->imu));
-  updateCurrentSensing();
-  model->dataset.x12 = model->imu.calibrated_roll;
-  model->dataset.x13 = model->imu.calibrated_roll_velocity;
-  model->dataset.x14 = 0.0;
-  model->dataset.x15 = model->imu.calibrated_pitch;
-  model->dataset.x16 = model->imu.calibrated_pitch_velocity;
-  model->dataset.x17 = model->RollingEncoder.acceleration;
-  model->dataset.x18 = model->ReactionEncoder.velocity;
-  model->dataset.x19 = model->RollingEncoder.angle;
-  model->dataset.x20 = reaction_wheel_current_acceleration;
-  model->dataset.x21 = rolling_wheel_current_acceleration;
+updateEncoder(&(model->ReactionEncoder), TIM3->CNT);
+updateEncoder(&(model->RollingEncoder), TIM4->CNT);
+updateIMU(model);
+updateCurrentSensing();
+model->dataset.x12 = model->imu1.roll;
+model->dataset.x13 = model->imu1.roll_velocity;
+model->dataset.x14 = model->imu1.roll_acceleration;
+model->dataset.x15 = model->imu1.pitch;
+model->dataset.x16 = model->imu1.pitch_velocity;
+model->dataset.x17 = model->imu1.pitch_acceleration;
+model->dataset.x18 = model->ReactionEncoder.velocity;
+model->dataset.x19 = model->RollingEncoder.velocity;
+model->dataset.x20 = reaction_wheel_current_velocity;
+model->dataset.x21 = rolling_wheel_current_velocity;
 ```
 
 ```@raw html
@@ -8960,56 +9255,58 @@ for (int i = 0; i < model->m; i++)
 
 ```c
 // Now perform a one-step update in the parameter vector W by applying RLS to equation (S27).
-  // initialize z_n
-  for (int i = 0; i < model->n + model->m; i++)
+for (int i = 0; i < model->n + model->m; i++)
+{
+  z_n[i] = 0.0;
+}
+for (int i = 0; i < model->n + model->m; i++)
+{
+  for (int j = 0; j < model->n + model->m; j++)
   {
-    z_n[i] = 0.0;
+    z_n[i] += P_n[i][j] * z_k[j];
   }
-  for (int i = 0; i < model->n + model->m; i++)
+}
+float z_k_dot_z_n = 0.0;
+for (int i = 0; i < model->n + model->m; i++)
+{
+  z_k_dot_z_n += z_k[i] * z_n[i];
+}
+for (int i = 0; i < model->n + model->m; i++)
+{
+  g_n[i] = 1.0 / (model->lambda + z_k_dot_z_n) * z_n[i];
+}
+// αₙ = dₙ - transpose(wₙ₋₁) * xₙ
+// initialize alpha_n
+for (int i = 0; i < model->n + model->m; i++)
+{
+  alpha_n[i] = 0.0;
+}
+for (int i = 0; i < model->n + model->m; i++)
+{
+  for (int j = 0; j < model->n + model->m; j++)
   {
-    for (int j = 0; j < model->n + model->m; j++)
-    {
-      z_n[i] += P_n[i][j] * z_k[j];
-    }
+    alpha_n[i] += W_n[i][j] * (basisset0[j] - basisset1[j]); // checked manually
   }
-  float z_k_dot_z_n = 0.0;
-  for (int i = 0; i < model->n + model->m; i++)
+}
+for (int i = 0; i < model->n + model->m; i++)
+{
+  for (int j = 0; j < model->n + model->m; j++)
   {
-    z_k_dot_z_n += z_k[i] * z_n[i];
+    W_n[i][j] = W_n[i][j] + (alpha_n[i] * g_n[j]); // checked manually
   }
-  for (int i = 0; i < model->n + model->m; i++)
+}
+for (int i = 0; i < model->n + model->m; i++)
+{
+  for (int j = 0; j < model->n + model->m; j++)
   {
-    g_n[i] = 1.0 / (model->lambda + z_k_dot_z_n) * z_n[i];
+    P_n[i][j] = (1.0 / model->lambda) * (P_n[i][j] - g_n[i] * z_n[j]); // checked manually
   }
-  // αₙ = dₙ - transpose(wₙ₋₁) * xₙ
-  // initialize alpha_n
-  for (int i = 0; i < model->n + model->m; i++)
-  {
-    alpha_n[i] = 0.0;
-  }
-  for (int i = 0; i < model->n + model->m; i++)
-  {
-    for (int j = 0; j < model->n + model->m; j++)
-    {
-      alpha_n[i] += W_n[i][j] * (basisset0[j] - basisset1[j]); // checked manually
-    }
-  }
-  for (int i = 0; i < model->n + model->m; i++)
-  {
-    for (int j = 0; j < model->n + model->m; j++)
-    {
-      W_n[i][j] = W_n[i][j] + (alpha_n[i] * g_n[j]); // checked manually
-    }
-  }
-  for (int i = 0; i < model->n + model->m; i++)
-  {
-    for (int j = 0; j < model->n + model->m; j++)
-    {
-      P_n[i][j] = (1.0 / model->lambda) * (P_n[i][j] - g_n[i] * z_n[j]); // checked manually
-    }
-  }
-  // Repeat at the next time k + 1 and continue until RLS converges and the new parameter vector Wⱼ₊₁ is found.
-  model->k = k + 1;
+}
+getBuffer(model->m + model->n, model->m + model->n, W_n, &(model->W_n));
+getBuffer(model->m + model->n, model->m + model->n, P_n, &(model->P_n));
+
+// Repeat at the next time k + 1 and continue until RLS converges and the new parameter vector Wⱼ₊₁ is found.
+model->k = k + 1;
 ```
 
 ```@raw html
@@ -9023,16 +9320,35 @@ for (int i = 0; i < model->m; i++)
 ```
 
 ```c
-  // npack the vector Wⱼ₊₁ into the kernel matrix
+void updateControlPolicy(LinearQuadraticRegulator *model)
+{
+  // unpack the vector Wⱼ₊₁ into the kernel matrix
   // Q(xₖ, uₖ) ≡ 0.5 * transpose([xₖ; uₖ]) * S * [xₖ; uₖ] = 0.5 * transpose([xₖ; uₖ]) * [Sₓₓ Sₓᵤ; Sᵤₓ Sᵤᵤ] * [xₖ; uₖ]
   model->k = 1;
   model->j = model->j + 1;
+  // initialize the filter matrix
+  putBuffer(model->m + model->n, model->m + model->n, W_n, model->W_n);
 
-   // Perform the control update using (S24), which is uₖ = -S⁻¹ᵤᵤ * Sᵤₓ * xₖ
+  for (int i = 0; i < model->m; i++)
+  {
+    for (int j = 0; j < model->n; j++)
+    {
+      S_ux[i][j] = W_n[model->n + i][j];
+    }
+  }
+  for (int i = 0; i < model->m; i++)
+  {
+    for (int j = 0; j < model->m; j++)
+    {
+      S_uu[i][j] = W_n[model->n + i][model->n + j];
+    }
+  }
+
+  // Perform the control update using (S24), which is uₖ = -S⁻¹ᵤᵤ * Sᵤₓ * xₖ
   // uₖ = -S⁻¹ᵤᵤ * Sᵤₓ * xₖ
   float determinant = S_uu[1][1] * S_uu[2][2] - S_uu[1][2] * S_uu[2][1];
   // check the rank S_uu to see if it's equal to 2 (invertible matrix)
-  if (fabs(determinant) > 0.001) // greater than zero
+  if (fabs(determinant) > 0.0001) // greater than zero
   {
     S_uu_inverse[0][0] = S_uu[1][1] / determinant;
     S_uu_inverse[0][1] = -S_uu[0][1] / determinant;
@@ -9056,8 +9372,30 @@ for (int i = 0; i < model->m; i++)
         }
       }
     }
-    model->updated = 1;
+    model->K_j.x00 = K_j[0][0];
+    model->K_j.x01 = K_j[0][1];
+    model->K_j.x02 = K_j[0][2];
+    model->K_j.x03 = K_j[0][3];
+    model->K_j.x04 = K_j[0][4];
+    model->K_j.x05 = K_j[0][5];
+    model->K_j.x06 = K_j[0][6];
+    model->K_j.x07 = K_j[0][7];
+    model->K_j.x08 = K_j[0][8];
+    model->K_j.x09 = K_j[0][9];
+    model->K_j.x10 = K_j[1][0];
+    model->K_j.x11 = K_j[1][1];
+    model->K_j.x12 = K_j[1][2];
+    model->K_j.x13 = K_j[1][3];
+    model->K_j.x14 = K_j[1][4];
+    model->K_j.x15 = K_j[1][5];
+    model->K_j.x16 = K_j[1][6];
+    model->K_j.x17 = K_j[1][7];
+    model->K_j.x18 = K_j[1][8];
+    model->K_j.x19 = K_j[1][9];
   }
+  model->updated = 1;
+  return;
+}
 ```
 
 ```@raw html
@@ -9084,7 +9422,7 @@ if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_0) == 0)
       TIM2->CCR2 = 0;
     }
 
-    if (fabs(model.imu.calibrated_roll) > reaction_wheel_safety_angle || fabs(model.imu.calibrated_pitch) > rolling_wheel_safety_angle || model.k > max_episode_length)
+    if (fabs(model.imu1.roll) > roll_safety_angle || fabs(model.imu1.pitch) > pitch_safety_angle || model.k > max_episode_length)
     {
       model.terminated = 1;
       model.active = 0;
@@ -9114,16 +9452,76 @@ if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_0) == 0)
       HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_RESET);
       HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2, GPIO_PIN_RESET);
       HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, GPIO_PIN_RESET);
-      updateEncoder(&model.ReactionEncoder, reactionEncoderWindow, TIM3->CNT);
-      updateEncoder(&model.RollingEncoder, rollingEncoderWindow, TIM4->CNT);
-      updateIMU(&(model.imu));
+      updateEncoder(&model.ReactionEncoder, TIM3->CNT);
+      updateEncoder(&model.RollingEncoder, TIM4->CNT);
+      updateIMU(&model);
       updateCurrentSensing();
     }
     if (model.terminated == 1 && model.updated == 0)
     {
       updateControlPolicy(&model);
     }
+    if (model.k % 500 == 0)
+    {
+      updateControlPolicy(&model);
+    }
 ```
+
+```c
+unsigned long t1 = 0;
+
+
+t1 = DWT->CYCCNT;
+// operations
+t2 = DWT->CYCCNT;
+diff = t2 - t1;
+dt = (float)diff / CPU_CLOCK;
+model.dt = dt;
+```
+
+```c
+typedef struct
+{
+  int value;
+  double angle;
+  double velocity;             // the angular velocity
+  double acceleration;         // the angular acceleration
+  int pulse_per_revolution; // the number of pulses per revolution
+} Encoder;
+```
+
+```c
+void updateEncoder(Encoder *encoder, int newValue)
+{
+  encoder->value = newValue;
+  double angle = sin((float)(encoder->value % encoder->pulse_per_revolution) / (double) encoder->pulse_per_revolution * 2.0 * M_PI);
+  double velocity = angle - encoder->angle;
+  double acceleration = velocity - encoder->velocity;
+  encoder->angle = angle;
+  encoder->velocity = velocity;
+  encoder->acceleration = acceleration;
+  return;
+}
+```
+
+```c
+void updateCurrentSensing()
+{
+  // Start ADC Conversion in DMA Mode (Periodically Every 1ms)
+  HAL_ADC_Start_DMA(&hadc1, AD_RES_BUFFER, 2);
+  reaction_wheel_current1 = reaction_wheel_current0;
+  rolling_wheel_current1 = rolling_wheel_current0;
+  reaction_wheel_current0 = (AD_RES_BUFFER[0] << 4);
+  rolling_wheel_current0 = (AD_RES_BUFFER[1] << 4);
+  double reaction_velocity = (double) (reaction_wheel_current0 - reaction_wheel_current1) / 32000.0;
+  double rolling_velocity = (double) (rolling_wheel_current0 - rolling_wheel_current1) / 32000.0;
+  rolling_wheel_current_acceleration = rolling_velocity - rolling_wheel_current_velocity;
+  reaction_wheel_current_acceleration = reaction_velocity - reaction_wheel_current_velocity;
+  reaction_wheel_current_velocity = reaction_velocity;
+  rolling_wheel_current_velocity = rolling_velocity;
+}
+```
+
 
 # References
 
