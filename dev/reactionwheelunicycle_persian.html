@@ -3736,6 +3736,52 @@
 برآورد شیب
 
 </h4>
+<p>
+
+با برآورد جی کلاه‌دار مرتبط با بردار جاذبه در چهارچوب بدنه، می‌توان معادله‌ی (۵) را برای برآورد کردن چرخش بدنه به کار برد، زیرا راستای بردار جاذبه در چهارچوب اینرسی از دانسته‌هاست. 
+
+</p>
+</div><p><span>$^{B}\hat{g}$</span></p><p><span>$\hat{B}, \ \hat{O}$</span></p><div dir = "rtl">
+<p>
+
+در این‌جا، وضعیت جسم صلب با زاویه‌های اویلر: زد، ایگرگ، ایکس (سمت‌گشت، تاب، غلت) بازنمایی می‌شود. یعنی چهارچوب بدنه، ماتریس بی کلاه‌دار با چرخاندن چهارچوب لختی او کلاه‌دار به طور متوالی به دور محور زد خودش، بعد به دور محور ایگرگ نتیجه و محور ایکس آن به دست می‌آید.
+
+</p>
+</div><p><span>$^{O}_{B}R = R_z(\alpha) \ R_y(\beta) \ R_x(\gamma)$</span>  (23)</p><p><span>$R_z(\alpha) := \begin{bmatrix} cos(\alpha) &amp; -sin(\alpha) &amp; 0 \\ sin(\alpha) &amp; cos(\alpha) &amp; 0 \\ 0 &amp; 0 &amp; 1 \end{bmatrix}$</span></p><p><span>$R_y(\beta) := \begin{bmatrix} cos(\beta) &amp; 0 &amp; sin(\beta) \\ 0 &amp; 1 &amp; 0 \\ -sin(\beta) &amp; 0 &amp; cos(\beta) \end{bmatrix}$</span></p><p><span>$R_x(\gamma) := \begin{bmatrix}  1 &amp; 0 &amp; 0 \\ 0 &amp; cos(\gamma) &amp; -sin(\gamma) \\ 0 &amp; sin(\gamma) &amp; cos(\gamma) \end{bmatrix}$</span></p><p><span>$\alpha, \ \beta, \ \gamma$</span></p><div dir = "rtl">
+<p>
+
+که در اینجا آلفا، بتا و گاما به ترتیب زاویه‌های اویلر سمت‌گشت، تاب و غلت هستند. با این بازنمایش، شیب جسم صلب با زاویه‌ی بتا و گاما دربر گرفته شده است. با استفاده از معادله (۲۳) می‌توان معادله‌ی (۵) را به این صورت از نو نوشت:
+
+</p>
+</div><p><span>$^{B}g = ^{O}_{B}R^T \ ^{O}g = R^T_x(\gamma) \ R^T_y(\beta) \ R^T_z(\alpha) \ ^{O}g$</span>  (24)</p><div dir = "rtl">
+<p>
+
+با استفاده از بردار جاذبه در چهارچوب اینرسی و ثابت جاذبه جی پایین‌نوشت صفر و تعریف‌های ماتریس‌های چرخش، معادله‌ی (۲۴) به صورت زیر ساده می‌شود:
+
+</p>
+</div><p><span>$^{O}g = \begin{bmatrix} 0 &amp; 0 &amp; g_0 \end{bmatrix}^T$</span></p><p><span>$g_0$</span></p><p><span>$^{B}g = R^T_x(\gamma) \ R^T_y(\beta) \ ^{O}g = g_0 \begin{bmatrix} -sin(\beta) \\ sin(\gamma) cos(\beta) \\ cos(\gamma) cos(\beta) \end{bmatrix}$</span>  (25)</p><div dir = "rtl">
+<p>
+
+نتیجه می‌گیریم که زاویه‌ی اویلر زد یعنی آلفا از اندازه‌گیری‌های شتاب‌سنج قابل مشاهده نیست.
+
+</p>
+<p>
+
+با برآورد بردار جاذبه در معادله‌ی (۲۰)، «برآورد شتاب‌سنجی» برای زاویه‌های اویلر ایگرگ و ایکس در زمان کا به این شکل است:
+
+</p>
+</div><p><span>$\hat{\beta}_a(k) = atan2(-^{B}\hat{g}_x(k), \sqrt{^{B}\hat{g}_y^2(k) + ^{B}\hat{g}_z^2(k)})$</span></p><p><span>$\hat{\gamma}_a(k) = atan2(^{B}\hat{g}_y(k), ^{B}\hat{g}_z(k))$</span></p><p><span>$atan2$</span></p><div dir = "rtl">
+<p>
+
+که در اینجا تابع آرک تانژانت ۲ همان تانژانت معکوس چهار ربعی می‌باشد. توجه کنید که برای برآورد کردن شیب به دانستن ثابت جاذبه جی پایین‌نویس صفر نیازی نیست.
+
+</p>
+</div><p><span>$g_0$</span></p><p><span>$P$</span></p><div dir = "rtl">
+<p>
+
+واریانس برآورد زاویه‌ها را می‌توان از واریانس برآورد بردار جاذبه به دست آورد، که آن نیز به نوبت خود از معادله‌ی (۱۸) و تجزیه‌ی مقدار منفرد ماتریس پی در معادله‌ی (۱۶) قابل محاسبه شدن است.
+
+</p>
 </div><div dir = "rtl">
 <h2>
 
@@ -4442,4 +4488,4 @@ typedef struct
 </li>
 
 </ol>
-</div></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="maxwellfield_persian.html">« The Maxwell Field (Persian)</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.14.1 on <span class="colophon-date" title="Thursday 11 September 2025 08:53">Thursday 11 September 2025</span>. Using Julia version 1.10.10.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+</div></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="maxwellfield_persian.html">« The Maxwell Field (Persian)</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.14.1 on <span class="colophon-date" title="Thursday 11 September 2025 14:21">Thursday 11 September 2025</span>. Using Julia version 1.10.10.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
