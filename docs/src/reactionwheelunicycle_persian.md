@@ -8202,7 +8202,6 @@ typedef struct
 ```
 
 ```c
-
 // tilt estimation
 // the pivot point B̂ in the inertial frame Ô
 float pivot[3] = {-0.097, -0.1, -0.032};
@@ -9049,6 +9048,7 @@ void updateIMU(LinearQuadraticRegulator *model)
 ```c
 // Represents a Linear Quadratic Regulator (LQR) model.
 typedef struct
+typedef struct
 {
   Mat12f W_n;     // filter matrix
   Mat12f P_n;     // inverse autocorrelation matrix
@@ -9067,8 +9067,10 @@ typedef struct
   float dt;       // period in seconds
   IMU imu1;
   IMU imu2;
-  Encoder ReactionEncoder;
-  Encoder RollingEncoder;
+  Encoder reactionEncoder;
+  Encoder rollingEncoder;
+  CurrentSensor reactionCurrentSensor;
+  CurrentSensor rollingCurrentSensor;
 } LinearQuadraticRegulator;
 ```
 
@@ -9105,16 +9107,6 @@ float S_uu[M][M];
 float S_uu_inverse[M][M];
 ```
 
-```c
-// feeback policy
-  for (int i = 0; i < model->m; i++)
-  {
-    for (int j = 0; j < model->n; j++)
-    {
-      u_k[i] += -K_j[i][j] * x_k[j];
-    }
-  }
-```
 
 ```@raw html
 <div dir = "rtl">
@@ -9128,21 +9120,6 @@ float S_uu_inverse[M][M];
 
 ``(x_k, u_k, x_{k + 1}, u_{k + 1})``.
 
-```c
-  // act!
-model->dataset.x0 = model->imu1.roll;
-model->dataset.x1 = model->imu1.roll_velocity;
-model->dataset.x2 = model->imu1.roll_acceleration;
-model->dataset.x3 = model->imu1.pitch;
-model->dataset.x4 = model->imu1.pitch_velocity;
-model->dataset.x5 = model->imu1.pitch_acceleration;
-model->dataset.x6 = model->ReactionEncoder.velocity;
-model->dataset.x7 = model->RollingEncoder.velocity;
-model->dataset.x8 = reaction_wheel_current_velocity;
-model->dataset.x9 = rolling_wheel_current_velocity;
-model->dataset.x10 = u_k[0];
-model->dataset.x11 = u_k[1];
-```
 
 ```@raw html
 <div dir = "rtl">
@@ -9158,8 +9135,102 @@ model->dataset.x11 = u_k[1];
 
 ``u_k \in \mathbb{R^2}``
 
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+دومین مجموعه‌ی پایه همانند اولین مجموعه می‌باشد، با این تفاوت که مقدار آن پس از اعمال فرمان کنترلی اندازه‌گیری می‌شود. بنابراین، یک خطای استدلال قیاسی با استفاده از همان ضریب‌های صافی محاسبه می‌شود، که به طور مستقیم با میزان تغییرات در دو مجموعه‌ی پایه (پیش و پس از اعمال فرمان کنترلی) متناسب است. هرگاه خطای استدلال قیاسی نابرابر با صفر باشد، ماتریس صافی باید به‌روزرسانی شود. برای به‌روزرسانی ماتریس صافی، ابتدا خطای استدلال قیاسی در ماتریس بهره ضرب می‌شود و سپس حاصل‌ضرب از ضریب‌های صافی کم می‌شود.
+
+</p>
+</div>
+```
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+در پایان، ماتریس معکوس خودهمبستگی به روزرسانی می‌شود. برای به‌روزرسانی ماتریس معکوس خودهمبستگی، حاصل‌ضرب ماتریس بهره در بردار تصفیه‌شده‌ی اطلاعاتی از مقدار قبلی ماتریس معکوس خودهمبستگی کم می‌شود. همچنین برای کاهش دادن اثر به‌روزرسانی‌های قدیمی‌تر بر ماتریس‌های بهره و معکوس خودهمبستگی، باید اندازه‌ی هر به‌روزرسانی را با استفاده از یک ضریب وزنی نمایی تعدیل کرد. به این ترتیب، پس از انجام دادن چندین به‌روزرسانی متوالی، ضریب کاهشی (که مقداری بین صفر تا یک دارد) به تعداد به روزرسانی‌های انجام شده در خودش ضرب می‌شود و این باعث می‌شود که ضریب موثر به‌روزرسانی‌های قدیمی بسیار کوچک شود.
+
+</p>
+</div>
+```
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+وضعیت ربات پس از یک یا چند بار اجرا شدن حلقه‌ی کنترلی، بالاخره از شرط‌های مرزی اولیه بیش از حد دور می‌شود، که این شرایط توسط کاربر و برای ایمنی و کارایی تعیین شده‌اند. در این صورت، ربات باید به کار خود پایان دهد و متوقف شود. این زمان، بهترین زمان برای به‌روزرسانی تدبیر پس‌خوری می‌باشد. به‌روزرسانی تدبیر پس‌خوری بعد از به‌روزرسانی‌های متعدد بر روی ضریب‌های صافی و  ماتریس معکوس خودهمبستگی در طول چندین بار اجرای حلقه ی کنترلی انجام می‌شود.
+
+</p>
+</div>
+```
+
 ```c
-if (model->active == 1)
+/*
+Identify the Q function using RLS and update the control policy,
+with the given `environment` and `model`.
+The algorithm is terminated when there are no further updates
+to the Q function or the control policy at each step.
+*/
+void stepForward(LinearQuadraticRegulator *model)
+{
+  int k = model->k;
+  x_k[0] = model->dataset.x0;
+  x_k[1] = model->dataset.x1;
+  x_k[2] = model->dataset.x2;
+  x_k[3] = model->dataset.x3;
+  x_k[4] = model->dataset.x4;
+  x_k[5] = model->dataset.x5;
+  x_k[6] = model->dataset.x6;
+  x_k[7] = model->dataset.x7;
+  x_k[8] = model->dataset.x8;
+  x_k[9] = model->dataset.x9;
+  K_j[0][0] = model->K_j.x00;
+  K_j[0][1] = model->K_j.x01;
+  K_j[0][2] = model->K_j.x02;
+  K_j[0][3] = model->K_j.x03;
+  K_j[0][4] = model->K_j.x04;
+  K_j[0][5] = model->K_j.x05;
+  K_j[0][6] = model->K_j.x06;
+  K_j[0][7] = model->K_j.x07;
+  K_j[0][8] = model->K_j.x08;
+  K_j[0][9] = model->K_j.x09;
+  K_j[1][0] = model->K_j.x10;
+  K_j[1][1] = model->K_j.x11;
+  K_j[1][2] = model->K_j.x12;
+  K_j[1][3] = model->K_j.x13;
+  K_j[1][4] = model->K_j.x14;
+  K_j[1][5] = model->K_j.x15;
+  K_j[1][6] = model->K_j.x16;
+  K_j[1][7] = model->K_j.x17;
+  K_j[1][8] = model->K_j.x18;
+  K_j[1][9] = model->K_j.x19;
+  u_k[0] = 0.0;
+  u_k[1] = 0.0;
+  // feeback policy
+  for (int i = 0; i < model->m; i++)
+  {
+    for (int j = 0; j < model->n; j++)
+    {
+      u_k[i] += -K_j[i][j] * x_k[j];
+    }
+  }
+  // act!
+  model->dataset.x0 = model->imu1.roll;
+  model->dataset.x1 = model->imu1.roll_velocity;
+  model->dataset.x2 = model->imu1.roll_acceleration;
+  model->dataset.x3 = model->imu1.pitch;
+  model->dataset.x4 = model->imu1.pitch_velocity;
+  model->dataset.x5 = model->imu1.pitch_acceleration;
+  model->dataset.x6 = model->reactionEncoder.velocity;
+  model->dataset.x7 = model->rollingEncoder.velocity;
+  model->dataset.x8 = model->reactionCurrentSensor.currentVelocity;
+  model->dataset.x9 = model->rollingCurrentSensor.currentVelocity;
+  model->dataset.x10 = u_k[0];
+  model->dataset.x11 = u_k[1];
+
+  if (model->active == 1)
   {
     reaction_wheel_pwm += 16.0 * u_k[0];
     rolling_wheel_pwm += 16.0 * u_k[1];
@@ -9201,48 +9272,34 @@ if (model->active == 1)
     HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2, GPIO_PIN_RESET);
     HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, GPIO_PIN_RESET);
   }
-```
-
-```@raw html
-<div dir = "rtl">
-<p>
-
-دومین مجموعه‌ی پایه همانند اولین مجموعه می‌باشد، با این تفاوت که مقدار آن پس از اعمال فرمان کنترلی اندازه‌گیری می‌شود. بنابراین، یک خطای استدلال قیاسی با استفاده از همان ضریب‌های صافی محاسبه می‌شود، که به طور مستقیم با میزان تغییرات در دو مجموعه‌ی پایه (پیش و پس از اعمال فرمان کنترلی) متناسب است. هرگاه خطای استدلال قیاسی نابرابر با صفر باشد، ماتریس صافی باید به‌روزرسانی شود. برای به‌روزرسانی ماتریس صافی، ابتدا خطای استدلال قیاسی در ماتریس بهره ضرب می‌شود و سپس حاصل‌ضرب از ضریب‌های صافی کم می‌شود.
-
-</p>
-</div>
-```
-
-```c
-// dataset = (xₖ, uₖ, xₖ₊₁, uₖ₊₁)
-updateEncoder(&(model->ReactionEncoder), TIM3->CNT);
-updateEncoder(&(model->RollingEncoder), TIM4->CNT);
-updateIMU(model);
-updateCurrentSensing();
-model->dataset.x12 = model->imu1.roll;
-model->dataset.x13 = model->imu1.roll_velocity;
-model->dataset.x14 = model->imu1.roll_acceleration;
-model->dataset.x15 = model->imu1.pitch;
-model->dataset.x16 = model->imu1.pitch_velocity;
-model->dataset.x17 = model->imu1.pitch_acceleration;
-model->dataset.x18 = model->ReactionEncoder.velocity;
-model->dataset.x19 = model->RollingEncoder.velocity;
-model->dataset.x20 = reaction_wheel_current_velocity;
-model->dataset.x21 = rolling_wheel_current_velocity;
-```
-
-```@raw html
-<div dir = "rtl">
-<p>
-
-در پایان، ماتریس معکوس خودهمبستگی به روزرسانی می‌شود. برای به‌روزرسانی ماتریس معکوس خودهمبستگی، حاصل‌ضرب ماتریس بهره در بردار تصفیه‌شده‌ی اطلاعاتی از مقدار قبلی ماتریس معکوس خودهمبستگی کم می‌شود. همچنین برای کاهش دادن اثر به‌روزرسانی‌های قدیمی‌تر بر ماتریس‌های بهره و معکوس خودهمبستگی، باید اندازه‌ی هر به‌روزرسانی را با استفاده از یک ضریب وزنی نمایی تعدیل کرد. به این ترتیب، پس از انجام دادن چندین به‌روزرسانی متوالی، ضریب کاهشی (که مقداری بین صفر تا یک دارد) به تعداد به روزرسانی‌های انجام شده در خودش ضرب می‌شود و این باعث می‌شود که ضریب موثر به‌روزرسانی‌های قدیمی بسیار کوچک شود.
-
-</p>
-</div>
-```
-
-```c
-for (int i = 0; i < model->m; i++)
+  // dataset = (xₖ, uₖ, xₖ₊₁, uₖ₊₁)
+  encodeWheel(&(model->reactionEncoder), TIM3->CNT);
+  encodeWheel(&(model->rollingEncoder), TIM4->CNT);
+  senseCurrent(&(model->reactionCurrentSensor), &(model->rollingCurrentSensor));
+  updateIMU(model);
+  model->dataset.x12 = model->imu1.roll;
+  model->dataset.x13 = model->imu1.roll_velocity;
+  model->dataset.x14 = model->imu1.roll_acceleration;
+  model->dataset.x15 = model->imu1.pitch;
+  model->dataset.x16 = model->imu1.pitch_velocity;
+  model->dataset.x17 = model->imu1.pitch_acceleration;
+  model->dataset.x18 = model->reactionEncoder.velocity;
+  model->dataset.x19 = model->rollingEncoder.velocity;
+  model->dataset.x20 = model->reactionCurrentSensor.currentVelocity;
+  model->dataset.x21 = model->rollingCurrentSensor.currentVelocity;
+  x_k1[0] = model->dataset.x12;
+  x_k1[1] = model->dataset.x13;
+  x_k1[2] = model->dataset.x14;
+  x_k1[3] = model->dataset.x15;
+  x_k1[4] = model->dataset.x16;
+  x_k1[5] = model->dataset.x17;
+  x_k1[6] = model->dataset.x18;
+  x_k1[7] = model->dataset.x19;
+  x_k1[8] = model->dataset.x20;
+  x_k1[9] = model->dataset.x21;
+  u_k1[0] = 0.0;
+  u_k1[1] = 0.0;
+  for (int i = 0; i < model->m; i++)
   {
     for (int j = 0; j < model->n; j++)
     {
@@ -9251,72 +9308,94 @@ for (int i = 0; i < model->m; i++)
   }
   model->dataset.x22 = u_k1[0];
   model->dataset.x23 = u_k1[1];
-```
-
-```@raw html
-<div dir = "rtl">
-<p>
-
-وضعیت ربات پس از یک یا چند بار اجرا شدن حلقه‌ی کنترلی، بالاخره از شرط‌های مرزی اولیه بیش از حد دور می‌شود، که این شرایط توسط کاربر و برای ایمنی و کارایی تعیین شده‌اند. در این صورت، ربات باید به کار خود پایان دهد و متوقف شود. این زمان، بهترین زمان برای به‌روزرسانی تدبیر پس‌خوری می‌باشد. به‌روزرسانی تدبیر پس‌خوری بعد از به‌روزرسانی‌های متعدد بر روی ضریب‌های صافی و  ماتریس معکوس خودهمبستگی در طول چندین بار اجرای حلقه ی کنترلی انجام می‌شود.
-
-</p>
-</div>
-```
-
-```c
-// Now perform a one-step update in the parameter vector W by applying RLS to equation (S27).
-for (int i = 0; i < model->n + model->m; i++)
-{
-  z_n[i] = 0.0;
-}
-for (int i = 0; i < model->n + model->m; i++)
-{
-  for (int j = 0; j < model->n + model->m; j++)
+  // Compute the quadratic basis sets ϕ(zₖ), ϕ(zₖ₊₁).
+  z_k[0] = model->dataset.x0;
+  z_k[1] = model->dataset.x1;
+  z_k[2] = model->dataset.x2;
+  z_k[3] = model->dataset.x3;
+  z_k[4] = model->dataset.x4;
+  z_k[5] = model->dataset.x5;
+  z_k[6] = model->dataset.x6;
+  z_k[7] = model->dataset.x7;
+  z_k[8] = model->dataset.x8;
+  z_k[9] = model->dataset.x9;
+  z_k[10] = model->dataset.x10;
+  z_k[11] = model->dataset.x11;
+  z_k1[0] = model->dataset.x12;
+  z_k1[1] = model->dataset.x13;
+  z_k1[2] = model->dataset.x14;
+  z_k1[3] = model->dataset.x15;
+  z_k1[4] = model->dataset.x16;
+  z_k1[5] = model->dataset.x17;
+  z_k1[6] = model->dataset.x18;
+  z_k1[7] = model->dataset.x19;
+  z_k1[8] = model->dataset.x20;
+  z_k1[9] = model->dataset.x21;
+  z_k1[10] = model->dataset.x22;
+  z_k1[11] = model->dataset.x23;
+  for (int i = 0; i < model->n + model->m; i++)
   {
-    z_n[i] += P_n[i][j] * z_k[j];
+    basisset0[i] = z_k[i];
+    basisset1[i] = z_k1[i];
   }
-}
-float z_k_dot_z_n = 0.0;
-for (int i = 0; i < model->n + model->m; i++)
-{
-  z_k_dot_z_n += z_k[i] * z_n[i];
-}
-for (int i = 0; i < model->n + model->m; i++)
-{
-  g_n[i] = 1.0 / (model->lambda + z_k_dot_z_n) * z_n[i];
-}
-// αₙ = dₙ - transpose(wₙ₋₁) * xₙ
-// initialize alpha_n
-for (int i = 0; i < model->n + model->m; i++)
-{
-  alpha_n[i] = 0.0;
-}
-for (int i = 0; i < model->n + model->m; i++)
-{
-  for (int j = 0; j < model->n + model->m; j++)
+  // Now perform a one-step update in the parameter vector W by applying RLS to equation (S27).
+  putBuffer(model->m + model->n, model->m + model->n, P_n, model->P_n);
+  putBuffer(model->m + model->n, model->m + model->n, W_n, model->W_n);
+  // initialize z_n
+  for (int i = 0; i < model->n + model->m; i++)
   {
-    alpha_n[i] += W_n[i][j] * (basisset0[j] - basisset1[j]); // checked manually
+    z_n[i] = 0.0;
   }
-}
-for (int i = 0; i < model->n + model->m; i++)
-{
-  for (int j = 0; j < model->n + model->m; j++)
+  for (int i = 0; i < model->n + model->m; i++)
   {
-    W_n[i][j] = W_n[i][j] + (alpha_n[i] * g_n[j]); // checked manually
+    for (int j = 0; j < model->n + model->m; j++)
+    {
+      z_n[i] += P_n[i][j] * z_k[j];
+    }
   }
-}
-for (int i = 0; i < model->n + model->m; i++)
-{
-  for (int j = 0; j < model->n + model->m; j++)
+  float z_k_dot_z_n = 0.0;
+  for (int i = 0; i < model->n + model->m; i++)
   {
-    P_n[i][j] = (1.0 / model->lambda) * (P_n[i][j] - g_n[i] * z_n[j]); // checked manually
+    z_k_dot_z_n += z_k[i] * z_n[i];
   }
-}
-getBuffer(model->m + model->n, model->m + model->n, W_n, &(model->W_n));
-getBuffer(model->m + model->n, model->m + model->n, P_n, &(model->P_n));
+  for (int i = 0; i < model->n + model->m; i++)
+  {
+    g_n[i] = 1.0 / (model->lambda + z_k_dot_z_n) * z_n[i];
+  }
+  // αₙ = dₙ - transpose(wₙ₋₁) * xₙ
+  // initialize alpha_n
+  for (int i = 0; i < model->n + model->m; i++)
+  {
+    alpha_n[i] = 0.0;
+  }
+  for (int i = 0; i < model->n + model->m; i++)
+  {
+    for (int j = 0; j < model->n + model->m; j++)
+    {
+      alpha_n[i] += W_n[i][j] * (basisset0[j] - basisset1[j]); // checked manually
+    }
+  }
+  for (int i = 0; i < model->n + model->m; i++)
+  {
+    for (int j = 0; j < model->n + model->m; j++)
+    {
+      W_n[i][j] = W_n[i][j] + (alpha_n[i] * g_n[j]); // checked manually
+    }
+  }
+  for (int i = 0; i < model->n + model->m; i++)
+  {
+    for (int j = 0; j < model->n + model->m; j++)
+    {
+      P_n[i][j] = (1.0 / model->lambda) * (P_n[i][j] - g_n[i] * z_n[j]); // checked manually
+    }
+  }
+  getBuffer(model->m + model->n, model->m + model->n, W_n, &(model->W_n));
+  getBuffer(model->m + model->n, model->m + model->n, P_n, &(model->P_n));
 
-// Repeat at the next time k + 1 and continue until RLS converges and the new parameter vector Wⱼ₊₁ is found.
-model->k = k + 1;
+  // Repeat at the next time k + 1 and continue until RLS converges and the new parameter vector Wⱼ₊₁ is found.
+  model->k = k + 1;
+  return;
+}
 ```
 
 ```@raw html
@@ -9421,7 +9500,23 @@ void updateControlPolicy(LinearQuadraticRegulator *model)
 ![buttonsandlights](./assets/reactionwheelunicycle/schematics/buttonsandlights.jpeg)
 
 ```c
-if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_0) == 0)
+const float CPU_CLOCK = 84000000.0;
+const int dim_n = N;
+const int dim_m = M;
+const int max_episode_length = 50000;
+const int updatePolicyPeriod = 100;
+const int LOG_CYCLE = 100;
+const float roll_safety_angle = 0.32;
+const float pitch_safety_angle = 0.20;
+const float sensorAngle = -30.0 / 180.0 * M_PI;
+```
+
+```c
+while (1)
+  {
+    t1 = DWT->CYCCNT;
+
+    if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_0) == 0)
     {
       model.active = 1;
     }
@@ -9464,26 +9559,56 @@ if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_0) == 0)
       HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_RESET);
       HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2, GPIO_PIN_RESET);
       HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, GPIO_PIN_RESET);
-      updateEncoder(&model.ReactionEncoder, TIM3->CNT);
-      updateEncoder(&model.RollingEncoder, TIM4->CNT);
+      encodeWheel(&model.reactionEncoder, TIM3->CNT);
+      encodeWheel(&model.rollingEncoder, TIM4->CNT);
+      senseCurrent(&(model.reactionCurrentSensor), &(model.rollingCurrentSensor));
       updateIMU(&model);
-      updateCurrentSensing();
     }
     if (model.terminated == 1 && model.updated == 0)
     {
       updateControlPolicy(&model);
     }
-    if (model.k % 500 == 0)
+    if (model.k % updatePolicyPeriod == 0)
     {
       updateControlPolicy(&model);
     }
+
+    model.imu1.yaw += dt * r_dot[2];
+
+    log_counter++;
+    if (log_counter > LOG_CYCLE && HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_1) == 0)
+    {
+      transmit = 1;
+    }
+    if (transmit == 1)
+    {
+      transmit = 0;
+      log_counter = 0;
+
+      if (log_status == 0)
+      {
+          sprintf(MSG, "Bottom: current: %d, curVel: %0.2f, enc: %d, angle: %0.2f, velocity: %0.2f, acceleration: %0.2f, | Top: current: %d, curvel: %0.2f, enc: %d, angle: %0.2f,   velocity: %0.2f, acceleration: %0.2f, dt: %0.6f\r\n",
+            model.rollingCurrentSensor.current0, model.rollingCurrentSensor.currentVelocity, TIM4->CNT, model.rollingEncoder.angle, model.rollingEncoder.velocity, model.rollingEncoder.acceleration,
+            model.reactionCurrentSensor.current0, model.reactionCurrentSensor.currentVelocity, TIM3->CNT, model.reactionEncoder.angle, model.reactionEncoder.velocity, model.reactionEncoder.acceleration, dt);
+          log_status = 0;
+      }
+
+      HAL_UART_Transmit(&huart6, MSG, sizeof(MSG), 1000);
+    }
+
+    t2 = DWT->CYCCNT;
+    diff = t2 - t1;
+    dt = (float)diff / CPU_CLOCK;
+    model.dt = dt;
+  }
 ```
 
 ![wifimodule](./assets/reactionwheelunicycle/schematics/wifimodule.jpeg)
 
 ```c
 unsigned long t1 = 0;
-
+unsigned long t2 = 0;
+unsigned long diff = 0;
 
 t1 = DWT->CYCCNT;
 // operations
@@ -9496,11 +9621,11 @@ model.dt = dt;
 ```c
 typedef struct
 {
-  int value;
-  double angle;
+  int pulse_per_revolution;    // the number of pulses per revolution
+  int value;                   // the counter
+  double angle;                // the absolute angle
   double velocity;             // the angular velocity
   double acceleration;         // the angular acceleration
-  int pulse_per_revolution; // the number of pulses per revolution
 } Encoder;
 ```
 
@@ -9509,7 +9634,7 @@ typedef struct
 ![motorb](./assets/reactionwheelunicycle/schematics/motorb.jpeg)
 
 ```c
-void updateEncoder(Encoder *encoder, int newValue)
+void encodeWheel(Encoder *encoder, int newValue)
 {
   encoder->value = newValue;
   double angle = sin((float)(encoder->value % encoder->pulse_per_revolution) / (double) encoder->pulse_per_revolution * 2.0 * M_PI);
@@ -9525,20 +9650,26 @@ void updateEncoder(Encoder *encoder, int newValue)
 ![currentsensing](./assets/reactionwheelunicycle/schematics/currentsensing.jpeg)
 
 ```c
-void updateCurrentSensing()
+typedef struct
+{
+  double currentScale;
+  int current0;
+  int current1;
+  double currentVelocity;
+} CurrentSensor;
+```
+
+```c
+void senseCurrent(CurrentSensor *reactionCurrentSensor, CurrentSensor *rollingCurrentSensor)
 {
   // Start ADC Conversion in DMA Mode (Periodically Every 1ms)
   HAL_ADC_Start_DMA(&hadc1, AD_RES_BUFFER, 2);
-  reaction_wheel_current1 = reaction_wheel_current0;
-  rolling_wheel_current1 = rolling_wheel_current0;
-  reaction_wheel_current0 = (AD_RES_BUFFER[0] << 4);
-  rolling_wheel_current0 = (AD_RES_BUFFER[1] << 4);
-  double reaction_velocity = (double) (reaction_wheel_current0 - reaction_wheel_current1) / 32000.0;
-  double rolling_velocity = (double) (rolling_wheel_current0 - rolling_wheel_current1) / 32000.0;
-  rolling_wheel_current_acceleration = rolling_velocity - rolling_wheel_current_velocity;
-  reaction_wheel_current_acceleration = reaction_velocity - reaction_wheel_current_velocity;
-  reaction_wheel_current_velocity = reaction_velocity;
-  rolling_wheel_current_velocity = rolling_velocity;
+  reactionCurrentSensor->current1 = reactionCurrentSensor->current0;
+  rollingCurrentSensor->current1 = rollingCurrentSensor->current0;
+  reactionCurrentSensor->current0 = (AD_RES_BUFFER[0] << 4);
+  rollingCurrentSensor->current0 = (AD_RES_BUFFER[1] << 4);
+  reactionCurrentSensor->currentVelocity = (double) (reactionCurrentSensor->current0 - reactionCurrentSensor->current1) / reactionCurrentSensor->currentScale;
+  rollingCurrentSensor->currentVelocity = (double) (rollingCurrentSensor->current0 - rollingCurrentSensor->current1) / rollingCurrentSensor->currentScale;
 }
 ```
 
