@@ -4396,7 +4396,7 @@ typedef struct
   IMU imu2;
   Encoder ReactionEncoder;
   Encoder RollingEncoder;
-} LinearQuadraticRegulator;</code></pre><p><img src="assets/reactionwheelunicycle/schematics.jpeg" alt="schematics"/></p><pre><code class="language-c hljs">// define arrays for matrix-matrix and matrix-vector multiplication
+} LinearQuadraticRegulator;</code></pre><p><img src="assets/reactionwheelunicycle/schematics/nucleof401re.jpeg" alt="nucleof401re"/></p><p><img src="assets/reactionwheelunicycle/schematics/microcontroller.jpeg" alt="microcontroller"/></p><p><img src="assets/reactionwheelunicycle/schematics/motordriver.jpeg" alt="motordriver"/></p><p><img src="assets/reactionwheelunicycle/schematics/inertialmeasurementunits.jpeg" alt="inertialmeasurementunits"/></p><p><img src="assets/reactionwheelunicycle/schematics/5vpowersupply.jpeg" alt="5vpowersupply"/></p><p><img src="assets/reactionwheelunicycle/schematics/3v3powersupply.jpeg" alt="3v3powersupply"/></p><pre><code class="language-c hljs">// define arrays for matrix-matrix and matrix-vector multiplication
 float x_k[N];
 float u_k[M];
 float x_k1[N];
@@ -4664,7 +4664,7 @@ model-&gt;k = k + 1;</code></pre><div dir = "rtl">
 زیربرنامه‌ای بر روی میکروکنترلر اجرا می‌شود که شرایط خارج شدن از حلقه‌ی کنترلی را تشخیص می‌دهد. هرگاه که شرایط توقف برقرار شود، این زیربرنامه به طور خودکار تدبیر پس‌خور را به‌روزرسانی می‌کند. سپس، ربات منتظر می‌ماند تا کاربر دکمه‌ای مخصوص را بر روی آن فشار دهد تا اجرا شدن حلقه ی کنترلی دوباره از سر گرفته شود. این مرحله‌ها تکرار می‌شوند تا ربات کیفیت کارهایش را بهبود دهد، در حالی که به کاربر خدمت می‌کند.
 
 </p>
-</div><pre><code class="language-c hljs">if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_0) == 0)
+</div><p><img src="assets/reactionwheelunicycle/schematics/buttonsandlights.jpeg" alt="buttonsandlights"/></p><pre><code class="language-c hljs">if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_0) == 0)
     {
       model.active = 1;
     }
@@ -4719,7 +4719,7 @@ model-&gt;k = k + 1;</code></pre><div dir = "rtl">
     if (model.k % 500 == 0)
     {
       updateControlPolicy(&amp;model);
-    }</code></pre><pre><code class="language-c hljs">unsigned long t1 = 0;
+    }</code></pre><p><img src="assets/reactionwheelunicycle/schematics/wifimodule.jpeg" alt="wifimodule"/></p><pre><code class="language-c hljs">unsigned long t1 = 0;
 
 
 t1 = DWT-&gt;CYCCNT;
@@ -4734,7 +4734,7 @@ model.dt = dt;</code></pre><pre><code class="language-c hljs">typedef struct
   double velocity;             // the angular velocity
   double acceleration;         // the angular acceleration
   int pulse_per_revolution; // the number of pulses per revolution
-} Encoder;</code></pre><pre><code class="language-c hljs">void updateEncoder(Encoder *encoder, int newValue)
+} Encoder;</code></pre><p><img src="assets/reactionwheelunicycle/schematics/motora.jpeg" alt="motora"/></p><p><img src="assets/reactionwheelunicycle/schematics/motorb.jpeg" alt="motorb"/></p><pre><code class="language-c hljs">void updateEncoder(Encoder *encoder, int newValue)
 {
   encoder-&gt;value = newValue;
   double angle = sin((float)(encoder-&gt;value % encoder-&gt;pulse_per_revolution) / (double) encoder-&gt;pulse_per_revolution * 2.0 * M_PI);
@@ -4744,7 +4744,7 @@ model.dt = dt;</code></pre><pre><code class="language-c hljs">typedef struct
   encoder-&gt;velocity = velocity;
   encoder-&gt;acceleration = acceleration;
   return;
-}</code></pre><pre><code class="language-c hljs">void updateCurrentSensing()
+}</code></pre><p><img src="assets/reactionwheelunicycle/schematics/currentsensing.jpeg" alt="currentsensing"/></p><pre><code class="language-c hljs">void updateCurrentSensing()
 {
   // Start ADC Conversion in DMA Mode (Periodically Every 1ms)
   HAL_ADC_Start_DMA(&amp;hadc1, AD_RES_BUFFER, 2);
@@ -4844,4 +4844,4 @@ model.dt = dt;</code></pre><pre><code class="language-c hljs">typedef struct
 </li>
 
 </ol>
-</div></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="maxwellfield_persian.html">« The Maxwell Field (Persian)</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.14.1 on <span class="colophon-date" title="Thursday 11 September 2025 14:54">Thursday 11 September 2025</span>. Using Julia version 1.10.10.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+</div></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="maxwellfield_persian.html">« The Maxwell Field (Persian)</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.14.1 on <span class="colophon-date" title="Saturday 13 September 2025 08:55">Saturday 13 September 2025</span>. Using Julia version 1.10.10.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
