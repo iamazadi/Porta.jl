@@ -9072,7 +9072,17 @@ typedef struct
 } LinearQuadraticRegulator;
 ```
 
-![schematics](./assets/reactionwheelunicycle/schematics.jpeg)
+![nucleof401re](./assets/reactionwheelunicycle/schematics/nucleof401re.jpeg)
+
+![microcontroller](./assets/reactionwheelunicycle/schematics/microcontroller.jpeg)
+
+![motordriver](./assets/reactionwheelunicycle/schematics/motordriver.jpeg)
+
+![inertialmeasurementunits](./assets/reactionwheelunicycle/schematics/inertialmeasurementunits.jpeg)
+
+![5vpowersupply](./assets/reactionwheelunicycle/schematics/5vpowersupply.jpeg)
+
+![3v3powersupply](./assets/reactionwheelunicycle/schematics/3v3powersupply.jpeg)
 
 ```c
 // define arrays for matrix-matrix and matrix-vector multiplication
@@ -9408,6 +9418,8 @@ void updateControlPolicy(LinearQuadraticRegulator *model)
 </div>
 ```
 
+![buttonsandlights](./assets/reactionwheelunicycle/schematics/buttonsandlights.jpeg)
+
 ```c
 if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_0) == 0)
     {
@@ -9467,6 +9479,8 @@ if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_0) == 0)
     }
 ```
 
+![wifimodule](./assets/reactionwheelunicycle/schematics/wifimodule.jpeg)
+
 ```c
 unsigned long t1 = 0;
 
@@ -9490,6 +9504,10 @@ typedef struct
 } Encoder;
 ```
 
+![motora](./assets/reactionwheelunicycle/schematics/motora.jpeg)
+
+![motorb](./assets/reactionwheelunicycle/schematics/motorb.jpeg)
+
 ```c
 void updateEncoder(Encoder *encoder, int newValue)
 {
@@ -9503,6 +9521,8 @@ void updateEncoder(Encoder *encoder, int newValue)
   return;
 }
 ```
+
+![currentsensing](./assets/reactionwheelunicycle/schematics/currentsensing.jpeg)
 
 ```c
 void updateCurrentSensing()
