@@ -8164,11 +8164,11 @@ Description = "Describes the mathematical model of a reaction wheel unicycle rob
 
 ```@raw html
 <div dir = "rtl">
-<h3>
+<h2>
 
 پیاده‌سازی الگوریتم برآورد شیب
 
-</h3>
+</h2>
 <p>
 
 واحد اندازه‌گیری شتاب‌سنج متر بر مجذور ثانیه می‌باشد و واحد اندازه‌گیری ژیروسکوپ زاویه بر ثانیه می‌باشد. ابتدا با تعریف کردن یک ساختار برنامه‌نویسی داده‌های مورد نیاز الگوریتم را سازمان‌دهی می‌کنیم. یک سامانه‌ی میکروالکترومکانیکی دارای حداقل یک شتاب‌سنج سه‌محوره و یک ژیروسکوپ سه‌محوره می‌باشد. به کار بردن صفت «سه‌محوره» به ما این پیشنهاد را می‌دهد که به دو بردار سه عنصری نیاز داریم تا داده‌های شتاب‌سنج و ژیروسکوپ را در رایانه ذخیره کنیم. اما در واقعیت مقدار مطلق و مقیاس هر عنصر با بقیه عنصرها متفاوت است. به بیانی دیگر یک تبدیل همگرا بر روی هر بردار اندازه‌گیری شده اثر می‌کند که باید در آزمایشگاه فیزیک ضریب‌های آن را با آزمایش کردن بیابیم. در آن صورت می‌توانیم داده‌های حسگرهای مختلف درون یک سامانه‌ی میکروالکترومکانیکی را با یکدیگر هم‌تراز کنیم و در تلفیق داده‌های چندین سامانه، خطای ناشی از ساختن و نصب کردن حسگرها را کم‌تر کنیم.
@@ -8226,6 +8226,8 @@ typedef struct
 } IMU;
 ```
 
+
+
 ```@raw html
 <div dir = "rtl">
 <p>
@@ -8235,6 +8237,10 @@ typedef struct
 </p>
 </div>
 ```
+
+![microcontroller](./assets/reactionwheelunicycle/schematics/microcontroller.jpeg)
+
+![inertialmeasurementunits](./assets/reactionwheelunicycle/schematics/inertialmeasurementunits.jpeg)
 
 ```C
 void updateIMU1(IMU *sensor) // GY-25 I2C
@@ -9156,9 +9162,23 @@ void updateIMU(LinearQuadraticRegulator *model)
 
 ``W_{j + 1}^T (\phi(z_k) - \phi(z_{k + 1})) = \frac{1}{2} (x_k^T Q x_k + u_k^T R u_k)``
 
+```@raw html
+<div dir = "rtl">
+<h2>
+
+پیاده‌سازی الگوریتم سامانگر خطی درجه دوم
+
+</h2>
+<p>
+
+هدف الگوریتم سامانگر خطی درجه دوم در ربات تعادلی تک‌چرخ فراهم‌کردن ورودی‌های کنترل دو موتور گیربکس‌دار است، که در طول زمان بدنه‌ی ربات را نسبت به بردار گرانش زمین تراز نگه می‌دارند. برای پشتیبانی از این هدف، یک ساختمان داده تعریف می‌کنیم تا داده‌های مورد نیاز برای محاسبه کردن خروجی‌های تابع کیفیت و تابع تدبیرگر را در آن ذخیره کنیم. این ساختار به ترتیب شامل میدان‌های زیر می‌باشد: ماتریس صافی، ماتریس معکوس خودهمبستگی، ماتریس تدبیرگر پسخوردی، بردار مجموعه‌ی داده، شماره‌ی گام الگوریتم، شماره‌ی زمان کا، تعداد ابعاد بردار حالت سامانه، تعداد ابعاد بردار ورودی، ضریب وزنی نمایی، ثابت دلتا برای پیش‌مقداردهی ماتریس پی، پرچم پایان فعالیت در محیط، پرچم به‌روزرسانی تدبیرگر، پرچم فعال بودن کنترل کننده‌ی ربات، دوره‌ی زمانی در واحد ثانیه، چرخه‌ی کاری مدولاسیون پهنای باند موتور چرخ عکس‌العملی، چرخه‌ی کاری مدولاسیون پهنای باند موتور چرخ اصلی، ساختمان داده‌ی واحد موقعیت‌یاب اینرسیایی ۱، ساختمان داده‌ی واحد موقعیت‌یاب اینرسیایی ۲، رمزنگار چرخ عکس‌العملی، رمزنگار چرخ اصلی، حسگر جریان موتور چرخ عکس‌العملی، و حسگر جریان موتور چرخ اصلی ربات.
+
+</p>
+</div>
+```
+
 ```c
 // Represents a Linear Quadratic Regulator (LQR) model.
-typedef struct
 typedef struct
 {
   Mat12f W_n;     // filter matrix
@@ -9167,35 +9187,35 @@ typedef struct
   Vec24f dataset; // (xₖ, uₖ, xₖ₊₁, uₖ₊₁)
   int j;          // step number
   int k;          // time k
-  float reward;   // the cumulative reward
   int n;          // xₖ ∈ ℝⁿ
   int m;          // uₖ ∈ ℝᵐ
-  float lambda;   // exponential wighting factor
-  float delta;    // value used to intialize P(0)
+  double lambda;   // exponential wighting factor
+  double delta;    // value used to intialize P(0)
   int terminated; // has the environment been reset
-  int updated;    // whether the policy has been updated since episode termination and parameter convegence
+  int updated;    // whether the policy has been updated
   int active;     // is the model controller active
-  float dt;       // period in seconds
-  IMU imu1;
-  IMU imu2;
-  Encoder reactionEncoder;
-  Encoder rollingEncoder;
-  CurrentSensor reactionCurrentSensor;
-  CurrentSensor rollingCurrentSensor;
+  double dt;       // period in seconds
+  double reactionPWM;  // reaction wheel's motor PWM duty cycle
+  double rollingPWM;   // rolling wheel's motor PWM duty cycle
+  IMU imu1;            // the first inertial measurement unit
+  IMU imu2;            // the second inertial measurement unit
+  Encoder reactionEncoder;  // the reaction wheel encoder
+  Encoder rollingEncoder;   // the rolling wheel encoder
+  CurrentSensor reactionCurrentSensor;  // the reaction wheel's motor current sensor
+  CurrentSensor rollingCurrentSensor;   // the rolling wheel's motor current sensor
 } LinearQuadraticRegulator;
 ```
 
-![nucleof401re](./assets/reactionwheelunicycle/schematics/nucleof401re.jpeg)
+```@raw html
+<div dir = "rtl">
+<p>
 
-![microcontroller](./assets/reactionwheelunicycle/schematics/microcontroller.jpeg)
+از ساختمان داده‌ی سامانگر خطی درجه دوم به عنوان پارامتر ورودی دو تابع مختلف استفاده می‌شود: تابع گام برداشتن به جلو، و تابع به‌روزرسانی تدبیرگر پسخوردی. در کنترل ربات در هر چرخه‌ی کنترلی، یک مرتبه تابع گام برداشتن به جلو فراخوانی می‌شود. اما به ازای هر صد مرتبه اجرا شدن تابع گام برداشتن به جلو (یعنی پس از تمام شدن صد چرخه‌ی کنترلی)، یک مرتبه تابع به‌روزرسانی تدبیرگر فراخوانی می‌شود. به عبارتی دیگر، به طور تقریبی یک هزارم ثانیه طول می‌کشد تا اجرا شدن تابع گام برداشتن به جلو تمام شود، و به طور تقریبی هر یک دهم ثانیه یک بار تدبیرگر پسخوردی به‌روزرسانی می‌شود. دلیل این زمان‌بندی برای اجرای حلقه‌ی کنترلی این است که بر اساس خطای استدلال قیاسی، ماتریس‌های صافی و معکوس خودهمبستگی هنگام اجرا شدن تابع «گام برداشتن به جلو» به‌روزرسانی می‌شوند و بعد از صد بار به‌روزرسانی این ماتریس‌ها (تابع کیفیت) نیاز است که یک بار تدبیرگر پسخوردی به‌روزرسانی شود. این کار به تابع «گام برداشتن به جلو» اجازه می‌دهد تا پیش از به‌روزرسانی تدبیرگر، به اندازه‌ی کافی تابع کیفیت را تغییر دهد. در این صورت شواهد و تجربه‌ی کافی برای به‌روزرسانی تدبیرگر فراهم می‌شود و در نتیجه عملکرد ربات در بازه‌های زمانی طولانی‌تر از قابلیت اطمینان و پایداری بیشتری برخوردار خواهد بود.
 
-![motordriver](./assets/reactionwheelunicycle/schematics/motordriver.jpeg)
+</p>
+</div>
+```
 
-![inertialmeasurementunits](./assets/reactionwheelunicycle/schematics/inertialmeasurementunits.jpeg)
-
-![5vpowersupply](./assets/reactionwheelunicycle/schematics/5vpowersupply.jpeg)
-
-![3v3powersupply](./assets/reactionwheelunicycle/schematics/3v3powersupply.jpeg)
 
 ```c
 // define arrays for matrix-matrix and matrix-vector multiplication
@@ -9236,7 +9256,7 @@ float S_uu_inverse[M][M];
 <div dir = "rtl">
 <p>
 
-نخستین مجموعه‌ی پایه شامل عضوهای زیر است: زاویه ی غلت شاسی ربات، زاویه‌ی تاب شاسی، سرعت زاویه‌ای غلت شاسی، سرعت زاویه‌ای تاب شاسی، زاویه‌ی چرخ اصلی ربات، شتاب دورانی چرخ اصلی، سرعت زاویه‌ای چرخ عکس‌العملی، شتاب تغییرات جریان عبورکننده از سیم‌پیچ موتور راه‌انداز چرخ اصلی، شتاب تغییرات جریان عبورکننده از موتور راه‌انداز چرخ عکس‌العملی، و دامنه‌ی سیگنال‌های ورودی موتورها. پس از اینکه اولین مجموعه‌ی پایه اندازه‌گیری شد، یک تدبیر پس‌خور با ارسال کردن سیگنال‌های کنترلی به موتورها اعمال می‌شود. پس از این که کار انجام شد، حالت سامانه از جمله: داده‌های واحد موقعیت‌یاب اینرسیایی، انکودر موتورها، و جریان مصرفی موتورها به روزرسانی می‌شود.
+نخستین مجموعه‌ی پایه شامل عضوهای زیر است: زاویه‌ی غلت بدنه‌ی ربات، سرعت زاویه‌ای غلت، شتاب زاویه‌ای غلت، زاویه‌ی تاب بدنه‌ی ربات، سرعت زاویه‌ای تاب، شتاب زاویه‌ای تاب، سرعت زاویه‌ای چرخ عکس‌العملی، سرعت زاویه‌ای چرخ اصلی ربات، سرعت جریان الکتریکی عبورکننده از موتور راه‌انداز چرخ عکس‌العملی، سرعت جریان عبورکننده از سیم‌پیچ موتور راه‌انداز چرخ اصلی، و دامنه‌ی سیگنال‌های ورودی موتورها. پس از اینکه اولین مجموعه‌ی پایه اندازه‌گیری شد، یک تدبیر پس‌خور با ارسال کردن سیگنال‌های کنترلی به موتورها اعمال می‌شود. پس از این که کار انجام شد، حالت سامانه از جمله: داده‌های واحد موقعیت‌یاب اینرسیایی، انکودر موتورها، و جریان مصرفی موتورها به روزرسانی می‌شود.
 
 </p>
 </div>
@@ -9271,7 +9291,7 @@ float S_uu_inverse[M][M];
 <div dir = "rtl">
 <p>
 
-وضعیت ربات پس از یک یا چند بار اجرا شدن حلقه‌ی کنترلی، بالاخره از شرط‌های مرزی اولیه بیش از حد دور می‌شود، که این شرایط توسط کاربر و برای ایمنی و کارایی تعیین شده‌اند. در این صورت، ربات باید به کار خود پایان دهد و متوقف شود. این زمان، بهترین زمان برای به‌روزرسانی تدبیر پس‌خوری می‌باشد. به‌روزرسانی تدبیر پس‌خوری بعد از به‌روزرسانی‌های متعدد بر روی ضریب‌های صافی و  ماتریس معکوس خودهمبستگی در طول چندین بار اجرای حلقه ی کنترلی انجام می‌شود.
+وضعیت ربات پس از یک یا چند بار اجرا شدن حلقه‌ی کنترلی، بالاخره از شرط‌های مرزی اولیه بیش از حد دور می‌شود، که این شرایط توسط کاربر و برای ایمنی و کارایی تعیین شده‌اند. برای مثال زاویه‌های غلت و تاب نباید بیشتر از ۱۰ درجه شوند زیرا امکان برخورد کردن بدنه‌ی ربات با زمین زیاد می‌شود. در این صورت، ربات باید به کار خود پایان دهد و متوقف شود. بر پایه‌ی آزمایش و تجربه، پس از ۱۰۰ بار اجرا شدن حلقه‌ی کنترلی بهترین زمان برای به‌روزرسانی تدبیرگر پس‌خوردی می‌باشد. بنابراین به‌روزرسانی تدبیرگر پس‌خوردی بعد از به‌روزرسانی‌های متعدد بر روی ضریب‌های صافی و ماتریس معکوس خودهمبستگی به ازای ۱۰۰ بار اجرای حلقه‌ی کنترلی انجام می‌شود.
 
 </p>
 </div>
@@ -9279,8 +9299,7 @@ float S_uu_inverse[M][M];
 
 ```c
 /*
-Identify the Q function using RLS and update the control policy,
-with the given `environment` and `model`.
+Identify the Q function using RLS with the given pointer to the `model`.
 The algorithm is terminated when there are no further updates
 to the Q function or the control policy at each step.
 */
@@ -9343,15 +9362,15 @@ void stepForward(LinearQuadraticRegulator *model)
 
   if (model->active == 1)
   {
-    reaction_wheel_pwm += 16.0 * u_k[0];
-    rolling_wheel_pwm += 16.0 * u_k[1];
-    reaction_wheel_pwm = fmin(255.0, reaction_wheel_pwm);
-    reaction_wheel_pwm = fmax(-255.0, reaction_wheel_pwm);
-    rolling_wheel_pwm = fmin(255.0, rolling_wheel_pwm);
-    rolling_wheel_pwm = fmax(-255.0, rolling_wheel_pwm);
-    TIM2->CCR1 = 255 * (int)fabs(rolling_wheel_pwm);
-    TIM2->CCR2 = 255 * (int)fabs(reaction_wheel_pwm);
-    if (reaction_wheel_pwm < 0)
+    model->reactionPWM += (255.0 * 16.0) * u_k[0];
+    model->rollingPWM += (255.0 * 16.0) * u_k[1];
+    model->reactionPWM = fmin(255.0 * 255.0, model->reactionPWM);
+    model->reactionPWM = fmax(-255.0 * 255.0, model->reactionPWM);
+    model->rollingPWM = fmin(255.0 * 255.0, model->rollingPWM);
+    model->rollingPWM = fmax(-255.0 * 255.0, model->rollingPWM);
+    TIM2->CCR1 = (int)fabs(model->rollingPWM);
+    TIM2->CCR2 = (int)fabs(model->reactionPWM);
+    if (model->reactionPWM < 0)
     {
       HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_RESET);
       HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_SET);
@@ -9361,7 +9380,7 @@ void stepForward(LinearQuadraticRegulator *model)
       HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_SET);
       HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_RESET);
     }
-    if (rolling_wheel_pwm < 0)
+    if (model->rollingPWM < 0)
     {
       HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2, GPIO_PIN_RESET);
       HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, GPIO_PIN_SET);
@@ -9374,8 +9393,8 @@ void stepForward(LinearQuadraticRegulator *model)
   }
   else
   {
-    reaction_wheel_pwm = 0.0;
-    rolling_wheel_pwm = 0.0;
+    model->reactionPWM = 0.0;
+    model->rollingPWM = 0.0;
     TIM2->CCR1 = 0;
     TIM2->CCR2 = 0;
     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_RESET);
@@ -9513,7 +9532,7 @@ void stepForward(LinearQuadraticRegulator *model)
 <div dir = "rtl">
 <p>
 
-از آنجایی که ضریب‌های صافی کیفیت عملکرد ربات را ایجاد می‌کنند، تدبیر پس‌خوری به عنوان تابعی از هسته‌ی ورودی-ورودی و هسته‌ی ورودی-حالت به‌روزرسانی می‌شود. هسته‌ی ورودی-ورودی یک بلوک ماتریسی است که در گوشه‌ی پایین و سمت راست ماتریس صافی قرار دارد. اما هسته‌ی ورودی-حالت یک بلوک در گوشه‌ی پایین و سمت چپ ماتریس صافی است. هسته‌ی ورودی-حالت از سمت راست در معکوس هسته‌ی ورودی-ورودی ضرب می‌شود تا ماتریس تدبیر پس‌خوری به دست آید.
+از آنجایی که ضریب‌های صافی (ماتریس دابلیو) کیفیت عملکرد ربات را ایجاد می‌کنند، تدبیرگر پس‌خوردی به عنوان تابعی از هسته‌ی ورودی-ورودی و هسته‌ی ورودی-حالت به‌روزرسانی می‌شود. هسته‌ی ورودی-ورودی یک بلوک ماتریسی است که در گوشه‌ی پایین و سمت راست ماتریس صافی قرار دارد. اما هسته‌ی ورودی-حالت یک بلوک در گوشه‌ی پایین و سمت چپ ماتریس صافی است. هسته‌ی ورودی-حالت از سمت راست در معکوس هسته‌ی ورودی-ورودی ضرب می‌شود تا ماتریس تدبیرگر پس‌خوردی به دست آید. به همین دلیل مهم است که پیش از انجام دادن به‌روزرسانی تدبیرگر پس‌خوردی این شرط بررسی شود که آیا دترمینان ماتریس معکوس هسته‌ی ورودی-ورودی صفر است یا نه.
 
 </p>
 </div>
@@ -9547,7 +9566,7 @@ void updateControlPolicy(LinearQuadraticRegulator *model)
   // Perform the control update using (S24), which is uₖ = -S⁻¹ᵤᵤ * Sᵤₓ * xₖ
   // uₖ = -S⁻¹ᵤᵤ * Sᵤₓ * xₖ
   float determinant = S_uu[1][1] * S_uu[2][2] - S_uu[1][2] * S_uu[2][1];
-  // check the rank S_uu to see if it's equal to 2 (invertible matrix)
+  // check the rank of S_uu to see if it's equal to 2 (invertible matrix)
   if (fabs(determinant) > 0.0001) // greater than zero
   {
     S_uu_inverse[0][0] = S_uu[1][1] / determinant;
@@ -9598,17 +9617,20 @@ void updateControlPolicy(LinearQuadraticRegulator *model)
 }
 ```
 
+![buttonsandlights](./assets/reactionwheelunicycle/schematics/buttonsandlights.jpeg)
+
+![nucleof401re](./assets/reactionwheelunicycle/schematics/nucleof401re.jpeg)
+
 ```@raw html
 <div dir = "rtl">
 <p>
 
-زیربرنامه‌ای بر روی میکروکنترلر اجرا می‌شود که شرایط خارج شدن از حلقه‌ی کنترلی را تشخیص می‌دهد. هرگاه که شرایط توقف برقرار شود، این زیربرنامه به طور خودکار تدبیر پس‌خور را به‌روزرسانی می‌کند. سپس، ربات منتظر می‌ماند تا کاربر دکمه‌ای مخصوص را بر روی آن فشار دهد تا اجرا شدن حلقه ی کنترلی دوباره از سر گرفته شود. این مرحله‌ها تکرار می‌شوند تا ربات کیفیت کارهایش را بهبود دهد، در حالی که به کاربر خدمت می‌کند.
+زیربرنامه‌ای بر روی میکروکنترلر اجرا می‌شود که شرایط خارج شدن از حلقه‌ی کنترلی را تشخیص می‌دهد. هرگاه که شرایط توقف برقرار شود، این زیربرنامه به طور خودکار چرخه‌ی کاری مدولاسیون پهنای باند موتورها را صفر می‌کند و پرچم پایان فعالیت ربات را فعال می‌کند. سپس، ربات منتظر می‌ماند تا کاربر دکمه‌ای مخصوص (دکمه‌ی آبی رنگ بی ۱) را بر روی ربات فشار دهد تا اجرا شدن حلقه ی کنترلی دوباره از سر گرفته شود. این گام‌ها تکرار می‌شوند تا ربات کیفیت کارهایش را بهبود دهد، در حالی که به کاربر خدمت می‌کند.
 
 </p>
 </div>
 ```
 
-![buttonsandlights](./assets/reactionwheelunicycle/schematics/buttonsandlights.jpeg)
 
 ```c
 const float CPU_CLOCK = 84000000.0;
@@ -9624,94 +9646,94 @@ const float sensorAngle = -30.0 / 180.0 * M_PI;
 
 ```c
 while (1)
+{
+  t1 = DWT->CYCCNT;
+
+  if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_0) == 0)
   {
-    t1 = DWT->CYCCNT;
-
-    if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_0) == 0)
-    {
-      model.active = 1;
-    }
-    else
-    {
-      model.active = 0;
-      reaction_wheel_pwm = 0.0;
-      rolling_wheel_pwm = 0.0;
-      TIM2->CCR1 = 0;
-      TIM2->CCR2 = 0;
-    }
-
-    if (fabs(model.imu1.roll) > roll_safety_angle || fabs(model.imu1.pitch) > pitch_safety_angle || model.k > max_episode_length)
-    {
-      model.terminated = 1;
-      model.active = 0;
-      HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
-    }
-
-    if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13) == 0)
-    {
-      HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
-      model.terminated = 0;
-      model.active = 1;
-      model.updated = 0;
-    }
-    // Rinse and repeat :)
-
-    if (model.terminated == 0)
-    {
-      stepForward(&model);
-    }
-    else
-    {
-      reaction_wheel_pwm = 0.0;
-      rolling_wheel_pwm = 0.0;
-      TIM2->CCR1 = 0;
-      TIM2->CCR2 = 0;
-      HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_RESET);
-      HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_RESET);
-      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2, GPIO_PIN_RESET);
-      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, GPIO_PIN_RESET);
-      encodeWheel(&model.reactionEncoder, TIM3->CNT);
-      encodeWheel(&model.rollingEncoder, TIM4->CNT);
-      senseCurrent(&(model.reactionCurrentSensor), &(model.rollingCurrentSensor));
-      updateIMU(&model);
-    }
-    if (model.terminated == 1 && model.updated == 0)
-    {
-      updateControlPolicy(&model);
-    }
-    if (model.k % updatePolicyPeriod == 0)
-    {
-      updateControlPolicy(&model);
-    }
-
-    model.imu1.yaw += dt * r_dot[2];
-
-    log_counter++;
-    if (log_counter > LOG_CYCLE && HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_1) == 0)
-    {
-      transmit = 1;
-    }
-    if (transmit == 1)
-    {
-      transmit = 0;
-      log_counter = 0;
-
-      if (log_status == 0)
-      {
-          sprintf(MSG, "Bottom: current: %d, curVel: %0.2f, enc: %d, angle: %0.2f, velocity: %0.2f, acceleration: %0.2f, | Top: current: %d, curvel: %0.2f, enc: %d, angle: %0.2f,   velocity: %0.2f, acceleration: %0.2f, dt: %0.6f\r\n",
-            model.rollingCurrentSensor.current0, model.rollingCurrentSensor.currentVelocity, TIM4->CNT, model.rollingEncoder.angle, model.rollingEncoder.velocity, model.rollingEncoder.acceleration,
-            model.reactionCurrentSensor.current0, model.reactionCurrentSensor.currentVelocity, TIM3->CNT, model.reactionEncoder.angle, model.reactionEncoder.velocity, model.reactionEncoder.acceleration, dt);
-          log_status = 0;
-      }
-
-      HAL_UART_Transmit(&huart6, MSG, sizeof(MSG), 1000);
-    }
-
-    t2 = DWT->CYCCNT;
-    diff = t2 - t1;
-    dt = (float)diff / CPU_CLOCK;
-    model.dt = dt;
+    model.active = 1;
   }
+  else
+  {
+    model.active = 0;
+    model.reactionPWM = 0.0;
+    model.rollingPWM = 0.0;
+    TIM2->CCR1 = 0;
+    TIM2->CCR2 = 0;
+  }
+
+  if (fabs(model.imu1.roll) > roll_safety_angle || fabs(model.imu1.pitch) > pitch_safety_angle || model.k > max_episode_length)
+  {
+    model.terminated = 1;
+    model.active = 0;
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
+  }
+
+  if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13) == 0)
+  {
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
+    model.terminated = 0;
+    model.active = 1;
+    model.updated = 0;
+  }
+  // Rinse and repeat :)
+
+  if (model.terminated == 0)
+  {
+    stepForward(&model);
+  }
+  else
+  {
+    model.reactionPWM = 0.0;
+    model.rollingPWM = 0.0;
+    TIM2->CCR1 = 0;
+    TIM2->CCR2 = 0;
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, GPIO_PIN_RESET);
+    encodeWheel(&model.reactionEncoder, TIM3->CNT);
+    encodeWheel(&model.rollingEncoder, TIM4->CNT);
+    senseCurrent(&(model.reactionCurrentSensor), &(model.rollingCurrentSensor));
+    updateIMU(&model);
+  }
+  if (model.terminated == 1 && model.updated == 0)
+  {
+    updateControlPolicy(&model);
+  }
+  if (model.k % updatePolicyPeriod == 0)
+  {
+    updateControlPolicy(&model);
+  }
+
+  model.imu1.yaw += dt * r_dot[2];
+
+  log_counter++;
+  if (log_counter > LOG_CYCLE && HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_1) == 0)
+  {
+    transmit = 1;
+  }
+  if (transmit == 1)
+  {
+    transmit = 0;
+    log_counter = 0;
+
+    if (log_status == 0)
+    {
+      sprintf(MSG, "Bottom: current: %d, curVel: %0.2f, enc: %d, angle: %0.2f, velocity: %0.2f, acceleration: %0.2f, | Top: current: %d, curvel: %0.2f, enc: %d, angle: %0.2f, velocity: %0.2f, acceleration: %0.2f, dt: %0.6f\r\n",
+        model.rollingCurrentSensor.current0, model.rollingCurrentSensor.currentVelocity, TIM4->CNT, model.rollingEncoder.angle, model.rollingEncoder.velocity, model.rollingEncoder.acceleration,
+        model.reactionCurrentSensor.current0, model.reactionCurrentSensor.currentVelocity, TIM3->CNT, model.reactionEncoder.angle, model.reactionEncoder.velocity, model.reactionEncoder.acceleration, dt);
+      log_status = 0;
+    }
+
+    HAL_UART_Transmit(&huart6, MSG, sizeof(MSG), 1000);
+  }
+
+  t2 = DWT->CYCCNT;
+  diff = t2 - t1;
+  dt = (float)diff / CPU_CLOCK;
+  model.dt = dt;
+}
 ```
 
 ![wifimodule](./assets/reactionwheelunicycle/schematics/wifimodule.jpeg)
@@ -9758,6 +9780,8 @@ void encodeWheel(Encoder *encoder, int newValue)
 }
 ```
 
+![motordriver](./assets/reactionwheelunicycle/schematics/motordriver.jpeg)
+
 ![currentsensing](./assets/reactionwheelunicycle/schematics/currentsensing.jpeg)
 
 ```c
@@ -9783,6 +9807,10 @@ void senseCurrent(CurrentSensor *reactionCurrentSensor, CurrentSensor *rollingCu
   rollingCurrentSensor->currentVelocity = (double) (rollingCurrentSensor->current0 - rollingCurrentSensor->current1) / rollingCurrentSensor->currentScale;
 }
 ```
+
+![5vpowersupply](./assets/reactionwheelunicycle/schematics/5vpowersupply.jpeg)
+
+![3v3powersupply](./assets/reactionwheelunicycle/schematics/3v3powersupply.jpeg)
 
 
 # References
