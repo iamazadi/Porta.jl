@@ -4836,21 +4836,45 @@ void stepForward(LinearQuadraticRegulator *model)
   }
   model-&gt;updated = 1;
   return;
-}</code></pre><p><img src="assets/reactionwheelunicycle/schematics/buttonsandlights.jpeg" alt="buttonsandlights"/></p><p><img src="assets/reactionwheelunicycle/schematics/nucleof401re.jpeg" alt="nucleof401re"/></p><div dir = "rtl">
+}</code></pre><div dir = "rtl">
 <p>
 
 زیربرنامه‌ای بر روی میکروکنترلر اجرا می‌شود که شرایط خارج شدن از حلقه‌ی کنترلی را تشخیص می‌دهد. هرگاه که شرایط توقف برقرار شود، این زیربرنامه به طور خودکار چرخه‌ی کاری مدولاسیون پهنای پالس موتورها را صفر می‌کند و پرچم پایان فعالیت ربات را فعال می‌کند. سپس، ربات منتظر می‌ماند تا کاربر دکمه‌ای مخصوص (دکمه‌ی آبی رنگ بی ۱) را بر روی ربات فشار دهد تا اجرا شدن حلقه ی کنترلی دوباره از سر گرفته شود. این گام‌ها تکرار می‌شوند تا ربات کیفیت کارهایش را بهبود دهد، در حالی که به کاربر خدمت می‌کند.
 
 </p>
-</div><pre><code class="language-c hljs">const float CPU_CLOCK = 84000000.0;
-const int dim_n = N;
-const int dim_m = M;
-const int max_episode_length = 50000;
-const int updatePolicyPeriod = 100;
-const int LOG_CYCLE = 100;
-const float roll_safety_angle = 0.32;
-const float pitch_safety_angle = 0.20;
-const float sensorAngle = -30.0 / 180.0 * M_PI;</code></pre><pre><code class="language-c hljs">while (1)
+</div><p><img src="assets/reactionwheelunicycle/schematics/buttonsandlights.jpeg" alt="buttonsandlights"/></p><div dir = "rtl">
+<p>
+
+برد توسعه‌ی میکروکنترلر نوکلیو-۶۴ راهی ارزان و انعطاف‌پذیر را برای کاربرها فراهم می‌کند تا مفهوم‌های تازه را آزمایش کنند و با میکروکنترلرهای ۳۲ بیتی شرکت اس‌تی نمونه‌سازی کنند. در این ربات، از نرم‌افزار کیوب ام‌ایکس برای ایجاد کردن پروژه استفاده می‌شود. همچنین برای پیکربندی و تنظیم کردن ادوات جانبی (مانند واحد تبدیل سیگنال آنالوگ به دیجیتال برای خواندن مقدار اندازه‌گیری حسگرها) از کیوب ام‌ایکس استفاده می‌شود. سپس از نرم‌افزار ویژوال استودیو کد برای نوشتن برنامه نرم‌افزار ربات استفاده می‌شود. نکته‌ی مهم در این قسمت از کار این است که خروجی نرم‌افزار کیوب ام‌ایکس بر روی گزینه‌ی سی میک تنظیم شده است تا منبع برنامه‌ی ربات با استفاده از ابزار استاندارد زبان برنامه‌نویسی سی ساخته شود. در این خط لوله، کد زبان سی پس از لینک شدن با کتابخانه‌های مرتبط به فایلی با پسوند الف تبدیل می‌شوند. ساخت فایل الف با ترکیب کلیدی کنترل شیفت پی در وی‌اس کد انجام می‌شود. در نهایت نرم‌افزار اس‌تی‌ام۳۲ کیوب پروگرامر برای بارگذاری برنامه در حافظه‌ی میکروکنترلر به کار می‌رود. برد توسعه‌ی نوکلیو-۶۴ دارای یک عیب‌یاب و برنامه‌ریز به نام اس‌تی-لینک نسخه ۲ است. این برنامه‌ریز از یک سمت با ارتباط یو‌اس‌بی به رایانه متصل می‌شود و از سمت دیگر رابط بین پروگرامر و میکروکنترلر شامل چهار عدد پین است. این گونه ارتباط بین میکروکنترلر و رایانه فقط برای برنامه‌ریزی حافظه‌ی میکروکنترلر است، زیرا برای اندازه‌گیری از دور ساختمان‌های داده‌ی برنامه از ارتباط بی‌سیم وای‌فای استفاده می‌شود.
+
+</p>
+</div><p><img src="assets/reactionwheelunicycle/schematics/nucleof401re.jpeg" alt="nucleof401re"/></p><pre><code class="language-c hljs">unsigned long t1 = 0;
+unsigned long t2 = 0;
+unsigned long diff = 0;
+
+t1 = DWT-&gt;CYCCNT;
+// operations
+t2 = DWT-&gt;CYCCNT;
+diff = t2 - t1;
+dt = (float)diff / CPU_CLOCK;
+model.dt = dt;</code></pre><div dir = "rtl">
+<p>
+
+در ابتدای حلقه‌ی اصلی برنامه‌ی میکروکنترلر مقدار یک شمارنده‌ی به خصوص در متغیر تی ۱ ذخیره می‌شود و در انتهای حلقه یک بار دیگر مقدار شمارنده در متغیر تی ۲ ذخیره می‌شود. با دانستن بسامد واحد پردازنده‌ی مرکزی میکروکنترلر می‌توان این اختلاف شمارش میان تی ۱ و تی ۲ را به دوره‌ی زمانی در واحد ثانیه تبدیل کرد. از این دوره‌ی زمانی در انتگرال گیری از سرعت زاویه‌ای داده‌های ژیروسکوپ استفاده می‌شود تا مقدار دقیق تغییر زاویه را با ضرب کردن «رادیان بر ثانیه» در «ثانیه» به واحد رادیان به دست آورد. به همین دلیل این اختلاف زمانی در ساختمان داده‌ی مدل سامانگر خطی درجه دوم به عنوان یکی از میدان‌ها تعریف شده است.
+
+</p>
+<p>
+
+پس از ذخیره کردن مقدار شمارنده در ابتدای حلقه‌ی تابع اصلی برنامه، مقدار فیوز بیت ۱ خوانده می‌شود تا بتوان به منظور تنظیم کردن واحد موقعیت‌یاب اینرسیایی به طور موقت کنترلر را غیر فعال کرد. غیر فعال کردن فیوز بیت ۱ باعث می‌شود تا موتورها خاموش شوند و از لرزش ناخواسته هنگام محاسبه کردن مقدارهای جبران کننده‌ی شتاب‌سنج و ژیروسکوپ جلوگیری کرد. سپس، شرط ایمنی بررسی می‌شود، که قدر مطلق زاویه‌های غلت و تاب را با ثابت‌های از پیش تعریف شده مقایسه می‌کند تا بتواند سقوط ربات را تشخیص دهد و مدل کنترلر را غیر فعال کند. همچنین گام زمانی کا در سامانگر خطی درجه دوم بررسی می‌شود تا از اجرای بی‌نهایت برنامه در طول زمان جلوگیری شود. وقتی که پرچم کنترلر ربات غیر فعال باشد، با فشردن کلید آبی رنگ بر روی برد نوکلیو-۶۴ می‌توان کنترلر را دوباره فعال کرد. چراغ سبز رنگ برنامه متناسب با فعال بودن یا غیرفعال بودن کنترلر ربات روشن و خاموش می‌شود. به صورتی که هنگام فعال بودن پرچم چراغ خاموش می‌شود و برای مثال به محض سقوط ربات چراغ سبز روشن می‌شود تا به کاربر بفهماند که کنترلر غیر فعال است.
+
+</p>
+
+<p>
+
+اگر پرچم پایان برنامه غیرفعال باشد، تابع گام برداشتن به جلو فراخوانی می‌شود. در غیر این صورت، چرخه‌ی کاری مدولاسیون پهنای باند هر دو موتور صفر می‌شود و تنها مقدار اندازه‌گیری حسگرها به‌روزرسانی می شود. این کار کمک می‌کند تا بدون حرکت ربات بتوان حسگرها را تنظیم کرد و عیب‌یابی کرد. اما اگر که پرچم پایان برنامه فعال باشد و به طور همزمان پرچم به‌روزرسانی برنامه غیرفعال باشد، آن‌گاه تابع به‌روزرسانی تدبیرگر پسخوردی فراخوانی می‌شود. تابع به‌روزرسانی تدبیرگر پس از پایان اجرا شدن، پرچم به‌روزرسانی تدبیرگر را فعال می‌کند تا از به‌روزرسانی مدل در چرخه‌های متوالی جلوگیری شود. در صورتی که گام زمانی کا در سامانگر خطی درجه دوم ضریبی از عدد ۱۰۰ باشد، تابع به‌روزرسانی تدبیرگر پسخوردی فراخوانی می‌شود که روش اصلی به‌روزرسانی تدبیرگر است.
+
+</p>
+</div><pre><code class="language-c hljs">while (1)
 {
   t1 = DWT-&gt;CYCCNT;
 
@@ -4881,7 +4905,6 @@ const float sensorAngle = -30.0 / 180.0 * M_PI;</code></pre><pre><code class="la
     model.active = 1;
     model.updated = 0;
   }
-  // Rinse and repeat :)
 
   if (model.terminated == 0)
   {
@@ -4938,23 +4961,39 @@ const float sensorAngle = -30.0 / 180.0 * M_PI;</code></pre><pre><code class="la
   diff = t2 - t1;
   dt = (float)diff / CPU_CLOCK;
   model.dt = dt;
-}</code></pre><p><img src="assets/reactionwheelunicycle/schematics/wifimodule.jpeg" alt="wifimodule"/></p><pre><code class="language-c hljs">unsigned long t1 = 0;
-unsigned long t2 = 0;
-unsigned long diff = 0;
+  // Rinse and repeat :)
+}</code></pre><div dir = "rtl">
+<p>
 
-t1 = DWT-&gt;CYCCNT;
-// operations
-t2 = DWT-&gt;CYCCNT;
-diff = t2 - t1;
-dt = (float)diff / CPU_CLOCK;
-model.dt = dt;</code></pre><pre><code class="language-c hljs">typedef struct
+اندازه‌گیری از راه دور روشی است برای خواندن میدان‌های ساختمان داده سامانگر خطی درجه دوم، که به توسعه‌دهنده کمک می‌کند تا ربات را تنظیم و عیب‌یابی کند. در این روش، ربات به یک تفتگاه رادیویی وای‌فای تبدیل می‌شود که با رایانه می‌توان به آن وصل شد. سپس با استفاده از آدرس آی‌پی و درگاه شبکه، اندازه‌گیری‌های ربات به صورت خط به خط در رایانه نمایش داده می‌شود. کانون رادیویی ربات یک ماژول وای‌فای است که با رابط گیرنده-فرستنده همگام و غیرهمگام جهانی (یوزارت) با میکروکنترلر صحبت می‌کند و دارای ۸۰ متر برد است. در لایه‌ی نرم‌افزاری اندازه‌گیری از راه دور، از ماژول وای‌فای با یک واژه‌ی عبور محافظت شده است. تابع اس‌پرینت‌اف یک تابع در کتابخانه‌ی استاندارد زبان برنامه‌نویسی سی است که متن رشته‌ای را قالب‌دهی می‌کند و به خروجی استاندارد ارسال می‌کند. آرگومان‌های تابع اس‌پرینت‌اف یک آرایه و یک رشته‌ی کاراکتری است که به دنبال آرگومان رشته، تعدادی آرگومان متغیر تامین می‌شود تا تازه‌ترین مقدارهای عددی در رشته‌ی کاراکتری جایگذاری شود. پس از فراخوانی تابع اس‌پرینت‌اف، رشته کاراکتری با اندازه‌گیری‌های عددی شکل می‌گیرد و سپس با فراخوانی تابع ارسال یوزارت به رابط ماژول وای‌فای فرستاده می‌شود. این کار به طور متناوب و با بسامدی کمتر از بسامد چرخه‌ی کنترلی انجام می‌شود تا تاخیر کنترلر کاهش یابد. به طور معمول با غیرفعال کردن فیوزبیت ۲ بر روی ربات این بسامد صفر می شود و کاربر تنها هنگام توسعه‌ی نرم‌افزاری ربات فیوزبیت ۲ را فعال می‌کند. 
+
+</p>
+</div><p><img src="assets/reactionwheelunicycle/schematics/wifimodule.jpeg" alt="wifimodule"/></p><div dir = "rtl">
+<p>
+
+رمزنگار چرخ ربات می‌تواند زاویه‌ی مطلق چرخ را در هر لحظه محاسبه کند. سپس با محاسبه کردن زاویه در دو چرخه‌ی متوالی کنترلی می‌توان سرعت زاویه‌ای چرخ را پیدا کرد. سرعت زاویه‌ای چرخ ربات از عنصرهای مجموعه‌ی پایه‌ی سامانگر خطی درجه دوم است و به همین خاطر برای عملکرد درست ربات ضروری است. ساختمان داده‌ی رمزنگار دارای میدانی به نام پالس بر دور است که به محاسبه‌ی زاویه‌ی چرخ به واحد رادیان کمک می‌کند.
+
+</p>
+</div><pre><code class="language-c hljs">typedef struct
 {
   int pulse_per_revolution;    // the number of pulses per revolution
   int value;                   // the counter
   double angle;                // the absolute angle
   double velocity;             // the angular velocity
   double acceleration;         // the angular acceleration
-} Encoder;</code></pre><p><img src="assets/reactionwheelunicycle/schematics/motora.jpeg" alt="motora"/></p><p><img src="assets/reactionwheelunicycle/schematics/motorb.jpeg" alt="motorb"/></p><pre><code class="language-c hljs">void encodeWheel(Encoder *encoder, int newValue)
+} Encoder;</code></pre><div dir = "rtl">
+<p>
+
+رمزنگار چرخ اصلی ربات از نوع نوری است، در حالی که رمزنگار چرخ عکس‌العملی از نوع مغناطیسی است. در گونه‌ی رمزنگار نوری، حسگر‌ها دو ترانزیستور نوری هستند که کانال‌های الف و ب را اندازه‌گیری می‌کنند. اما در گونه‌ی رمزنگار مغناطیسی، حسگرهای کانال الف و ب حسگرهای اثر هال هستند که شدت میدان مغناطیسی را در نزدیکی یک آرایه‌ی مغناطیسی (به شکل یک دیسک با مرکز محور موتور) اندازه‌گیری می‌کنند.
+
+</p>
+</div><p><img src="assets/reactionwheelunicycle/schematics/motora.jpeg" alt="motora"/></p><p><img src="assets/reactionwheelunicycle/schematics/motorb.jpeg" alt="motorb"/></p><div dir = "rtl">
+<p>
+
+به‌روزرسانی رمزنگارهای چرخ‌های ربات با فراخوانی تابع رمزکننده‌ی چرخ انجام می‌پذیرد. پارامترهای ورودی تابع یک اشاره‌گر به ساختمان داده‌ی رمزنگار است به همراه تازه‌ترین مقدار واحد شمارنده‌ی مرتبط. در میکروکنترلری که استفاده شده است، شیوه‌ی عملکردی به نام رمزنگار در واحدهای شمارنده‌ی میکروکنترلر وجود دارد. برای رمزنگاری دو چرخ به دو شمارنده‌ی جداگانه در میکروکنترلر نیاز داریم. این تابع ابتدا مقدار شمارنده‌ی مرتبط با چرخ را می‌خواند و سپس زاویه‌ی چرخ را محاسبه می‌کند. با دانستن مقدار پالس بر گردش می‌توان شمارش را با عملگر باقیمانده‌ی تقسیم به یک زاویه تبدیل کرد و سپس با ضرب در یک مقیاس مناسب، واحد زاویه را به رادیان تغییر داد. سرعت زاویه‌ای چرخ نیز با عملگر تفریق انجام می‌شود که تغییر زاویه‌ی یک چرخ را در دو چرخه‌ی کنترلی متوالی اندازه‌گیری می‌کند.
+
+</p>
+</div><pre><code class="language-c hljs">void encodeWheel(Encoder *encoder, int newValue)
 {
   encoder-&gt;value = newValue;
   double angle = sin((float)(encoder-&gt;value % encoder-&gt;pulse_per_revolution) / (double) encoder-&gt;pulse_per_revolution * 2.0 * M_PI);
@@ -4964,13 +5003,31 @@ model.dt = dt;</code></pre><pre><code class="language-c hljs">typedef struct
   encoder-&gt;velocity = velocity;
   encoder-&gt;acceleration = acceleration;
   return;
-}</code></pre><p><img src="assets/reactionwheelunicycle/schematics/motordriver.jpeg" alt="motordriver"/></p><p><img src="assets/reactionwheelunicycle/schematics/currentsensing.jpeg" alt="currentsensing"/></p><pre><code class="language-c hljs">typedef struct
+}</code></pre><div dir = "rtl">
+<p>
+
+قطعه‌ی مدار مجتمع ال۲۹۳دی دارای چهار مدار نیم‌پل ایچ با جریان بالاست. مدار مجتمع ال۲۹۳دی می‌تواند جریان‌های الکتریکی را به صورت دوطرفه با حداکثر جریان ۶۰۰ میلی آمپر در بازه ی ولتاژ ۴٫۵ ولت تا ۳۶ ولت بگرداند. این قطعه برای رانش بارهای القایی مانند سیم‌پیچ موتورها مناسب است. دمای کاری این آی‌سی از صفر تا ۷۰ درجه‌ی سانتیگراد است. در کاربرد ربات تعادلی تک‌چرخ، از آی‌سی ال۲۹۳دی به عنوان دو مدار پل ایچ مستقل استفاده شده است. به طوری که ورودی فعال‌کننده‌ی هر پل با مدولاسیون پهنای پالس کنترل می‌شود تا سرعت هر موتور به طور جداگانه کنترل شود. پس، دو ورودی یک پل ایچ برای کنترل جهت چرخش موتور به کار می‌روند. به این شکل که با صفر کردن یک ورودی و یک کردن ورودی دیگر موتور ربات با سرعتی که به چرخه‌ی کاری مدولاسیون پهنای پالس بستگی دارد شروع به چرخش می‌کند، و با معکوس کردن منطقی دو ورودی پل ایچ، جهت چرخش موتور عوض می‌شود. این کار کمک می‌کند تا از تنها ۲ پالس برای کنترل سرعت موتورها استفاده شود که در واقع متناظر با همان دو ورودی سامانگر خطی درجه دوم هستند. برای جلوگیری از حرکت‌های احتمالی بیش از حد سریع و ناخواسته‌ی موتورها، ابتدا ورودی سامانگر خطی درجه دوم انتگرال گیری می‌شود و سپس مقدار نتیجه‌ی انتگرال با تغییر مقیاسی مناسب به چرخه‌ی کاری مدولاسیون پهنای پالس موتور تبدیل می‌شود.
+
+</p>
+</div><p><img src="assets/reactionwheelunicycle/schematics/motordriver.jpeg" alt="motordriver"/></p><div dir = "rtl">
+<p>
+
+خروجی گرداننده‌ی موتور به یک حسگر اثر هال به طور سری وصل شده است و سپس به پایانه‌های سیم‌پیچ موتور وصل می‌شود. این حسگر اثر هال، وظیفه دارد تا برآوردی خطی از جریان عبور کننده از سیم‌پیچ موتور به دست آورد. سپس برآورد خطی دو چرخه‌ی متوالی کنترلی محاسبه می‌شود تا به سرعت جریان مصرفی موتور برسیم. برآورد سرعت جریان عبوری از موتور از عنصرهای اصلی مجموعه‌ی پایه‌ی سامانگر خطی درجه دوم است و به همین دلیل برای عملکرد درست ربات ضروری است. یک دلیل برای اضافه کردن سرعت جریان سیم‌پیچ به مجموعه‌ی پایه این است که ولتاژ ژنراتوری بازگشتی موتور با جریان عبوری از سیم‌پیچ رابطه‌ی مستقیم دارد. با استفاده از این روش، برای تاثیر دادن ولتاژ ژنراتوری بازگشتی در کنترل ربات به اندازه‌گیری مشخصات موتور در آزمایشگاه فیزیک نیازی نداریم. به این ترتیب عملکرد سامانگر خطی درجه دوم از نوع موتور استفاده شده در ربات تا حد زیادی مستقل می شود.
+
+</p>
+</div><p><img src="assets/reactionwheelunicycle/schematics/currentsensing.jpeg" alt="currentsensing"/></p><pre><code class="language-c hljs">typedef struct
 {
   double currentScale;
   int current0;
   int current1;
   double currentVelocity;
-} CurrentSensor;</code></pre><pre><code class="language-c hljs">void senseCurrent(CurrentSensor *reactionCurrentSensor, CurrentSensor *rollingCurrentSensor)
+} CurrentSensor;</code></pre><div dir = "rtl">
+<p>
+
+واحد تبدیل آنالوگ به دیجیتال میکروکنترلر به گونه‌ای پیکربندی شده است که مقدارهای اندازه‌گیری شده‌ی هر کانال به طور مستقیم در حافظه‌ی میکروکنترلر ذخیره می‌شود. بنابراین تابع حس کردن جریان بدون درنگ مقدار ذخیره شده را می‌خواند و برای اندازه‌گیری حسگرهای جریان، حلقه‌ی کنترلی را معطل نمی‌کند. مقدار جریان عبورکننده از سیم‌پیچ یک موتور متناسب است با مقدار خوانده شده از یک کانال واحد آنالوگ به دیجیتال میکروکنترلر.
+
+</p>
+</div><pre><code class="language-c hljs">void senseCurrent(CurrentSensor *reactionCurrentSensor, CurrentSensor *rollingCurrentSensor)
 {
   // Start ADC Conversion in DMA Mode (Periodically Every 1ms)
   HAL_ADC_Start_DMA(&amp;hadc1, AD_RES_BUFFER, 2);
@@ -4980,7 +5037,13 @@ model.dt = dt;</code></pre><pre><code class="language-c hljs">typedef struct
   rollingCurrentSensor-&gt;current0 = (AD_RES_BUFFER[1] &lt;&lt; 4);
   reactionCurrentSensor-&gt;currentVelocity = (double) (reactionCurrentSensor-&gt;current0 - reactionCurrentSensor-&gt;current1) / reactionCurrentSensor-&gt;currentScale;
   rollingCurrentSensor-&gt;currentVelocity = (double) (rollingCurrentSensor-&gt;current0 - rollingCurrentSensor-&gt;current1) / rollingCurrentSensor-&gt;currentScale;
-}</code></pre><p><img src="assets/reactionwheelunicycle/schematics/5vpowersupply.jpeg" alt="5vpowersupply"/></p><p><img src="assets/reactionwheelunicycle/schematics/3v3powersupply.jpeg" alt="3v3powersupply"/></p><h1 id="References"><a class="docs-heading-anchor" href="#References">References</a><a id="References-1"></a><a class="docs-heading-anchor-permalink" href="#References" title="Permalink"></a></h1><div dir = "rtl">
+}</code></pre><div dir = "rtl">
+<p>
+
+منبع تغذیه‌ی ربات ولتاژ دو باتری یون لیتیم که با یکدیگر به طور متوالی بسته شده اند را ساماندهی می‌کند. مقدار نامی ولتاژ مجموعه‌ی باتری‌ها برابر است با ۷٫۴ ولت. سپس، یک سامانگر ولتاژ ۵ ولتی و یک سامانگر ولتاژ ۳٫۳ ولتی از ورودی ۷٫۴ ولتی بهره می‌گیرند تا تغذیه‌ی مدارهای منطقی ربات را تامین کنند. مدارهایی که با ولتاژ ۵ ولت جریان مستقیم کار می‌کنند: حسگرهای اثر هال رمزنگار چرخ عکس‌العملی و حسگرهای جریان موتورها، حسگرهای ترانزیستور نوری رمزنگار چرخ اصلی، و مدار مجتمع گرداننده‌ی موتورها. مدارهایی که با ولتاژ ۳٫۳ ولت جریان مستقیم کار می‌کنند: برد نوکلیو-۶۴ میکروکنترلر، واحدهای موقعیت‌یاب اینرسیایی ۱ و ۲، و ماژول وای‌فای. همچنین برای جلوگیری از افت ناگهانی ولتاژ خط تغذیه‌ی ۷٫۴ ولتی از تعدادی خازن با ظرفیت بالا استفاده شده است. این خازن‌ها که به طور موازی به یکدیگر وصل شده اند کمک می‌کنند تا سامانگر خطی درجه دوم بتواند تغییرهای ناگهانی و شدید ورودی را به طور موثر در دنیای فیزیکی انجام دهد و در نتیجه ربات تعادل خود را به موقع و بدون درنگ حفظ کند.
+
+</p>
+</div><p><img src="assets/reactionwheelunicycle/schematics/5vpowersupply.jpeg" alt="5vpowersupply"/></p><p><img src="assets/reactionwheelunicycle/schematics/3v3powersupply.jpeg" alt="3v3powersupply"/></p><h1 id="References"><a class="docs-heading-anchor" href="#References">References</a><a id="References-1"></a><a class="docs-heading-anchor-permalink" href="#References" title="Permalink"></a></h1><div dir = "rtl">
 <h1>
 
 منابع
@@ -5078,4 +5141,4 @@ model.dt = dt;</code></pre><pre><code class="language-c hljs">typedef struct
 </li>
 
 </ol>
-</div></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="maxwellfield_persian.html">« The Maxwell Field (Persian)</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.14.1 on <span class="colophon-date" title="Monday 15 September 2025 19:12">Monday 15 September 2025</span>. Using Julia version 1.10.10.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+</div></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="maxwellfield_persian.html">« The Maxwell Field (Persian)</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.14.1 on <span class="colophon-date" title="Tuesday 16 September 2025 11:48">Tuesday 16 September 2025</span>. Using Julia version 1.10.10.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
