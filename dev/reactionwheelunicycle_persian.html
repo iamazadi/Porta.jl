@@ -5040,10 +5040,16 @@ model.dt = dt;</code></pre><div dir = "rtl">
 }</code></pre><div dir = "rtl">
 <p>
 
-منبع تغذیه‌ی ربات ولتاژ دو باتری یون لیتیم که با یکدیگر به طور متوالی بسته شده اند را ساماندهی می‌کند. مقدار نامی ولتاژ مجموعه‌ی باتری‌ها برابر است با ۷٫۴ ولت. سپس، یک سامانگر ولتاژ ۵ ولتی و یک سامانگر ولتاژ ۳٫۳ ولتی از ورودی ۷٫۴ ولتی بهره می‌گیرند تا تغذیه‌ی مدارهای منطقی ربات را تامین کنند. مدارهایی که با ولتاژ ۵ ولت جریان مستقیم کار می‌کنند: حسگرهای اثر هال رمزنگار چرخ عکس‌العملی و حسگرهای جریان موتورها، حسگرهای ترانزیستور نوری رمزنگار چرخ اصلی، و مدار مجتمع گرداننده‌ی موتورها. مدارهایی که با ولتاژ ۳٫۳ ولت جریان مستقیم کار می‌کنند: برد نوکلیو-۶۴ میکروکنترلر، واحدهای موقعیت‌یاب اینرسیایی ۱ و ۲، و ماژول وای‌فای. همچنین برای جلوگیری از افت ناگهانی ولتاژ خط تغذیه‌ی ۷٫۴ ولتی از تعدادی خازن با ظرفیت بالا استفاده شده است. این خازن‌ها که به طور موازی به یکدیگر وصل شده اند کمک می‌کنند تا سامانگر خطی درجه دوم بتواند تغییرهای ناگهانی و شدید ورودی را به طور موثر در دنیای فیزیکی انجام دهد و در نتیجه ربات تعادل خود را به موقع و بدون درنگ حفظ کند.
+منبع تغذیه‌ی ربات ولتاژ دو باتری یون لیتیم که با یکدیگر به طور متوالی بسته شده اند را ساماندهی می‌کند. مقدار نامی ولتاژ مجموعه‌ی باتری‌ها برابر است با ۷٫۴ ولت. سپس، یک سامانگر ولتاژ ۵ ولتی و یک سامانگر ولتاژ ۳٫۳ ولتی از ورودی ۷٫۴ ولتی بهره می‌گیرند تا تغذیه‌ی مدارهای منطقی ربات را تامین کنند. مدارهایی که با ولتاژ ۵ ولت جریان مستقیم کار می‌کنند: حسگرهای اثر هال رمزنگار چرخ عکس‌العملی و حسگرهای جریان موتورها، حسگرهای ترانزیستور نوری رمزنگار چرخ اصلی، و مدار مجتمع گرداننده‌ی موتورها. مدارهایی که با ولتاژ ۳٫۳ ولت جریان مستقیم کار می‌کنند: برد نوکلیو-۶۴ میکروکنترلر، واحدهای موقعیت‌یاب اینرسیایی ۱ و ۲، و ماژول وای‌فای.
 
 </p>
-</div><p><img src="assets/reactionwheelunicycle/schematics/5vpowersupply.jpeg" alt="5vpowersupply"/></p><p><img src="assets/reactionwheelunicycle/schematics/3v3powersupply.jpeg" alt="3v3powersupply"/></p><h1 id="References"><a class="docs-heading-anchor" href="#References">References</a><a id="References-1"></a><a class="docs-heading-anchor-permalink" href="#References" title="Permalink"></a></h1><div dir = "rtl">
+</div><p><img src="assets/reactionwheelunicycle/schematics/5vpowersupply.jpeg" alt="5vpowersupply"/></p><div dir = "rtl">
+<p>
+
+نقطه ضعف چرخ عکس‌العملی، اشباع شدن چرخ هنگام رسیدن به حداکثر سرعت موتور می‌باشد. وقتی که چرخ عکس‌العملی به حالت اشباع می‌رسد، موتور چرخ عکس‌العملی با سرعت ۴۸۰ دور بر دقیقه می‌چرخد و چرخ عکس‌العملی قابلیت تولید گشتاور کافی در یکی از جهت‌ها را از دست می‌دهد. پس بهتر است که با بیشینه کردن سرعت آخر موتور (افزایش توان، ولتاژ ضرب در جریان)، حاشیه‌ی موثر تولید گشتاور را گسترش دهیم تا احتمال رسیدن چرخ عکس‌العملی به حالت اشباع را کاهش دهیم. مدار مجتمع ال۲۹۳دی دارای دو ورودی تغذیه‌ی مجزا است: ورودی وسطح ولتاژ منطقی در پایه‌ی ۱۶ قطعه و ورودی سطح ولتاژ قدرت در پایه‌ی ۸ قطعه. چون سرعت چرخش موتور جریان مستقیم با ولتاژ ورودی رابطه‌ی مستقیمی دارد، ولتاژ خط تغذیه‌ی قدرت مدار باید به ۱۲ ولت جریان مستقیم نزدیک‌تر شود. بنابراین پایه‌ی ۸ آی‌سی گرداننده‌ی ال۲۹۳دی به طور مستقیم به سر مثبت پایانه‌ی باتری‌های متوالی وصل شده است. عکس‌العمل سریع‌تر به ربات کمک می‌کند تا با تولید گشتاور کوچک‌تری تعادل خود را حفظ کند. محدود کردن اندازه‌ی گشتاور تولید شده با عکس‌العمل سریع نیز به نوبت خود احتمال به اشباع رسیدن چرخ عکس‌العملی را کمتر می‌کند. پس برای جلوگیری از افت ناگهانی ولتاژ خط تغذیه‌ی ۷٫۴ ولتی، از هفت خازن با ظرفیتی در حدود ۴۷۰ میکرو فاراد استفاده شده است. این خازن‌ها به طور موازی به یکدیگر وصل شده اند. ذخیره کردن انرژی الکتریکی در خازن‌ها کمک می‌کند تا سامانگر خطی درجه دوم بتواند افت ولتاژ ورودی (ناشی از تغییر جهت دادن ناگهانی موتورها) را بلافاصله جبران کند و به طور موثر در دنیای فیزیکی عمل کند. بانک خازن در زمان افت ولتاژ شدید (بارهای الکتریکی سنگین و گذرا) تخلیه می شود و با گرفتن ضربه، ولتاژ تغذیه را ثابت و پیوسته نگه می‌دارد.
+
+</p>
+</div><p><img src="assets/reactionwheelunicycle/schematics/3v3powersupply.jpeg" alt="3v3powersupply"/></p><h1 id="References"><a class="docs-heading-anchor" href="#References">References</a><a id="References-1"></a><a class="docs-heading-anchor-permalink" href="#References" title="Permalink"></a></h1><div dir = "rtl">
 <h1>
 
 منابع
@@ -5105,7 +5111,7 @@ model.dt = dt;</code></pre><div dir = "rtl">
 </li>
 
 <li>
-احمد فیض دیزجی، آنالیز تابعی کاربردی، انتشارات دانشگاه تهران، سال ۱۳۹۳، چاپ دوم، شابک 978-9640363263
+احمد فیض دیزجی، آنالیز تابعی کاربردی، انتشارات دانشگاه تهران، سال ۱۳۹۳، چاپ دوم، شابک ۹۶۴۰۳۶۳۲۶۳ ۹۷۸.
 </li>
 
 <li>
@@ -5125,24 +5131,24 @@ model.dt = dt;</code></pre><div dir = "rtl">
 </li>
 
 <li>
-آ. رنه گایست، جوناتان فین، نایومی تاشیرو، ژنگ جیا، و سباستین تریمپ، ویل‌بات: ربات تعادلی تک‌چرخ جهنده با چرخ عکس‌العملی، مرداد ۱۴۰۱، نامه‌های رباتیک و اتوماسیون انجمن مهندس‌های برق و الکترونیک، شناسه بایگانی مقاله: arXiv:2207.06988v1 [cs.RO].
+آ. رنه گایست، جوناتان فین، نایومی تاشیرو، ژنگ جیا، و سباستین تریمپ، ویل‌بات: ربات تعادلی تک‌چرخ جهنده با چرخ عکس‌العملی، مرداد ۱۴۰۱، نامه‌های رباتیک و اتوماسیون انجمن مهندس‌های برق و الکترونیک، شناسه بایگانی مقاله: آرشیو:۲۲۰۷.۰۶۹۸۸ نسخه ۱ ،علوم رایانه‌ای.
 </li>
 
 <li>
-راجر پنروز، راه رسیدن به واقعیت: راهنمای کامل قوانین کیهان، انتشارات جوناتان کیپ، سال ۱۳۸۲، شابک ۰−۲۲۴−۰۴۴۴۷−۸
+راجر پنروز، راه رسیدن به واقعیت: راهنمای کامل قوانین کیهان، انتشارات جوناتان کیپ، سال ۱۳۸۲، شابک ۰−۲۲۴−۰۴۴۴۷−۸.
 </li>
 
 <li>
-تریستان نیدهام، هندسه دیفرانسیل بصری و شکل‌ها: یک نمایش ریاضیاتی پنج پرده‌ای، انتشارات دانشگاه پرینستون، سال ۱۳۹۹، شابک 9780691203690
+تریستان نیدهام، هندسه دیفرانسیل بصری و شکل‌ها: یک نمایش ریاضیاتی پنج پرده‌ای، انتشارات دانشگاه پرینستون، سال ۱۳۹۹، شابک ۹۷۸۰۶۹۱۲۰۳۶۹۰.
 </li>
 
 <li>
-جان ام. لی، مقدمه‌ای بر منیفلد ریمانی، انتشارات بین‌المللی اسپرینگر، سال ۱۳۹۷، چاپ دوم، شابک  9783319917542, 3319917544
+جان ام. لی، مقدمه‌ای بر منیفلد ریمانی، انتشارات بین‌المللی اسپرینگر، سال ۱۳۹۷، چاپ دوم، شابک ۹۷۸۳۳۱۹۹۱۷۵۴۲، ۳۳۱۹۹۱۷۵۴۴.
 </li>
 
 <li>
-دراگونا ورابی، کایریاکوس جی. ومووداکیس، و فرانک ال. لوییس، کنترل تطبیق‌پذیر بهینه و بازی‌های دیفرانسیلی با استفاده از اصول یادگیری تقویتی، انتشارات موسسه‌ی مهندسی و فناوری، لندن، بریتانیا، ۱۳۹۱.
+دراگونا ورابی، کایریاکوس جی. ومووداکیس، و فرانک ال. لوییس، کنترل تطبیق‌پذیر بهینه و بازی‌های دیفرانسیلی با استفاده از اصول یادگیری تقویتی، انتشارات موسسه‌ی مهندسی و فناوری، لندن، بریتانیا، ۱۳۹۱، شابک ۹۷۸۱۸۴۹۱۹۴۹۰۷.
 </li>
 
 </ol>
-</div></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="maxwellfield_persian.html">« The Maxwell Field (Persian)</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.14.1 on <span class="colophon-date" title="Wednesday 17 September 2025 06:06">Wednesday 17 September 2025</span>. Using Julia version 1.10.10.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+</div></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="maxwellfield_persian.html">« The Maxwell Field (Persian)</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.14.1 on <span class="colophon-date" title="Wednesday 17 September 2025 07:11">Wednesday 17 September 2025</span>. Using Julia version 1.10.10.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
