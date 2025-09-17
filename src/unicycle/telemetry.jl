@@ -128,7 +128,7 @@ parsetext(text::String, headers::Vector{String}) = begin
     readings = Dict()
     if length(text) > 30
         for header in eachindex(headers)
-            scalar = parsescalar(text, "$(headers[header]): ", ", ", type = Int)
+            scalar = parsescalar(text, "$(headers[header]): ", ", ", type = Float64)
             if !isnothing(scalar)
                 readings[headers[header]] = scalar
             end

@@ -8334,8 +8334,8 @@ void updateIMU2(IMU *sensor) // GY-95 USART
 // the pivot point B̂ in the inertial frame Ô
 float pivot[3] = {-0.097, -0.1, -0.032};
 // the position of sensors mounted on the body in the body frame of reference
-float p1[3] = {-0.035, -0.19, -0.04};
-float p2[3] = {0.025, -0.144, -0.07};
+float p1[3] = {-0.1400, -0.0650, -0.0620};
+float p2[3] = {-0.0400, -0.0600, -0.0600};
 // the vectors of the standard basis for the input space ℝ³
 float e1[3] = {1.0, 0.0, 0.0};
 float e2[3] = {0.0, 1.0, 0.0};

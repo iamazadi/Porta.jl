@@ -7,8 +7,8 @@ using Porta
 
 figuresize = (1920, 1080)
 modelname = "unicycle"
-maxplotnumber = 300
-headers = ["aX1", "aY1", "aZ1", "gX1", "gY1", "gZ1", "aX2", "aY2", "aZ2", "gX2", "gY2", "gZ2"]
+maxplotnumber = 100
+headers = ["AX1", "AY1", "AZ1", "AX2", "AY2", "AZ2", "roll", "pitch", "encT", "encB"]#, "P11", "P22", "P33","P44", "P55"]
 clientside = nothing
 run = false
 readings = Dict()
@@ -29,8 +29,10 @@ origin = Point3f(-0.1, -0.1, -0.02)
 # the pivot point B̂ in the inertial frame Ô
 pivot = Point3f(-0.097, -0.1, -0.032)
 # the position of sensors mounted on the body in the body frame of reference
-p1 = Point3f(-0.035, -0.19, -0.04)
-p2 = Point3f(0.025, -0.144, -0.07)
+# p1 = Point3f(-0.035, -0.19, -0.04)
+# p2 = Point3f(0.025, -0.144, -0.07)
+p1 = Point3f(-0.14000000286102293, -0.06500000149011612, -0.06200000151991844)
+p2 = Point3f(-0.04000000286102295, -0.06000000149011612, -0.06000000151991844)
 # the vectors of the standard basis for the input space ℝ³
 ê = [Vec3f(1, 0, 0), Vec3f(0, 1, 0), Vec3f(0, 0, 1)]
 # The rotation of the inertial frame Ô to the body frame B̂
@@ -204,16 +206,21 @@ on(buttons[1].clicks) do n
         allkeys = keys(readings)
         flag = all([x ∈ allkeys for x in headers]) && all([!isnothing(readings[x]) for x in headers])
         if flag
-            acc1 = [readings["aX1"]; readings["aY1"]; readings["aZ1"]] .* (1.0 / 2048.0)            # acc2 = [-(cos(imu2angle) * readings["aY2"] - sin(imu2angle) * readings["aX2"]); -(sin(imu2angle) * readings["aX2"] + cos(imu2angle) * readings["aY2"]); -readings["aZ2"]] .* (1.0 / 8092.0)
-            acc2 = [-(sin(imu2angle) * readings["aX2"] + cos(imu2angle) * readings["aY2"]);
-                    -(cos(imu2angle) * readings["aY2"] - sin(imu2angle) * readings["aX2"]);
-                    -readings["aZ2"]] .* (1.0 / (5.0 * 2048.0))
+            acc1 = [readings["AX1"]; readings["AY1"]; readings["AZ1"]]          # acc2 = [-(cos(imu2angle) * readings["aY2"] - sin(imu2angle) * readings["aX2"]); -(sin(imu2angle) * readings["aX2"] + cos(imu2angle) * readings["aY2"]); -readings["aZ2"]] .* (1.0 / 8092.0)
+            acc2 = [readings["AX2"], readings["AY2"], readings["AZ2"]]
 
             # acc2 = [-(cos(imu2angle) * readings["aY2"] - sin(imu2angle) * readings["aX2"]); -(sin(imu2angle) * readings["aX2"] + cos(imu2angle) * readings["aY2"]); -readings["aZ2"]] .* (1.0 / 8092.0)
             # gyr1 = [readings["gX1"]; readings["gY1"]; readings["gZ1"]]
             # gyr2 = [readings["gX2"]; readings["gY2"]; readings["gZ2"]]
-            # rolling_angle = readings["encB"]
-            # reaction_angle = readings["encT"]
+            roll = readings["roll"]
+            pitch = readings["pitch"]
+            rolling_angle = readings["encB"]
+            reaction_angle = -readings["encT"]
+            # P11 = readings["P11"]
+            # P22 = readings["P22"]
+            # P33 = readings["P33"]
+            # P44 = readings["P44"]
+            # P55 = readings["P55"]
             # delta_time = readings["dt"]
 
             global R1 = acc1
@@ -224,8 +231,8 @@ on(buttons[1].clicks) do n
             β = atan(-ĝ[1], √(ĝ[2]^2 + ĝ[3]^2))
             γ = atan(ĝ[2], ĝ[3])
             println("β: $β, γ: $γ.")
-            roll = β
-            pitch = -γ
+            # roll = β
+            # pitch = -γ
             q = ℍ(roll, x̂) * ℍ(pitch, ŷ)
             O_B_R = mat33(q)
             B_O_R = mat33(-q)
@@ -237,7 +244,7 @@ on(buttons[1].clicks) do n
             point2_observable[] = Point3f(O_B_R * (p2 - origin) + origin)
 
             ps[] = [Point3f(point1_observable[]...), Point3f(point2_observable[]...)]
-            ns[] = map(x -> x .* arrowscale, [Vec3f(O_B_R * _R1...), Vec3f(O_B_R * _R2...)])
+            ns[] = map(x -> x .* arrowscale, [Vec3f(O_B_R * [R1[2]; -R1[1]; R1[3]]...), Vec3f(O_B_R * [R2[2]; -R2[1]; R2[3]]...)])
 
             pivot_ps[] = [Point3f(pivot_observable[]...), Point3f(pivot_observable[]...), Point3f(pivot_observable[]...)]
             ps1[] = [Point3f(point1_observable[]...), Point3f(point1_observable[]...), Point3f(point1_observable[]...)]
@@ -270,7 +277,7 @@ on(buttons[1].clicks) do n
             end
             xlims!(ax1, timestamp - maxplotnumber, timestamp)
             #######
-            q = ℍ(roll, x̂) * ℍ(pitch, ŷ)
+            # q = ℍ(roll, x̂) * ℍ(pitch, ŷ)
             O_B_R = mat3(q)
     
             g = q * chassis_q0
@@ -278,10 +285,10 @@ on(buttons[1].clicks) do n
             pivot_observable[] = Point3f(O_B_R * (pivot - origin) + origin)
     
             pivot_ps[] = [Point3f(pivot_observable[]...), Point3f(pivot_observable[]...), Point3f(pivot_observable[]...)]
-            # rq = Quaternion(ℍ(reaction_angle, x̂))
-            # mq = Quaternion(ℍ(rolling_angle, ẑ))
-            # rotate!(rollingwheel, mq)
-            # rotate!(reactionwheel, rq)
+            rq = Quaternion(ℍ(reaction_angle, x̂))
+            mq = Quaternion(ℍ(rolling_angle, ẑ))
+            GLMakie.rotate!(rollingwheel, mq)
+            GLMakie.rotate!(reactionwheel, rq)
         end
     end)
 end
