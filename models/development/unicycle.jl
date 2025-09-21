@@ -8,7 +8,7 @@ using Porta
 figuresize = (1920, 1080)
 modelname = "unicycle"
 maxplotnumber = 100
-headers = ["AX1", "AY1", "AZ1", "AX2", "AY2", "AZ2", "roll", "pitch", "encT", "encB"]#, "P11", "P22", "P33","P44", "P55"]
+headers = ["AX1", "AY1", "AZ1", "AX2", "AY2", "AZ2", "roll", "pitch", "encT", "encB" , "P0", "P1", "P2","P3", "P4"]
 clientside = nothing
 run = false
 readings = Dict()
@@ -17,7 +17,7 @@ x̂ = ℝ³([1.0; 0.0; 0.0])
 ŷ = ℝ³([0.0; 1.0; 0.0])
 ẑ = ℝ³([0.0; 0.0; 1.0])
 
-eyeposition = normalize([0.0, 1.0, 1.0]) .* 0.55
+eyeposition = normalize([0.0, 1.0, 1.0]) .* 0.5
 lookat = [-0.1, -0.1, 0.1]
 up = [0.0; 0.0; 1.0]
 arrowsize = Observable(Vec3f(0.02, 0.02, 0.03))
@@ -78,9 +78,9 @@ chassis_stl_path = joinpath("data", "unicycle", "unicycle_chassis.STL")
 rollingwheel_stl_path = joinpath("data", "unicycle", "unicycle_main_wheel.STL")
 reactionwheel_stl_path = joinpath("data", "unicycle", "unicycle_reaction_wheel.STL")
 
-chassis_colormap = :jet
-rollingwheel_colormap = :rainbow
-reactionwheel_colormap = :darkrainbow
+chassis_colormap = :bam
+rollingwheel_colormap = :Accent_8
+reactionwheel_colormap = :seaborn_flare_gradient
 
 pivot_observable = Observable(pivot)
 point1_observable = Observable(p1)
@@ -91,7 +91,7 @@ fig = with_theme(makefigure, theme_black())
 pl = PointLight(Point3f(0), RGBf(0.0862, 0.0862, 0.0862))
 al = AmbientLight(RGBf(0.9, 0.9, 0.9))
 backgroundcolor = RGBf(1.0, 1.0, 1.0)
-lscene = LScene(fig[1, 1], show_axis = false, scenekw = (lights = [pl, al], clear = true, backgroundcolor = :white))
+lscene = LScene(fig[1, 1], show_axis = false, scenekw = (lights = [pl, al], clear = true, backgroundcolor = :black))
 ax1 = Axis(fig[2, 1], xlabel = "Time (s)", ylabel = "System States")
 ax2 = Axis(fig[2, 2], xlabel = "Time (s)", ylabel = "P Matrix Parameters")
 buttoncolor = RGBf(0.3, 0.3, 0.3)
@@ -102,14 +102,17 @@ statuslabel = Label(fig, statustext)
 fig[1, 2] = grid!(hcat(statuslabel, buttons...), tellheight = false, tellwidth = false)
 
 graphpoints = Observable([Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)]])
+graphpoints2 = Observable([Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)]])
 
-linegraphx2 = Observable(0..10)
-linegraphy2 = Observable(cos)
+P0_lineobject = scatter!(ax2, @lift(($graphpoints2)[1]), color = :red)
+P1_lineobject = scatter!(ax2, @lift(($graphpoints2)[2]), color = :green)
+P2_lineobject = scatter!(ax2, @lift(($graphpoints2)[3]), color = :blue)
+P3_lineobject = scatter!(ax2, @lift(($graphpoints2)[4]), color = :yellow)
+P4_lineobject = scatter!(ax2, @lift(($graphpoints2)[5]), color = :orange)
 roll_lineobject = scatter!(ax1, @lift(($graphpoints)[1]), color = :red)
 pitch_lineobject = scatter!(ax1, @lift(($graphpoints)[2]), color = :green)
 encoder1_lineobject = scatter!(ax1, @lift(($graphpoints)[3]), color = :orange)
 encoder2_lineobject = scatter!(ax1, @lift(($graphpoints)[4]), color = :pink)
-lineobject2 = lines!(ax2, linegraphx2, linegraphy2, color = :blue)
 
 chassis_stl = load(chassis_stl_path)
 reactionwheel_stl = load(reactionwheel_stl_path)
@@ -123,7 +126,7 @@ reactionwheel = make_sprite(lscene.scene, robot, reactionwheel_origin, reactionw
 
 pivotball = meshscatter!(lscene, pivot_observable, markersize = 0.01, color = :gold)
 
-arrowscale = 0.1
+arrowscale = 0.2
 smallarrowscale = arrowscale * 0.5
 R1_tail = vec(p1)
 R2_tail = vec(p2)
@@ -138,7 +141,7 @@ arrows!(lscene,
     ps, ns, fxaa = true, # turn on anti-aliasing
     color = [:orange, :lime, :pink, :purple],
     linewidth = linewidth, arrowsize = arrowsize,
-    align = :center
+    align = :origin
 )
 
 pivotball = meshscatter!(lscene, pivot_observable, markersize = 0.01, color = :gold)
@@ -151,25 +154,25 @@ ps1 = Observable([point1_observable[], point1_observable[], point1_observable[]]
 ps2 = Observable([point2_observable[], point2_observable[], point2_observable[]])
 ns1 = Observable(map(x -> smallarrowscale .* B_O_R * x, [B_A1_R * ê[1], B_A1_R * ê[2], B_A1_R * ê[3]]))
 ns2 = Observable(map(x -> smallarrowscale .* B_O_R * x, [B_A2_R * ê[1], B_A2_R * ê[2], B_A2_R * ê[3]]))
-arrowsize1 = Observable(Vec3f(0.01, 0.02, 0.03))
+arrowsize1 = Observable(Vec3f(0.01, 0.02, 0.03) .* 2.0)
 linewidth1 = Observable(0.005)
 arrows!(lscene,
     pivot_ps, pivot_ns, fxaa = true, # turn on anti-aliasing
     color = [:red, :green, :blue],
     linewidth = linewidth1, arrowsize = arrowsize1,
-    align = :center
+    align = :origin
 )
 arrows!(lscene,
     ps1, ns1, fxaa = true, # turn on anti-aliasing
     color = [:red, :green, :blue],
     linewidth = linewidth1, arrowsize = arrowsize1,
-    align = :center
+    align = :origin
 )
 arrows!(lscene,
     ps2, ns2, fxaa = true, # turn on anti-aliasing
     color = [:red, :green, :blue],
     linewidth = linewidth1, arrowsize = arrowsize1,
-    align = :center
+    align = :origin
 )
 
 lookat = deepcopy(pivot)
@@ -216,11 +219,11 @@ on(buttons[1].clicks) do n
             pitch = readings["pitch"]
             rolling_angle = readings["encB"]
             reaction_angle = -readings["encT"]
-            # P11 = readings["P11"]
-            # P22 = readings["P22"]
-            # P33 = readings["P33"]
-            # P44 = readings["P44"]
-            # P55 = readings["P55"]
+            P0 = readings["P0"]
+            P1 = readings["P1"]
+            P2 = readings["P2"]
+            P3 = readings["P3"]
+            P4 = readings["P4"]
             # delta_time = readings["dt"]
 
             global R1 = acc1
@@ -264,19 +267,43 @@ on(buttons[1].clicks) do n
             push!(_pitchpoints, Point2f(timestamp, pitch))
             push!(_encoder1points, Point2f(timestamp, rolling_angle))
             push!(_encoder2points, Point2f(timestamp, reaction_angle))
+            # plot the P Matrix
+            _graphpoints2 = graphpoints2[]
+            _P0points = _graphpoints2[1]
+            _P1points = _graphpoints2[2]
+            _P2points = _graphpoints2[3]
+            _P3points = _graphpoints2[4]
+            _P4points = _graphpoints2[5]
+            push!(_P0points, Point2f(timestamp, P0))
+            push!(_P1points, Point2f(timestamp, P1))
+            push!(_P2points, Point2f(timestamp, P2))
+            push!(_P3points, Point2f(timestamp, P3))
+            push!(_P4points, Point2f(timestamp, P4))
             number = length(_rollpoints)
             if number > maxplotnumber
                 _rollpoints = _rollpoints[number - maxplotnumber + 1:end]
                 _pitchpoints = _pitchpoints[number - maxplotnumber + 1:end]
                 _encoder1points = _encoder1points[number - maxplotnumber + 1:end]
                 _encoder2points = _encoder2points[number - maxplotnumber + 1:end]
+                # P matrix graph
+                _P0points = _P0points[number - maxplotnumber + 1:end]
+                _P1points = _P1points[number - maxplotnumber + 1:end]
+                _P2points = _P2points[number - maxplotnumber + 1:end]
+                _P3points = _P3points[number - maxplotnumber + 1:end]
+                _P4points = _P4points[number - maxplotnumber + 1:end]
                 @assert(length(_rollpoints) == maxplotnumber)
                 graphpoints[] = [_rollpoints, _pitchpoints, _encoder1points, _encoder2points]
+                graphpoints2[] = [_P0points, _P1points, _P2points, _P3points, _P4points]
             else
                 graphpoints[] = [_rollpoints, _pitchpoints, _encoder1points, _encoder2points]
+                graphpoints2[] = [_P0points, _P1points, _P2points, _P3points, _P4points]
             end
             xlims!(ax1, timestamp - maxplotnumber, timestamp)
+            xlims!(ax2, timestamp - maxplotnumber, timestamp)
+            ylims!(ax1, -1.0, 2π)
+            ylims!(ax2, min(P0, P1, P2, P3, P4), max(P0, P1, P2, P3, P4))
             #######
+
             # q = ℍ(roll, x̂) * ℍ(pitch, ŷ)
             O_B_R = mat3(q)
     
