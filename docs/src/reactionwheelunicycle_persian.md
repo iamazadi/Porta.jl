@@ -9171,7 +9171,7 @@ void updateIMU(LinearQuadraticRegulator *model)
 </h2>
 <p>
 
-هدف الگوریتم سامانگر خطی درجه دوم در ربات تعادلی تک‌چرخ فراهم‌کردن ورودی‌های کنترل دو موتور گیربکس‌دار است، که در طول زمان بدنه‌ی ربات را نسبت به بردار گرانش زمین تراز نگه می‌دارند. برای پشتیبانی از این هدف، یک ساختمان داده تعریف می‌کنیم تا داده‌های مورد نیاز برای محاسبه کردن خروجی‌های تابع کیفیت و تابع تدبیرگر را در آن ذخیره کنیم. این ساختار به ترتیب شامل میدان‌های زیر می‌باشد: ماتریس صافی، ماتریس معکوس خودهمبستگی، ماتریس تدبیرگر پسخوردی، بردار مجموعه‌ی داده، شماره‌ی گام الگوریتم، شماره‌ی زمان کا، تعداد ابعاد بردار حالت سامانه، تعداد ابعاد بردار ورودی، ضریب وزنی نمایی، ثابت دلتا برای پیش‌مقداردهی ماتریس پی، پرچم پایان فعالیت در محیط، پرچم به‌روزرسانی تدبیرگر، پرچم فعال بودن کنترل کننده‌ی ربات، دوره‌ی زمانی در واحد ثانیه، چرخه‌ی کاری مدولاسیون پهنای پالس موتور چرخ عکس‌العملی، چرخه‌ی کاری مدولاسیون پهنای پالس موتور چرخ اصلی، ساختمان داده‌ی واحد موقعیت‌یاب اینرسیایی ۱، ساختمان داده‌ی واحد موقعیت‌یاب اینرسیایی ۲، رمزنگار چرخ عکس‌العملی، رمزنگار چرخ اصلی، حسگر جریان موتور چرخ عکس‌العملی، و حسگر جریان موتور چرخ اصلی ربات.
+هدف الگوریتم سامانگر خطی درجه دوم در ربات تعادلی تک‌چرخ فراهم‌کردن ورودی‌های کنترل دو موتور گیربکس‌دار است، که در طول زمان بدنه‌ی ربات را نسبت به بردار گرانش زمین تراز نگه می‌دارند. برای پشتیبانی از این هدف، یک ساختمان داده تعریف می‌کنیم تا داده‌های مورد نیاز برای محاسبه کردن خروجی‌های تابع کیفیت و تابع تدبیرگر را در آن ذخیره کنیم. این ساختار به ترتیب شامل میدان‌های زیر می‌باشد: ماتریس صافی، ماتریس خودهمبستگی معکوس، ماتریس تدبیرگر پسخوردی، بردار مجموعه‌ی داده، شماره‌ی گام الگوریتم، شماره‌ی زمان کا، تعداد ابعاد بردار حالت سامانه، تعداد ابعاد بردار ورودی، ضریب وزنی نمایی، ثابت دلتا برای پیش‌مقداردهی ماتریس پی، پرچم پایان فعالیت در محیط، پرچم به‌روزرسانی تدبیرگر، پرچم فعال بودن کنترل کننده‌ی ربات، دوره‌ی زمانی در واحد ثانیه، چرخه‌ی کاری مدولاسیون پهنای پالس موتور چرخ عکس‌العملی، چرخه‌ی کاری مدولاسیون پهنای پالس موتور چرخ اصلی، ساختمان داده‌ی واحد موقعیت‌یاب اینرسیایی ۱، ساختمان داده‌ی واحد موقعیت‌یاب اینرسیایی ۲، رمزنگار چرخ عکس‌العملی، رمزنگار چرخ اصلی، حسگر جریان موتور چرخ عکس‌العملی، و حسگر جریان موتور چرخ اصلی ربات.
 
 </p>
 </div>
@@ -9181,8 +9181,8 @@ void updateIMU(LinearQuadraticRegulator *model)
 // Represents a Linear Quadratic Regulator (LQR) model.
 typedef struct
 {
-  Mat12f W_n;     // filter matrix
-  Mat12f P_n;     // inverse autocorrelation matrix
+  Mat12 W_n;     // filter matrix
+  Mat12 P_n;     // inverse autocorrelation matrix
   Mat210f K_j;    // feedback policy
   Vec24f dataset; // (xₖ, uₖ, xₖ₊₁, uₖ₊₁)
   int j;          // step number
@@ -9210,7 +9210,7 @@ typedef struct
 <div dir = "rtl">
 <p>
 
-از ساختمان داده‌ی سامانگر خطی درجه دوم به عنوان پارامتر ورودی دو تابع مختلف استفاده می‌شود: تابع گام برداشتن به جلو، و تابع به‌روزرسانی تدبیرگر پسخوردی. در کنترل ربات در هر چرخه‌ی کنترلی، یک مرتبه تابع گام برداشتن به جلو فراخوانی می‌شود. اما به ازای هر صد مرتبه اجرا شدن تابع گام برداشتن به جلو (یعنی پس از تمام شدن صد چرخه‌ی کنترلی)، یک مرتبه تابع به‌روزرسانی تدبیرگر فراخوانی می‌شود. به عبارتی دیگر، به طور تقریبی یک هزارم ثانیه طول می‌کشد تا اجرا شدن تابع گام برداشتن به جلو تمام شود، و به طور تقریبی هر یک دهم ثانیه یک بار تدبیرگر پسخوردی به‌روزرسانی می‌شود. دلیل این زمان‌بندی برای اجرای حلقه‌ی کنترلی این است که بر اساس خطای استدلال قیاسی، ماتریس‌های صافی و معکوس خودهمبستگی هنگام اجرا شدن تابع «گام برداشتن به جلو» به‌روزرسانی می‌شوند و بعد از صد بار به‌روزرسانی این ماتریس‌ها (تابع کیفیت) نیاز است که یک بار تدبیرگر پسخوردی به‌روزرسانی شود. این کار به تابع «گام برداشتن به جلو» اجازه می‌دهد تا پیش از به‌روزرسانی تدبیرگر، به اندازه‌ی کافی تابع کیفیت را تغییر دهد. در این صورت شواهد و تجربه‌ی کافی برای به‌روزرسانی تدبیرگر فراهم می‌شود و در نتیجه عملکرد ربات در بازه‌های زمانی طولانی‌تر از قابلیت اطمینان و پایداری بیشتری برخوردار خواهد بود.
+از ساختمان داده‌ی سامانگر خطی درجه دوم به عنوان پارامتر ورودی دو تابع مختلف استفاده می‌شود: تابع گام برداشتن به جلو، و تابع به‌روزرسانی تدبیرگر پسخوردی. در کنترل ربات در هر چرخه‌ی کنترلی، یک مرتبه تابع گام برداشتن به جلو فراخوانی می‌شود. اما به ازای هر صد مرتبه اجرا شدن تابع گام برداشتن به جلو (یعنی پس از تمام شدن صد چرخه‌ی کنترلی)، یک مرتبه تابع به‌روزرسانی تدبیرگر فراخوانی می‌شود. به عبارتی دیگر، به طور تقریبی یک هزارم ثانیه طول می‌کشد تا اجرا شدن تابع گام برداشتن به جلو تمام شود، و به طور تقریبی هر یک دهم ثانیه یک بار تدبیرگر پسخوردی به‌روزرسانی می‌شود. دلیل این زمان‌بندی برای اجرای حلقه‌ی کنترلی این است که بر اساس خطای استدلال قیاسی، ماتریس‌های صافی و خودهمبستگی معکوس هنگام اجرا شدن تابع «گام برداشتن به جلو» به‌روزرسانی می‌شوند و بعد از صد بار به‌روزرسانی این ماتریس‌ها (تابع کیفیت) نیاز است که یک بار تدبیرگر پسخوردی به‌روزرسانی شود. این کار به تابع «گام برداشتن به جلو» اجازه می‌دهد تا پیش از به‌روزرسانی تدبیرگر، به اندازه‌ی کافی تابع کیفیت را تغییر دهد. در این صورت شواهد و تجربه‌ی کافی برای به‌روزرسانی تدبیرگر فراهم می‌شود و در نتیجه عملکرد ربات در بازه‌های زمانی طولانی‌تر از قابلیت اطمینان و پایداری بیشتری برخوردار خواهد بود.
 
 </p>
 </div>
@@ -9227,8 +9227,6 @@ float z_k1[N + M];
 float basisset0[N + M];
 float basisset1[N + M];
 float z_n[N + M];
-float W_n[N + M][N + M];
-float P_n[N + M][N + M];
 float K_j[M][N];
 float g_n[N + M];
 float alpha_n[N + M];
@@ -9242,7 +9240,7 @@ float S_uu_inverse[M][M];
 <div dir = "rtl">
 <p>
 
-در هر بار اجرا شدن حلقه‌ی کنترلی یک بردار تصفیه‌شده‌ی اطلاعاتی تولید می‌شود، که با ضرب کردن ماتریس معکوس خودهمبستگی در بردار حالت سامانه به دست می‌آید. سپس، ماتریس بهره برابر است با نسخه‌ای از بردار تصفیه‌شده‌ی اطلاعاتی که تغییر مقیاس داده شده است. اگر ضریب‌های صافی به‌روزرسانی نشده باشند، پس خطایی رخ خواهد داد، که برابر است با حاصل‌ضرب ضریب‌های صافی در فاصله‌ی میان یک جفت مجموعه‌ی پایه. قالب کلی مجموعه‌ی پایه به شکل زیر است:
+در هر بار اجرا شدن حلقه‌ی کنترلی یک بردار تصفیه‌شده‌ی اطلاعاتی تولید می‌شود، که با ضرب کردن ماتریس خودهمبستگی معکوس در بردار حالت سامانه به دست می‌آید. سپس، ماتریس بهره برابر است با نسخه‌ای از بردار تصفیه‌شده‌ی اطلاعاتی که تغییر مقیاس داده شده است. اگر ضریب‌های صافی به‌روزرسانی نشده باشند، پس خطایی رخ خواهد داد، که برابر است با حاصل‌ضرب ضریب‌های صافی در فاصله‌ی میان یک جفت مجموعه‌ی پایه. قالب کلی مجموعه‌ی پایه به شکل زیر است:
 
 </p>
 </div>
@@ -9280,17 +9278,51 @@ float S_uu_inverse[M][M];
 <div dir = "rtl">
 <p>
 
-در پایان، ماتریس معکوس خودهمبستگی به روزرسانی می‌شود. برای به‌روزرسانی ماتریس معکوس خودهمبستگی، حاصل‌ضرب ماتریس بهره در بردار تصفیه‌شده‌ی اطلاعاتی از مقدار قبلی ماتریس معکوس خودهمبستگی کم می‌شود. همچنین برای کاهش دادن اثر به‌روزرسانی‌های قدیمی‌تر بر ماتریس‌های بهره و معکوس خودهمبستگی، باید اندازه‌ی هر به‌روزرسانی را با استفاده از یک ضریب وزنی نمایی تعدیل کرد. به این ترتیب، پس از انجام دادن چندین به‌روزرسانی متوالی، ضریب کاهشی (که مقداری بین صفر تا یک دارد) به تعداد به روزرسانی‌های انجام شده در خودش ضرب می‌شود و این باعث می‌شود که ضریب موثر به‌روزرسانی‌های قدیمی بسیار کوچک شود.
+در پایان، ماتریس خودهمبستگی معکوس به روزرسانی می‌شود. برای به‌روزرسانی ماتریس خودهمبستگی معکوس، حاصل‌ضرب ماتریس بهره در بردار تصفیه‌شده‌ی اطلاعاتی از مقدار قبلی ماتریس خودهمبستگی معکوس کم می‌شود. همچنین برای کاهش دادن اثر به‌روزرسانی‌های قدیمی‌تر بر ماتریس‌های بهره و خودهمبستگی معکوس، باید اندازه‌ی هر به‌روزرسانی را با استفاده از یک ضریب وزنی نمایی تعدیل کرد. به این ترتیب، پس از انجام دادن چندین به‌روزرسانی متوالی، ضریب کاهشی (که مقداری بین صفر تا یک دارد) به تعداد به روزرسانی‌های انجام شده در خودش ضرب می‌شود و این باعث می‌شود که ضریب موثر به‌روزرسانی‌های قدیمی بسیار کوچک شود.
 
 </p>
 </div>
+```
+
+```c
+typedef struct
+{
+  float row0[N + M];
+  float row1[N + M];
+  float row2[N + M];
+  float row3[N + M];
+  float row4[N + M];
+  float row5[N + M];
+  float row6[N + M];
+  float row7[N + M];
+  float row8[N + M];
+  float row9[N + M];
+  float row10[N + M];
+  float row11[N + M];
+} Mat12;
 ```
 
 ```@raw html
 <div dir = "rtl">
 <p>
 
-وضعیت ربات پس از یک یا چند بار اجرا شدن حلقه‌ی کنترلی، بالاخره از شرط‌های مرزی اولیه بیش از حد دور می‌شود، که این شرایط توسط کاربر و برای ایمنی و کارایی تعیین شده‌اند. برای مثال زاویه‌های غلت و تاب نباید بیشتر از ۱۰ درجه شوند زیرا امکان برخورد کردن بدنه‌ی ربات با زمین زیاد می‌شود. در این صورت، ربات باید به کار خود پایان دهد و متوقف شود. بر پایه‌ی آزمایش و تجربه، پس از ۱۰۰ بار اجرا شدن حلقه‌ی کنترلی بهترین زمان برای به‌روزرسانی تدبیرگر پس‌خوردی می‌باشد. بنابراین به‌روزرسانی تدبیرگر پس‌خوردی بعد از به‌روزرسانی‌های متعدد بر روی ضریب‌های صافی و ماتریس معکوس خودهمبستگی به ازای ۱۰۰ بار اجرای حلقه‌ی کنترلی انجام می‌شود.
+در این ربات تنها دو ماتریس صافی و خودهمبستگی معکوس قابلیت ماندگاری در حافظه را دارند. به طوری که در هر بار اجرای حلقه‌ی کنترلی این دو ماتریس تغییر می‌کنند و تغییرات دو ماتریس در حافظه ذخیره می‌شود تا در اجرای بعدی حلقه جای مقدارهای پیشین را بگیرد. اما برای ساختار ماتریس‌ها به یک آرایه‌ی دو بعدی در حافظه نیاز داریم. به دلیل منابع سخت‌افزاری محدود میکروکنترلرها، اختصاص دادن آرایه‌های بزرگ دو بعدی در حافظه‌ی میکروکنترلر مشکل است. بنابراین در ساختار داده‌ی ماتریس‌های صافی و خودهمبستگی معکوس هر سطر به طور جداگانه یک میدان به خود اختصاص می‌دهد تا شکسته شدن داده در حافظه امکان‌پذیر باشد بدون اینکه دسترسی به ماتریس‌ها سخت شود. دو تابع «نسبت دادن اندیس» و «دریافت اندیس» به منظور دسترسی به عنصرهای ماتریس تعریف شده اند. آرگومان‌های تابع دریافت اندیس شامل یک نسخه از ساختمان داده و دو اندیس سطر و ستون است. خروجی تابع دریافت اندیس یک عدد ممیز شناور است که مقدار درایه‌ی ماتریس را با توجه به اندیس‌های داده شده بر می‌گرداند. در حالی که آرگومان‌های تابع نسبت دادن اندیس شامل یک اشاره‌گر به نسخه‌ی اصلی ماتریس در حافظه است، و علاوه بر اندیس‌های سطر و ستون، با مقداری که به درایه‌ی مورد نظر باید نسبت داده شود نیز همراه است. به این ترتیب با دو تابع دسترسی به ماتریس که تعریف کردیم، عملیات به‌روزرسانی ماتریس‌های صافی و خودهمبستگی معکوس رابطی برنامه‌نویسی مشابه با آرایه‌های دو بعدی زبان برنامه‌نویسی سی پیدا می‌کنند.
+
+</p>
+</div>
+```
+
+```c
+float getIndex(Mat12 matrix, int i, int j)
+
+void setIndex(Mat12 *matrix, int i, int j, float value)
+```
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+وضعیت ربات پس از یک یا چند بار اجرا شدن حلقه‌ی کنترلی، بالاخره از شرط‌های مرزی اولیه بیش از حد دور می‌شود، که این شرایط توسط کاربر و برای ایمنی و کارایی تعیین شده‌اند. برای مثال زاویه‌های غلت و تاب نباید بیشتر از ۱۰ درجه شوند زیرا امکان برخورد کردن بدنه‌ی ربات با زمین زیاد می‌شود. در این صورت، ربات باید به کار خود پایان دهد و متوقف شود. بر پایه‌ی آزمایش و تجربه، پس از اجرا شدن حلقه‌ی کنترلی بهترین زمان برای به‌روزرسانی تدبیرگر پس‌خوردی می‌باشد. بنابراین به‌روزرسانی تدبیرگر پس‌خوردی بعد از به‌روزرسانی ضریب‌های صافی و ماتریس خودهمبستگی معکوس و به ازای هر بار اجرای حلقه‌ی کنترلی انجام می‌شود.
 
 </p>
 </div>
@@ -9346,12 +9378,12 @@ void stepForward(LinearQuadraticRegulator *model)
     }
   }
   // act!
-  model->dataset.x0 = model->imu1.roll;
-  model->dataset.x1 = model->imu1.roll_velocity;
-  model->dataset.x2 = model->imu1.roll_acceleration;
-  model->dataset.x3 = model->imu1.pitch;
-  model->dataset.x4 = model->imu1.pitch_velocity;
-  model->dataset.x5 = model->imu1.pitch_acceleration;
+  model->dataset.x0 = model->imu1.roll / M_PI;
+  model->dataset.x1 = model->imu1.roll_velocity / M_PI;
+  model->dataset.x2 = model->imu1.roll_acceleration / M_PI;
+  model->dataset.x3 = model->imu1.pitch / M_PI;
+  model->dataset.x4 = model->imu1.pitch_velocity / M_PI;
+  model->dataset.x5 = model->imu1.pitch_acceleration / M_PI;
   model->dataset.x6 = model->reactionEncoder.velocity;
   model->dataset.x7 = model->rollingEncoder.velocity;
   model->dataset.x8 = model->reactionCurrentSensor.currentVelocity;
@@ -9361,8 +9393,8 @@ void stepForward(LinearQuadraticRegulator *model)
 
   if (model->active == 1)
   {
-    model->reactionPWM += (255.0 * 16.0) * u_k[0];
-    model->rollingPWM += (255.0 * 16.0) * u_k[1];
+    model->reactionPWM += (255.0 * 96.0) * u_k[0];
+    model->rollingPWM += (255.0 * 96.0) * u_k[1];
     model->reactionPWM = fmin(255.0 * 255.0, model->reactionPWM);
     model->reactionPWM = fmax(-255.0 * 255.0, model->reactionPWM);
     model->rollingPWM = fmin(255.0 * 255.0, model->rollingPWM);
@@ -9406,12 +9438,12 @@ void stepForward(LinearQuadraticRegulator *model)
   encodeWheel(&(model->rollingEncoder), TIM4->CNT);
   senseCurrent(&(model->reactionCurrentSensor), &(model->rollingCurrentSensor));
   updateIMU(model);
-  model->dataset.x12 = model->imu1.roll;
-  model->dataset.x13 = model->imu1.roll_velocity;
-  model->dataset.x14 = model->imu1.roll_acceleration;
-  model->dataset.x15 = model->imu1.pitch;
-  model->dataset.x16 = model->imu1.pitch_velocity;
-  model->dataset.x17 = model->imu1.pitch_acceleration;
+  model->dataset.x12 = model->imu1.roll / M_PI;
+  model->dataset.x13 = model->imu1.roll_velocity / M_PI;
+  model->dataset.x14 = model->imu1.roll_acceleration / M_PI;
+  model->dataset.x15 = model->imu1.pitch / M_PI;
+  model->dataset.x16 = model->imu1.pitch_velocity / M_PI;
+  model->dataset.x17 = model->imu1.pitch_acceleration / M_PI;
   model->dataset.x18 = model->reactionEncoder.velocity;
   model->dataset.x19 = model->rollingEncoder.velocity;
   model->dataset.x20 = model->reactionCurrentSensor.currentVelocity;
@@ -9462,68 +9494,109 @@ void stepForward(LinearQuadraticRegulator *model)
   z_k1[9] = model->dataset.x21;
   z_k1[10] = model->dataset.x22;
   z_k1[11] = model->dataset.x23;
-  for (int i = 0; i < model->n + model->m; i++)
+  for (int i = 0; i < (model->n + model->m); i++)
   {
     basisset0[i] = z_k[i];
     basisset1[i] = z_k1[i];
   }
   // Now perform a one-step update in the parameter vector W by applying RLS to equation (S27).
-  putBuffer(model->m + model->n, model->m + model->n, P_n, model->P_n);
-  putBuffer(model->m + model->n, model->m + model->n, W_n, model->W_n);
   // initialize z_n
-  for (int i = 0; i < model->n + model->m; i++)
+  for (int i = 0; i < (model->n + model->m); i++)
   {
     z_n[i] = 0.0;
   }
-  for (int i = 0; i < model->n + model->m; i++)
+  for (int i = 0; i < (model->n + model->m); i++)
   {
-    for (int j = 0; j < model->n + model->m; j++)
+    for (int j = 0; j < (model->n + model->m); j++)
     {
-      z_n[i] += P_n[i][j] * z_k[j];
+      z_n[i] += getIndex(model->P_n, i, j) * z_k[j];
     }
   }
-  float z_k_dot_z_n = 0.0;
-  for (int i = 0; i < model->n + model->m; i++)
+  z_k_dot_z_n = 0.0;
+  float buffer = 0.0;
+  for (int i = 0; i < (model->n + model->m); i++)
   {
-    z_k_dot_z_n += z_k[i] * z_n[i];
+    buffer = z_k[i] * z_n[i];
+    if (isnanf(buffer) == 0)
+    {
+      z_k_dot_z_n += buffer;
+    }
   }
-  for (int i = 0; i < model->n + model->m; i++)
+  if (fabs(model->lambda + z_k_dot_z_n) > 0)
   {
-    g_n[i] = 1.0 / (model->lambda + z_k_dot_z_n) * z_n[i];
+    for (int i = 0; i < (model->n + model->m); i++)
+    {
+      g_n[i] = (1.0 / (model->lambda + z_k_dot_z_n)) * z_n[i];
+    }
+  }
+  else
+  {
+    for (int i = 0; i < (model->n + model->m); i++)
+    {
+      g_n[i] = (1.0 / model->lambda) * z_n[i];
+    }
   }
   // αₙ = dₙ - transpose(wₙ₋₁) * xₙ
   // initialize alpha_n
-  for (int i = 0; i < model->n + model->m; i++)
+  for (int i = 0; i < (model->n + model->m); i++)
   {
     alpha_n[i] = 0.0;
   }
-  for (int i = 0; i < model->n + model->m; i++)
+  for (int i = 0; i < (model->n + model->m); i++)
   {
-    for (int j = 0; j < model->n + model->m; j++)
+    for (int j = 0; j < (model->n + model->m); j++)
     {
-      alpha_n[i] += W_n[i][j] * (basisset0[j] - basisset1[j]); // checked manually
+      alpha_n[i] += getIndex(model->W_n, i, j) * (basisset1[j] - basisset0[j]); // checked manually
     }
   }
-  for (int i = 0; i < model->n + model->m; i++)
+  for (int i = 0; i < (model->n + model->m); i++)
   {
-    for (int j = 0; j < model->n + model->m; j++)
+    for (int j = 0; j < (model->n + model->m); j++)
     {
-      W_n[i][j] = W_n[i][j] + (alpha_n[i] * g_n[j]); // checked manually
+      buffer = getIndex(model->W_n, i, j) + (alpha_n[i] * g_n[j]);
+      if (isnanf(buffer) == 0)
+      {
+        setIndex(&(model->W_n), i, j, buffer); // checked manually
+      }
     }
   }
-  for (int i = 0; i < model->n + model->m; i++)
+  for (int i = 0; i < (model->n + model->m); i++)
   {
-    for (int j = 0; j < model->n + model->m; j++)
+    for (int j = 0; j < (model->n + model->m); j++)
     {
-      P_n[i][j] = (1.0 / model->lambda) * (P_n[i][j] - g_n[i] * z_n[j]); // checked manually
+      buffer = (1.0 / model->lambda) * (getIndex(model->P_n, i, j) - g_n[i] * z_n[j]);
+      if (isnanf(buffer) == 0)
+      {
+        setIndex(&(model->P_n), i, j, buffer); // checked manually
+      }
     }
   }
-  getBuffer(model->m + model->n, model->m + model->n, W_n, &(model->W_n));
-  getBuffer(model->m + model->n, model->m + model->n, P_n, &(model->P_n));
-
   // Repeat at the next time k + 1 and continue until RLS converges and the new parameter vector Wⱼ₊₁ is found.
   model->k = k + 1;
   return;
+}
+```
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+چون به روزرسانی‌های متعدد و سریع ماتریس های صافی و خودهمبستگی معکوس بر پایه‌ی محاسبات عددی هستند، لازم است که پایداری درایه‌های ماتریس در طول زمان بررسی شود. در محاسبه‌ی ضرب داخلی بردار حالت سامانه و بردار تصفیه‌شده‌ی اطلاعاتی یک شرط قرار داده شده است که با فراخوانی یک تابع زبان برنامه‌نویسی سی و دادن تک تک عبارت‌های موجود در ضرب داخلی تضمین می‌کند که نتیجه‌ی ضرب یک عدد متناهی و حقیقی است. در صورتی که یکی از عبارت‌ها در جمع عملگر ضرب داخلی بینهایت شود، ضرب داخلی همچنان محاسبه می‌شود و نتیجه می‌دهد، اما با این تفاوت که تنها عبارت بینهایت از نتیجه‌ی ضرب حذف می‌شود تا این بینهایت به ماتریس‌های صافی و خودهمبستگی معکوس راه پیدا نکند. در یک آزمایش تجربی، پنج درایه‌ی اول قطر اصلی ماتریس خودهمبستگی معکوس نسبت به محور زمان رسم می‌شود. با توجه به اینکه در ابتدای روشن شدن ربات، ماتریس خودهمبستگی معکوس با ماتریس همانی پیش‌مقداردهی می‌شود، به‌روزرسانی ماتریس خودهمبستگی معکوس باعث می‌شود که قطر اصلی ماتریس در طول زمان تغییر کند. شرایط مطلوب، شرایطی است که مقدار درایه‌های ماتریس اعدادی متناهی باشند و به مقدارهایی مشخص به طور جداگانه همگرا شوند. این شرایط همگرایی و پایداری محاسبات هنگام عملکرد واقعی ربات بررسی می‌شوند. همان برنامه‌ی نرم‌افزاری که برای پیکربندی هندسی برآورد شیب استفاده می‌شود دارای قابلیت رسم نمودار درایه‌های ماتریس خودهمبستگی معکوس نیز می‌باشد. در رابط کاربری برنامه، یک نمودار اختصاصی برای ماتریس خودهمبستگی معکوس در نظر گرفته شده است تا مسیر به‌روزرسانی‌های ماتریس را نسبت به زمان ترسیم کرده و پایایی محاسبات را به طور زنده مشاهده نمود.
+
+</p>
+</div>
+```
+
+```c
+z_k_dot_z_n = 0.0;
+float buffer = 0.0;
+for (int i = 0; i < (model->n + model->m); i++)
+{
+  buffer = z_k[i] * z_n[i];
+  if (isnanf(buffer) == 0)
+  {
+    z_k_dot_z_n += buffer;
+  }
 }
 ```
 
@@ -9545,20 +9618,20 @@ void updateControlPolicy(LinearQuadraticRegulator *model)
   model->k = 1;
   model->j = model->j + 1;
   // initialize the filter matrix
-  putBuffer(model->m + model->n, model->m + model->n, W_n, model->W_n);
+  // putBuffer(model->m + model->n, model->m + model->n, W_n, model->W_n);
 
   for (int i = 0; i < model->m; i++)
   {
     for (int j = 0; j < model->n; j++)
     {
-      S_ux[i][j] = W_n[model->n + i][j];
+      S_ux[i][j] = getIndex(model->W_n, model->n + i, j);
     }
   }
   for (int i = 0; i < model->m; i++)
   {
     for (int j = 0; j < model->m; j++)
     {
-      S_uu[i][j] = W_n[model->n + i][model->n + j];
+      S_uu[i][j] = getIndex(model->W_n, model->n + i, model->n + j);
     }
   }
 
@@ -9632,6 +9705,58 @@ void updateControlPolicy(LinearQuadraticRegulator *model)
 <div dir = "rtl">
 <p>
 
+پارامترهای الگوریتم حداقل مربعات بازگشتی:
+
+</p>
+</div>
+```
+
+``p = Filter \ order``
+
+``\lambda = Exponential \ weighting \ factor``
+
+``\delta = Value \ used \ to \ initialize \ \textbf{P}(0)``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+پیش‌مقداردهی الگوریتم حداقل مربعات بازگشتی:
+
+</p>
+</div>
+```
+
+``\textbf{w}_0 = \textbf{0}``
+
+``\textbf{P}(0) = \delta^{-1} \textbf{I}``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+محاسبات الگوریتم حداقل مربعات بازگشتی:
+
+</p>
+</div>
+```
+
+``For \ n = 1, 2, ... \ compute``
+
+``\textbf{z}(n) = \textbf{P}(n - 1) x^*(n)``
+
+``\textbf{g}(n) = \frac{1}{\lambda + \textbf{x}^T(n) \textbf{z}(n)} \textbf{z}(n)``
+
+``\alpha(n) = d(n) - \textbf{w}_{n - 1}^T \textbf{x}(n)``
+
+``\textbf{w}_n = \textbf{w}_{n - 1} + \alpha(n) \textbf{g}(n)``
+
+``\textbf{P}(n) = \frac{1}{\lambda} [\textbf{P}(n - 1) - \textbf{g}(n) \textbf{z}^H(n)]``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
 برد توسعه‌ی میکروکنترلر نوکلیو-۶۴ راهی ارزان و انعطاف‌پذیر را برای کاربرها فراهم می‌کند تا مفهوم‌های تازه را آزمایش کنند و با میکروکنترلرهای ۳۲ بیتی شرکت اس‌تی نمونه‌سازی کنند. در این ربات، از نرم‌افزار کیوب ام‌ایکس برای ایجاد کردن پروژه استفاده می‌شود. همچنین برای پیکربندی و تنظیم کردن ادوات جانبی (مانند واحد تبدیل سیگنال آنالوگ به دیجیتال برای خواندن مقدار اندازه‌گیری حسگرها) از کیوب ام‌ایکس استفاده می‌شود. سپس از نرم‌افزار ویژوال استودیو کد برای نوشتن برنامه نرم‌افزار ربات استفاده می‌شود. نکته‌ی مهم در این قسمت از کار این است که خروجی نرم‌افزار کیوب ام‌ایکس بر روی گزینه‌ی سی میک تنظیم شده است تا منبع برنامه‌ی ربات با استفاده از ابزار استاندارد زبان برنامه‌نویسی سی ساخته شود. در این خط لوله، کد زبان سی پس از لینک شدن با کتابخانه‌های مرتبط به فایلی با پسوند الف تبدیل می‌شوند. ساخت فایل الف با ترکیب کلیدی کنترل شیفت پی در وی‌اس کد انجام می‌شود. در نهایت نرم‌افزار اس‌تی‌ام۳۲ کیوب پروگرامر برای بارگذاری برنامه در حافظه‌ی میکروکنترلر به کار می‌رود. برد توسعه‌ی نوکلیو-۶۴ دارای یک عیب‌یاب و برنامه‌ریز به نام اس‌تی-لینک نسخه ۲ است. این برنامه‌ریز از یک سمت با ارتباط یو‌اس‌بی به رایانه متصل می‌شود و از سمت دیگر رابط بین پروگرامر و میکروکنترلر شامل چهار عدد پین است. این گونه ارتباط بین میکروکنترلر و رایانه فقط برای برنامه‌ریزی حافظه‌ی میکروکنترلر است، زیرا برای اندازه‌گیری از دور ساختمان‌های داده‌ی برنامه از ارتباط بی‌سیم وای‌فای استفاده می‌شود.
 
 </p>
@@ -9675,95 +9800,95 @@ model.dt = dt;
 ```
 
 ```c
-while (1)
-{
-  t1 = DWT->CYCCNT;
+  while (1)
+  {
+    t1 = DWT->CYCCNT;
 
-  if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_0) == 0)
-  {
-    model.active = 1;
-  }
-  else
-  {
-    model.active = 0;
-    model.reactionPWM = 0.0;
-    model.rollingPWM = 0.0;
-    TIM2->CCR1 = 0;
-    TIM2->CCR2 = 0;
-  }
-
-  if (fabs(model.imu1.roll) > roll_safety_angle || fabs(model.imu1.pitch) > pitch_safety_angle || model.k > max_episode_length)
-  {
-    model.terminated = 1;
-    model.active = 0;
-    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
-  }
-
-  if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13) == 0)
-  {
-    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
-    model.terminated = 0;
-    model.active = 1;
-    model.updated = 0;
-  }
-
-  if (model.terminated == 0)
-  {
-    stepForward(&model);
-  }
-  else
-  {
-    model.reactionPWM = 0.0;
-    model.rollingPWM = 0.0;
-    TIM2->CCR1 = 0;
-    TIM2->CCR2 = 0;
-    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_RESET);
-    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_RESET);
-    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2, GPIO_PIN_RESET);
-    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, GPIO_PIN_RESET);
-    encodeWheel(&model.reactionEncoder, TIM3->CNT);
-    encodeWheel(&model.rollingEncoder, TIM4->CNT);
-    senseCurrent(&(model.reactionCurrentSensor), &(model.rollingCurrentSensor));
-    updateIMU(&model);
-  }
-  if (model.terminated == 1 && model.updated == 0)
-  {
-    updateControlPolicy(&model);
-  }
-  if (model.k % updatePolicyPeriod == 0)
-  {
-    updateControlPolicy(&model);
-  }
-
-  model.imu1.yaw += dt * r_dot[2];
-
-  log_counter++;
-  if (log_counter > LOG_CYCLE && HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_1) == 0)
-  {
-    transmit = 1;
-  }
-  if (transmit == 1)
-  {
-    transmit = 0;
-    log_counter = 0;
-
-    if (log_status == 0)
+    if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_0) == 0)
     {
-      sprintf(MSG, "Bottom: current: %d, curVel: %0.2f, enc: %d, angle: %0.2f, velocity: %0.2f, acceleration: %0.2f, | Top: current: %d, curvel: %0.2f, enc: %d, angle: %0.2f, velocity: %0.2f, acceleration: %0.2f, dt: %0.6f\r\n",
-        model.rollingCurrentSensor.current0, model.rollingCurrentSensor.currentVelocity, TIM4->CNT, model.rollingEncoder.angle, model.rollingEncoder.velocity, model.rollingEncoder.acceleration,
-        model.reactionCurrentSensor.current0, model.reactionCurrentSensor.currentVelocity, TIM3->CNT, model.reactionEncoder.angle, model.reactionEncoder.velocity, model.reactionEncoder.acceleration, dt);
-      log_status = 0;
+      model.active = 1;
+    }
+    else
+    {
+      model.active = 0;
+      model.reactionPWM = 0.0;
+      model.rollingPWM = 0.0;
+      TIM2->CCR1 = 0;
+      TIM2->CCR2 = 0;
     }
 
-    HAL_UART_Transmit(&huart6, MSG, sizeof(MSG), 1000);
-  }
+    if (fabs(model.imu1.roll) > roll_safety_angle || fabs(model.imu1.pitch) > pitch_safety_angle || model.k > max_episode_length)
+    {
+      model.terminated = 1;
+      model.active = 0;
+      HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
+    }
 
-  t2 = DWT->CYCCNT;
-  diff = t2 - t1;
-  dt = (float)diff / CPU_CLOCK;
-  model.dt = dt;
-  // Rinse and repeat :)
-}
+    if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13) == 0)
+    {
+      HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
+      model.terminated = 0;
+      model.active = 1;
+      model.updated = 0;
+    }
+
+    if (model.terminated == 0)
+    {
+      stepForward(&model);
+    }
+    else
+    {
+      model.reactionPWM = 0.0;
+      model.rollingPWM = 0.0;
+      TIM2->CCR1 = 0;
+      TIM2->CCR2 = 0;
+      HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_RESET);
+      HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_RESET);
+      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2, GPIO_PIN_RESET);
+      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, GPIO_PIN_RESET);
+      encodeWheel(&model.reactionEncoder, TIM3->CNT);
+      encodeWheel(&model.rollingEncoder, TIM4->CNT);
+      senseCurrent(&(model.reactionCurrentSensor), &(model.rollingCurrentSensor));
+      updateIMU(&model);
+    }
+    if (model.terminated == 1 && model.updated == 0)
+    {
+      updateControlPolicy(&model);
+    }
+    if (model.k % updatePolicyPeriod == 0)
+    {
+      updateControlPolicy(&model);
+    }
+
+    model.imu1.yaw += dt * r_dot[2];
+
+    t2 = DWT->CYCCNT;
+    diff = t2 - t1;
+    dt = (float)diff / CPU_CLOCK;
+    model.dt = dt;
+
+    log_counter++;
+    if (log_counter > LOG_CYCLE && HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_1) == 0)
+    {
+      transmit = 1;
+    }
+    if (transmit == 1)
+    {
+      transmit = 0;
+      log_counter = 0;
+
+      if (log_status == 0)
+      {
+        sprintf(MSG,
+                "AX1: %0.2f, AY1: %0.2f, AZ1: %0.2f, | AX2: %0.2f, AY2: %0.2f, AZ2: %0.2f, | roll: %0.2f, pitch: %0.2f, | encT: %0.2f, encB: %0.2f, | P0: %0.2f, P1: %0.2f, P2: %0.2f, P3: %0.2f, P4: %0.2f, dt: %0.6f\r\n",
+                model.imu1.accX, model.imu1.accY, model.imu1.accZ, model.imu2.accX, model.imu2.accY, model.imu2.accZ, model.imu1.roll, model.imu1.pitch, model.reactionEncoder.radianAngle, model.rollingEncoder.radianAngle, getIndex(model.P_n, 0, 0), getIndex(model.P_n, 1, 1), getIndex(model.P_n, 2, 2), getIndex(model.P_n, 3, 3), getIndex(model.P_n, 4, 4), dt);
+        log_status = 0;
+      }
+
+      HAL_UART_Transmit(&huart6, MSG, sizeof(MSG), 1000);
+    }
+    // Rinse and repeat :)
+  }
 ```
 
 ```@raw html
@@ -9911,13 +10036,23 @@ void senseCurrent(CurrentSensor *reactionCurrentSensor, CurrentSensor *rollingCu
 <div dir = "rtl">
 <p>
 
-نقطه ضعف چرخ عکس‌العملی، اشباع شدن چرخ هنگام رسیدن به حداکثر سرعت موتور می‌باشد. وقتی که چرخ عکس‌العملی به حالت اشباع می‌رسد، موتور چرخ عکس‌العملی با سرعت ۴۸۰ دور بر دقیقه می‌چرخد و چرخ عکس‌العملی قابلیت تولید گشتاور کافی در یکی از جهت‌ها را از دست می‌دهد. پس بهتر است که با بیشینه کردن سرعت آخر موتور (افزایش توان، ولتاژ ضرب در جریان)، حاشیه‌ی موثر تولید گشتاور را گسترش دهیم تا احتمال رسیدن چرخ عکس‌العملی به حالت اشباع را کاهش دهیم. مدار مجتمع ال۲۹۳دی دارای دو ورودی تغذیه‌ی مجزا است: ورودی وسطح ولتاژ منطقی در پایه‌ی ۱۶ قطعه و ورودی سطح ولتاژ قدرت در پایه‌ی ۸ قطعه. چون سرعت چرخش موتور جریان مستقیم با ولتاژ ورودی رابطه‌ی مستقیمی دارد، ولتاژ خط تغذیه‌ی قدرت مدار باید به ۱۲ ولت جریان مستقیم نزدیک‌تر شود. بنابراین پایه‌ی ۸ آی‌سی گرداننده‌ی ال۲۹۳دی به طور مستقیم به سر مثبت پایانه‌ی باتری‌های متوالی وصل شده است. عکس‌العمل سریع‌تر به ربات کمک می‌کند تا با تولید گشتاور کوچک‌تری تعادل خود را حفظ کند. محدود کردن اندازه‌ی گشتاور تولید شده با عکس‌العمل سریع نیز به نوبت خود احتمال به اشباع رسیدن چرخ عکس‌العملی را کمتر می‌کند. پس برای جلوگیری از افت ناگهانی ولتاژ خط تغذیه‌ی ۷٫۴ ولتی، از هفت خازن با ظرفیتی در حدود ۴۷۰ میکرو فاراد استفاده شده است. این خازن‌ها به طور موازی به یکدیگر وصل شده اند. ذخیره کردن انرژی الکتریکی در خازن‌ها کمک می‌کند تا سامانگر خطی درجه دوم بتواند افت ولتاژ ورودی (ناشی از تغییر جهت دادن ناگهانی موتورها) را بلافاصله جبران کند و به طور موثر در دنیای فیزیکی عمل کند. بانک خازن در زمان افت ولتاژ شدید (بارهای الکتریکی سنگین و گذرا) تخلیه می شود و با گرفتن ضربه، ولتاژ تغذیه را ثابت و پیوسته نگه می‌دارد.
+نقطه ضعف چرخ عکس‌العملی، اشباع شدن چرخ هنگام رسیدن به حداکثر سرعت موتور می‌باشد. وقتی که چرخ عکس‌العملی به حالت اشباع می‌رسد، موتور چرخ عکس‌العملی با سرعت ۴۸۰ دور بر دقیقه می‌چرخد و چرخ عکس‌العملی قابلیت تولید گشتاور کافی در یکی از جهت‌ها را از دست می‌دهد. پس بهتر است که با بیشینه کردن سرعت آخر موتور (افزایش توان، ولتاژ ضرب در جریان)، حاشیه‌ی موثر تولید گشتاور را گسترش دهیم تا احتمال رسیدن چرخ عکس‌العملی به حالت اشباع را کاهش دهیم. مدار مجتمع ال۲۹۳دی دارای دو ورودی تغذیه‌ی مجزا است: ورودی وسطح ولتاژ منطقی در پایه‌ی ۱۶ قطعه و ورودی سطح ولتاژ قدرت در پایه‌ی ۸ قطعه. چون سرعت چرخش موتور جریان مستقیم با ولتاژ ورودی رابطه‌ی مستقیمی دارد، ولتاژ خط تغذیه‌ی قدرت مدار باید به ۱۲ ولت جریان مستقیم نزدیک‌تر شود. بنابراین پایه‌ی ۸ آی‌سی گرداننده‌ی ال۲۹۳دی به طور مستقیم به سر مثبت پایانه‌ی باتری‌های متوالی وصل شده است.
 
 </p>
 </div>
 ```
 
 ![3v3powersupply](./assets/reactionwheelunicycle/schematics/3v3powersupply.jpeg)
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+عکس‌العمل سریع‌تر به ربات کمک می‌کند تا با تولید گشتاور کوچک‌تری تعادل خود را حفظ کند. محدود کردن اندازه‌ی گشتاور تولید شده با عکس‌العمل سریع نیز به نوبت خود احتمال به اشباع رسیدن چرخ عکس‌العملی را کمتر می‌کند. پس برای جلوگیری از افت ناگهانی ولتاژ خط تغذیه‌ی ۷٫۴ ولتی، از هفت خازن با ظرفیتی در حدود ۴۷۰ میکرو فاراد استفاده شده است. این خازن‌ها به طور موازی به یکدیگر وصل شده اند. ذخیره کردن انرژی الکتریکی در خازن‌ها کمک می‌کند تا سامانگر خطی درجه دوم بتواند افت ولتاژ ورودی (ناشی از تغییر جهت دادن ناگهانی موتورها) را بلافاصله جبران کند و به طور موثر در دنیای فیزیکی عمل کند. بانک خازن در زمان افت ولتاژ شدید (بارهای الکتریکی سنگین و گذرا) تخلیه می شود و با گرفتن ضربه، ولتاژ تغذیه را ثابت و پیوسته نگه می‌دارد.
+
+</p>
+</div>
+```
 
 
 # References
