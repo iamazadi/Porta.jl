@@ -4453,28 +4453,26 @@ float E[3][3] = {{0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}};</code></pre
 </div><pre><code class="language-c hljs">// Represents a Linear Quadratic Regulator (LQR) model.
 typedef struct
 {
-  Mat12 W_n;     // filter matrix
-  Mat12 P_n;     // inverse autocorrelation matrix
-  Mat210f K_j;    // feedback policy
-  Vec24f dataset; // (xₖ, uₖ, xₖ₊₁, uₖ₊₁)
-  int j;          // step number
-  int k;          // time k
-  int n;          // xₖ ∈ ℝⁿ
-  int m;          // uₖ ∈ ℝᵐ
-  double lambda;   // exponential wighting factor
-  double delta;    // value used to intialize P(0)
-  int terminated; // has the environment been reset
-  int updated;    // whether the policy has been updated
-  int active;     // is the model controller active
-  double dt;       // period in seconds
-  double reactionPWM;  // reaction wheel&#39;s motor PWM duty cycle
-  double rollingPWM;   // rolling wheel&#39;s motor PWM duty cycle
-  IMU imu1;            // the first inertial measurement unit
-  IMU imu2;            // the second inertial measurement unit
-  Encoder reactionEncoder;  // the reaction wheel encoder
-  Encoder rollingEncoder;   // the rolling wheel encoder
-  CurrentSensor reactionCurrentSensor;  // the reaction wheel&#39;s motor current sensor
-  CurrentSensor rollingCurrentSensor;   // the rolling wheel&#39;s motor current sensor
+  Mat12 W_n;                           // filter matrix
+  Mat12 P_n;                           // inverse autocorrelation matrix
+  Mat210f K_j;                         // feedback policy
+  Vec24f dataset;                      // (xₖ, uₖ, xₖ₊₁, uₖ₊₁)
+  int j;                               // step number
+  int k;                               // time k
+  int n;                               // xₖ ∈ ℝⁿ
+  int m;                               // uₖ ∈ ℝᵐ
+  float lambda;                        // exponential wighting factor
+  float delta;                         // value used to intialize P(0)
+  int active;                          // is the model controller active
+  float dt;                            // period in seconds
+  float reactionPWM;                   // reaction wheel&#39;s motor PWM duty cycle
+  float rollingPWM;                    // rolling wheel&#39;s motor PWM duty cycle
+  IMU imu1;                            // the first inertial measurement unit
+  IMU imu2;                            // the second inertial measurement unit
+  Encoder reactionEncoder;             // the reaction wheel encoder
+  Encoder rollingEncoder;              // the rolling wheel encoder
+  CurrentSensor reactionCurrentSensor; // the reaction wheel&#39;s motor current sensor
+  CurrentSensor rollingCurrentSensor;  // the rolling wheel&#39;s motor current sensor
 } LinearQuadraticRegulator;</code></pre><div dir = "rtl">
 <p>
 
@@ -4610,48 +4608,35 @@ void stepForward(LinearQuadraticRegulator *model)
   model-&gt;dataset.x10 = u_k[0];
   model-&gt;dataset.x11 = u_k[1];
 
-  if (model-&gt;active == 1)
+  model-&gt;reactionPWM += (255.0 * pulseStep) * u_k[0];
+  model-&gt;rollingPWM += (255.0 * pulseStep) * u_k[1];
+  model-&gt;reactionPWM = fmin(255.0 * 255.0, model-&gt;reactionPWM);
+  model-&gt;reactionPWM = fmax(-255.0 * 255.0, model-&gt;reactionPWM);
+  model-&gt;rollingPWM = fmin(255.0 * 255.0, model-&gt;rollingPWM);
+  model-&gt;rollingPWM = fmax(-255.0 * 255.0, model-&gt;rollingPWM);
+  TIM2-&gt;CCR1 = (int)fabs(model-&gt;rollingPWM);
+  TIM2-&gt;CCR2 = (int)fabs(model-&gt;reactionPWM);
+  if (model-&gt;reactionPWM &lt; 0)
   {
-    model-&gt;reactionPWM += (255.0 * 96.0) * u_k[0];
-    model-&gt;rollingPWM += (255.0 * 96.0) * u_k[1];
-    model-&gt;reactionPWM = fmin(255.0 * 255.0, model-&gt;reactionPWM);
-    model-&gt;reactionPWM = fmax(-255.0 * 255.0, model-&gt;reactionPWM);
-    model-&gt;rollingPWM = fmin(255.0 * 255.0, model-&gt;rollingPWM);
-    model-&gt;rollingPWM = fmax(-255.0 * 255.0, model-&gt;rollingPWM);
-    TIM2-&gt;CCR1 = (int)fabs(model-&gt;rollingPWM);
-    TIM2-&gt;CCR2 = (int)fabs(model-&gt;reactionPWM);
-    if (model-&gt;reactionPWM &lt; 0)
-    {
-      HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_RESET);
-      HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_SET);
-    }
-    else
-    {
-      HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_SET);
-      HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_RESET);
-    }
-    if (model-&gt;rollingPWM &lt; 0)
-    {
-      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2, GPIO_PIN_RESET);
-      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, GPIO_PIN_SET);
-    }
-    else
-    {
-      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2, GPIO_PIN_SET);
-      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, GPIO_PIN_RESET);
-    }
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_SET);
   }
   else
   {
-    model-&gt;reactionPWM = 0.0;
-    model-&gt;rollingPWM = 0.0;
-    TIM2-&gt;CCR1 = 0;
-    TIM2-&gt;CCR2 = 0;
-    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_SET);
     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_RESET);
+  }
+  if (model-&gt;rollingPWM &lt; 0)
+  {
     HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, GPIO_PIN_SET);
+  }
+  else
+  {
+    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2, GPIO_PIN_SET);
     HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, GPIO_PIN_RESET);
   }
+
   // dataset = (xₖ, uₖ, xₖ₊₁, uₖ₊₁)
   encodeWheel(&amp;(model-&gt;reactionEncoder), TIM3-&gt;CNT);
   encodeWheel(&amp;(model-&gt;rollingEncoder), TIM4-&gt;CNT);
@@ -4731,21 +4716,21 @@ void stepForward(LinearQuadraticRegulator *model)
       z_n[i] += getIndex(model-&gt;P_n, i, j) * z_k[j];
     }
   }
-  z_k_dot_z_n = 0.0;
+  z_k1_dot_z_n = 0.0;
   float buffer = 0.0;
   for (int i = 0; i &lt; (model-&gt;n + model-&gt;m); i++)
   {
-    buffer = z_k[i] * z_n[i];
+    buffer = z_k1[i] * z_n[i];
     if (isnanf(buffer) == 0)
     {
-      z_k_dot_z_n += buffer;
+      z_k1_dot_z_n += buffer;
     }
   }
-  if (fabs(model-&gt;lambda + z_k_dot_z_n) &gt; 0)
+  if (fabs(model-&gt;lambda + z_k1_dot_z_n) &gt; 0)
   {
     for (int i = 0; i &lt; (model-&gt;n + model-&gt;m); i++)
     {
-      g_n[i] = (1.0 / (model-&gt;lambda + z_k_dot_z_n)) * z_n[i];
+      g_n[i] = (1.0 / (model-&gt;lambda + z_k1_dot_z_n)) * z_n[i];
     }
   }
   else
@@ -4799,14 +4784,14 @@ void stepForward(LinearQuadraticRegulator *model)
 چون به روزرسانی‌های متعدد و سریع ماتریس های صافی و خودهمبستگی معکوس بر پایه‌ی محاسبات عددی هستند، لازم است که پایداری درایه‌های ماتریس در طول زمان بررسی شود. در محاسبه‌ی ضرب داخلی بردار حالت سامانه و بردار تصفیه‌شده‌ی اطلاعاتی یک شرط قرار داده شده است که با فراخوانی یک تابع زبان برنامه‌نویسی سی و دادن تک تک عبارت‌های موجود در ضرب داخلی تضمین می‌کند که نتیجه‌ی ضرب یک عدد متناهی و حقیقی است. در صورتی که یکی از عبارت‌ها در جمع عملگر ضرب داخلی بینهایت شود، ضرب داخلی همچنان محاسبه می‌شود و نتیجه می‌دهد، اما با این تفاوت که تنها عبارت بینهایت از نتیجه‌ی ضرب حذف می‌شود تا این بینهایت به ماتریس‌های صافی و خودهمبستگی معکوس راه پیدا نکند. در یک آزمایش تجربی، پنج درایه‌ی اول قطر اصلی ماتریس خودهمبستگی معکوس نسبت به محور زمان رسم می‌شود. با توجه به اینکه در ابتدای روشن شدن ربات، ماتریس خودهمبستگی معکوس با ماتریس همانی پیش‌مقداردهی می‌شود، به‌روزرسانی ماتریس خودهمبستگی معکوس باعث می‌شود که قطر اصلی ماتریس در طول زمان تغییر کند. شرایط مطلوب، شرایطی است که مقدار درایه‌های ماتریس اعدادی متناهی باشند و به مقدارهایی مشخص به طور جداگانه همگرا شوند. این شرایط همگرایی و پایداری محاسبات هنگام عملکرد واقعی ربات بررسی می‌شوند. همان برنامه‌ی نرم‌افزاری که برای پیکربندی هندسی برآورد شیب استفاده می‌شود دارای قابلیت رسم نمودار درایه‌های ماتریس خودهمبستگی معکوس نیز می‌باشد. در رابط کاربری برنامه، یک نمودار اختصاصی برای ماتریس خودهمبستگی معکوس در نظر گرفته شده است تا مسیر به‌روزرسانی‌های ماتریس را نسبت به زمان ترسیم کرده و پایایی محاسبات را به طور زنده مشاهده نمود.
 
 </p>
-</div><pre><code class="language-c hljs">z_k_dot_z_n = 0.0;
+</div><pre><code class="language-c hljs">z_k1_dot_z_n = 0.0;
 float buffer = 0.0;
 for (int i = 0; i &lt; (model-&gt;n + model-&gt;m); i++)
 {
-  buffer = z_k[i] * z_n[i];
+  buffer = z_k1[i] * z_n[i];
   if (isnanf(buffer) == 0)
   {
-    z_k_dot_z_n += buffer;
+    z_k1_dot_z_n += buffer;
   }
 }</code></pre><div dir = "rtl">
 <p>
@@ -4887,7 +4872,6 @@ for (int i = 0; i &lt; (model-&gt;n + model-&gt;m); i++)
     model-&gt;K_j.x18 = K_j[1][8];
     model-&gt;K_j.x19 = K_j[1][9];
   }
-  model-&gt;updated = 1;
   return;
 }</code></pre><div dir = "rtl">
 <p>
@@ -4945,95 +4929,86 @@ model.dt = dt;</code></pre><div dir = "rtl">
 اگر پرچم پایان برنامه غیرفعال باشد، تابع گام برداشتن به جلو فراخوانی می‌شود. در غیر این صورت، چرخه‌ی کاری مدولاسیون پهنای باند هر دو موتور صفر می‌شود و تنها مقدار اندازه‌گیری حسگرها به‌روزرسانی می شود. این کار کمک می‌کند تا بدون حرکت ربات بتوان حسگرها را تنظیم کرد و عیب‌یابی کرد. اما اگر که پرچم پایان برنامه فعال باشد و به طور همزمان پرچم به‌روزرسانی برنامه غیرفعال باشد، آن‌گاه تابع به‌روزرسانی تدبیرگر پسخوردی فراخوانی می‌شود. تابع به‌روزرسانی تدبیرگر پس از پایان اجرا شدن، پرچم به‌روزرسانی تدبیرگر را فعال می‌کند تا از به‌روزرسانی مدل در چرخه‌های متوالی جلوگیری شود. در صورتی که گام زمانی کا در سامانگر خطی درجه دوم ضریبی از عدد ۱۰۰ باشد، تابع به‌روزرسانی تدبیرگر پسخوردی فراخوانی می‌شود که روش اصلی به‌روزرسانی تدبیرگر است.
 
 </p>
-</div><pre><code class="language-c hljs">  while (1)
+</div><pre><code class="language-c hljs">while (1)
+{
+  t1 = DWT-&gt;CYCCNT;
+
+  if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_0) == 0)
   {
-    t1 = DWT-&gt;CYCCNT;
-
-    if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_0) == 0)
-    {
-      model.active = 1;
-    }
-    else
-    {
-      model.active = 0;
-      model.reactionPWM = 0.0;
-      model.rollingPWM = 0.0;
-      TIM2-&gt;CCR1 = 0;
-      TIM2-&gt;CCR2 = 0;
-    }
-
-    if (fabs(model.imu1.roll) &gt; roll_safety_angle || fabs(model.imu1.pitch) &gt; pitch_safety_angle || model.k &gt; max_episode_length)
-    {
-      model.terminated = 1;
-      model.active = 0;
-      HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
-    }
-
     if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13) == 0)
     {
       HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
-      model.terminated = 0;
       model.active = 1;
-      model.updated = 0;
+    }
+  }
+  else
+  {
+    model.active = 0;
+    model.reactionPWM = 0.0;
+    model.rollingPWM = 0.0;
+    TIM2-&gt;CCR1 = 0;
+    TIM2-&gt;CCR2 = 0;
+  }
+
+  if (fabs(model.imu1.roll) &gt; roll_safety_angle || fabs(model.imu1.pitch) &gt; pitch_safety_angle || model.k &gt; max_episode_length)
+  {
+    model.active = 0;
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
+  }
+
+  if (model.active == 1)
+  {
+    stepForward(&amp;model);
+  }
+  else
+  {
+    model.reactionPWM = 0.0;
+    model.rollingPWM = 0.0;
+    TIM2-&gt;CCR1 = 0;
+    TIM2-&gt;CCR2 = 0;
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, GPIO_PIN_RESET);
+    encodeWheel(&amp;model.reactionEncoder, TIM3-&gt;CNT);
+    encodeWheel(&amp;model.rollingEncoder, TIM4-&gt;CNT);
+    senseCurrent(&amp;(model.reactionCurrentSensor), &amp;(model.rollingCurrentSensor));
+    updateIMU(&amp;model);
+  }
+  if (model.k % updatePolicyPeriod == 0)
+  {
+    updateControlPolicy(&amp;model);
+  }
+
+  model.imu1.yaw += dt * r_dot[2];
+
+  t2 = DWT-&gt;CYCCNT;
+  diff = t2 - t1;
+  dt = (float)diff / CPU_CLOCK;
+  model.dt = dt;
+
+  log_counter++;
+  if (log_counter &gt; LOG_CYCLE &amp;&amp; HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_1) == 0)
+  {
+    transmit = 1;
+  }
+  if (transmit == 1)
+  {
+    transmit = 0;
+    log_counter = 0;
+
+    if (log_status == 0)
+    {
+      sprintf(MSG,
+              &quot;AX1: %0.2f, AY1: %0.2f, AZ1: %0.2f, | AX2: %0.2f, AY2: %0.2f, AZ2: %0.2f, | roll: %0.2f, pitch: %0.2f, | encT: %0.2f, encB: %0.2f, | P0: %0.2f, P1: %0.2f, P2: %0.2f, P3: %0.2f, P4: %0.2f, dt: %0.6f\r\n&quot;,
+              model.imu1.accX, model.imu1.accY, model.imu1.accZ, model.imu2.accX, model.imu2.accY, model.imu2.accZ, model.imu1.roll, model.imu1.pitch, model.reactionEncoder.radianAngle, model.rollingEncoder.radianAngle, getIndex(model.P_n, 0, 0), getIndex(model.P_n, 1, 1), getIndex(model.P_n, 2, 2), getIndex(model.P_n, 3, 3), getIndex(model.P_n, 4, 4), dt);
+      log_status = 0;
     }
 
-    if (model.terminated == 0)
-    {
-      stepForward(&amp;model);
-    }
-    else
-    {
-      model.reactionPWM = 0.0;
-      model.rollingPWM = 0.0;
-      TIM2-&gt;CCR1 = 0;
-      TIM2-&gt;CCR2 = 0;
-      HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_RESET);
-      HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_RESET);
-      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2, GPIO_PIN_RESET);
-      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, GPIO_PIN_RESET);
-      encodeWheel(&amp;model.reactionEncoder, TIM3-&gt;CNT);
-      encodeWheel(&amp;model.rollingEncoder, TIM4-&gt;CNT);
-      senseCurrent(&amp;(model.reactionCurrentSensor), &amp;(model.rollingCurrentSensor));
-      updateIMU(&amp;model);
-    }
-    if (model.terminated == 1 &amp;&amp; model.updated == 0)
-    {
-      updateControlPolicy(&amp;model);
-    }
-    if (model.k % updatePolicyPeriod == 0)
-    {
-      updateControlPolicy(&amp;model);
-    }
-
-    model.imu1.yaw += dt * r_dot[2];
-
-    t2 = DWT-&gt;CYCCNT;
-    diff = t2 - t1;
-    dt = (float)diff / CPU_CLOCK;
-    model.dt = dt;
-
-    log_counter++;
-    if (log_counter &gt; LOG_CYCLE &amp;&amp; HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_1) == 0)
-    {
-      transmit = 1;
-    }
-    if (transmit == 1)
-    {
-      transmit = 0;
-      log_counter = 0;
-
-      if (log_status == 0)
-      {
-        sprintf(MSG,
-                &quot;AX1: %0.2f, AY1: %0.2f, AZ1: %0.2f, | AX2: %0.2f, AY2: %0.2f, AZ2: %0.2f, | roll: %0.2f, pitch: %0.2f, | encT: %0.2f, encB: %0.2f, | P0: %0.2f, P1: %0.2f, P2: %0.2f, P3: %0.2f, P4: %0.2f, dt: %0.6f\r\n&quot;,
-                model.imu1.accX, model.imu1.accY, model.imu1.accZ, model.imu2.accX, model.imu2.accY, model.imu2.accZ, model.imu1.roll, model.imu1.pitch, model.reactionEncoder.radianAngle, model.rollingEncoder.radianAngle, getIndex(model.P_n, 0, 0), getIndex(model.P_n, 1, 1), getIndex(model.P_n, 2, 2), getIndex(model.P_n, 3, 3), getIndex(model.P_n, 4, 4), dt);
-        log_status = 0;
-      }
-
-      HAL_UART_Transmit(&amp;huart6, MSG, sizeof(MSG), 1000);
-    }
-    // Rinse and repeat :)
-  }</code></pre><div dir = "rtl">
+    HAL_UART_Transmit(&amp;huart6, MSG, sizeof(MSG), 1000);
+  }
+  // Rinse and repeat :)
+}</code></pre><div dir = "rtl">
 <p>
 
 اندازه‌گیری از راه دور روشی است برای خواندن میدان‌های ساختمان داده سامانگر خطی درجه دوم، که به توسعه‌دهنده کمک می‌کند تا ربات را تنظیم و عیب‌یابی کند. در این روش، ربات به یک تفتگاه رادیویی وای‌فای تبدیل می‌شود که با رایانه می‌توان به آن وصل شد. سپس با استفاده از آدرس آی‌پی و درگاه شبکه، اندازه‌گیری‌های ربات به صورت خط به خط در رایانه نمایش داده می‌شود. کانون رادیویی ربات یک ماژول وای‌فای است که با رابط گیرنده-فرستنده همگام و غیرهمگام جهانی (یوزارت) با میکروکنترلر صحبت می‌کند و دارای ۸۰ متر برد است. در لایه‌ی نرم‌افزاری اندازه‌گیری از راه دور، از ماژول وای‌فای با یک واژه‌ی عبور محافظت شده است. تابع اس‌پرینت‌اف یک تابع در کتابخانه‌ی استاندارد زبان برنامه‌نویسی سی است که متن رشته‌ای را قالب‌دهی می‌کند و به خروجی استاندارد ارسال می‌کند. آرگومان‌های تابع اس‌پرینت‌اف یک آرایه و یک رشته‌ی کاراکتری است که به دنبال آرگومان رشته، تعدادی آرگومان متغیر تامین می‌شود تا تازه‌ترین مقدارهای عددی در رشته‌ی کاراکتری جایگذاری شود. پس از فراخوانی تابع اس‌پرینت‌اف، رشته کاراکتری با اندازه‌گیری‌های عددی شکل می‌گیرد و سپس با فراخوانی تابع ارسال یوزارت به رابط ماژول وای‌فای فرستاده می‌شود. این کار به طور متناوب و با بسامدی کمتر از بسامد چرخه‌ی کنترلی انجام می‌شود تا تاخیر کنترلر کاهش یابد. به طور معمول با غیرفعال کردن فیوزبیت ۲ بر روی ربات این بسامد صفر می شود و کاربر تنها هنگام توسعه‌ی نرم‌افزاری ربات فیوزبیت ۲ را فعال می‌کند. 
@@ -5228,4 +5203,4 @@ model.dt = dt;</code></pre><div dir = "rtl">
 </li>
 
 </ol>
-</div></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="maxwellfield_persian.html">« The Maxwell Field (Persian)</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.14.1 on <span class="colophon-date" title="Monday 22 September 2025 10:00">Monday 22 September 2025</span>. Using Julia version 1.10.10.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+</div></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="maxwellfield_persian.html">« The Maxwell Field (Persian)</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.14.1 on <span class="colophon-date" title="Thursday 25 September 2025 14:17">Thursday 25 September 2025</span>. Using Julia version 1.10.10.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
