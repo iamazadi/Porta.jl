@@ -9181,28 +9181,26 @@ void updateIMU(LinearQuadraticRegulator *model)
 // Represents a Linear Quadratic Regulator (LQR) model.
 typedef struct
 {
-  Mat12 W_n;     // filter matrix
-  Mat12 P_n;     // inverse autocorrelation matrix
-  Mat210f K_j;    // feedback policy
-  Vec24f dataset; // (xₖ, uₖ, xₖ₊₁, uₖ₊₁)
-  int j;          // step number
-  int k;          // time k
-  int n;          // xₖ ∈ ℝⁿ
-  int m;          // uₖ ∈ ℝᵐ
-  double lambda;   // exponential wighting factor
-  double delta;    // value used to intialize P(0)
-  int terminated; // has the environment been reset
-  int updated;    // whether the policy has been updated
-  int active;     // is the model controller active
-  double dt;       // period in seconds
-  double reactionPWM;  // reaction wheel's motor PWM duty cycle
-  double rollingPWM;   // rolling wheel's motor PWM duty cycle
-  IMU imu1;            // the first inertial measurement unit
-  IMU imu2;            // the second inertial measurement unit
-  Encoder reactionEncoder;  // the reaction wheel encoder
-  Encoder rollingEncoder;   // the rolling wheel encoder
-  CurrentSensor reactionCurrentSensor;  // the reaction wheel's motor current sensor
-  CurrentSensor rollingCurrentSensor;   // the rolling wheel's motor current sensor
+  Mat12 W_n;                           // filter matrix
+  Mat12 P_n;                           // inverse autocorrelation matrix
+  Mat210f K_j;                         // feedback policy
+  Vec24f dataset;                      // (xₖ, uₖ, xₖ₊₁, uₖ₊₁)
+  int j;                               // step number
+  int k;                               // time k
+  int n;                               // xₖ ∈ ℝⁿ
+  int m;                               // uₖ ∈ ℝᵐ
+  float lambda;                        // exponential wighting factor
+  float delta;                         // value used to intialize P(0)
+  int active;                          // is the model controller active
+  float dt;                            // period in seconds
+  float reactionPWM;                   // reaction wheel's motor PWM duty cycle
+  float rollingPWM;                    // rolling wheel's motor PWM duty cycle
+  IMU imu1;                            // the first inertial measurement unit
+  IMU imu2;                            // the second inertial measurement unit
+  Encoder reactionEncoder;             // the reaction wheel encoder
+  Encoder rollingEncoder;              // the rolling wheel encoder
+  CurrentSensor reactionCurrentSensor; // the reaction wheel's motor current sensor
+  CurrentSensor rollingCurrentSensor;  // the rolling wheel's motor current sensor
 } LinearQuadraticRegulator;
 ```
 
@@ -9391,48 +9389,35 @@ void stepForward(LinearQuadraticRegulator *model)
   model->dataset.x10 = u_k[0];
   model->dataset.x11 = u_k[1];
 
-  if (model->active == 1)
+  model->reactionPWM += (255.0 * pulseStep) * u_k[0];
+  model->rollingPWM += (255.0 * pulseStep) * u_k[1];
+  model->reactionPWM = fmin(255.0 * 255.0, model->reactionPWM);
+  model->reactionPWM = fmax(-255.0 * 255.0, model->reactionPWM);
+  model->rollingPWM = fmin(255.0 * 255.0, model->rollingPWM);
+  model->rollingPWM = fmax(-255.0 * 255.0, model->rollingPWM);
+  TIM2->CCR1 = (int)fabs(model->rollingPWM);
+  TIM2->CCR2 = (int)fabs(model->reactionPWM);
+  if (model->reactionPWM < 0)
   {
-    model->reactionPWM += (255.0 * 96.0) * u_k[0];
-    model->rollingPWM += (255.0 * 96.0) * u_k[1];
-    model->reactionPWM = fmin(255.0 * 255.0, model->reactionPWM);
-    model->reactionPWM = fmax(-255.0 * 255.0, model->reactionPWM);
-    model->rollingPWM = fmin(255.0 * 255.0, model->rollingPWM);
-    model->rollingPWM = fmax(-255.0 * 255.0, model->rollingPWM);
-    TIM2->CCR1 = (int)fabs(model->rollingPWM);
-    TIM2->CCR2 = (int)fabs(model->reactionPWM);
-    if (model->reactionPWM < 0)
-    {
-      HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_RESET);
-      HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_SET);
-    }
-    else
-    {
-      HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_SET);
-      HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_RESET);
-    }
-    if (model->rollingPWM < 0)
-    {
-      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2, GPIO_PIN_RESET);
-      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, GPIO_PIN_SET);
-    }
-    else
-    {
-      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2, GPIO_PIN_SET);
-      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, GPIO_PIN_RESET);
-    }
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_SET);
   }
   else
   {
-    model->reactionPWM = 0.0;
-    model->rollingPWM = 0.0;
-    TIM2->CCR1 = 0;
-    TIM2->CCR2 = 0;
-    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_SET);
     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_RESET);
+  }
+  if (model->rollingPWM < 0)
+  {
     HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, GPIO_PIN_SET);
+  }
+  else
+  {
+    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2, GPIO_PIN_SET);
     HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, GPIO_PIN_RESET);
   }
+
   // dataset = (xₖ, uₖ, xₖ₊₁, uₖ₊₁)
   encodeWheel(&(model->reactionEncoder), TIM3->CNT);
   encodeWheel(&(model->rollingEncoder), TIM4->CNT);
@@ -9512,21 +9497,21 @@ void stepForward(LinearQuadraticRegulator *model)
       z_n[i] += getIndex(model->P_n, i, j) * z_k[j];
     }
   }
-  z_k_dot_z_n = 0.0;
+  z_k1_dot_z_n = 0.0;
   float buffer = 0.0;
   for (int i = 0; i < (model->n + model->m); i++)
   {
-    buffer = z_k[i] * z_n[i];
+    buffer = z_k1[i] * z_n[i];
     if (isnanf(buffer) == 0)
     {
-      z_k_dot_z_n += buffer;
+      z_k1_dot_z_n += buffer;
     }
   }
-  if (fabs(model->lambda + z_k_dot_z_n) > 0)
+  if (fabs(model->lambda + z_k1_dot_z_n) > 0)
   {
     for (int i = 0; i < (model->n + model->m); i++)
     {
-      g_n[i] = (1.0 / (model->lambda + z_k_dot_z_n)) * z_n[i];
+      g_n[i] = (1.0 / (model->lambda + z_k1_dot_z_n)) * z_n[i];
     }
   }
   else
@@ -9588,14 +9573,14 @@ void stepForward(LinearQuadraticRegulator *model)
 ```
 
 ```c
-z_k_dot_z_n = 0.0;
+z_k1_dot_z_n = 0.0;
 float buffer = 0.0;
 for (int i = 0; i < (model->n + model->m); i++)
 {
-  buffer = z_k[i] * z_n[i];
+  buffer = z_k1[i] * z_n[i];
   if (isnanf(buffer) == 0)
   {
-    z_k_dot_z_n += buffer;
+    z_k1_dot_z_n += buffer;
   }
 }
 ```
@@ -9684,7 +9669,6 @@ void updateControlPolicy(LinearQuadraticRegulator *model)
     model->K_j.x18 = K_j[1][8];
     model->K_j.x19 = K_j[1][9];
   }
-  model->updated = 1;
   return;
 }
 ```
@@ -9800,95 +9784,86 @@ model.dt = dt;
 ```
 
 ```c
-  while (1)
+while (1)
+{
+  t1 = DWT->CYCCNT;
+
+  if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_0) == 0)
   {
-    t1 = DWT->CYCCNT;
-
-    if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_0) == 0)
-    {
-      model.active = 1;
-    }
-    else
-    {
-      model.active = 0;
-      model.reactionPWM = 0.0;
-      model.rollingPWM = 0.0;
-      TIM2->CCR1 = 0;
-      TIM2->CCR2 = 0;
-    }
-
-    if (fabs(model.imu1.roll) > roll_safety_angle || fabs(model.imu1.pitch) > pitch_safety_angle || model.k > max_episode_length)
-    {
-      model.terminated = 1;
-      model.active = 0;
-      HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
-    }
-
     if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13) == 0)
     {
       HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
-      model.terminated = 0;
       model.active = 1;
-      model.updated = 0;
     }
-
-    if (model.terminated == 0)
-    {
-      stepForward(&model);
-    }
-    else
-    {
-      model.reactionPWM = 0.0;
-      model.rollingPWM = 0.0;
-      TIM2->CCR1 = 0;
-      TIM2->CCR2 = 0;
-      HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_RESET);
-      HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_RESET);
-      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2, GPIO_PIN_RESET);
-      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, GPIO_PIN_RESET);
-      encodeWheel(&model.reactionEncoder, TIM3->CNT);
-      encodeWheel(&model.rollingEncoder, TIM4->CNT);
-      senseCurrent(&(model.reactionCurrentSensor), &(model.rollingCurrentSensor));
-      updateIMU(&model);
-    }
-    if (model.terminated == 1 && model.updated == 0)
-    {
-      updateControlPolicy(&model);
-    }
-    if (model.k % updatePolicyPeriod == 0)
-    {
-      updateControlPolicy(&model);
-    }
-
-    model.imu1.yaw += dt * r_dot[2];
-
-    t2 = DWT->CYCCNT;
-    diff = t2 - t1;
-    dt = (float)diff / CPU_CLOCK;
-    model.dt = dt;
-
-    log_counter++;
-    if (log_counter > LOG_CYCLE && HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_1) == 0)
-    {
-      transmit = 1;
-    }
-    if (transmit == 1)
-    {
-      transmit = 0;
-      log_counter = 0;
-
-      if (log_status == 0)
-      {
-        sprintf(MSG,
-                "AX1: %0.2f, AY1: %0.2f, AZ1: %0.2f, | AX2: %0.2f, AY2: %0.2f, AZ2: %0.2f, | roll: %0.2f, pitch: %0.2f, | encT: %0.2f, encB: %0.2f, | P0: %0.2f, P1: %0.2f, P2: %0.2f, P3: %0.2f, P4: %0.2f, dt: %0.6f\r\n",
-                model.imu1.accX, model.imu1.accY, model.imu1.accZ, model.imu2.accX, model.imu2.accY, model.imu2.accZ, model.imu1.roll, model.imu1.pitch, model.reactionEncoder.radianAngle, model.rollingEncoder.radianAngle, getIndex(model.P_n, 0, 0), getIndex(model.P_n, 1, 1), getIndex(model.P_n, 2, 2), getIndex(model.P_n, 3, 3), getIndex(model.P_n, 4, 4), dt);
-        log_status = 0;
-      }
-
-      HAL_UART_Transmit(&huart6, MSG, sizeof(MSG), 1000);
-    }
-    // Rinse and repeat :)
   }
+  else
+  {
+    model.active = 0;
+    model.reactionPWM = 0.0;
+    model.rollingPWM = 0.0;
+    TIM2->CCR1 = 0;
+    TIM2->CCR2 = 0;
+  }
+
+  if (fabs(model.imu1.roll) > roll_safety_angle || fabs(model.imu1.pitch) > pitch_safety_angle || model.k > max_episode_length)
+  {
+    model.active = 0;
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
+  }
+
+  if (model.active == 1)
+  {
+    stepForward(&model);
+  }
+  else
+  {
+    model.reactionPWM = 0.0;
+    model.rollingPWM = 0.0;
+    TIM2->CCR1 = 0;
+    TIM2->CCR2 = 0;
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, GPIO_PIN_RESET);
+    encodeWheel(&model.reactionEncoder, TIM3->CNT);
+    encodeWheel(&model.rollingEncoder, TIM4->CNT);
+    senseCurrent(&(model.reactionCurrentSensor), &(model.rollingCurrentSensor));
+    updateIMU(&model);
+  }
+  if (model.k % updatePolicyPeriod == 0)
+  {
+    updateControlPolicy(&model);
+  }
+
+  model.imu1.yaw += dt * r_dot[2];
+
+  t2 = DWT->CYCCNT;
+  diff = t2 - t1;
+  dt = (float)diff / CPU_CLOCK;
+  model.dt = dt;
+
+  log_counter++;
+  if (log_counter > LOG_CYCLE && HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_1) == 0)
+  {
+    transmit = 1;
+  }
+  if (transmit == 1)
+  {
+    transmit = 0;
+    log_counter = 0;
+
+    if (log_status == 0)
+    {
+      sprintf(MSG,
+              "AX1: %0.2f, AY1: %0.2f, AZ1: %0.2f, | AX2: %0.2f, AY2: %0.2f, AZ2: %0.2f, | roll: %0.2f, pitch: %0.2f, | encT: %0.2f, encB: %0.2f, | P0: %0.2f, P1: %0.2f, P2: %0.2f, P3: %0.2f, P4: %0.2f, dt: %0.6f\r\n",
+              model.imu1.accX, model.imu1.accY, model.imu1.accZ, model.imu2.accX, model.imu2.accY, model.imu2.accZ, model.imu1.roll, model.imu1.pitch, model.reactionEncoder.radianAngle, model.rollingEncoder.radianAngle, getIndex(model.P_n, 0, 0), getIndex(model.P_n, 1, 1), getIndex(model.P_n, 2, 2), getIndex(model.P_n, 3, 3), getIndex(model.P_n, 4, 4), dt);
+      log_status = 0;
+    }
+
+    HAL_UART_Transmit(&huart6, MSG, sizeof(MSG), 1000);
+  }
+  // Rinse and repeat :)
+}
 ```
 
 ```@raw html
