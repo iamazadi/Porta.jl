@@ -48,6 +48,18 @@ else
 ```
 
 - 
+When the reaction wheel unicycle falls over, the roll and pitch angles of the chassis with respect to the pivot point exeed ten degrees. The geared motors produce high torques in stall mode after their failure to prevent the fall from happening. It makes sense to disable the actuators to save energy resources and reduce physical shocks to the motor gearboxes. The lower and upper bounds on the roll and pitch angles are combined using the logical or `||` operator with the episode counter so that the model stops running after the maximum number of interactions with the environment, the total steps in an episode. A fall or a certain number of interactions, whichever comes first, causes the model to deactivate. In order to make the robot live longer and consume less power, three conditions must be met, or else the model is deactivated and the green light on the NUCLEOF401RE turns on to signify that the controller is no longer active. The user has four options in whenever the green LED lights up:
+
+1. Pick the robot up and make it stand upright, before pushing the blue push button to run again.
+
+2. Switch the power button on the chassis to condition zero, in order to power off the robot.
+
+3. Connect to the robot WiFi network and execute the following command in the terminal for printing the logs. Print uart6 serial messages by executing: `nc 192.168.4.1 10000`
+
+4. Activate the Porta.jl environment in a Julia REPL and run the linked script for visualizing the logs: [Unicycle](https://github.com/iamazadi/Porta.jl/blob/master/models/unicycle.jl)
+
+The controller stops spinning and stays that way, unless one of the above are performed by the user.
+
 ```c
 if (fabs(model.imu1.roll) > roll_safety_angle || fabs(model.imu1.pitch) > pitch_safety_angle || model.k > max_episode_length)
 {
@@ -57,6 +69,8 @@ if (fabs(model.imu1.roll) > roll_safety_angle || fabs(model.imu1.pitch) > pitch_
 ```
 
 - 
+If the model is set to be active, then the controller takes one step forward. The function `stepForward` takes as argument a pointer to the model, mainly because two of its fields require persistent memory: the filter matrix `W_n` and the inverse autocorrelation matrix `P_n`. But also partly because the sensory fields among others are updated inside the function. The actual side effect of this function call is the action of the feedback policy, which changes the angular velocity of the motors.
+
 ```c
 if (model.active == 1)
 {
@@ -65,6 +79,16 @@ if (model.active == 1)
 ```
 
 - 
+In case the model is not active, a block of code runs instead of the `stepForward` function, in order to make sure the motors stop moving, and to update sensors for development purposes. First, the duty cycles are set to zero, both in the model struct fields and in the respective channels of Timer 2. Second, the driver inputs are all cleared to make a breaking condition according to the driver's data sheet. Third, the encoder of the reaction wheel is updated by calling the `encodeWheel` function, supplying a pointer to the encoder's instantiation and the value of the counter register `CNT` of Timer 3. Timer 3 is configured with two cannels A nd B for reading the absolute position of the wheel. What Timer 3 counts in the "encoder mode" is the angular position of the reaction wheel. Then, the `encodeWheel` function transforms the angular position to the angular velocity for the linear quadratic regulator model. The rolling wheel's encoder works in the same way, except Timer 4 is used. Next, the rate of electric current in the coils of the motors is measured by calling the `senseCurrent` function with pointers to the current sensor struct of the motors.
+
+Finally, the Inertial Measurement Unit (IMU) is updated by calling the `updateIMU` function with the pointer to the model struct. There are two IMUs on the robot for estimating tilt at the pivot point rather than the point where the IMUs are located. The essential feature of the `updateIMU` function is the ability to calculate the roll and pitch angles using the static acceleration of gravity, discarding the dynamical part of acceleration beforehand. The quality of tilt estimation depends on three features:
+
+1. The calculation is done for the pivot point.
+
+2. The calculation does not consider dynamical accelerations of the robot.
+
+3. The tilt estimation given the accelerometers is enhanced by fusing it with gyroscopic measurements.
+
 ```c
 else
 {
