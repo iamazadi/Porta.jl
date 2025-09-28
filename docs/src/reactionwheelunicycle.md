@@ -48,7 +48,7 @@ else
 ```
 
 - 
-When the reaction wheel unicycle falls over, the roll and pitch angles of the chassis with respect to the pivot point exeed ten degrees. The geared motors produce high torques in stall mode after their failure to prevent the fall from happening. It makes sense to disable the actuators to save energy resources and reduce physical shocks to the motor gearboxes. The lower and upper bounds on the roll and pitch angles are combined using the logical or `||` operator with the episode counter so that the model stops running after the maximum number of interactions with the environment, the total steps in an episode. A fall or a certain number of interactions, whichever comes first, causes the model to deactivate. In order to make the robot live longer and consume less power, three conditions must be met, or else the model is deactivated and the green light on the NUCLEOF401RE turns on to signify that the controller is no longer active. The user has four options in whenever the green LED lights up:
+When the reaction wheel unicycle falls over, the roll and pitch angles of the chassis with respect to the pivot point exeed ten degrees. The geared motors produce high torques in stall mode after their failure to prevent the fall from happening. It makes sense to disable the actuators to save energy resources and reduce physical shocks to the motor gearboxes. The lower and upper bounds on the roll and pitch angles are combined using the logical "or" operator `||` with the episode counter so that the model stops running after the maximum number of interactions with the environment, the total steps in an episode. A fall or a certain number of interactions, whichever comes first, causes the model to deactivate. In order to make the robot live longer and consume less power, three conditions must be met, or else the model is deactivated and the green light on the NUCLEOF401RE turns on to signify that the controller is no longer active. The user has four options in whenever the green LED lights up:
 
 1. Pick the robot up and make it stand upright, before pushing the blue push button to run again.
 
@@ -108,6 +108,8 @@ else
 ```
 
 - 
+An episode is defined as one or more sequential interactions with the environment. An episode is finished once the robot falls over or when the control policy is updated. The field `k` of the model counts the number of environment interactions in an episode. Since the `stepForward` function is essentially a Recursive Least Squares (RLS) algorithm, it will make the filter matrix `W_n` and the inverse autocorrelation matrix `P_n` converge after a finite number of runs. The exact number of runs for the RLS to converge is not constant, but we can assume that it is small when the robot approaches a state in which opposing angular momenta are balanced. Therefore, by counting the number of `stepForward` function calls we can insert control policy updates periodically. The function `updateControlPolicy` is given a pointer to the model object and its side effect is an update to the feedback policy matrix `K_j`. The index of the feeback policy matrix is different from the index of the filter matrix `W_n` and the inverse autocorrelation matrix `P_n`. A second counter variable `j` is incremented every time the control policy is updated, whereas the variable `k` counts the number of calls to the `stepForward` function. Whenever the update policy period is equal to one, the variables `k` and `j` count the same. However, if the update period is higher than one control cycle then the variable `j` counts at a slower rate than the variable `k`. As the model learns from experience online and in real time, the variable `updatePolicyPeriod` determines how much experience is accumulated before a policy update.
+
 ```c
 if (model.k % updatePolicyPeriod == 0)
 {
@@ -116,6 +118,8 @@ if (model.k % updatePolicyPeriod == 0)
 ```
 
 - 
+At the end of the control loop, where the model has taken one step forward and possibly the control policy has been updated, it is time to count the number of the processor's clock cycles for a second time for measuring delta `t`. At this point, by assigning the value of the DWT counter register to the variable `t2` we can know how many cycles are there between `t1` and `t2`. Having calculated the temporal difference between the start of the main loop and its end in terms of the processor's cycles, we then divide the difference by the number of Central Processing Unit (CPU) clock cycles per second for finding the period of the control cycle in the unit of seconds. The field `dt` of the model struct stores the control period for intermediate physical calculations. The control period is ususally 2 to 5 milliseconds on a NUCLEOF401RE, which clocks at 84 Mhz.
+
 ```c
 t2 = DWT->CYCCNT;
 diff = t2 - t1;
@@ -124,6 +128,8 @@ model.dt = dt;
 ```
 
 - 
+In order to monitor the controller and debug issues we write the logs periodically to the standard input / output console. The variable `log_counter` is incremented by one every control cycle. Then, the log counter is compared to the constnt `LOG_CYCLE` for finding out if a cycle should be logged. But it is not a sufficient condition for logging because a second fuse bit is also rquired for permission to log. The second fuse bit is connected to the port C of the general purpose input / output, pin 1. Whenever the fuse bit pin is grounded it is activated. Once the fuse bit is active, the transmission flag `transmit` is set at the appropriate control cycle count. The reason for `LOG_CYCLE` is to limit the total number of logs per second, as the Micro-Controller Unit (MCU) is too fast for a continuous report. And the second fuse bit is there to turn off logging for saving time, as log transmissions takes time away from the control processes. So by using the logical "and" operator `&&` we can combine the logging cycle condition with the logging fuse bit, in order to regulate the frequnecy of transmissions.
+
 ```c
 log_counter++;
 if (log_counter > LOG_CYCLE && HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_1) == 0)
@@ -133,22 +139,21 @@ if (log_counter > LOG_CYCLE && HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_1) == 0)
 ```
 
 - 
+
+If the `transmit` variable is equal to one, then the log counter is cleard along with the `transmit` variable before transmission. The function `sprintf` is called with a message buffer `MSG` and a formatted character string to populate the buffer with numbers. A log message can be anything, but for finding the matrix of known parameters in tilt estimation, the accelerometrs data must be included. After the message is composed, it is given as an argument to the function `HAL_UART_Transmit`, which stands for: Hardware Abstraction Layer, Universal Asynchronous Receiver / Transmitter, Transmit. The function also requires a pointer to `uart6`, which is a micro-controller peripheral for serial communication, and the size of the message buffer, along with a time out delay. Printing and transmitting the log finishes the main control loop. The console on the other side of tranmission receives a line like this:
+`AX1: -0.05, AY1: 0.02, AZ1: 0.99, | AX2: -0.05, AY2: 0.01, AZ2: 1.01, | roll: 0.05, pitch: -0.01, | encT: 4.21, encB: 0.81, | P0: -10.02, P1: 19.02, P2: 27.25, P3: 26.37, P4: 24.57, dt: 0.006890`.
+You can visualize this example message using the [Unicycle](https://github.com/iamazadi/Porta.jl/blob/master/models/unicycle.jl) script. The example includes: the tri-axis acceleromer measurements of IMU 1 and IMU 2, the roll and pitch angles after sensor fusion, the absolute position of both encoders, and the diagonal entries of the inverse auto-correlation matrix `P_n`. Different messages can be composed for different use cases, for example printing raw sensor readings for calibrating the zero point and the scale of the accelerometers axes.
+
 ```c
 if (transmit == 1)
 {
   transmit = 0;
   log_counter = 0;
-
-  if (log_status == 0)
-  {
-    sprintf(MSG,
-            "AX1: %0.2f, AY1: %0.2f, AZ1: %0.2f, | AX2: %0.2f, AY2: %0.2f, AZ2: %0.2f, | roll: %0.2f, pitch: %0.2f, | encT: %0.2f, encB: %0.2f, | P0: %0.2f, P1: %0.2f, P2: %0.2f, P3: %0.2f, P4: %0.2f, dt: %0.6f\r\n",
-            model.imu1.accX, model.imu1.accY, model.imu1.accZ, model.imu2.accX, model.imu2.accY, model.imu2.accZ, model.imu1.roll, model.imu1.pitch, model.reactionEncoder.radianAngle, model.rollingEncoder.radianAngle, getIndex(model.P_n, 0, 0), getIndex(model.P_n, 1, 1), getIndex(model.P_n, 2, 2), getIndex(model.P_n, 3, 3), getIndex(model.P_n, 4, 4), dt);
-    log_status = 0;
-  }
+  sprintf(MSG,
+          "AX1: %0.2f, AY1: %0.2f, AZ1: %0.2f, | AX2: %0.2f, AY2: %0.2f, AZ2: %0.2f, | roll: %0.2f, pitch: %0.2f, | encT: %0.2f, encB: %0.2f, | P0: %0.2f, P1: %0.2f, P2: %0.2f, P3: %0.2f, P4: %0.2f, dt: %0.6f\r\n",
+          model.imu1.accX, model.imu1.accY, model.imu1.accZ, model.imu2.accX, model.imu2.accY, model.imu2.accZ, model.imu1.roll, model.imu1.pitch, model.reactionEncoder.radianAngle, model.rollingEncoder.radianAngle, getIndex(model.P_n, 0, 0), getIndex(model.P_n, 1, 1), getIndex(model.P_n, 2, 2), getIndex(model.P_n, 3, 3), getIndex(model.P_n, 4, 4), dt);
   HAL_UART_Transmit(&huart6, MSG, sizeof(MSG), 1000);
 }
-// AX1: -0.05, AY1: 0.02, AZ1: 0.99, | AX2: -0.05, AY2: 0.01, AZ2: 1.01, | roll: 0.05, pitch: -0.01, | encT: 4.21, encB: 0.81, | P0: -10.02, P1: 19.02, P2: 27.25, P3: 26.37, P4: 24.57, dt: 0.006890
 // Rinse and repeat :)
 ```
 
