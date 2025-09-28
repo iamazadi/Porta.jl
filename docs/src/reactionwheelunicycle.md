@@ -19,6 +19,8 @@ In this section, we step through the implementation of the robot's controller in
 - 
 The microcontroller is built around a Cortex-M4 with Floating Point Unit (FPU) core, which contains hardware extensions for debugging features. The debug extensions allow the core to be stopped either on a given instruction fetch (breakpoint), or on data access (watchpoint). When stopped, the core's internal state and the system's external state may be examined. Once examination is complete, the core and the system may be restored and program execution resumed.
 
+![nucleof401re](./assets/reactionwheelunicycle/schematics/nucleof401re.jpeg)
+
 The ARM Cortex-M4 with FPU core provides integrated on-chip debug support. One of the debug features is called Data Watchpoint Trigger (DWT). The DWT unit  provides a means to give the number of clock cycles. The DWT register `CYCCNT` counts the number of clock cycles. The period of a control cycle is required in the application for integrating the gyroscopic angle rates. If we count the number of clocks twice: one time before the loop begins and one time after the loop ends, then we can find the time period that it takes to complete a control loop. In the beginning, we count the number of clocks by assigning the register value to a variable called `t1`.
 
 ```c
@@ -27,6 +29,8 @@ t1 = DWT->CYCCNT;
 
 - 
 There are two fuse bits on the robot for configuration without flashing a program. The first one is connected to the port C of the general purpose input / output, pin 0. The fuse bit is active whenever the connected pin is grounded. The fuse bit deactivates the linear quadratic regulator by clearing the `active` field as a flag in the model structure. Even though the status of the fuse bit 0 is necessary to activate the model, it is not a sufficient condition. The user must connect the fuse bit and also push a blue push button once on the robot for activating the model. The push button is the same blue button that is found on the NUCLEOF401RE board. These two conditions are chained together for safety reasons. If the model is not active, then the robot must stop moving. Therefore, the output of the model must be set to zero as well in order to override the last action of the model. But, the speed of a direct current motor is directly proportional to the amplitude of the enable signals of the motor driver. In the peripherals of the microcontroller, two channels of Timer 2 generate the driver enable signals. If the model is not active, then the duty cycle of the Pulse Width Modulation (PWM) of each timer channel is set to zero for safety. 
+
+![buttonsandlights](./assets/reactionwheelunicycle/schematics/buttonsandlights.jpeg)
 
 ```c
 if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_0) == 0)
@@ -156,6 +160,19 @@ if (transmit == 1)
 }
 // Rinse and repeat :)
 ```
+
+In order to enable the function `sprintf` to use floating point numbers, do the following steps:
+1. Open the file `gcc-arm-none-eabi.cmake` that is created by CubeMX.
+2. Add the option `-u _printf_float` to `CMAKE_C_FLAGS`.
+
+![wifimodule](./assets/reactionwheelunicycle/schematics/wifimodule.jpeg)
+
+Set the baudrate of `uart6` to 921600, for the wifi module HC-25. The HC-25 module settings are on the IP address `192.168.4.1` as a web page. Here is the checklist to set up a new module:
+1. The password is not set for new modules. So just login without a password to access the settings page.
+2. Set a username and password for the robot's access point.
+3. Set the *WiFi Mode* to **AP** for Access Point.
+4. Change the port number from *8080* to *10000*.
+5. Set the *Baud Rate* parameter to 921600 Bits/s.
 
 - 
 ```c
