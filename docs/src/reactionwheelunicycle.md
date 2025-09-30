@@ -28,7 +28,7 @@ t1 = DWT->CYCCNT;
 ```
 
 - 
-There are two fuse bits on the robot for configuration without flashing a program. The first one is connected to the port C of the general purpose input / output, pin 0. The fuse bit is active whenever the connected pin is grounded. The fuse bit deactivates the linear quadratic regulator by clearing the `active` field as a flag in the model structure. Even though the status of the fuse bit 0 is necessary to activate the model, it is not a sufficient condition. The user must connect the fuse bit and also push a blue push button once on the robot for activating the model. The push button is the same blue button that is found on the NUCLEOF401RE board. These two conditions are chained together for safety reasons. If the model is not active, then the robot must stop moving. Therefore, the output of the model must be set to zero as well in order to override the last action of the model. But, the speed of a direct current motor is directly proportional to the amplitude of the enable signals of the motor driver. In the peripherals of the microcontroller, two channels of Timer 2 generate the driver enable signals. If the model is not active, then the duty cycle of the Pulse Width Modulation (PWM) of each timer channel is set to zero for safety. 
+There are two fuse bits on the robot for configuration without flashing a program. The first one is connected to the port C of the general purpose input / output, pin 0. The fuse bit is active whenever the connected pin is grounded. The fuse bit deactivates the linear quadratic regulator by clearing the `active` field as a flag in the model structure. Even though the status of the fuse bit 0 is necessary to activate the model, it is not a sufficient condition. The user must connect the fuse bit and also push a blue push button once on the robot for activating the model. The push button is the same blue button that is found on the NUCLEOF401RE board. These two conditions are chained together for safety reasons. If the model is not active, then the robot must stop moving. Therefore, the output of the model must be set to zero as well in order to override the last action of the model. But, the speed of a direct current motor is directly proportional to the amplitude of the enable signals of the motor driver, L293D. In the peripherals of the microcontroller, two channels of Timer 2 generate the driver enable signals: EN1,2 and EN3,4. If the model is not active, then the duty cycle of the Pulse Width Modulation (PWM) of each timer channel is set to zero for safety. 
 
 ![buttonsandlights](./assets/reactionwheelunicycle/schematics/buttonsandlights.jpeg)
 
@@ -175,21 +175,22 @@ Set the baudrate of `uart6` to 921600, for the wifi module HC-25. The HC-25 modu
 5. Set the *Baud Rate* parameter to 921600 Bits/s.
 
 - 
+The function `stepForward` identifies the Q function using RLS with the given pointer to the `model`. The algorithm updates the Q function at each step. The main side effect of the function is an interaction with the environment, which consists of reading the sensors and changing the speed of rotation of the motors. In the end, the filter matrix `W_n` and the inverse auto-correlation matrix `P_n` are updated.
+
 ```c
-/*
-Identify the Q function using RLS with the given pointer to the `model`.
-The algorithm is terminated when there are no further updates
-to the Q function or the control policy at each step.
-*/
 void stepForward(LinearQuadraticRegulator *model)
 ```
 
 - 
+The counter variable `k` is incremented every time the `stepForward` function is called for keeping track of the number of steps in an episode. This reminds us of the counter variable `j`, which counts the number of policy updates in the function `updateControlPolicy`. But in the `stepForward` function, the variable `k` is defined in the local scope of the function to be incremented before returning to the `main` function.
+
 ```c
 int k = model->k;
 ```
 
 - 
+The vector `x_k` is initialized as an array of element type `float` with the model data set. The data set (xₖ, uₖ, xₖ₊₁, uₖ₊₁) contains data from two consecutive time steps `k` and `k + 1`. The number of dimensions of the `x_k` vector is equal to n = 10, storing the system state at time `k`. Each element of the state vector xₖ ∈ ℝⁿ has a name that represents a physical quantity. The order of the feature names are the same in both time indices: the roll angle, the roll angular velocity, the roll angular acceleration, the pitch angle, the pitch angular velocity, the pitch angular acceleration, the angular velocity of the reaction wheel, the angular velocity of the rolling wheel, the electric current velocity of the reaction motor, and the electric current velocity of the rolling motor.
+
 ```c
 x_k[0] = model->dataset.x0;
 x_k[1] = model->dataset.x1;
@@ -204,6 +205,8 @@ x_k[9] = model->dataset.x9;
 ```
 
 - 
+After initializing the state buffer `x_k`, another buffer is initialized with the feedback policy matrix `K_j`. The matrix Kⱼ ∈ ℝᵐˣⁿ has m = 2 rows since there are two inputs and it has n = 10 columns as there are ten states. The only reason for initializing `K_j` in the `stepForward` function is to execute a feedback policy action right before performing the measurements of the next time step `k + 1`. So the matrix and its index `j` stay constant throughout this function call.
+
 ```c
 K_j[0][0] = model->K_j.x00;
 K_j[0][1] = model->K_j.x01;
@@ -228,14 +231,12 @@ K_j[1][9] = model->K_j.x19;
 ```
 
 - 
-```c
-u_k[0] = 0.0;
-u_k[1] = 0.0;
-```
+The inputs of the system are stored in a vector uₖ ∈ ℝᵐ, which is the result of a matrix-vector product. The input is a function of the current system state at time step `k`. The feedback policy matrix `K_j` times the state vector `x_k` equals the negative of the input `u_k`. It is called the input because the product produces m = 2 floating point numbers that are used to modulate the duty cycle of the motors.
 
 - 
 ```c
-// feeback policy
+u_k[0] = 0.0;
+u_k[1] = 0.0;
 for (int i = 0; i < model->m; i++)
 {
   for (int j = 0; j < model->n; j++)
@@ -246,6 +247,8 @@ for (int i = 0; i < model->m; i++)
 ```
 
 - 
+The data set (xₖ, uₖ, xₖ₊₁, uₖ₊₁) of the Linear Quadratic Regulator (LQR) model directly sums up the ststem state `x_k` and the system input `u_k`. The roll and pitch angles and their derivatives with respect to time are divided by π in order to normalize the anglular values. The velocities of the wheels and the current rates of the motors are also normalized to be in the closed interval [-1, 1]. But those normalizations are encapsulated inside the `encodeWheel` and `senseCurrent` functions respectively. Since the RLS algorithm is an iterative computation, normalizing data makes the numerical results stable by limiting the absolute value of the elements of the matrices `W_n` and `P_n`. The first half of the data set pertains to the time step `k`, which occurs before the action is executed. The second half of the data set is assiged after the action has taken place.
+
 ```c
 model->dataset.x0 = model->imu1.roll / M_PI;
 model->dataset.x1 = model->imu1.roll_velocity / M_PI;
@@ -262,6 +265,12 @@ model->dataset.x11 = u_k[1];
 ```
 
 - 
+The LQR inputs are bidirectional and analog. The LQR regulates the roll and pitch angles by a choice of a suitable input. There are four digital input pins: **1A**, **2A**, **3A**, **4A**, and a pair of analog enable pins: **1,2En** and **3,4EN**. The enable pins control the speeds of rotation with a 16-bit resolution, whereas the logical input pins: **1A**, **2A**, **3A** and **4A** control the direction of rotation. A motor rotates in reverse by swapping the values of Input 1 with Input 2, switching 2 values in the memory. Therefore, LQR controls the roll and pitch angles by making changes to two variables: `rollingPWM` corresponding to **1,2EN** and `reactionPWM` corresponding to **3,4EN**. LQR adds / subtracts from the two variables when it acts in the environment. To drive a direct current actuator, the driver generates an electric potential at the two ends of the actuator's coil. An electric current in the power terminals (**1Y** and **2Y**, or, **3Y** and **4Y**) occurs whenever the electric potential at the two end points are sifficiently different in intensity. The duty cycle of a PWM signal shapes the line graph of an analog voltage. In a Voltage versus Time graph, the PWM signal is a point on the graph and varies with time. There are two independent PWM signals: the reaction wheel's motor enable pin and the rolling wheel's motor enable pin. In turn, the duty cycles of the PWM signals, tell the Integrated Circuit (IC) to adjust the electric potential at the output pins of the IC: **1Y**, **2Y**, **3Y** and **4Y**. Making changes to the duty cycles with the given feedback policy `u_k`, the registers of channels one and two of Timer 2 are changed after scaling the variables and casting them to integer values.
+
+![motordriver](./assets/reactionwheelunicycle/schematics/motordriver.jpeg)
+
+The control policy takes an action by writing to MCU registers. The MCU is capable of writing to millions of registers in less than one second. However, it takes about 2 to 5 milliseconds to solve for 2 input variables in a multi-input / multi-output system. By integrating the input vector `u_k` with a suitable step size, the duty cycle becomes approximately continuous. A big pulse step results in overshooting input adjustments in the pursuit of the equiblirium state. Since the harware power (in terms of revolutions per second and output torque) varies from motor to motor, the variable `pulseStep` helps limit changes to the input. Therefore, fine motor functions are acheived with a calibrated value of the parameter `pulseStep`.
+
 ```c
 model->reactionPWM += (255.0 * pulseStep) * u_k[0];
 model->rollingPWM += (255.0 * pulseStep) * u_k[1];
@@ -295,24 +304,17 @@ else
 
 - 
 ```c
-else
-{
-  model->reactionPWM = 0.0;
-  model->rollingPWM = 0.0;
-  TIM2->CCR1 = 0;
-  TIM2->CCR2 = 0;
-  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_RESET);
-  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_RESET);
-  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2, GPIO_PIN_RESET);
-  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, GPIO_PIN_RESET);
-}
+encodeWheel(&(model->reactionEncoder), TIM3->CNT);
+encodeWheel(&(model->rollingEncoder), TIM4->CNT);
 ```
 
 - 
 ```c
-encodeWheel(&(model->reactionEncoder), TIM3->CNT);
-encodeWheel(&(model->rollingEncoder), TIM4->CNT);
 senseCurrent(&(model->reactionCurrentSensor), &(model->rollingCurrentSensor));
+```
+
+- 
+```c
 updateIMU(model);
 ```
 
