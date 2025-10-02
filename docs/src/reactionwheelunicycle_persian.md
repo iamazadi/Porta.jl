@@ -9334,7 +9334,6 @@ to the Q function or the control policy at each step.
 */
 void stepForward(LinearQuadraticRegulator *model)
 {
-  int k = model->k;
   x_k[0] = model->dataset.x0;
   x_k[1] = model->dataset.x1;
   x_k[2] = model->dataset.x2;
@@ -9497,21 +9496,21 @@ void stepForward(LinearQuadraticRegulator *model)
       z_n[i] += getIndex(model->P_n, i, j) * z_k[j];
     }
   }
-  z_k1_dot_z_n = 0.0;
+  z_k_dot_z_n = 0.0;
   float buffer = 0.0;
   for (int i = 0; i < (model->n + model->m); i++)
   {
-    buffer = z_k1[i] * z_n[i];
+    buffer = z_k[i] * z_n[i];
     if (isnanf(buffer) == 0)
     {
-      z_k1_dot_z_n += buffer;
+      z_k_dot_z_n += buffer;
     }
   }
-  if (fabs(model->lambda + z_k1_dot_z_n) > 0)
+  if (fabs(model->lambda + z_k_dot_z_n) > 0)
   {
     for (int i = 0; i < (model->n + model->m); i++)
     {
-      g_n[i] = (1.0 / (model->lambda + z_k1_dot_z_n)) * z_n[i];
+      g_n[i] = (1.0 / (model->lambda + z_k_dot_z_n)) * z_n[i];
     }
   }
   else
@@ -9531,7 +9530,7 @@ void stepForward(LinearQuadraticRegulator *model)
   {
     for (int j = 0; j < (model->n + model->m); j++)
     {
-      alpha_n[i] += getIndex(model->W_n, i, j) * (basisset1[j] - basisset0[j]); // checked manually
+      alpha_n[i] += getIndex(model->W_n, i, j) * (basisset0[j] - basisset1[j]); // checked manually
     }
   }
   for (int i = 0; i < (model->n + model->m); i++)
@@ -9545,6 +9544,7 @@ void stepForward(LinearQuadraticRegulator *model)
       }
     }
   }
+  int scaleFlag = 0;
   for (int i = 0; i < (model->n + model->m); i++)
   {
     for (int j = 0; j < (model->n + model->m); j++)
@@ -9552,12 +9552,26 @@ void stepForward(LinearQuadraticRegulator *model)
       buffer = (1.0 / model->lambda) * (getIndex(model->P_n, i, j) - g_n[i] * z_n[j]);
       if (isnanf(buffer) == 0)
       {
+        if (fabs(buffer) > clipping)
+        {
+          scaleFlag = 1;
+        }
         setIndex(&(model->P_n), i, j, buffer); // checked manually
       }
     }
   }
+  if (scaleFlag == 1)
+  {
+    for (int i = 0; i < (model->n + model->m); i++)
+    {
+      for (int j = 0; j < (model->n + model->m); j++)
+      {
+        setIndex(&(model->P_n), i, j, 0.9 * getIndex(model->P_n, i, j)); // checked manually
+      }
+    }
+  }
   // Repeat at the next time k + 1 and continue until RLS converges and the new parameter vector Wⱼ₊₁ is found.
-  model->k = k + 1;
+  model->k = model->k + 1;
   return;
 }
 ```

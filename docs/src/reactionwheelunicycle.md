@@ -4,11 +4,15 @@ Description = "How the reaction wheel unicycle works."
 
 # How the Reaction Wheel Unicycle Works
 
+This is a model of a unicycle with two symmetrically attached rotors. One of the reasons the matrix of inertia is not trivial is that the rotors’ axes of rotation do not intersect at a point. The constraint on the system is conservation of angular momentum. The angular velocity of the body is related to the rotor velocities. That relation gives rise to a differential equation in the rotation group Special Orthogonal (3) for the robot’s body. Using the Euler parameters of SO(3) we obtain a local coordinate description of the differential equation, in terms of the roll, pitch and yaw angles. The robot can be repositioned by controlling the rotor velocities. The Linear Quadratic Regulator regulates the roll and pitch angles by a choice of a suitable input.
+
 ## Introducing Reinforcement Learning and Feedback Control
 
 ## Natural Decision Methods
 
 ## An Optimal Adaptive Controller
+
+System states in real time. Even though the matrix of inertia (among other physical parameters) is unknown, the adaptive controller based on value iteration keeps the states stable and regulates them to zero. The index `k` denotes value iteration whereas the index `j` counts the number of policy updates.
 
 ## The Z-Euler Angle Is Not Observable
 
@@ -112,23 +116,13 @@ else
 ```
 
 - 
-An episode is defined as one or more sequential interactions with the environment. An episode is finished once the robot falls over or when the control policy is updated. The field `k` of the model counts the number of environment interactions in an episode. Since the `stepForward` function is essentially a Recursive Least Squares (RLS) algorithm, it will make the filter matrix `W_n` and the inverse autocorrelation matrix `P_n` converge after a finite number of runs. The exact number of runs for the RLS to converge is not constant, but we can assume that it is small when the robot approaches a state in which opposing angular momenta are balanced. Therefore, by counting the number of `stepForward` function calls we can insert control policy updates periodically. The function `updateControlPolicy` is given a pointer to the model object and its side effect is an update to the feedback policy matrix `K_j`. The index of the feeback policy matrix is different from the index of the filter matrix `W_n` and the inverse autocorrelation matrix `P_n`. A second counter variable `j` is incremented every time the control policy is updated, whereas the variable `k` counts the number of calls to the `stepForward` function. Whenever the update policy period is equal to one, the variables `k` and `j` count the same. However, if the update period is higher than one control cycle then the variable `j` counts at a slower rate than the variable `k`. As the model learns from experience online and in real time, the variable `updatePolicyPeriod` determines how much experience is accumulated before a policy update.
+An episode is defined as one or more sequential interactions with the environment. An episode is finished once the robot falls over or when the control policy is updated. The field `k` of the model counts the number of environment interactions in an episode. Since the `stepForward` function is essentially a Recursive Least Squares (RLS) algorithm, it will make the filter matrix `W_n` and the inverse autocorrelation matrix `P_n` converge after a finite number of runs. The exact number of runs for the RLS to converge is not constant, but we can assume that it is small when the robot approaches a state in which opposing angular momenta are balanced. Therefore, by counting the number of `stepForward` function calls we can insert control policy updates periodically. The function `updateControlPolicy` is given a pointer to the model object and its side effect is an update to the feedback policy matrix `K_j`. The index of the feeback policy matrix is different from the index of the filter matrix `W_n` and the inverse autocorrelation matrix `P_n`. A second counter variable `j` is incremented every time the control policy is updated, whereas the variable `k` counts the number of calls to the `stepForward` function. However, if the update frequency is higher than one control cycle then the variable `j` counts at a slower rate than the variable `k`. As the model learns from experience online and in real time, the variable `updatePolicyFrequency` determines how much experience is accumulated before a policy update. Experimentally, 10 value iterations per policy update is the optimal ratio.
 
 ```c
-if (model.k % updatePolicyPeriod == 0)
+if (model.k % updatePolicyFrequency == 0)
 {
   updateControlPolicy(&model);
 }
-```
-
-- 
-At the end of the control loop, where the model has taken one step forward and possibly the control policy has been updated, it is time to count the number of the processor's clock cycles for a second time for measuring delta `t`. At this point, by assigning the value of the DWT counter register to the variable `t2` we can know how many cycles are there between `t1` and `t2`. Having calculated the temporal difference between the start of the main loop and its end in terms of the processor's cycles, we then divide the difference by the number of Central Processing Unit (CPU) clock cycles per second for finding the period of the control cycle in the unit of seconds. The field `dt` of the model struct stores the control period for intermediate physical calculations. The control period is ususally 2 to 5 milliseconds on a NUCLEOF401RE, which clocks at 84 Mhz.
-
-```c
-t2 = DWT->CYCCNT;
-diff = t2 - t1;
-dt = (float)diff / CPU_CLOCK;
-model.dt = dt;
 ```
 
 - 
@@ -145,7 +139,8 @@ if (log_counter > LOG_CYCLE && HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_1) == 0)
 - 
 
 If the `transmit` variable is equal to one, then the log counter is cleard along with the `transmit` variable before transmission. The function `sprintf` is called with a message buffer `MSG` and a formatted character string to populate the buffer with numbers. A log message can be anything, but for finding the matrix of known parameters in tilt estimation, the accelerometrs data must be included. After the message is composed, it is given as an argument to the function `HAL_UART_Transmit`, which stands for: Hardware Abstraction Layer, Universal Asynchronous Receiver / Transmitter, Transmit. The function also requires a pointer to `uart6`, which is a micro-controller peripheral for serial communication, and the size of the message buffer, along with a time out delay. Printing and transmitting the log finishes the main control loop. The console on the other side of tranmission receives a line like this:
-`AX1: -0.05, AY1: 0.02, AZ1: 0.99, | AX2: -0.05, AY2: 0.01, AZ2: 1.01, | roll: 0.05, pitch: -0.01, | encT: 4.21, encB: 0.81, | P0: -10.02, P1: 19.02, P2: 27.25, P3: 26.37, P4: 24.57, dt: 0.006890`.
+`AX1: 0.34, AY1: 0.03, AZ1: 0.95, | AX2: 0.34, AY2: 0.02, AZ2: 0.94, | roll: -0.34, pitch: -0.03, | encT: 0.00, encB: 0.00, | k: 1, j: 1, | x0: 0.00, x1: 0.00, x2: 0.00, x3: 0.00, x4: 0.00, x5: 0.00, x6: 0.00, x7: 0.00, x8: 0.00, x9: 0.00, x10: 0.00, x11: 0.00, | P0: 0.12, P1: 1.00, P2: 1.00, P3: 1.00, P4: 1.00, P5: 1.00, P6: 1.00, P7: 1.00, P8: 1.00, P9: 1.00, P10: 1.00, P11: 1.00, dt: 0.001847`.
+
 You can visualize this example message using the [Unicycle](https://github.com/iamazadi/Porta.jl/blob/master/models/unicycle.jl) script. The example includes: the tri-axis acceleromer measurements of IMU 1 and IMU 2, the roll and pitch angles after sensor fusion, the absolute position of both encoders, and the diagonal entries of the inverse auto-correlation matrix `P_n`. Different messages can be composed for different use cases, for example printing raw sensor readings for calibrating the zero point and the scale of the accelerometers axes.
 
 ```c
@@ -154,8 +149,8 @@ if (transmit == 1)
   transmit = 0;
   log_counter = 0;
   sprintf(MSG,
-          "AX1: %0.2f, AY1: %0.2f, AZ1: %0.2f, | AX2: %0.2f, AY2: %0.2f, AZ2: %0.2f, | roll: %0.2f, pitch: %0.2f, | encT: %0.2f, encB: %0.2f, | P0: %0.2f, P1: %0.2f, P2: %0.2f, P3: %0.2f, P4: %0.2f, dt: %0.6f\r\n",
-          model.imu1.accX, model.imu1.accY, model.imu1.accZ, model.imu2.accX, model.imu2.accY, model.imu2.accZ, model.imu1.roll, model.imu1.pitch, model.reactionEncoder.radianAngle, model.rollingEncoder.radianAngle, getIndex(model.P_n, 0, 0), getIndex(model.P_n, 1, 1), getIndex(model.P_n, 2, 2), getIndex(model.P_n, 3, 3), getIndex(model.P_n, 4, 4), dt);
+          "AX1: %0.2f, AY1: %0.2f, AZ1: %0.2f, | AX2: %0.2f, AY2: %0.2f, AZ2: %0.2f, | roll: %0.2f, pitch: %0.2f, | encT: %0.2f, encB: %0.2f, | k: %f, j: %f, | x0: %0.2f, x1: %0.2f, x2: %0.2f, x3: %0.2f, x4: %0.2f, x5: %0.2f, x6: %0.2f, x7: %0.2f, x8: %0.2f, x9: %0.2f, x10: %0.2f, x11: %0.2f, | P0: %0.2f, P1: %0.2f, P2: %0.2f, P3: %0.2f, P4: %0.2f, P5: %0.2f, P6: %0.2f, P7: %0.2f, P8: %0.2f, P9: %0.2f, P10: %0.2f, P11: %0.2f, dt: %0.6f\r\n",
+          model.imu1.accX, model.imu1.accY, model.imu1.accZ, model.imu2.accX, model.imu2.accY, model.imu2.accZ, model.imu1.roll, model.imu1.pitch, model.reactionEncoder.radianAngle, model.rollingEncoder.radianAngle, (float) model.k, (float) model.j, model.dataset.x0, model.dataset.x1, model.dataset.x2, model.dataset.x3, model.dataset.x4, model.dataset.x5, model.dataset.x6, model.dataset.x7, model.dataset.x8, model.dataset.x9, model.dataset.x10, model.dataset.x11, getIndex(model.P_n, 0, 0), getIndex(model.P_n, 1, 1), getIndex(model.P_n, 2, 2), getIndex(model.P_n, 3, 3), getIndex(model.P_n, 4, 4), getIndex(model.P_n, 5, 5), getIndex(model.P_n, 6, 6), getIndex(model.P_n, 7, 7), getIndex(model.P_n, 8, 8), getIndex(model.P_n, 9, 9), getIndex(model.P_n, 10, 10), getIndex(model.P_n, 11, 11), dt);
   HAL_UART_Transmit(&huart6, MSG, sizeof(MSG), 1000);
 }
 // Rinse and repeat :)
@@ -175,17 +170,20 @@ Set the baudrate of `uart6` to 921600, for the wifi module HC-25. The HC-25 modu
 5. Set the *Baud Rate* parameter to 921600 Bits/s.
 
 - 
+At the end of the control loop, where the model has taken one step forward and possibly the control policy has been updated, it is time to count the number of the processor's clock cycles for a second time for measuring delta `t`. At this point, by assigning the value of the DWT counter register to the variable `t2` we can know how many cycles are there between `t1` and `t2`. Having calculated the temporal difference between the start of the main loop and its end in terms of the processor's cycles, we then divide the difference by the number of Central Processing Unit (CPU) clock cycles per second for finding the period of the control cycle in the unit of seconds. The field `dt` of the model struct stores the control period for intermediate physical calculations. The control period is ususally 2 to 5 milliseconds on a NUCLEOF401RE, which clocks at 84 Mhz.
+
+```c
+t2 = DWT->CYCCNT;
+diff = t2 - t1;
+dt = (float)diff / CPU_CLOCK;
+model.dt = dt;
+```
+
+- 
 The function `stepForward` identifies the Q function using RLS with the given pointer to the `model`. The algorithm updates the Q function at each step. The main side effect of the function is an interaction with the environment, which consists of reading the sensors and changing the speed of rotation of the motors. In the end, the filter matrix `W_n` and the inverse auto-correlation matrix `P_n` are updated.
 
 ```c
 void stepForward(LinearQuadraticRegulator *model)
-```
-
-- 
-The counter variable `k` is incremented every time the `stepForward` function is called for keeping track of the number of steps in an episode. This reminds us of the counter variable `j`, which counts the number of policy updates in the function `updateControlPolicy`. But in the `stepForward` function, the variable `k` is defined in the local scope of the function to be incremented before returning to the `main` function.
-
-```c
-int k = model->k;
 ```
 
 - 
@@ -265,7 +263,7 @@ model->dataset.x11 = u_k[1];
 ```
 
 - 
-The LQR inputs are bidirectional and analog. The LQR regulates the roll and pitch angles by a choice of a suitable input. There are four digital input pins: **1A**, **2A**, **3A**, **4A**, and a pair of analog enable pins: **1,2En** and **3,4EN**. The enable pins control the speeds of rotation with a 16-bit resolution, whereas the logical input pins: **1A**, **2A**, **3A** and **4A** control the direction of rotation. A motor rotates in reverse by swapping the values of Input 1 with Input 2, switching 2 values in the memory. Therefore, LQR controls the roll and pitch angles by making changes to two variables: `rollingPWM` corresponding to **1,2EN** and `reactionPWM` corresponding to **3,4EN**. LQR adds / subtracts from the two variables when it acts in the environment. To drive a direct current actuator, the driver generates an electric potential at the two ends of the actuator's coil. An electric current in the power terminals (**1Y** and **2Y**, or, **3Y** and **4Y**) occurs whenever the electric potential at the two end points are sifficiently different in intensity. The duty cycle of a PWM signal shapes the line graph of an analog voltage. In a Voltage versus Time graph, the PWM signal is a point on the graph and varies with time. There are two independent PWM signals: the reaction wheel's motor enable pin and the rolling wheel's motor enable pin. In turn, the duty cycles of the PWM signals, tell the Integrated Circuit (IC) to adjust the electric potential at the output pins of the IC: **1Y**, **2Y**, **3Y** and **4Y**. Making changes to the duty cycles with the given feedback policy `u_k`, the registers of channels one and two of Timer 2 are changed after scaling the variables and casting them to integer values.
+The LQR inputs are bidirectional and analog. The LQR regulates the roll and pitch angles by a choice of a suitable input. There are four digital input pins: **1A**, **2A**, **3A**, **4A**, and a pair of analog enable pins: **1,2En** and **3,4EN**. The enable pins control the speeds of rotation with a 16-bit resolution, whereas the logical input pins: **1A**, **2A**, **3A** and **4A** control the direction of rotation. A motor rotates in reverse by swapping the values of Input 1 with Input 2, switching 2 values in the memory. Therefore, LQR controls the roll and pitch angles by making changes to two variables: `rollingPWM` corresponding to **1,2EN** and `reactionPWM` corresponding to **3,4EN**. LQR adds / subtracts from the two variables when it acts in the environment. To drive a direct current actuator, the driver generates an electric potential at the two ends of the actuator's coil. An electric current in the power terminals (**1Y** and **2Y**, or, **3Y** and **4Y**) occurs whenever the electric potential at the two end points are sufficiently different in intensity. The duty cycle of a PWM signal shapes the line graph of an analog voltage. In a Voltage versus Time graph, the PWM signal is a point on the graph and varies with time. There are two independent PWM signals: the reaction wheel's motor enable pin and the rolling wheel's motor enable pin. In turn, the duty cycles of the PWM signals, tell the Integrated Circuit (IC) to adjust the electric potential at the output pins of the IC: **1Y**, **2Y**, **3Y** and **4Y**. Making changes to the duty cycles with the given feedback policy `u_k`, the registers of channels one and two of Timer 2 are changed after scaling the variables and casting them to integer values.
 
 ![motordriver](./assets/reactionwheelunicycle/schematics/motordriver.jpeg)
 
@@ -303,20 +301,37 @@ else
 ```
 
 - 
+After the action, the agent begins sensing the environment for feedback. The first to update is the the encoder of the reaction wheel. There is an encoder wheel at the opposite the end of the reaction wheel's motor. Since the gearbox reduces the speed of rotation of the reaction wheel in exchange for multiplying the output torque, the encoder's wheel rotates faster than the reaction wheel. The difference in the speed of rotation between the output reaction wheel and the input encoder wheel allows the encoder to be more precise. Also in the motor / encoder assembley, there is an array of small magnets on the circumference of the encoder's wheel. The resolution of the encoder depends on the number of magnets in the circular array and the gearbox ratio. A Hall effect sensor produces a voltage proportional to an axial component of the magnetic field vector produced by the magnetic array. The encoder measures the absolute position of the wheel using two channels. A pair of Hall effect sensors are mounted near the surface of the encoder's wheel, such that the magnets pass by the Hall effect sensors. Timer 3 of the MCU is set up to work in encoder mode, with a register of the absolute position of the encoder's wheel. When Timer 3 is in the encoder mode, it compares the pair of channels at each rising edge of the signals to find the position. Therefore, we call the `encodeWheel` function with a pointer to the `Encoder` object of the reaction wheel along with the value of the counter register of Timer 3. The function `encodeWheel` updates the velocity field of the reaction wheel's encoder struct to be used in the LQR model as a system state.
+
 ```c
 encodeWheel(&(model->reactionEncoder), TIM3->CNT);
+```
+
+![motorb](./assets/reactionwheelunicycle/schematics/motorb.jpeg)
+
+- 
+The rolling wheel's encoder works the same as the reaction wheel's encoder, except for the fact that the hardware of the channels sensors is photonic rather than magnetic. The rolling wheel encoder's disk has an alternating pattern of stripes on it for a pair of infrared light emmiting diodes and a pair of photo transistors to sense its rotation. The IR LEDs send light from one side of the wheel to be received by photo transistors on the other side through the alternating pattern. The amount of light received by the photo transistors is translated to two channels of representative electrical signals, which are fed to Timer 4 of the MCU. Supplying the `encodeWheel` function with a pointer to the rolling wheel's encoder object and the value of the counter register of Timer 4, the function call updates the wheel velocity. Before connecting the encoder signals to the MCU timer, a voltage division is applied for making sure the amplitudes of the signals do not exceed 3.3 volts.
+
+```c
 encodeWheel(&(model->rollingEncoder), TIM4->CNT);
 ```
 
-- 
+![motora](./assets/reactionwheelunicycle/schematics/motora.jpeg)
+
+- The `senseCurrent` function computes the current rates of the reaction and rolling motors. The function accepts two pointers of the `CurrentSensor` type and updates the `currentVelocity` field of the respective arguments. Measuring the electric current rate is the result of two Analog to Digital Conversion (ADC) channels, as peripherals of the MCU (pins `PC4` and `PA4` of the ADC unit). A pair of Hall effect sensors are powered using a regulated 5-Volt direct current source. To measure the current rate of the driver's output, two of the wires that connect the driver IC pins (**1Y** and **4Y**) to the respective motor coils (**MotorA2** and **MotorB2**), are routed in such a way that they pass by the respective current sensing Hall effect sensors. When the IC drives a voltage across the motor terminals (**MA1** and **MA2**, or **MB1** and **MB2**), the Hall effect sensors measure the magnetic field vector that is caused by the electric field inside the wires between the motors and the driver. The ratio-metric readings from the magnetic field vectors represent the flows of the electric current of the reaction motor's and the rolling motor's coils. The LQR model observes the current rates and regulates them to zero by generating suitable inputs.
+
 ```c
 senseCurrent(&(model->reactionCurrentSensor), &(model->rollingCurrentSensor));
 ```
+
+![currentsensing](./assets/reactionwheelunicycle/schematics/currentsensing.jpeg)
 
 - 
 ```c
 updateIMU(model);
 ```
+
+![inertialmeasurementunits](./assets/reactionwheelunicycle/schematics/inertialmeasurementunits.jpeg)
 
 - 
 ```
@@ -499,6 +514,7 @@ for (int i = 0; i < (model->n + model->m); i++)
 
 - 
 ```c
+int scaleFlag = 0;
 for (int i = 0; i < (model->n + model->m); i++)
 {
   for (int j = 0; j < (model->n + model->m); j++)
@@ -506,16 +522,31 @@ for (int i = 0; i < (model->n + model->m); i++)
     buffer = (1.0 / model->lambda) * (getIndex(model->P_n, i, j) - g_n[i] * z_n[j]);
     if (isnanf(buffer) == 0)
     {
+      if (fabs(buffer) > clipping)
+      {
+        scaleFlag = 1;
+      }
       setIndex(&(model->P_n), i, j, buffer); // checked manually
+    }
+  }
+}
+if (scaleFlag == 1)
+{
+  for (int i = 0; i < (model->n + model->m); i++)
+  {
+    for (int j = 0; j < (model->n + model->m); j++)
+    {
+      setIndex(&(model->P_n), i, j, 0.9 * getIndex(model->P_n, i, j)); // checked manually
     }
   }
 }
 ```
 
 - 
+The counter variable `k` is incremented every time the `stepForward` function is called for keeping track of the number of steps in an episode. This reminds us of the counter variable `j`, which counts the number of policy updates in the function `updateControlPolicy`. But in the `stepForward` function, the variable `k` is defined in the local scope of the function to be incremented before returning to the `main` function. Repeat at the next time `k + 1` and continue until RLS converges and the new parameter vector Wⱼ₊₁ is found.
+
 ```c
-// Repeat at the next time k + 1 and continue until RLS converges and the new parameter vector Wⱼ₊₁ is found.
-model->k = k + 1;
+model->k = model->k + 1;
 ```
 
 - 
@@ -1199,6 +1230,8 @@ model->rollingPWM = 0.0;
 ```
 
 ## The Convergence of Selected Algebraic Riccati Equation Solution Parameters
+
+Convergence of selected algebraic Riccati equation solution parameters. The adaptive controller based on value iteration converges to the ARE solution in real time without knowing the system matrix (including the inertia matrix, and the torque and the electromotive force constants of the motors.)
 
 ## The Controllability of the Z-Euler Angle
 
