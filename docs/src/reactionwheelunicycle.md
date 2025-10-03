@@ -301,7 +301,7 @@ else
 ```
 
 - 
-After the action, the agent begins sensing the environment for feedback. The first to update is the the encoder of the reaction wheel. There is an encoder wheel at the opposite the end of the reaction wheel's motor. Since the gearbox reduces the speed of rotation of the reaction wheel in exchange for multiplying the output torque, the encoder's wheel rotates faster than the reaction wheel. The difference in the speed of rotation between the output reaction wheel and the input encoder wheel allows the encoder to be more precise. Also in the motor / encoder assembley, there is an array of small magnets on the circumference of the encoder's wheel. The resolution of the encoder depends on the number of magnets in the circular array and the gearbox ratio. A Hall effect sensor produces a voltage proportional to an axial component of the magnetic field vector produced by the magnetic array. The encoder measures the absolute position of the wheel using two channels. A pair of Hall effect sensors are mounted near the surface of the encoder's wheel, such that the magnets pass by the Hall effect sensors. Timer 3 of the MCU is set up to work in encoder mode, with a register of the absolute position of the encoder's wheel. When Timer 3 is in the encoder mode, it compares the pair of channels at each rising edge of the signals to find the position. Therefore, we call the `encodeWheel` function with a pointer to the `Encoder` object of the reaction wheel along with the value of the counter register of Timer 3. The function `encodeWheel` updates the velocity field of the reaction wheel's encoder struct to be used in the LQR model as a system state.
+After the action, the agent begins sensing the environment for feedback. The first to update is the encoder of the reaction wheel. There is an encoder wheel at the opposite the end of the reaction wheel's motor. Since the gearbox reduces the speed of rotation of the reaction wheel in exchange for multiplying the output torque, the encoder's wheel rotates faster than the reaction wheel. The difference in the speed of rotation between the output reaction wheel and the input encoder wheel allows the encoder to be more precise. Also in the motor / encoder assembley, there is an array of small magnets on the circumference of the encoder's wheel. The resolution of the encoder depends on the number of magnets in the circular array and the gearbox ratio. A Hall effect sensor produces a voltage proportional to an axial component of the magnetic field vector produced by the magnetic array. The encoder measures the absolute position of the wheel using two channels. A pair of Hall effect sensors are mounted near the surface of the encoder's wheel, such that the magnets pass by the Hall effect sensors. Timer 3 of the MCU is set up to work in encoder mode, with a register of the absolute position of the encoder's wheel. When Timer 3 is in the encoder mode, it compares the pair of channels at each rising edge of the signals to find the position. Therefore, we call the `encodeWheel` function with a pointer to the `Encoder` object of the reaction wheel along with the value of the counter register of Timer 3. The function `encodeWheel` updates the velocity field of the reaction wheel's encoder struct to be used in the LQR model as a system state.
 
 ```c
 encodeWheel(&(model->reactionEncoder), TIM3->CNT);
@@ -327,6 +327,8 @@ senseCurrent(&(model->reactionCurrentSensor), &(model->rollingCurrentSensor));
 ![currentsensing](./assets/reactionwheelunicycle/schematics/currentsensing.jpeg)
 
 - 
+The function `updateIMU` provides the main source of data for the objective of the system. Through this function, the MCU talks to the IMU modules 1 and 2 for updating the roll and pitch angles along with their first and second derivatives. This is done by calling the function and giving it a pointer to the LQR model object. Although both IMUs are used for tilt estimation, the final result is assigned to the field of IMU 1. This function encapsulates matrix-vector multiplications for coordinate transformations, the singular value decomposition for obtaining the gravity vector, and sensor fusion between the tri-axis accelerometers and the tri-axis gyroscopes. Knowing about the position and orientation of each IMU with respect to the body, the function excludes linear accelerations from calculations. So, `UpdateIMU` gathers the latest inertial measurements form multiple sensor units and computes the roll and pitch angles using known parameters of the system configuration.
+
 ```c
 updateIMU(model);
 ```
@@ -334,6 +336,8 @@ updateIMU(model);
 ![inertialmeasurementunits](./assets/reactionwheelunicycle/schematics/inertialmeasurementunits.jpeg)
 
 - 
+Once the action is complete and the sensory information is refreshed, the second half of the data set is assigned. The elements `x12` through `x23` mirror the elements `x0` through `x11`, with the only difference being the respective time indices `k + 1` and `k`. There should be about a 5-millisecond interval between `k` and `k + 1`, which is long enough to judge the quality of the action. The two consecutive time steps are separated by an action happening in time step `k` using the input `u_k`, and the subsequent sensor measurements.
+
 ```
 // dataset = (xₖ, uₖ, xₖ₊₁, uₖ₊₁)
 model->dataset.x12 = model->imu1.roll / M_PI;
@@ -349,6 +353,8 @@ model->dataset.x21 = model->rollingCurrentSensor.currentVelocity;
 ```
 
 - 
+After the action, the model determines the quality of the system state. The ideal state is where the first half of the data set is approximately equal to zero and at the same time equal to the second half. In other words, the best quality means that each element of the data set with index `k` is equal to its counterpart element with index `k + 1`. Unlike the pair of elements `x10` and `x11` (input `u_k` of step `k`), the pair of elements `x22` and `x23` (input `u_k1` of step `k + 1`) are not used for action until the next call to the `stepForward` function. But, one can see that `u_k1` will be applied to the action of step `k + 1` at the next `stepForward` function call, if the `j` index is the same across the consecutive calls. The input vector `u_k1` of the time step `k + 1` is the result of a matrix-vector multiplication between the policy matrix `K_j` and the next system state vector `x_k1`. Even though `u_k1` is not used for action at step `k`, it informs the model about the future of the system trajectory in case the filter matrix `W_n` and the inverse auto-correlation matrix `P_n` are not updated. When the last two elements of the data set (`x22` and `x23`) are computed, the value iteration algorithm can calculate an error and correct the priors of the model to find the next filter matrix Wⱼ₊₁, such that the error is minimized.
+
 ```c
 x_k1[0] = model->dataset.x12;
 x_k1[1] = model->dataset.x13;
@@ -360,16 +366,10 @@ x_k1[6] = model->dataset.x18;
 x_k1[7] = model->dataset.x19;
 x_k1[8] = model->dataset.x20;
 x_k1[9] = model->dataset.x21;
-```
 
-- 
-```c
 u_k1[0] = 0.0;
 u_k1[1] = 0.0;
-```
 
-- 
-```c
 for (int i = 0; i < model->m; i++)
 {
   for (int j = 0; j < model->n; j++)
@@ -377,10 +377,7 @@ for (int i = 0; i < model->m; i++)
     u_k1[i] += -K_j[i][j] * x_k1[j];
   }
 }
-```
 
-- 
-```c
 model->dataset.x22 = u_k1[0];
 model->dataset.x23 = u_k1[1];
 ```
@@ -492,7 +489,7 @@ for (int i = 0; i < (model->n + model->m); i++)
 {
   for (int j = 0; j < (model->n + model->m); j++)
   {
-    alpha_n[i] += getIndex(model->W_n, i, j) * (basisset1[j] - basisset0[j]); // checked manually
+    alpha_n[i] += getIndex(model->W_n, i, j) * (basisset0[j] - basisset1[j]); // checked manually
   }
 }
 ```
