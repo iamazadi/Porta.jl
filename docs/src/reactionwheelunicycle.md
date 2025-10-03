@@ -116,10 +116,10 @@ else
 ```
 
 - 
-An episode is defined as one or more sequential interactions with the environment. An episode is finished once the robot falls over or when the control policy is updated. The field `k` of the model counts the number of environment interactions in an episode. Since the `stepForward` function is essentially a Recursive Least Squares (RLS) algorithm, it will make the filter matrix `W_n` and the inverse autocorrelation matrix `P_n` converge after a finite number of runs. The exact number of runs for the RLS to converge is not constant, but we can assume that it is small when the robot approaches a state in which opposing angular momenta are balanced. Therefore, by counting the number of `stepForward` function calls we can insert control policy updates periodically. The function `updateControlPolicy` is given a pointer to the model object and its side effect is an update to the feedback policy matrix `K_j`. The index of the feeback policy matrix is different from the index of the filter matrix `W_n` and the inverse autocorrelation matrix `P_n`. A second counter variable `j` is incremented every time the control policy is updated, whereas the variable `k` counts the number of calls to the `stepForward` function. However, if the update frequency is higher than one control cycle then the variable `j` counts at a slower rate than the variable `k`. As the model learns from experience online and in real time, the variable `updatePolicyFrequency` determines how much experience is accumulated before a policy update. Experimentally, 10 value iterations per policy update is the optimal ratio.
+An episode is defined as one or more sequential interactions with the environment. An episode is finished once the robot falls over or when the control policy is updated. The field `k` of the model counts the number of environment interactions in an episode. Since the `stepForward` function is essentially a Recursive Least Squares (RLS) algorithm, it will make the filter matrix `W_n` and the inverse autocorrelation matrix `P_n` converge after a finite number of runs. The exact number of runs for the RLS to converge is not constant, but we can assume that it is small when the robot approaches a state in which opposing angular momenta are balanced. Therefore, by counting the number of `stepForward` function calls we can insert control policy updates periodically. The function `updateControlPolicy` is given a pointer to the model object and its side effect is an update to the feedback policy matrix `K_j`. The index of the feeback policy matrix is different from the index of the filter matrix `W_n` and the inverse autocorrelation matrix `P_n`. A second counter variable `j` is incremented every time the control policy is updated, whereas the variable `k` counts the number of calls to the `stepForward` function. However, if the update frequency is higher than one control cycle then the variable `j` counts at a slower rate than the variable `k`. As the model learns from experience online and in real time, the variable `updatePolicyPeriod` determines how much experience is accumulated before a policy update. Experimentally, 10 value iterations per policy update is the optimal ratio.
 
 ```c
-if (model.k % updatePolicyFrequency == 0)
+if (model.k % updatePolicyPeriod == 0)
 {
   updateControlPolicy(&model);
 }
@@ -332,6 +332,8 @@ The function `updateIMU` provides the main source of data for the objective of t
 ```c
 updateIMU(model);
 ```
+
+In terms of connectivity, The MCU peripheral USART1 is used to talk to IMU #2 (GY-95T). Set the baudrate of uart1 to 115200 Bits/s for the GY-95 IMU module. Set the Pin6 (PS: IIC/USART output mode selection) of IMU #2 (GY-25T) to zero, in order to use the I2C protocol. The I2C cock speed is set at 100000 Hz in the stanard mode. For saving MCU clock cycles and time, added a DMA request with USART1_RX and DMA2 Stream 2 from peripheral to memory and low priority. The mode is circular and the request call is made once in the main function by passing the usart1 handle and the receive buffer. The request increments the address of memory. The data width is one Byte for both the preipheral and memory.
 
 ![inertialmeasurementunits](./assets/reactionwheelunicycle/schematics/inertialmeasurementunits.jpeg)
 
