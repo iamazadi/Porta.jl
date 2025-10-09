@@ -247,6 +247,8 @@ for (int i = 0; i < model->m; i++)
 - 
 The data set (xₖ, uₖ, xₖ₊₁, uₖ₊₁) of the Linear Quadratic Regulator (LQR) model directly sums up the ststem state `x_k` and the system input `u_k`. The roll and pitch angles and their derivatives with respect to time are divided by π in order to normalize the anglular values. The velocities of the wheels and the current rates of the motors are also normalized to be in the closed interval [-1, 1]. But those normalizations are encapsulated inside the `encodeWheel` and `senseCurrent` functions respectively. Since the RLS algorithm is an iterative computation, normalizing data makes the numerical results stable by limiting the absolute value of the elements of the matrices `W_n` and `P_n`. The first half of the data set pertains to the time step `k`, which occurs before the action is executed. The second half of the data set is assiged after the action has taken place.
 
+``(x_k, u_k, x_{k + 1}, u_{k + 1})``
+
 ```c
 model->dataset.x0 = model->imu1.roll / M_PI;
 model->dataset.x1 = model->imu1.roll_velocity / M_PI;
@@ -357,6 +359,14 @@ model->dataset.x21 = model->rollingCurrentSensor.currentVelocity;
 - 
 After the action, the model determines the quality of the system state. The ideal state is where the first half of the data set is approximately equal to zero and at the same time equal to the second half. In other words, the best quality means that each element of the data set with index `k` is equal to its counterpart element with index `k + 1`. Unlike the pair of elements `x10` and `x11` (input `u_k` of step `k`), the pair of elements `x22` and `x23` (input `u_k1` of step `k + 1`) are not used for action until the next call to the `stepForward` function. But, one can see that `u_k1` will be applied to the action of step `k + 1` at the next `stepForward` function call, if the `j` index is the same across the consecutive calls. The input vector `u_k1` of the time step `k + 1` is the result of a matrix-vector multiplication between the policy matrix `K_j` and the next system state vector `x_k1`. Even though `u_k1` is not used for action at step `k`, it informs the model about the future of the system trajectory in case the filter matrix `W_n` and the inverse auto-correlation matrix `P_n` are not updated. When the last two elements of the data set (`x22` and `x23`) are computed, the value iteration algorithm can calculate an error and correct the priors of the model to find the next filter matrix Wⱼ₊₁, such that the error is minimized.
 
+``j = 0``
+
+``u_k = -K^0 x_k``
+
+``u_k = -K^j x_k``
+
+``u_{k + 1} = -K^j x_{k + 1}``
+
 ```c
 x_k1[0] = model->dataset.x12;
 x_k1[1] = model->dataset.x13;
@@ -385,8 +395,15 @@ model->dataset.x23 = u_k1[1];
 ```
 
 - 
+The data set can be through of as a pair of vectors in an abstract vector space. A vector with index `k` and another with index `k + 1`. At this stage, compute the quadratic basis sets ϕ(zₖ) and ϕ(zₖ₊₁). Here, the transformation ϕ is the identity matrix. These are a pair of besis sets that are separated by a policy implementation and so differ in a time index.
+
+``For \ k = 1, 2, ... \ compute``
+
+``z_k = {\begin{bmatrix} x_k^T & u_k^T \end{bmatrix}}^T``
+
+``\left\{ \begin{array}{l} \phi(z_k) &\\ \phi(z_{k + 1}) \end{array} \right.``
+
 ```c
-// Compute the quadratic basis sets ϕ(zₖ), ϕ(zₖ₊₁).
 z_k[0] = model->dataset.x0;
 z_k[1] = model->dataset.x1;
 z_k[2] = model->dataset.x2;
@@ -399,10 +416,7 @@ z_k[8] = model->dataset.x8;
 z_k[9] = model->dataset.x9;
 z_k[10] = model->dataset.x10;
 z_k[11] = model->dataset.x11;
-```
 
-- 
-```c
 z_k1[0] = model->dataset.x12;
 z_k1[1] = model->dataset.x13;
 z_k1[2] = model->dataset.x14;
@@ -415,10 +429,7 @@ z_k1[8] = model->dataset.x20;
 z_k1[9] = model->dataset.x21;
 z_k1[10] = model->dataset.x22;
 z_k1[11] = model->dataset.x23;
-```
 
-- 
-```c
 for (int i = 0; i < (model->n + model->m); i++)
 {
   basisset0[i] = z_k[i];
@@ -426,10 +437,177 @@ for (int i = 0; i < (model->n + model->m); i++)
 }
 ```
 
+``\textbf{w}_n = \begin{bmatrix} w_n(0) & w_n(1) & \ldots & w_n(p) \end{bmatrix}^T``
+
+The filter coefficients at time ``n`` minimize
+
+``\Epsilon (n) = \sum_{i = 0}^{n} \lambda^{n - i} | e(i) |^2``
+
+The weighted least squares error
+
+``0 < \lambda \leq 1``
+
+The exponential weighting (forgetting) factor
+
+``e(i) = d(i) - y(i) = d(i) - \textbf{w}_n^T x(i)``
+
+``d(i)`` is the desired signal at time ``i``.
+
+``y(i)`` is the filter output at time ``i``.
+
+``\textbf{w}_n(k)`` the latest set of filter coefficients
+
+The weights ``\textbf{w}_n`` are constant over the observation interval ``[0, n]``.
+
+``\frac{\partial \Epsilon (n)}{\partial \textbf{w}_n^* (k)} = 0``, minimizing the weighted least squares error for ``k = 0, 1, ..., p``.
+
+``\textbf{R}_x(n) \textbf{w}_n = \textbf{r}_{dx}(n)``
+
+The deterministic normal equations ``\textbf{R}_x(n) \in \mathbb{R}^{(p + 1) \times (p + 1)}``, defines the optimum filter coefficients.
+
+The exponentially weighted deterministic autocorrelation matrix for ``\textbf{x}(n)``
+
+``\textbf{R}_x(n) = \sum_{i = 0}^n \lambda^{n - i} \textbf{x}^*(i) \textbf{x}^T(i)``
+
+The data vector
+
+``\textbf{x}(i) = \begin{bmatrix} x(i) & x(i - 1) & \ldots & x(i - p) \end{bmatrix}^T``
+
+``\textbf{r}_{dx}(n)``
+
+The deterministic cross-correlation between ``d(n)`` and ``\textbf{x}(n)``
+
+``\textbf{r}_{dx}(n) = \sum_{i = 0}^n \lambda^{n - i} d(i) \textbf{x}^*(i)``
+
+The minimum error ``\{\Epsilon(n)\}_{min} = || d(n) ||_\lambda^2 - \textbf{r}_{dx}^H(n) \textbf{w}_n``
+
+``|| d(n) ||_\lambda^2`` the weighted norm of the vector ``d(n) = \begin{bmatrix} d(n) & d(n - 1) & \ldots & d(0) \end{bmatrix}^T``
+
+``\textbf{R}_x(n)`` and ``\textbf{r}_{dx}(n)`` depend on ``n``
+
+Instead of directly solving the deterministic normal equations ``\textbf{R}_x(n) \textbf{w}_n = \textbf{r}_{dx}(n)``, derive a recursive solution for ``\textbf{w}_n``:
+
+``\textbf{w}_n = \textbf{w}_{n - 1} + \Delta \textbf{w}_{n - 1}``
+
+``\Delta \textbf{w}_{n - 1}`` a correction that is applied to the solution at time ``n - 1``
+
+``\textbf{w}_n = \textbf{R}_x^{-1}(n) \textbf{r}_{dx}(n)``
+
+First derive ``\textbf{r}_{dx}(n)`` in terms of ``\textbf{r}_{dx}(n - 1)``.
+
+Then derive ``\textbf{R}_x^{-1}(n)`` in terms of ``\textbf{R}_x^{-1}(n - 1)`` and the new data vector ``\textbf{x}(n)``.
+
+``\textbf{r}_{dx}(n) = \sum_{i = 0}^n \lambda^{n - i} d(i) \textbf{x}^*(i)`` the cross-correlation may be updated recursively:
+
+``\textbf{r}_{dx}(n) = \lambda \textbf{r}_{dx}(n - 1) + d(n) \textbf{x}^*(n)``
+
+The autocorrelation matrix ``\textbf{R}_x(n)`` may be updated recursively from ``\textbf{R}_x(n - 1)`` and ``\textbf{x}(n)``:
+
+``\textbf{R}_x(n) = \lambda \textbf{R}_x(n - 1) + \textbf{x}^*(n) \textbf{x}^T(n)``
+
+Since we are interested in the inverse of ``\textbf{R}_x(n)``
+
+Woodbury's Identity: ``(\textbf{A} + \textbf{u} \textbf{v}^H)^{-1} = \textbf{A}^{-1} - \frac{\textbf{A}^{-1} \textbf{u} \textbf{v}^H \textbf{A}^{-1}}{1 + \textbf{v}^H \textbf{A}^{-1} \textbf{u}}``
+
+``\left\{ \begin{array}{l} \textbf{A} = \lambda \textbf{R}_x(n - 1) &\\ \textbf{u} = \textbf{v} = \textbf{x}^*(n) \end{array} \right.``
+
+``\textbf{R}_x^{-1}(n) = \lambda^{-1} \textbf{R}_x^{-1} (n - 1) - \frac{\lambda^{-2} \textbf{R}_x^{-1} (n - 1) \textbf{x}^*(n) \textbf{x}^T(n) \textbf{R}_x^{-1}(n - 1)}{1 + \lambda^{-1} \textbf{x}^T(n) \textbf{R}_x^{-1}(n - 1) \textbf{x}^*(n)}``
+
+``\textbf{P}(n)`` is the inverse of the autocorrelation matrix at time ``n``.
+
+``\textbf{P}(n) = \textbf{R}_x^{-1}(n)``
+
+The gain vector ``\textbf{g}(n) = \frac{\lambda^{-1} \textbf{P}(n - 1) \textbf{x}^*(n)}{1 + \lambda^{-1} \textbf{x}^T(n) \textbf{P}(n - 1) \textbf{x}^*(n)}``
+
+``\textbf{P}(n) = \lambda^{-1} [\textbf{P}(n - 1) - \textbf{g}(n) \textbf{x}^T(n) \textbf{P}(n -1)]``
+
+``\textbf{g}(n) = \textbf{P}(n) \textbf{x}^*(n)``
+
+The gain vector is the solution to the equations ``\textbf{R}_x(n) \textbf{g}(n) = \textbf{x}^*(n)``.
+
+This is the same as the deterministic normal equations ``\textbf{R}_x(n) \textbf{w}_n = \textbf{r}_{dx}(n)``
+, but the cross-correlation vector ``\textbf{r}_{dx}(n)`` is replaced with the data vector ``\textbf{x}^*(n)``
+
+The final derivation to complete the recursion.
+
+The time-update equation for the coefficient vector ``\textbf{w}_n``
+
+``\left\{ \begin{array}{l} \textbf{w}_n = \textbf{P}(n) \textbf{r}_{dx}(n) &\\ \textbf{r}_{dx}(n) = \lambda \textbf{r}_{dx}(n - 1) + d(n) \textbf{x}^*(n) \end{array} \right.``
+
+``\textbf{w}_n = \lambda \textbf{P}(n) \textbf{r}_{dx}(n - 1) + d(n) \textbf{P}(n) \textbf{x}^*(n)``
+
+``\left\{ \begin{array}{l} \textbf{P}(n) \textbf{x}^*(n) = \textbf{g}(n) &\\ \textbf{P}(n) = \lambda^{-1} [\textbf{P}(n - 1) - \textbf{g}(n) \textbf{x}^T(n) \textbf{P}(n - 1)] \end{array} \right.``
+
+``\textbf{w}_n = [\textbf{P}(n - 1) - \textbf{g}(n) \textbf{x}^T(n) \textbf{P}(n - 1)] \textbf{r}_{dx}(n - 1) + d(n) \textbf{g}(n)``
+
+``\textbf{P}(n - 1) \textbf{r}_{dx}(n - 1) = \textbf{w}_{n - 1}``
+
+``\textbf{w}_n = \textbf{w}_{n - 1} + \textbf{g}(n) [d(n) - \textbf{w}_{n - 1}^T \textbf{x}(n)]``
+
+``\textbf{w}_n = \textbf{w}_{n - 1} + \alpha(n) \textbf{g}(n)``
+
+``\alpha(n) = d(n) - \textbf{w}_{n - 1}^T \textbf{x}(n)`` the *a priori error*
+
+``\textbf{w}_{n - 1}^T \textbf{x}(n)`` the estimate of ``d(n)`` using previous set of filter coefficients ``\textbf{w}_{n - 1}``
+
+``\left\{ \begin{array}{l} \alpha(n) = d(n) - \textbf{w}_{n - 1}^T \textbf{x}(n) &\\ e(n) = d(n) - \textbf{w}_n^T \textbf{x}(n) \end{array} \right.``
+
+``\alpha(n)`` the *a priori error*: the error that would occur if the filter coefficients were not updated.
+
+``e(n)`` the *a posteriori error*: the error that occurs after the weight vector ``\textbf{w}_n`` is updated
+
+A simplification:
+
+``\left\{ \begin{array}{l} \textbf{g}(n) = \frac{\lambda^{-1} \textbf{P}(n - 1) \textbf{x}^*(n)}{1 + \lambda^{-1} \textbf{x}^T(n) \textbf{P}(n - 1) \textbf{x}^*(n)} &\\ \textbf{P}(n) = \lambda^{-1} [\textbf{P}(n - 1) - \textbf{g}(n) \textbf{x}^T(n) \textbf{P}(n - 1)] \end{array} \right.``
+
+``\textbf{z}(n) = \textbf{P}(n - 1) \textbf{x}^*(n)`` filtered information vector
+
+``\left\{ \begin{array}{l} \textbf{g}(n) = \frac{1}{\lambda + \textbf{x}^T(n) \textbf{z}(n)} \textbf{z}(n) &\\ \textbf{P}(n) = \frac{1}{\lambda} [\textbf{P}(n - 1) - \textbf{g}(n) \textbf{z}^H(n)] \end{array} \right.``
+
+
+The exponentially weighted Recursive Least Squares (RLS) algorithm:
+
+``\left\{ \begin{array}{l} \textbf{z}(n) = \textbf{P}(n - 1) \textbf{x}^*(n) &\\ \alpha(n) = d(n) - \textbf{w}_{n - 1}^T \textbf{x}(n) &\\ \textbf{g}(n) = \frac{1}{\lambda + \textbf{x}^T(n) \textbf{z}(n)} \textbf{z}(n) &\\ \textbf{w}_n = \textbf{w}_{n - 1} + \alpha(n) \textbf{g}(n) &\\ \textbf{P}(n) = \frac{1}{\lambda} [\textbf{P}(n - 1) - \textbf{g}(n) \textbf{z}^H(n)] \end{array} \right.``
+
+``\lambda = 1`` the growing window RLS algorithm
+
+Recursive updating of ``\textbf{w}_n`` and ``\textbf{P}(n)`` requires initial conditions for both terms.
+
+``\textbf{R}_x(0) = \delta \textbf{I}``, ``\delta`` small positive constant
+
+``\textbf{P}(0) = \delta^{-1} \textbf{I}``
+
+``\textbf{w}_0 = \textbf{0}``
+
+The initial zero vector of the filter coefficients does not minimize the weighted least squares error ``\Epsilon(0)`` and so ``\textbf{w}_0`` is not an optimal initial vector.
+
+With an exponential weighting factor ``\lambda < 1`` the bias in the least squares solution goes to zero as ``n`` increases.
+
 - 
+``W_{j + 1}^T (\phi (z_k) - \gamma \phi (z_{k + 1})) = r (x_k, h_j(x_k))``
+
+``h_{j + 1} (x_k) = \underset{u}{arg \ min} (W_{j + 1}^T \phi (x_k, u))``, for all ``x \in X``
+
+``Q(x_k, u_k) = Q(z_k) \equiv (\frac{1}{2}) z_k^T S z_k``
+
+``Q(x_k, u_k) = \frac{1}{2} \begin{bmatrix} x_k \\ u_k \end{bmatrix} \begin{bmatrix} A^T P A + Q & B^T P A \\ A^T P B & B^T P B + R \end{bmatrix} \begin{bmatrix} x_k \\ u_k \end{bmatrix}``
+
+``Q(x, u) = Q(z) = W^T \phi(z)``
+
+``x_k \in \mathbb{R^n}, \ u_k \in \mathbb{R^m} \longrightarrow length(W) = (n + m) (n + m + 1) / 2``
+
+``W_{j + 1}^T (\phi(z_k) - \gamma \phi(z_{k + 1})) = r(x_k, h_j(x_k))``
+
+``W_{j + 1}^T (\phi(z_k) - \phi(z_{k + 1})) = \frac{1}{2} (x_k^T Q x_k + u_k^T R u_k)``
+
+``n (n + 1) / 2``
+
+Perform a one-step update in the parameter vector W by applying RLS to equation.
+
+``Q(x_k, u_k) = \frac{1}{2} {\begin{bmatrix} x_k \\ u_k \end{bmatrix}}^T S \begin{bmatrix} x_k \\ u_k \end{bmatrix} = \frac{1}{2} {\begin{bmatrix} x_k \\ u_k \end{bmatrix}}^T \begin{bmatrix} S_{xx} & S_{xu} \\ S_{ux} & S_{uu} \end{bmatrix} \begin{bmatrix} x_k \\ u_k \end{bmatrix}``
+
+
 ```c
-// Now perform a one-step update in the parameter vector W by applying RLS to equation (S27).
-// initialize z_n
 for (int i = 0; i < (model->n + model->m); i++)
 {
   z_n[i] = 0.0;
@@ -438,38 +616,28 @@ for (int i = 0; i < (model->n + model->m); i++)
 {
   for (int j = 0; j < (model->n + model->m); j++)
   {
-    z_n[i] += getIndex(model->P_n, i, j) * z_k[j];
+    z_n[i] += getIndex(model->P_n, i, j) * z_k1[j];
   }
 }
-```
 
-- 
-```c
-z_k1_dot_z_n = 0.0;
+z_k_dot_z_n = 0.0;
 float buffer = 0.0;
 for (int i = 0; i < (model->n + model->m); i++)
 {
   buffer = z_k1[i] * z_n[i];
   if (isnanf(buffer) == 0)
   {
-    z_k1_dot_z_n += buffer;
+    z_k_dot_z_n += buffer;
   }
 }
-```
 
-- 
-```c
-if (fabs(model->lambda + z_k1_dot_z_n) > 0)
+if (fabs(model->lambda + z_k_dot_z_n) > 0)
 {
   for (int i = 0; i < (model->n + model->m); i++)
   {
-    g_n[i] = (1.0 / (model->lambda + z_k1_dot_z_n)) * z_n[i];
+    g_n[i] = (1.0 / (model->lambda + z_k_dot_z_n)) * z_n[i];
   }
 }
-```
-
-- 
-```c
 else
 {
   for (int i = 0; i < (model->n + model->m); i++)
@@ -477,12 +645,7 @@ else
     g_n[i] = (1.0 / model->lambda) * z_n[i];
   }
 }
-```
 
-- 
-```c
-// αₙ = dₙ - transpose(wₙ₋₁) * xₙ
-// initialize alpha_n
 for (int i = 0; i < (model->n + model->m); i++)
 {
   alpha_n[i] = 0.0;
@@ -491,13 +654,10 @@ for (int i = 0; i < (model->n + model->m); i++)
 {
   for (int j = 0; j < (model->n + model->m); j++)
   {
-    alpha_n[i] += getIndex(model->W_n, i, j) * (basisset0[j] - basisset1[j]); // checked manually
+    alpha_n[i] +=  0.0 - getIndex(model->W_n, i, j) * basisset1[j];
   }
 }
-```
 
-- 
-```c
 for (int i = 0; i < (model->n + model->m); i++)
 {
   for (int j = 0; j < (model->n + model->m); j++)
@@ -505,14 +665,11 @@ for (int i = 0; i < (model->n + model->m); i++)
     buffer = getIndex(model->W_n, i, j) + (alpha_n[i] * g_n[j]);
     if (isnanf(buffer) == 0)
     {
-      setIndex(&(model->W_n), i, j, buffer); // checked manually
+      setIndex(&(model->W_n), i, j, buffer);
     }
   }
 }
-```
 
-- 
-```c
 int scaleFlag = 0;
 for (int i = 0; i < (model->n + model->m); i++)
 {
@@ -525,7 +682,7 @@ for (int i = 0; i < (model->n + model->m); i++)
       {
         scaleFlag = 1;
       }
-      setIndex(&(model->P_n), i, j, buffer); // checked manually
+      setIndex(&(model->P_n), i, j, buffer);
     }
   }
 }
@@ -535,14 +692,14 @@ if (scaleFlag == 1)
   {
     for (int j = 0; j < (model->n + model->m); j++)
     {
-      setIndex(&(model->P_n), i, j, 0.9 * getIndex(model->P_n, i, j)); // checked manually
+      setIndex(&(model->P_n), i, j, clippingFactor * getIndex(model->P_n, i, j));
     }
   }
 }
 ```
 
 - 
-The counter variable `k` is incremented every time the `stepForward` function is called for keeping track of the number of steps in an episode. This reminds us of the counter variable `j`, which counts the number of policy updates in the function `updateControlPolicy`. But in the `stepForward` function, the variable `k` is defined in the local scope of the function to be incremented before returning to the `main` function. Repeat at the next time `k + 1` and continue until RLS converges and the new parameter vector Wⱼ₊₁ is found.
+The counter variable `k` is incremented every time the `stepForward` function is called for keeping track of the number of steps in an episode. This reminds us of the counter variable `j`, which counts the number of policy updates in the function `updateControlPolicy`. In the `stepForward` function, the variable `k` is incremented before returning to the `main` function. Repeat at the next time `k + 1` and continue until RLS converges and the new parameter vector Wⱼ₊₁ is found.
 
 ```c
 model->k = model->k + 1;
@@ -587,6 +744,8 @@ model->j = model->j + 1;
 ```
 
 - 
+``u_k = -S_{uu}^{-1} S_{ux} x_k``
+
 ```c
 // initialize the filter matrix
 // putBuffer(model->m + model->n, model->m + model->n, W_n, model->W_n);
@@ -1115,6 +1274,12 @@ void initialize(LinearQuadraticRegulator *model)
 ```
 
 - 
+``p = Filter \ order``
+
+``\lambda = Exponential \ weighting \ factor``
+
+``\delta = Value \ used \ to \ initialize \ \textbf{P}(0)``
+
 ```c
 model->j = 1;
 model->k = 1;
@@ -1127,6 +1292,10 @@ model->dt = 0.0;
 ```
 
 - 
+``\textbf{w}_0 = \textbf{0}``
+
+``\textbf{P}(0) = \delta^{-1} \textbf{I}``
+
 ```c
 for (int i = 0; i < (model->n + model->n); i++)
 {

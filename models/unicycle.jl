@@ -78,9 +78,9 @@ chassis_stl_path = joinpath("data", "unicycle", "unicycle_chassis.STL")
 rollingwheel_stl_path = joinpath("data", "unicycle", "unicycle_main_wheel.STL")
 reactionwheel_stl_path = joinpath("data", "unicycle", "unicycle_reaction_wheel.STL")
 
-chassis_colormap = :gnuplot
-rollingwheel_colormap = :cyclic_mrybm_35_75_c68_n256_s25
-reactionwheel_colormap = :glasbey_bw_minc_20_hue_150_280_n256
+chassis_colormap = :Pastel2_8
+rollingwheel_colormap = :diverging_rainbow_bgymr_45_85_c67_n256
+reactionwheel_colormap = :Set3_12
 
 pivot_observable = Observable(pivot)
 point1_observable = Observable(p1)
