@@ -78,9 +78,9 @@ chassis_stl_path = joinpath("data", "unicycle", "unicycle_chassis.STL")
 rollingwheel_stl_path = joinpath("data", "unicycle", "unicycle_main_wheel.STL")
 reactionwheel_stl_path = joinpath("data", "unicycle", "unicycle_reaction_wheel.STL")
 
-chassis_colormap = :Pastel2_8
-rollingwheel_colormap = :diverging_rainbow_bgymr_45_85_c67_n256
-reactionwheel_colormap = :Set3_12
+chassis_colormap = :cyclic_protanopic_deuteranopic_bwyk_16_96_c31_n256
+rollingwheel_colormap = :linear_bmy_10_95_c78_n256
+reactionwheel_colormap = :cividis
 
 pivot_observable = Observable(pivot)
 point1_observable = Observable(p1)
@@ -92,8 +92,8 @@ pl = PointLight(Point3f(0), RGBf(0.0862, 0.0862, 0.0862))
 al = AmbientLight(RGBf(0.9, 0.9, 0.9))
 backgroundcolor = RGBf(1.0, 1.0, 1.0)
 lscene = LScene(fig[1, 1], show_axis=false, scenekw=(lights=[pl, al], clear=true, backgroundcolor=:black))
-ax1 = Axis(fig[2, 1], xlabel="Time (s)", ylabel="System States")
-ax2 = Axis(fig[2, 2], xlabel="Time (s)", ylabel="P Matrix Parameters")
+ax1 = Axis(fig[2, 1], xlabel="Time (s)", ylabel="System States", xlabelsize = 30, ylabelsize = 30)
+ax2 = Axis(fig[2, 2], xlabel="Time (s)", ylabel="P Matrix Parameters", xlabelsize = 30, ylabelsize = 30)
 buttoncolor = RGBf(0.3, 0.3, 0.3)
 buttonlabels = ["Run", "Stop", "Connect", "Disconnect"]
 buttons = [Button(fig, label=l, buttoncolor=buttoncolor) for l in buttonlabels]

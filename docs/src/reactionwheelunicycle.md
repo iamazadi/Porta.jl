@@ -16,6 +16,229 @@ System states in real time. Even though the matrix of inertia (among other physi
 
 ## The Z-Euler Angle Is Not Observable
 
+
+- 
+```c
+void updateIMU(LinearQuadraticRegulator *model)
+```
+
+- 
+```c
+updateIMU1(&(model->imu1));
+updateIMU2(&(model->imu2));
+```
+
+- 
+```c
+typedef struct
+{
+  int16_t accX_offset;
+  int16_t accY_offset;
+  int16_t accZ_offset;
+  float accX_scale;
+  float accY_scale;
+  float accZ_scale;
+  int16_t gyrX_offset;
+  int16_t gyrY_offset;
+  int16_t gyrZ_offset;
+  float gyrX_scale;
+  float gyrY_scale;
+  float gyrZ_scale;
+  int16_t rawAccX;
+  int16_t rawAccY;
+  int16_t rawAccZ;
+  int16_t rawGyrX;
+  int16_t rawGyrY;
+  int16_t rawGyrZ;
+  float accX;
+  float accY;
+  float accZ;
+  float gyrX;
+  float gyrY;
+  float gyrZ;
+  float roll;
+  float pitch;
+  float yaw;
+  float roll_velocity;
+  float pitch_velocity;
+  float yaw_velocity;
+  float roll_acceleration;
+  float pitch_acceleration;
+  float yaw_acceleration;
+} IMU;
+```
+
+- 
+```c
+R1[0] = model->imu1.accX;
+R1[1] = model->imu1.accY;
+R1[2] = model->imu1.accZ;
+R2[0] = model->imu2.accX;
+R2[1] = model->imu2.accY;
+R2[2] = model->imu2.accZ;
+```
+
+- 
+```c
+_R1[0] = 0.0;
+_R1[1] = 0.0;
+_R1[2] = 0.0;
+_R2[0] = 0.0;
+_R2[1] = 0.0;
+_R2[2] = 0.0;
+for (int i = 0; i < 3; i++)
+{
+  for (int j = 0; j < 3; j++)
+  {
+    _R1[i] += B_A1_R[i][j] * R1[j];
+    _R2[i] += B_A2_R[i][j] * R2[j];
+  }
+}
+```
+
+- 
+```c
+for (int i = 0; i < 3; i++)
+{
+  Matrix[i][0] = _R1[i];
+  Matrix[i][1] = _R2[i];
+}
+```
+
+- 
+```c
+for (int i = 0; i < 3; i++)
+{
+  for (int j = 0; j < 4; j++)
+  {
+    Q[i][j] = 0.0;
+    for (int k = 0; k < 2; k++)
+    {
+      Q[i][j] += Matrix[i][k] * X[k][j];
+    }
+  }
+}
+```
+
+- 
+```c
+g[0] = Q[0][0];
+g[1] = Q[1][0];
+g[2] = Q[2][0];
+```
+
+- 
+```c
+beta = atan2(-g[0], sqrt(pow(g[1], 2) + pow(g[2], 2)));
+```
+
+- 
+```c
+gamma1 = atan2(g[1], g[2]);
+```
+
+- 
+```c
+G1[0] = model->imu1.gyrX;
+G1[1] = model->imu1.gyrY;
+G1[2] = model->imu1.gyrZ;
+G2[0] = model->imu2.gyrX;
+G2[1] = model->imu2.gyrY;
+G2[2] = model->imu2.gyrZ;
+```
+
+- 
+```c
+_G1[0] = 0.0;
+_G1[1] = 0.0;
+_G1[2] = 0.0;
+_G2[0] = 0.0;
+_G2[1] = 0.0;
+_G2[2] = 0.0;
+for (int i = 0; i < 3; i++)
+{
+  for (int j = 0; j < 3; j++)
+  {
+    _G1[i] += B_A1_R[i][j] * G1[j];
+    _G2[i] += B_A2_R[i][j] * G2[j];
+  }
+}
+```
+
+- 
+```c
+for (int i = 0; i < 3; i++)
+{
+  r[i] = (_G1[i] + _G2[i]) / 2.0;
+}
+```
+
+- 
+```
+E[0][0] = 0.0;
+E[0][1] = sin(gamma1) / cos(beta);
+E[0][2] = cos(gamma1) / cos(beta);
+E[1][0] = 0.0;
+E[1][1] = cos(gamma1);
+E[1][2] = -sin(gamma1);
+E[2][0] = 1.0;
+E[2][1] = sin(gamma1) * tan(beta);
+E[2][2] = cos(gamma1) * tan(beta);
+```
+
+- 
+```c
+r_dot[0] = 0.0;
+r_dot[1] = 0.0;
+r_dot[2] = 0.0;
+for (int i = 0; i < 3; i++)
+{
+  for (int j = 0; j < 3; j++)
+  {
+    r_dot[i] += E[i][j] * r[j];
+    r_dot[i] += E[i][j] * r[j];
+    r_dot[i] += E[i][j] * r[j];
+    r_dot[i] += E[i][j] * r[j];
+  }
+}
+```
+
+- 
+```c
+fused_beta = kappa1 * beta + (1.0 - kappa1) * (fused_beta + model->dt * (r_dot[1] / 180.0 * M_PI));
+```
+
+- 
+```c
+fused_gamma = kappa2 * gamma1 + (1.0 - kappa2) * (fused_gamma + model->dt * (r_dot[2] / 180.0 * M_PI));
+```
+
+- 
+```c
+float _roll = fused_beta;
+float _pitch = -fused_gamma;
+```
+
+- 
+```c
+float _roll_velocity = ((r_dot[1] / 180.0 * M_PI) + (_roll - model->imu1.roll) / model->dt) / 2.0;
+float _pitch_velocity = ((-r_dot[2] / 180.0 * M_PI) + (_pitch - model->imu1.pitch) / model->dt) / 2.0;
+```
+
+- 
+```c
+model->imu1.roll_acceleration = _roll_velocity - model->imu1.roll_velocity;
+model->imu1.pitch_acceleration = _pitch_velocity - model->imu1.pitch_velocity;
+```
+
+- 
+```c
+model->imu1.roll_velocity = _roll_velocity;
+model->imu1.pitch_velocity = _pitch_velocity;
+model->imu1.roll = _roll;
+model->imu1.pitch = _pitch;
+```
+
 ## Stepping Through the Implementation
 
 In this section, we step through the implementation of the robot's controller in the order of execution. The controller is implemented in the C programming language. It runs on a STM32F401RE mictocontroller, which is clocked at 84 MHz. Here. we focus on the part of the code that runs in the main loop, which is a `while` loop in the main function of the program.
@@ -119,9 +342,10 @@ else
 An episode is defined as one or more sequential interactions with the environment. An episode is finished once the robot falls over or when the control policy is updated. The field `k` of the model counts the number of environment interactions in an episode. Since the `stepForward` function is essentially a Recursive Least Squares (RLS) algorithm, it will make the filter matrix `W_n` and the inverse autocorrelation matrix `P_n` converge after a finite number of runs. The exact number of runs for the RLS to converge is not constant, but we can assume that it is small when the robot approaches a state in which opposing angular momenta are balanced. Therefore, by counting the number of `stepForward` function calls we can insert control policy updates periodically. The function `updateControlPolicy` is given a pointer to the model object and its side effect is an update to the feedback policy matrix `K_j`. The index of the feeback policy matrix is different from the index of the filter matrix `W_n` and the inverse autocorrelation matrix `P_n`. A second counter variable `j` is incremented every time the control policy is updated, whereas the variable `k` counts the number of calls to the `stepForward` function. However, if the update frequency is higher than one control cycle then the variable `j` counts at a slower rate than the variable `k`. As the model learns from experience online and in real time, the variable `updatePolicyPeriod` determines how much experience is accumulated before a policy update. Experimentally, 10 value iterations per policy update is the optimal ratio.
 
 ```c
-if (model.k % updatePolicyPeriod == 0)
+if (model.k % updatePolicyPeriod == 0 || triggerUpdate == 1)
 {
   updateControlPolicy(&model);
+  triggerUpdate = 0;
 }
 ```
 
@@ -437,7 +661,7 @@ for (int i = 0; i < (model->n + model->m); i++)
 }
 ```
 
-The vector of filter coefficients ``\textbf{w}_n = \begin{bmatrix} w_n(0) & w_n(1) & \ldots & w_n(p) \end{bmatrix}^T`` at time ``n`` minimizes the weighted least squares error. The weighted least squares error is equal to the squared norm of the error at time ``i`` times an exponential weighting factor, sumed over the observation interval. ``\Epsilon (n) = \sum_{i = 0}^{n} \lambda^{n - i} | e(i) |^2``. The exponential weighting (forgetting) factor ``\lambda`` is greater than zero and, less than or equal to one. ``0 < \lambda \leq 1``. The error at time ``i`` is equal to the difference between the desired signal and the filter output. ``e(i) = d(i) - y(i) = d(i) - \textbf{w}_n^T x(i)``. In the definition of the error, ``d(i)`` is the desired signal at time ``i``, and ``y(i)`` is the filter output at time ``i``. The filter output is the result of the matrix-vector product of the filter coeeficients and the new data vector. The latest set of filter coefficients ``\textbf{w}_n(k)`` is used for minimizing the weighted least squares error ``\Epsilon (n)``. Also, it is assumed that the weights ``\textbf{w}_n`` are constant over the observation interval with end points zero and `n`: ``[0, n]``.
+The vector of filter coefficients ``\textbf{w}_n = \begin{bmatrix} w_n(0) & w_n(1) & \ldots & w_n(p) \end{bmatrix}^T`` at time ``n`` minimizes the weighted least squares error. The weighted least squares error is equal to the squared norm of the error at time ``i`` times an exponential weighting factor, sumed over the observation interval. ``\Epsilon (n) = \sum_{i = 0}^{n} \lambda^{n - i} | e(i) |^2``. The exponential weighting (forgetting) factor ``\lambda`` is greater than zero and, less than or equal to one. ``0 < \lambda \leq 1``. The error at time ``i`` is equal to the difference between the desired signal and the filter output. ``e(i) = d(i) - y(i) = d(i) - \textbf{w}_n^T x(i)``. In the definition of the error, ``d(i)`` is the desired signal at time ``i``, and ``y(i)`` is the filter output at time ``i``. The filter output is the result of the matrix-vector product of the filter coefficients and the new data vector. The latest set of filter coefficients ``\textbf{w}_n(k)`` is used for minimizing the weighted least squares error ``\Epsilon (n)``. Also, it is assumed that the weights ``\textbf{w}_n`` are constant over the observation interval with end points zero and `n`: ``[0, n]``.
 
 For the error minimization objective, the partial derivative of the weighted least squares error with respect to the filter coefficients must be equal to zero. Setting the partial derivative equal to zero minimizes the weighted least squares error ``\frac{\partial \Epsilon (n)}{\partial \textbf{w}_n^* (k)} = 0`` for ``k = 0, 1, ..., p``. Following the implications of the partial derivative equation, the filter coefficients are transformed by the exponentially weighted deterministic autocorrelation matrix ``\textbf{R}_x(n) \textbf{w}_n = \textbf{r}_{dx}(n)`` in order to produce the deterministic cross-correlation between the desired signal ``d(n) = \begin{bmatrix} d(n) & d(n - 1) & \ldots & d(0) \end{bmatrix}^T`` and the new data vector ``\textbf{x}(i) = \begin{bmatrix} x(i) & x(i - 1) & \ldots & x(i - p) \end{bmatrix}^T``.
 
@@ -447,7 +671,7 @@ Therefore, the deterministic normal equations define the optimum filter coeffici
 
 Multiplying the data vector ``\textbf{x}(i)`` with the deterministic cross-correlation on the left and then subtracting the result from the weighted norm of the desired signal ``|| d(n) ||_\lambda^2`` yields the minimum error ``\{\Epsilon(n)\}_{min} = || d(n) ||_\lambda^2 - \textbf{r}_{dx}^H(n) \textbf{w}_n``.
 
-Both the deterministic autocorrelation matrix ``\textbf{R}_x(n)`` and the deterministic cross-correlation matrix ``\textbf{r}_{dx}(n)`` depend on the time variable ``n``. So instead of directly solving the deterministic normal equations ``\textbf{R}_x(n) \textbf{w}_n = \textbf{r}_{dx}(n)``, it is easier to derive a recursive solution for the filter coefficients ``\textbf{w}_n``. A correction ``\Delta \textbf{w}_{n - 1}`` that is applied to the solution at time ``n - 1`` results in the filter coeeficients ``\textbf{w}_n = \textbf{w}_{n - 1} + \Delta \textbf{w}_{n - 1}`` at time ``n``.
+Both the deterministic autocorrelation matrix ``\textbf{R}_x(n)`` and the deterministic cross-correlation matrix ``\textbf{r}_{dx}(n)`` depend on the time variable ``n``. So instead of directly solving the deterministic normal equations ``\textbf{R}_x(n) \textbf{w}_n = \textbf{r}_{dx}(n)``, it is easier to derive a recursive solution for the filter coefficients ``\textbf{w}_n``. A correction ``\Delta \textbf{w}_{n - 1}`` that is applied to the solution at time ``n - 1`` results in the filter coefficients ``\textbf{w}_n = \textbf{w}_{n - 1} + \Delta \textbf{w}_{n - 1}`` at time ``n``.
 
 For a recursive equation, first derive the deterministic cross-correlation ``\textbf{r}_{dx}(n)`` at time ``n`` in terms of the cross-correlation ``\textbf{r}_{dx}(n - 1)`` at time ``n - 1``. To solve for the filter coefficients, multiply both sides of the deterministic normal equations on the left by the inverse of the deterministic autocorrelation matrix: ``\textbf{w}_n = \textbf{R}_x^{-1}(n) \textbf{r}_{dx}(n)``. Second, derive the inverse of the deterministic autocorrelation matrix ``\textbf{R}_x^{-1}(n)`` in terms of the inverse autocorrelation at the previous time ``\textbf{R}_x^{-1}(n - 1)`` and the new data vector ``\textbf{x}(n)``. So on the one hand, the cross-correlation ``\textbf{r}_{dx}(n) = \sum_{i = 0}^n \lambda^{n - i} d(i) \textbf{x}^*(i)`` may be updated recursively as the sum of the previous cross-correlation times the weighting factor, and the desired signal times new data. On the other hand, the autocorrelation matrix ``\textbf{R}_x(n)`` may be updated recursively from the autocorrlation of the previous time ``\textbf{R}_x(n - 1)`` and the new data vector ``\textbf{x}(n)`` in this way: multiply the previous autocorrelation by the weighting factor and then add the result to the outer product of the new data vector.
 
@@ -463,7 +687,7 @@ Writing the inverse of the deterministic autocorrelation matrix using Woodbury's
 
 ``\left\{ \begin{array}{l} \textbf{R}_x(n) \textbf{w}_n = \textbf{r}_{dx}(n) &\\ \textbf{R}_x(n) \textbf{g}(n) = \textbf{x}^*(n) \end{array} \right.``
 
-The derivation of the time-update equation for the coefficient vector ``\textbf{w}_n`` completes the recursion. Start with the fact that the transformation of the cross-correlation by the inverse autoccorrelation results in the filter coeeficients. Then, replace the cross-correlation with the recursive solution.
+The derivation of the time-update equation for the coefficient vector ``\textbf{w}_n`` completes the recursion. Start with the fact that the transformation of the cross-correlation by the inverse autoccorrelation results in the filter coefficients. Then, replace the cross-correlation with the recursive solution.
 
 ``\left\{ \begin{array}{l} \textbf{w}_n = \textbf{P}(n) \textbf{r}_{dx}(n) &\\ \textbf{r}_{dx}(n) = \lambda \textbf{r}_{dx}(n - 1) + d(n) \textbf{x}^*(n) \end{array} \right.``
 
@@ -575,16 +799,25 @@ for (int i = 0; i < (model->n + model->m); i++)
   }
 }
 
+updateChange = 0.0;
+float correction = 0.0;
 for (int i = 0; i < (model->n + model->m); i++)
 {
   for (int j = 0; j < (model->n + model->m); j++)
   {
-    buffer = getIndex(model->W_n, i, j) + (alpha_n[i] * g_n[j]);
+    correction = alpha_n[i] * g_n[j];
+    // sum the absolute value of the corrections to the filter coefficients to see if there is any update
+    updateChange += fabs(getIndex(model->W_n, i, j) - correction);
+    buffer = getIndex(model->W_n, i, j) + correction;
     if (isnanf(buffer) == 0)
     {
-      setIndex(&(model->W_n), i, j, buffer);
+      setIndex(&(model->W_n), i, j, buffer); 
     }
   }
+}
+// trigger a policy update if the RLS algorithm has converged
+if (fabs(updateChange) < minimumChange) {
+  triggerUpdate = 1;
 }
 
 int scaleFlag = 0;
@@ -776,228 +1009,6 @@ typedef struct
   CurrentSensor reactionCurrentSensor; // the reaction wheel's motor current sensor
   CurrentSensor rollingCurrentSensor;  // the rolling wheel's motor current sensor
 } LinearQuadraticRegulator;
-```
-
-- 
-```c
-void updateIMU(LinearQuadraticRegulator *model)
-```
-
-- 
-```c
-updateIMU1(&(model->imu1));
-updateIMU2(&(model->imu2));
-```
-
-- 
-```c
-typedef struct
-{
-  int16_t accX_offset;
-  int16_t accY_offset;
-  int16_t accZ_offset;
-  float accX_scale;
-  float accY_scale;
-  float accZ_scale;
-  int16_t gyrX_offset;
-  int16_t gyrY_offset;
-  int16_t gyrZ_offset;
-  float gyrX_scale;
-  float gyrY_scale;
-  float gyrZ_scale;
-  int16_t rawAccX;
-  int16_t rawAccY;
-  int16_t rawAccZ;
-  int16_t rawGyrX;
-  int16_t rawGyrY;
-  int16_t rawGyrZ;
-  float accX;
-  float accY;
-  float accZ;
-  float gyrX;
-  float gyrY;
-  float gyrZ;
-  float roll;
-  float pitch;
-  float yaw;
-  float roll_velocity;
-  float pitch_velocity;
-  float yaw_velocity;
-  float roll_acceleration;
-  float pitch_acceleration;
-  float yaw_acceleration;
-} IMU;
-```
-
-- 
-```c
-R1[0] = model->imu1.accX;
-R1[1] = model->imu1.accY;
-R1[2] = model->imu1.accZ;
-R2[0] = model->imu2.accX;
-R2[1] = model->imu2.accY;
-R2[2] = model->imu2.accZ;
-```
-
-- 
-```c
-_R1[0] = 0.0;
-_R1[1] = 0.0;
-_R1[2] = 0.0;
-_R2[0] = 0.0;
-_R2[1] = 0.0;
-_R2[2] = 0.0;
-for (int i = 0; i < 3; i++)
-{
-  for (int j = 0; j < 3; j++)
-  {
-    _R1[i] += B_A1_R[i][j] * R1[j];
-    _R2[i] += B_A2_R[i][j] * R2[j];
-  }
-}
-```
-
-- 
-```c
-for (int i = 0; i < 3; i++)
-{
-  Matrix[i][0] = _R1[i];
-  Matrix[i][1] = _R2[i];
-}
-```
-
-- 
-```c
-for (int i = 0; i < 3; i++)
-{
-  for (int j = 0; j < 4; j++)
-  {
-    Q[i][j] = 0.0;
-    for (int k = 0; k < 2; k++)
-    {
-      Q[i][j] += Matrix[i][k] * X[k][j];
-    }
-  }
-}
-```
-
-- 
-```c
-g[0] = Q[0][0];
-g[1] = Q[1][0];
-g[2] = Q[2][0];
-```
-
-- 
-```c
-beta = atan2(-g[0], sqrt(pow(g[1], 2) + pow(g[2], 2)));
-```
-
-- 
-```c
-gamma1 = atan2(g[1], g[2]);
-```
-
-- 
-```c
-G1[0] = model->imu1.gyrX;
-G1[1] = model->imu1.gyrY;
-G1[2] = model->imu1.gyrZ;
-G2[0] = model->imu2.gyrX;
-G2[1] = model->imu2.gyrY;
-G2[2] = model->imu2.gyrZ;
-```
-
-- 
-```c
-_G1[0] = 0.0;
-_G1[1] = 0.0;
-_G1[2] = 0.0;
-_G2[0] = 0.0;
-_G2[1] = 0.0;
-_G2[2] = 0.0;
-for (int i = 0; i < 3; i++)
-{
-  for (int j = 0; j < 3; j++)
-  {
-    _G1[i] += B_A1_R[i][j] * G1[j];
-    _G2[i] += B_A2_R[i][j] * G2[j];
-  }
-}
-```
-
-- 
-```c
-for (int i = 0; i < 3; i++)
-{
-  r[i] = (_G1[i] + _G2[i]) / 2.0;
-}
-```
-
-- 
-```
-E[0][0] = 0.0;
-E[0][1] = sin(gamma1) / cos(beta);
-E[0][2] = cos(gamma1) / cos(beta);
-E[1][0] = 0.0;
-E[1][1] = cos(gamma1);
-E[1][2] = -sin(gamma1);
-E[2][0] = 1.0;
-E[2][1] = sin(gamma1) * tan(beta);
-E[2][2] = cos(gamma1) * tan(beta);
-```
-
-- 
-```c
-r_dot[0] = 0.0;
-r_dot[1] = 0.0;
-r_dot[2] = 0.0;
-for (int i = 0; i < 3; i++)
-{
-  for (int j = 0; j < 3; j++)
-  {
-    r_dot[i] += E[i][j] * r[j];
-    r_dot[i] += E[i][j] * r[j];
-    r_dot[i] += E[i][j] * r[j];
-    r_dot[i] += E[i][j] * r[j];
-  }
-}
-```
-
-- 
-```c
-fused_beta = kappa1 * beta + (1.0 - kappa1) * (fused_beta + model->dt * (r_dot[1] / 180.0 * M_PI));
-```
-
-- 
-```c
-fused_gamma = kappa2 * gamma1 + (1.0 - kappa2) * (fused_gamma + model->dt * (r_dot[2] / 180.0 * M_PI));
-```
-
-- 
-```c
-float _roll = fused_beta;
-float _pitch = -fused_gamma;
-```
-
-- 
-```c
-float _roll_velocity = ((r_dot[1] / 180.0 * M_PI) + (_roll - model->imu1.roll) / model->dt) / 2.0;
-float _pitch_velocity = ((-r_dot[2] / 180.0 * M_PI) + (_pitch - model->imu1.pitch) / model->dt) / 2.0;
-```
-
-- 
-```c
-model->imu1.roll_acceleration = _roll_velocity - model->imu1.roll_velocity;
-model->imu1.pitch_acceleration = _pitch_velocity - model->imu1.pitch_velocity;
-```
-
-- 
-```c
-model->imu1.roll_velocity = _roll_velocity;
-model->imu1.pitch_velocity = _pitch_velocity;
-model->imu1.roll = _roll;
-model->imu1.pitch = _pitch;
 ```
 
 - 
@@ -1349,3 +1360,5 @@ Convergence of selected algebraic Riccati equation solution parameters. The adap
 7. Hayes, Monson H. (1996). "9.4: Recursive Least Squares". Statistical Digital Signal Processing and Modeling. Wiley. p. 541. ISBN 0-471-59431-8.
 
 8. Richard M. Murray, Zexiang Li, and S. Shankar Sastry, *A Mathematical Introduction to Robotic Manipulation*, CRC-Press, March 22, 1994, ISBN 9780849379819, 0849379814.
+
+9. S. Haykin, Adaptive Filter Theory, Prentice-Hall, Englewood-Cliffs, NJ, 1986.
