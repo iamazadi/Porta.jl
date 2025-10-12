@@ -661,47 +661,103 @@ for (int i = 0; i < (model->n + model->m); i++)
 }
 ```
 
-The vector of filter coefficients ``\textbf{w}_n = \begin{bmatrix} w_n(0) & w_n(1) & \ldots & w_n(p) \end{bmatrix}^T`` at time ``n`` minimizes the weighted least squares error. The weighted least squares error is equal to the squared norm of the error at time ``i`` times an exponential weighting factor, sumed over the observation interval. ``\Epsilon (n) = \sum_{i = 0}^{n} \lambda^{n - i} | e(i) |^2``. The exponential weighting (forgetting) factor ``\lambda`` is greater than zero and, less than or equal to one. ``0 < \lambda \leq 1``. The error at time ``i`` is equal to the difference between the desired signal and the filter output. ``e(i) = d(i) - y(i) = d(i) - \textbf{w}_n^T x(i)``. In the definition of the error, ``d(i)`` is the desired signal at time ``i``, and ``y(i)`` is the filter output at time ``i``. The filter output is the result of the matrix-vector product of the filter coefficients and the new data vector. The latest set of filter coefficients ``\textbf{w}_n(k)`` is used for minimizing the weighted least squares error ``\Epsilon (n)``. Also, it is assumed that the weights ``\textbf{w}_n`` are constant over the observation interval with end points zero and `n`: ``[0, n]``.
+The vector of filter coefficients ``\textbf{w}_n = \begin{bmatrix} w_n(0) & w_n(1) & \ldots & w_n(p) \end{bmatrix}^T`` at time ``n`` minimizes the weighted least squares error. The weighted least squares error is equal to the squared norm of the error at time ``i`` times an exponential weighting factor, sumed over the observation interval. ``\Epsilon (n) = \sum_{i = 0}^{n} \lambda^{n - i} | e(i) |^2``. The exponential weighting (forgetting) factor ``\lambda`` is greater than zero and, less than or equal to one. ``0 < \lambda \leq 1``. The error at time ``i`` is equal to the difference between the desired signal and the filter output. ``e(i) = d(i) - y(i) = d(i) - \textbf{w}_n^T x(i)``. In the definition of the error, ``d(i)`` is the desired signal at time ``i``, and ``y(i)`` is the filter output at time ``i``. The filter output is the result of the matrix-vector product of the filter coefficients and the new data vector. The latest set of filter coefficients ``\textbf{w}_n(k)`` is used for minimizing the weighted least squares error ``\Epsilon (n)``. Also, it is assumed that the weights ``\textbf{w}_n`` are constant over the observation interval ``[0, n]`` with end points zero and ``n``.
 
-For the error minimization objective, the partial derivative of the weighted least squares error with respect to the filter coefficients must be equal to zero. Setting the partial derivative equal to zero minimizes the weighted least squares error ``\frac{\partial \Epsilon (n)}{\partial \textbf{w}_n^* (k)} = 0`` for ``k = 0, 1, ..., p``. Following the implications of the partial derivative equation, the filter coefficients are transformed by the exponentially weighted deterministic autocorrelation matrix ``\textbf{R}_x(n) \textbf{w}_n = \textbf{r}_{dx}(n)`` in order to produce the deterministic cross-correlation between the desired signal ``d(n) = \begin{bmatrix} d(n) & d(n - 1) & \ldots & d(0) \end{bmatrix}^T`` and the new data vector ``\textbf{x}(i) = \begin{bmatrix} x(i) & x(i - 1) & \ldots & x(i - p) \end{bmatrix}^T``.
+For the error minimization objective, the partial derivative of the weighted least squares error with respect to the filter coefficients must be equal to zero. Setting the partial derivative equal to zero minimizes the weighted least squares error ``\frac{\partial \Epsilon (n)}{\partial \textbf{w}_n^* (k)} = 0`` for ``k = 0, 1, ..., p``, where ``p`` denotes the filter order. Following the implications of the partial derivative equation, the filter coefficients are transformed by the exponentially weighted deterministic autocorrelation matrix ``\textbf{R}_x(n) \textbf{w}_n = \textbf{r}_{dx}(n)`` in order to produce the deterministic cross-correlation between the desired signal ``d(n) = \begin{bmatrix} d(n) & d(n - 1) & \ldots & d(0) \end{bmatrix}^T`` and the new data vector ``\textbf{x}(i) = \begin{bmatrix} x(i) & x(i - 1) & \ldots & x(i - p) \end{bmatrix}^T``.
 
 Therefore, the deterministic normal equations define the optimum filter coefficients. The exponentially weighted deterministic autocorrelation matrix ``\textbf{R}_x(n) \in \mathbb{R}^{(p + 1) \times (p + 1)}`` for the new data vector ``\textbf{x}(n)`` is defined as the sum of the outer product of the data vector with itself, in an exponential way with the given exponential factor ``\lambda``. In contrast, the deterministic cross-correlation ``\textbf{r}_{dx}(n)`` is the outer product between the desired signal ``d(n)`` and the data vector ``\textbf{x}(n)``.
 
 ``\left\{ \begin{array}{l} \textbf{r}_{dx}(n) = \sum_{i = 0}^n \lambda^{n - i} d(i) \textbf{x}^*(i) &\\ \textbf{R}_x(n) = \sum_{i = 0}^n \lambda^{n - i} \textbf{x}^*(i) \textbf{x}^T(i) \end{array} \right.``
 
-Multiplying the data vector ``\textbf{x}(i)`` with the deterministic cross-correlation on the left and then subtracting the result from the weighted norm of the desired signal ``|| d(n) ||_\lambda^2`` yields the minimum error ``\{\Epsilon(n)\}_{min} = || d(n) ||_\lambda^2 - \textbf{r}_{dx}^H(n) \textbf{w}_n``.
+Multiplying the filter coefficients with the deterministic cross-correlation on the left and then subtracting the result from the weighted norm of the desired signal ``|| d(n) ||_\lambda^2`` yields the minimum error ``\{\Epsilon(n)\}_{min} = || d(n) ||_\lambda^2 - \textbf{r}_{dx}^H(n) \textbf{w}_n``.
 
-Both the deterministic autocorrelation matrix ``\textbf{R}_x(n)`` and the deterministic cross-correlation matrix ``\textbf{r}_{dx}(n)`` depend on the time variable ``n``. So instead of directly solving the deterministic normal equations ``\textbf{R}_x(n) \textbf{w}_n = \textbf{r}_{dx}(n)``, it is easier to derive a recursive solution for the filter coefficients ``\textbf{w}_n``. A correction ``\Delta \textbf{w}_{n - 1}`` that is applied to the solution at time ``n - 1`` results in the filter coefficients ``\textbf{w}_n = \textbf{w}_{n - 1} + \Delta \textbf{w}_{n - 1}`` at time ``n``.
+Both the deterministic autocorrelation matrix ``\textbf{R}_x(n)`` and the deterministic cross-correlation ``\textbf{r}_{dx}(n)`` depend on the time variable ``n``. So instead of directly solving the deterministic normal equations ``\textbf{R}_x(n) \textbf{w}_n = \textbf{r}_{dx}(n)``, it is easier to derive a recursive solution for the filter coefficients ``\textbf{w}_n``. A correction ``\Delta \textbf{w}_{n - 1}`` that is applied to the solution at time ``n - 1`` results in the filter coefficients ``\textbf{w}_n = \textbf{w}_{n - 1} + \Delta \textbf{w}_{n - 1}`` at time ``n``.
 
-For a recursive equation, first derive the deterministic cross-correlation ``\textbf{r}_{dx}(n)`` at time ``n`` in terms of the cross-correlation ``\textbf{r}_{dx}(n - 1)`` at time ``n - 1``. To solve for the filter coefficients, multiply both sides of the deterministic normal equations on the left by the inverse of the deterministic autocorrelation matrix: ``\textbf{w}_n = \textbf{R}_x^{-1}(n) \textbf{r}_{dx}(n)``. Second, derive the inverse of the deterministic autocorrelation matrix ``\textbf{R}_x^{-1}(n)`` in terms of the inverse autocorrelation at the previous time ``\textbf{R}_x^{-1}(n - 1)`` and the new data vector ``\textbf{x}(n)``. So on the one hand, the cross-correlation ``\textbf{r}_{dx}(n) = \sum_{i = 0}^n \lambda^{n - i} d(i) \textbf{x}^*(i)`` may be updated recursively as the sum of the previous cross-correlation times the weighting factor, and the desired signal times new data. On the other hand, the autocorrelation matrix ``\textbf{R}_x(n)`` may be updated recursively from the autocorrlation of the previous time ``\textbf{R}_x(n - 1)`` and the new data vector ``\textbf{x}(n)`` in this way: multiply the previous autocorrelation by the weighting factor and then add the result to the outer product of the new data vector.
+For a recursive equation, first derive the deterministic cross-correlation ``\textbf{r}_{dx}(n)`` at time ``n`` in terms of the cross-correlation ``\textbf{r}_{dx}(n - 1)`` at time ``n - 1``. To solve for the filter coefficients, multiply both sides of the deterministic normal equations on the left by the inverse of the deterministic autocorrelation matrix: ``\textbf{w}_n = \textbf{R}_x^{-1}(n) \textbf{r}_{dx}(n)``. Second, derive the inverse of the deterministic autocorrelation matrix ``\textbf{R}_x^{-1}(n)`` in terms of the inverse autocorrelation at the previous time ``\textbf{R}_x^{-1}(n - 1)`` and the new data vector ``\textbf{x}(n)``. On the one hand, the cross-correlation ``\textbf{r}_{dx}(n) = \sum_{i = 0}^n \lambda^{n - i} d(i) \textbf{x}^*(i)`` may be updated recursively as the sum of the previous cross-correlation times the weighting factor, and the desired signal times new data. On the other hand, the autocorrelation matrix ``\textbf{R}_x(n)`` may be updated recursively from the autocorrlation of the previous time ``\textbf{R}_x(n - 1)`` and the new data vector ``\textbf{x}(n)`` in this way: multiply the previous autocorrelation by the weighting factor and then add the result to the outer product of the new data vector with itself.
 
 ``\left\{ \begin{array}{l} \textbf{r}_{dx}(n) = \lambda \textbf{r}_{dx}(n - 1) + d(n) \textbf{x}^*(n) &\\ \textbf{R}_x(n) = \lambda \textbf{R}_x(n - 1) + \textbf{x}^*(n) \textbf{x}^T(n) \end{array} \right.``
 
-Since we are interested in the inverse of the autocorrelation matrix ``\textbf{R}_x(n)`` we use the Woodbury's Identity. The Woodbury matrix identity ``(\textbf{A} + \textbf{u} \textbf{v}^H)^{-1} = \textbf{A}^{-1} - \frac{\textbf{A}^{-1} \textbf{u} \textbf{v}^H \textbf{A}^{-1}}{1 + \textbf{v}^H \textbf{A}^{-1} \textbf{u}}`` says that the inverse of a rank-k correction of some matrix can be computed by doing a rank-k correction to the inverse of the original matrix. Therefore, the multiplication of the weighting factor ``\lambda`` and the autocorrelation matrix ``\textbf{R}_x(n - 1)`` at time ``n - 1`` should be the original matrix, whereas the pair of vectors in the identity are equal to the new data vector ``\textbf{x}^*(n)``.
+Since we are interested in the inverse of the autocorrelation matrix ``\textbf{R}_x(n)`` we use the Woodbury's Identity. The Woodbury matrix identity ``(\textbf{A} + \textbf{u} \textbf{v}^H)^{-1} = \textbf{A}^{-1} - \frac{\textbf{A}^{-1} \textbf{u} \textbf{v}^H \textbf{A}^{-1}}{1 + \textbf{v}^H \textbf{A}^{-1} \textbf{u}}`` says that the inverse of a rank-k correction of some matrix can be computed by doing a rank-k correction to the inverse of the original matrix. Therefore, the multiplication of the weighting factor ``\lambda`` and the autocorrelation matrix ``\textbf{R}_x(n - 1)`` at time ``n - 1`` should be the original matrix ``\textbf{A}``, whereas the pair of vectors ``\textbf{u}`` and ``\textbf{v}`` in the identity are both equal to the new data vector ``\textbf{x}^*(n)``.
 
 ``\left\{ \begin{array}{l} \textbf{A} = \lambda \textbf{R}_x(n - 1) &\\ \textbf{u} = \textbf{v} = \textbf{x}^*(n) \end{array} \right.``
 
 ``\textbf{R}_x^{-1}(n) = \lambda^{-1} \textbf{R}_x^{-1} (n - 1) - \frac{\lambda^{-2} \textbf{R}_x^{-1} (n - 1) \textbf{x}^*(n) \textbf{x}^T(n) \textbf{R}_x^{-1}(n - 1)}{1 + \lambda^{-1} \textbf{x}^T(n) \textbf{R}_x^{-1}(n - 1) \textbf{x}^*(n)}``
 
-Writing the inverse of the deterministic autocorrelation matrix using Woodbury's identity, ``\textbf{P}(n) = \lambda^{-1} [\textbf{P}(n - 1) - \textbf{g}(n) \textbf{x}^T(n) \textbf{P}(n -1)]``, we find that the inverse of the autocorrelation matrix ``\textbf{P}(n) = \textbf{R}_x^{-1}(n)`` at time ``n`` involves two terms, one of which is the weighted version of the matrix at time ``n - 1``. The other term in the calculation of the inverse matrix is the multiplication of the gain vector and the data vector and the inverse matrix at time ``n - 1``. The gain vector is the solution to the equations ``\textbf{R}_x(n) \textbf{g}(n) = \textbf{x}^*(n)``. As such, the gain vector ``\textbf{g}(n) = \frac{\lambda^{-1} \textbf{P}(n - 1) \textbf{x}^*(n)}{1 + \lambda^{-1} \textbf{x}^T(n) \textbf{P}(n - 1) \textbf{x}^*(n)}`` is transformed by the deterministic autocorrelation matrix to yield the new data vector. Alternatively one can say that the new data vector is transformed by the inverse of the deterministic autocorrelation matrix in order to produce the gain vector ``\textbf{g}(n) = \textbf{P}(n) \textbf{x}^*(n)``. This is the same as the deterministic normal equations, but the cross-correlation vector ``\textbf{r}_{dx}(n)`` is replaced with the data vector ``\textbf{x}^*(n)``:
+Writing the inverse of the deterministic autocorrelation matrix using Woodbury's identity, ``\textbf{P}(n) = \lambda^{-1} [\textbf{P}(n - 1) - \textbf{g}(n) \textbf{x}^T(n) \textbf{P}(n -1)]``, we find that the inverse of the autocorrelation matrix ``\textbf{P}(n) = \textbf{R}_x^{-1}(n)`` at time ``n`` involves two terms, one of which is the weighted version of the matrix at time ``n - 1``. The other term in the calculation of the inverse matrix is the multiplication of the gain vector and the data vector and the inverse matrix at time ``n - 1``. The gain vector is the solution to the equation ``\textbf{R}_x(n) \textbf{g}(n) = \textbf{x}^*(n)``. As such, the gain vector ``\textbf{g}(n) = \frac{\lambda^{-1} \textbf{P}(n - 1) \textbf{x}^*(n)}{1 + \lambda^{-1} \textbf{x}^T(n) \textbf{P}(n - 1) \textbf{x}^*(n)}`` is transformed by the deterministic autocorrelation matrix to yield the new data vector. Alternatively one can say that the new data vector is transformed by the inverse of the deterministic autocorrelation matrix in order to produce the gain vector ``\textbf{g}(n) = \textbf{P}(n) \textbf{x}^*(n)``. This is the same as the deterministic normal equations, but the cross-correlation vector ``\textbf{r}_{dx}(n)`` is replaced with the data vector ``\textbf{x}^*(n)``:
 
 ``\left\{ \begin{array}{l} \textbf{R}_x(n) \textbf{w}_n = \textbf{r}_{dx}(n) &\\ \textbf{R}_x(n) \textbf{g}(n) = \textbf{x}^*(n) \end{array} \right.``
+
+```c
+z_k_dot_z_n = 0.0;
+float buffer = 0.0;
+for (int i = 0; i < (model->n + model->m); i++)
+{
+  buffer = z_k1[i] * z_n[i];
+  if (isnanf(buffer) == 0)
+  {
+    z_k_dot_z_n += buffer;
+  }
+}
+
+if (fabs(model->lambda + z_k_dot_z_n) > 0)
+{
+  for (int i = 0; i < (model->n + model->m); i++)
+  {
+    g_n[i] = (1.0 / (model->lambda + z_k_dot_z_n)) * z_n[i];
+  }
+}
+else
+{
+  for (int i = 0; i < (model->n + model->m); i++)
+  {
+    g_n[i] = (1.0 / model->lambda) * z_n[i];
+  }
+}
+```
 
 The derivation of the time-update equation for the coefficient vector ``\textbf{w}_n`` completes the recursion. Start with the fact that the transformation of the cross-correlation by the inverse autoccorrelation results in the filter coefficients. Then, replace the cross-correlation with the recursive solution.
 
 ``\left\{ \begin{array}{l} \textbf{w}_n = \textbf{P}(n) \textbf{r}_{dx}(n) &\\ \textbf{r}_{dx}(n) = \lambda \textbf{r}_{dx}(n - 1) + d(n) \textbf{x}^*(n) \end{array} \right.``
 
-Replacing the solution with a recursive term gets us half of the way, because we still need to replace the inverse autocorrelation matrix in the time-update equation with its recursive counterpart as well: ``\textbf{w}_n = \lambda \textbf{P}(n) \textbf{r}_{dx}(n - 1) + d(n) \textbf{P}(n) \textbf{x}^*(n)``. Recall that the transformation of the data vector by the inverse autocorrelation matrix gives us the gain vector. But we also established that the recursive relation of the inverse autocorrelation matrix includes the gain vector.
+Replacing the solution with a recursive term gets us half of the way, because in the time-update equation we still need to replace the inverse autocorrelation matrix with a recursive inverse autocorrelation: ``\textbf{w}_n = \lambda \textbf{P}(n) \textbf{r}_{dx}(n - 1) + d(n) \textbf{P}(n) \textbf{x}^*(n)``. Recall that the transformation of the data vector by the inverse autocorrelation matrix gives us the gain vector. But we also established that the recursive relation of the inverse autocorrelation matrix includes the gain vector.
 
 ``\left\{ \begin{array}{l} \textbf{P}(n) \textbf{x}^*(n) = \textbf{g}(n) &\\ \textbf{P}(n) = \lambda^{-1} [\textbf{P}(n - 1) - \textbf{g}(n) \textbf{x}^T(n) \textbf{P}(n - 1)] \end{array} \right.``
 
-Given these two facts, the time-update of the filter coefficients at time ``n`` is rewritten, ``\textbf{w}_n = [\textbf{P}(n - 1) - \textbf{g}(n) \textbf{x}^T(n) \textbf{P}(n - 1)] \textbf{r}_{dx}(n - 1) + d(n) \textbf{g}(n)``, so that it becomes dependent on the inverse autocorrelation matrix at time ``n - 1``. To simplify the time-update equation, we use the filter coefficients at time ``n - 1`` in place of the transformation of the cross-correlation by the inverse autocorrelation: ``\textbf{P}(n - 1) \textbf{r}_{dx}(n - 1) = \textbf{w}_{n - 1}``. So far, the filter coefficients vector is derived in terms of the following: the filter coefficients at time ``n - 1``, the gain vector at time ``n``, the desired signal at time ``n``, and the new data vector: ``\textbf{w}_n = \textbf{w}_{n - 1} + \textbf{g}(n) [d(n) - \textbf{w}_{n - 1}^T \textbf{x}(n)]``.
+Given these two facts, the time-update of the filter coefficients at time ``n`` is rewritten, ``\textbf{w}_n = [\textbf{P}(n - 1) - \textbf{g}(n) \textbf{x}^T(n) \textbf{P}(n - 1)] \textbf{r}_{dx}(n - 1) + d(n) \textbf{g}(n)``, so that it becomes dependent on the inverse autocorrelation matrix at time ``n - 1``. So far, the filter coefficients vector is derived in terms of the following: the filter coefficients at time ``n - 1``, the gain vector at time ``n``, the desired signal at time ``n``, and the new data vector: ``\textbf{w}_n = \textbf{w}_{n - 1} + \textbf{g}(n) [d(n) - \textbf{w}_{n - 1}^T \textbf{x}(n)]``. To simplify the time-update equation, we use the filter coefficients at time ``n - 1`` in place of the transformation of the cross-correlation by the inverse autocorrelation: ``\textbf{P}(n - 1) \textbf{r}_{dx}(n - 1) = \textbf{w}_{n - 1}``.
 
-Here is yet another simplification for defining the correction to the filter coefficients as the *a priori error* transforming the gain vector: ``\textbf{w}_n = \textbf{w}_{n - 1} + \alpha(n) \textbf{g}(n)``. The *a priori error* ``\alpha(n) = d(n) - \textbf{w}_{n - 1}^T \textbf{x}(n)`` is the difference relation between the desired signal at time ``n`` and ``\textbf{w}_{n - 1}^T \textbf{x}(n)`` the estimate of the desired signal ``d(n)`` using the previous set of filter coefficients ``\textbf{w}_{n - 1}`` at time ``n - 1``.
+```c
+for (int i = 0; i < (model->n + model->m); i++)
+{
+  alpha_n[i] = 0.0;
+}
+for (int i = 0; i < (model->n + model->m); i++)
+{
+  for (int j = 0; j < (model->n + model->m); j++)
+  {
+    alpha_n[i] +=  0.0 - getIndex(model->W_n, i, j) * basisset1[j];
+  }
+}
+```
+
+Here is yet another simplification for defining the correction to the filter coefficients as the *a priori error* transforming the gain vector: ``\textbf{w}_n = \textbf{w}_{n - 1} + \alpha(n) \textbf{g}(n)``. The *a priori error* ``\alpha(n) = d(n) - \textbf{w}_{n - 1}^T \textbf{x}(n)`` is the difference relation between the desired signal ``d(n)`` at time ``n`` and the estimate of the desired signal ``\textbf{w}_{n - 1}^T \textbf{x}(n)`` using the previous set of filter coefficients ``\textbf{w}_{n - 1}`` at time ``n - 1``.
 
 ``\left\{ \begin{array}{l} \alpha(n) = d(n) - \textbf{w}_{n - 1}^T \textbf{x}(n) &\\ e(n) = d(n) - \textbf{w}_n^T \textbf{x}(n) \end{array} \right.``
 
 The *a priori error* ``\alpha(n)`` is defined as the error that would occur if the filter coefficients were not updated, whereas the *a posteriori error* ``e(n)`` is defined as the error that occurs after the weight vector ``\textbf{w}_n`` is updated.
+
+```c
+for (int i = 0; i < (model->n + model->m); i++)
+{
+  z_n[i] = 0.0;
+}
+for (int i = 0; i < (model->n + model->m); i++)
+{
+  for (int j = 0; j < (model->n + model->m); j++)
+  {
+    z_n[i] += getIndex(model->P_n, i, j) * z_k1[j];
+  }
+}
+```
 
 The definition of the filtered information vector ``\textbf{z}(n) = \textbf{P}(n - 1) \textbf{x}^*(n)``  makes the equations for the gain vector and the inverse of the deterministic autocorrelation matrix simple.
 
@@ -711,10 +767,61 @@ The filtered information vector ``z(n)`` at time ``n`` is the transformation of 
 
 ``\left\{ \begin{array}{l} \textbf{g}(n) = \frac{1}{\lambda + \textbf{x}^T(n) \textbf{z}(n)} \textbf{z}(n) &\\ \textbf{P}(n) = \frac{1}{\lambda} [\textbf{P}(n - 1) - \textbf{g}(n) \textbf{z}^H(n)] \end{array} \right.``
 
+```c
+updateChange = 0.0;
+float correction = 0.0;
+for (int i = 0; i < (model->n + model->m); i++)
+{
+  for (int j = 0; j < (model->n + model->m); j++)
+  {
+    correction = alpha_n[i] * g_n[j];
+    // sum the absolute value of the corrections to the filter coefficients to see if there is any update
+    updateChange += fabs(getIndex(model->W_n, i, j) - correction);
+    buffer = getIndex(model->W_n, i, j) + correction;
+    if (isnanf(buffer) == 0)
+    {
+      setIndex(&(model->W_n), i, j, buffer); 
+    }
+  }
+}
+// trigger a policy update if the RLS algorithm has converged
+if (fabs(updateChange) < minimumChange) {
+  triggerUpdate = 1;
+}
+```
 
 In short, we derived five equations for minimizing the weighted least squares error ``\Epsilon (n)`` in a recursive way: the filtered information vector, the *a priori error*, the gain vector, the filter coefficients, and the inverse of the autocorrelation matrix. These equations are parts of what is called the exponentially weighted Recursive Least Squares (RLS) algorithm.
 
 ``\left\{ \begin{array}{l} \textbf{z}(n) = \textbf{P}(n - 1) \textbf{x}^*(n) &\\ \alpha(n) = d(n) - \textbf{w}_{n - 1}^T \textbf{x}(n) &\\ \textbf{g}(n) = \frac{1}{\lambda + \textbf{x}^T(n) \textbf{z}(n)} \textbf{z}(n) &\\ \textbf{w}_n = \textbf{w}_{n - 1} + \alpha(n) \textbf{g}(n) &\\ \textbf{P}(n) = \frac{1}{\lambda} [\textbf{P}(n - 1) - \textbf{g}(n) \textbf{z}^H(n)] \end{array} \right.``
+
+```c
+int scaleFlag = 0;
+for (int i = 0; i < (model->n + model->m); i++)
+{
+  for (int j = 0; j < (model->n + model->m); j++)
+  {
+    buffer = (1.0 / model->lambda) * (getIndex(model->P_n, i, j) - g_n[i] * z_n[j]);
+    if (isnanf(buffer) == 0)
+    {
+      if (fabs(buffer) > clipping)
+      {
+        scaleFlag = 1;
+      }
+      setIndex(&(model->P_n), i, j, buffer);
+    }
+  }
+}
+if (scaleFlag == 1)
+{
+  for (int i = 0; i < (model->n + model->m); i++)
+  {
+    for (int j = 0; j < (model->n + model->m); j++)
+    {
+      setIndex(&(model->P_n), i, j, clippingFactor * getIndex(model->P_n, i, j));
+    }
+  }
+}
+```
 
 Whenever the weighting factor is equal to one, ``\lambda = 1``, the algorithm is called the growing window RLS algorithm, because it has infinite memory of the system's trajectory. Meaning the algorithm does not forget outliers, even though it can make the effects of older data less significant over time with a forgetting facter ``\lambda`` less than one. But a sliding window variant of the algorithm can forget outlier at the cost of doubling the computation.
 
@@ -747,137 +854,11 @@ Perform a one-step update in the parameter vector W by applying RLS to equation.
 
 ``Q(x_k, u_k) = \frac{1}{2} {\begin{bmatrix} x_k \\ u_k \end{bmatrix}}^T S \begin{bmatrix} x_k \\ u_k \end{bmatrix} = \frac{1}{2} {\begin{bmatrix} x_k \\ u_k \end{bmatrix}}^T \begin{bmatrix} S_{xx} & S_{xu} \\ S_{ux} & S_{uu} \end{bmatrix} \begin{bmatrix} x_k \\ u_k \end{bmatrix}``
 
-
-```c
-for (int i = 0; i < (model->n + model->m); i++)
-{
-  z_n[i] = 0.0;
-}
-for (int i = 0; i < (model->n + model->m); i++)
-{
-  for (int j = 0; j < (model->n + model->m); j++)
-  {
-    z_n[i] += getIndex(model->P_n, i, j) * z_k1[j];
-  }
-}
-
-z_k_dot_z_n = 0.0;
-float buffer = 0.0;
-for (int i = 0; i < (model->n + model->m); i++)
-{
-  buffer = z_k1[i] * z_n[i];
-  if (isnanf(buffer) == 0)
-  {
-    z_k_dot_z_n += buffer;
-  }
-}
-
-if (fabs(model->lambda + z_k_dot_z_n) > 0)
-{
-  for (int i = 0; i < (model->n + model->m); i++)
-  {
-    g_n[i] = (1.0 / (model->lambda + z_k_dot_z_n)) * z_n[i];
-  }
-}
-else
-{
-  for (int i = 0; i < (model->n + model->m); i++)
-  {
-    g_n[i] = (1.0 / model->lambda) * z_n[i];
-  }
-}
-
-for (int i = 0; i < (model->n + model->m); i++)
-{
-  alpha_n[i] = 0.0;
-}
-for (int i = 0; i < (model->n + model->m); i++)
-{
-  for (int j = 0; j < (model->n + model->m); j++)
-  {
-    alpha_n[i] +=  0.0 - getIndex(model->W_n, i, j) * basisset1[j];
-  }
-}
-
-updateChange = 0.0;
-float correction = 0.0;
-for (int i = 0; i < (model->n + model->m); i++)
-{
-  for (int j = 0; j < (model->n + model->m); j++)
-  {
-    correction = alpha_n[i] * g_n[j];
-    // sum the absolute value of the corrections to the filter coefficients to see if there is any update
-    updateChange += fabs(getIndex(model->W_n, i, j) - correction);
-    buffer = getIndex(model->W_n, i, j) + correction;
-    if (isnanf(buffer) == 0)
-    {
-      setIndex(&(model->W_n), i, j, buffer); 
-    }
-  }
-}
-// trigger a policy update if the RLS algorithm has converged
-if (fabs(updateChange) < minimumChange) {
-  triggerUpdate = 1;
-}
-
-int scaleFlag = 0;
-for (int i = 0; i < (model->n + model->m); i++)
-{
-  for (int j = 0; j < (model->n + model->m); j++)
-  {
-    buffer = (1.0 / model->lambda) * (getIndex(model->P_n, i, j) - g_n[i] * z_n[j]);
-    if (isnanf(buffer) == 0)
-    {
-      if (fabs(buffer) > clipping)
-      {
-        scaleFlag = 1;
-      }
-      setIndex(&(model->P_n), i, j, buffer);
-    }
-  }
-}
-if (scaleFlag == 1)
-{
-  for (int i = 0; i < (model->n + model->m); i++)
-  {
-    for (int j = 0; j < (model->n + model->m); j++)
-    {
-      setIndex(&(model->P_n), i, j, clippingFactor * getIndex(model->P_n, i, j));
-    }
-  }
-}
-```
-
 - 
 The counter variable `k` is incremented every time the `stepForward` function is called for keeping track of the number of steps in an episode. This reminds us of the counter variable `j`, which counts the number of policy updates in the function `updateControlPolicy`. In the `stepForward` function, the variable `k` is incremented before returning to the `main` function. Repeat at the next time `k + 1` and continue until RLS converges and the new parameter vector Wⱼ₊₁ is found.
 
 ```c
 model->k = model->k + 1;
-```
-
-- 
-```c
-typedef struct
-{
-  float row0[N + M];
-  float row1[N + M];
-  float row2[N + M];
-  float row3[N + M];
-  float row4[N + M];
-  float row5[N + M];
-  float row6[N + M];
-  float row7[N + M];
-  float row8[N + M];
-  float row9[N + M];
-  float row10[N + M];
-  float row11[N + M];
-} Mat12;
-```
-
-- 
-```c
-float getIndex(Mat12 matrix, int i, int j)
-void setIndex(Mat12 *matrix, int i, int j, float value)
 ```
 
 - 
@@ -1011,320 +992,6 @@ typedef struct
 } LinearQuadraticRegulator;
 ```
 
-- 
-```c
-typedef struct
-{
-  int pulse_per_revolution; // the number of pulses per revolution
-  int value;                // the counter
-  float radianAngle;        // the angle in radian
-  float angle;              // the absolute angle
-  float velocity;           // the angular velocity
-  float acceleration;       // the angular acceleration
-} Encoder;
-```
-
-- 
-```c
-void encodeWheel(Encoder *encoder, int newValue)
-```
-
-- 
-```c
-encoder->value = newValue;
-encoder->radianAngle = (float)(encoder->value % encoder->pulse_per_revolution) / (float)encoder->pulse_per_revolution * 2.0 * M_PI;
-```
-
-- 
-```c
-float angle = sin(encoder->radianAngle);
-```
-
-- 
-```c
-float velocity = angle - encoder->angle;
-float acceleration = velocity - encoder->velocity;
-```
-
-- 
-```c
-encoder->angle = angle;
-encoder->velocity = velocity;
-encoder->acceleration = acceleration;
-```
-
-- 
-```c
-typedef struct
-{
-  float currentScale;
-  int current0;
-  int current1;
-  float currentVelocity;
-} CurrentSensor;
-```
-
-- 
-```c
-void senseCurrent(CurrentSensor *reactionCurrentSensor, CurrentSensor *rollingCurrentSensor)
-```
-
-- 
-```c
-// Start ADC Conversion in DMA Mode (Periodically Every 1ms)
-HAL_ADC_Start_DMA(&hadc1, AD_RES_BUFFER, 2);
-```
-
-- 
-```c
-reactionCurrentSensor->current1 = reactionCurrentSensor->current0;
-rollingCurrentSensor->current1 = rollingCurrentSensor->current0;
-```
-
-- 
-```c
-reactionCurrentSensor->current0 = (AD_RES_BUFFER[0] << 4);
-rollingCurrentSensor->current0 = (AD_RES_BUFFER[1] << 4);
-```
-
-- 
-```c
-reactionCurrentSensor->currentVelocity = (float)(reactionCurrentSensor->current0 - reactionCurrentSensor->current1) / reactionCurrentSensor->currentScale;
-rollingCurrentSensor->currentVelocity = (float)(rollingCurrentSensor->current0 - rollingCurrentSensor->current1) / rollingCurrentSensor->currentScale;
-```
-
-- 
-```c
-void updateIMU1(IMU *sensor) // GY-25 I2C
-```
-
-- 
-```c
-do
-{
-  HAL_I2C_Master_Transmit(&hi2c1, (uint16_t)SLAVE_ADDRESS, (uint8_t *)&transferRequest, 1, 10);
-  while (HAL_I2C_GetState(&hi2c1) != HAL_I2C_STATE_READY)
-    ;
-} while (HAL_I2C_GetError(&hi2c1) == HAL_I2C_ERROR_AF);
-```
-
-- 
-```c
-do
-{
-  HAL_I2C_Master_Receive(&hi2c1, (uint16_t)SLAVE_ADDRESS, (uint8_t *)raw_data, 12, 10);
-  while (HAL_I2C_GetState(&hi2c1) != HAL_I2C_STATE_READY)
-    ;
-  sensor->rawAccX = (raw_data[0] << 8) | raw_data[1];
-  sensor->rawAccY = (raw_data[2] << 8) | raw_data[3];
-  sensor->rawAccZ = (raw_data[4] << 8) | raw_data[5];
-  sensor->rawGyrX = (raw_data[6] << 8) | raw_data[7];
-  sensor->rawGyrY = (raw_data[8] << 8) | raw_data[9];
-  sensor->rawGyrZ = (raw_data[10] << 8) | raw_data[11];
-  sensor->accX = sensor->accX_scale * (sensor->rawAccX - sensor->accX_offset);
-  sensor->accY = sensor->accY_scale * (sensor->rawAccY - sensor->accY_offset);
-  sensor->accZ = sensor->accZ_scale * (sensor->rawAccZ - sensor->accZ_offset);
-  sensor->gyrX = sensor->gyrX_scale * (sensor->rawGyrX - sensor->gyrX_offset);
-  sensor->gyrY = sensor->gyrY_scale * (sensor->rawGyrY - sensor->gyrY_offset);
-  sensor->gyrZ = sensor->gyrZ_scale * (sensor->rawGyrZ - sensor->gyrZ_offset);
-} while (HAL_I2C_GetError(&hi2c1) == HAL_I2C_ERROR_AF);
-```
-
-- 
-```c
-void updateIMU2(IMU *sensor) // GY-95 USART
-```
-
-- 
-```c
-if (uart_receive_ok == 1)
-```
-
-- 
-```c
-if (UART1_rxBuffer[0] == UART1_txBuffer[0] && UART1_rxBuffer[1] == UART1_txBuffer[1] && UART1_rxBuffer[2] == UART1_txBuffer[2] && UART1_rxBuffer[3] == UART1_txBuffer[3])
-```
-
-- 
-```c
-sensor->rawAccX = (UART1_rxBuffer[5] << 8) | UART1_rxBuffer[4];
-sensor->rawAccY = (UART1_rxBuffer[7] << 8) | UART1_rxBuffer[6];
-sensor->rawAccZ = (UART1_rxBuffer[9] << 8) | UART1_rxBuffer[8];
-sensor->rawGyrX = (UART1_rxBuffer[11] << 8) | UART1_rxBuffer[10];
-sensor->rawGyrY = (UART1_rxBuffer[13] << 8) | UART1_rxBuffer[12];
-sensor->rawGyrZ = (UART1_rxBuffer[15] << 8) | UART1_rxBuffer[14];
-```
-
-- 
-```c
-sensor->accX = sensor->accX_scale * (sensor->rawAccX - sensor->accX_offset);
-sensor->accY = sensor->accY_scale * (sensor->rawAccY - sensor->accY_offset);
-sensor->accZ = sensor->accZ_scale * (sensor->rawAccZ - sensor->accZ_offset);
-sensor->gyrX = sensor->gyrX_scale * (sensor->rawGyrX - sensor->gyrX_offset);
-sensor->gyrY = sensor->gyrY_scale * (sensor->rawGyrY - sensor->gyrY_offset);
-sensor->gyrZ = sensor->gyrZ_scale * (sensor->rawGyrZ - sensor->gyrZ_offset);
-```
-
-- 
-```c
-float dummyx = cos(sensorAngle) * sensor->accX - sin(sensorAngle) * sensor->accY;
-float dummyy = sin(sensorAngle) * sensor->accX + cos(sensorAngle) * sensor->accY;
-sensor->accX = -dummyy;
-sensor->accY = dummyx;
-dummyx = cos(sensorAngle) * sensor->gyrX - sin(sensorAngle) * sensor->gyrY;
-dummyy = sin(sensorAngle) * sensor->gyrX + cos(sensorAngle) * sensor->gyrY;
-sensor->gyrX = -dummyy;
-sensor->gyrY = dummyx;
-```
-
-- 
-```c
-uart_receive_ok = 0;
-```
-
-- 
-```c
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
-{
-  if (uart_receive_ok == 0 && huart->Instance == USART1)
-  {
-    uart_receive_ok = 1;
-  }
-}
-```
-
-- 
-```c
-// Initialize the randomizer using the current timestamp as a seed
-// (The time() function is provided by the <time.h> header file)
-// srand(time(NULL));
-void initialize(LinearQuadraticRegulator *model)
-```
-
-- 
-``p = Filter \ order``
-
-``\lambda = Exponential \ weighting \ factor``
-
-``\delta = Value \ used \ to \ initialize \ \textbf{P}(0)``
-
-```c
-model->j = 1;
-model->k = 1;
-model->n = dim_n;
-model->m = dim_m;
-model->lambda = 0.99;
-model->delta = 0.01;
-model->active = 0;
-model->dt = 0.0;
-```
-
-- 
-``\textbf{w}_0 = \textbf{0}``
-
-``\textbf{P}(0) = \delta^{-1} \textbf{I}``
-
-```c
-for (int i = 0; i < (model->n + model->n); i++)
-{
-  for (int j = 0; j < (model->n + model->n); j++)
-  {
-    setIndex(&(model->W_n), i, j, (float)(rand() % 100) / 100.0);
-    if (i == j)
-    {
-      setIndex(&(model->P_n), i, j, 1.0);
-    }
-    else
-    {
-      setIndex(&(model->P_n), i, j, 0.0);
-    }
-  }
-}
-```
-
-- 
-```c
-model->K_j.x00 = (float)(rand() % 100) / 100.0;
-model->K_j.x01 = (float)(rand() % 100) / 100.0;
-model->K_j.x02 = (float)(rand() % 100) / 100.0;
-model->K_j.x03 = (float)(rand() % 100) / 100.0;
-model->K_j.x04 = (float)(rand() % 100) / 100.0;
-model->K_j.x05 = (float)(rand() % 100) / 100.0;
-model->K_j.x06 = (float)(rand() % 100) / 100.0;
-model->K_j.x07 = (float)(rand() % 100) / 100.0;
-model->K_j.x08 = (float)(rand() % 100) / 100.0;
-model->K_j.x09 = (float)(rand() % 100) / 100.0;
-model->K_j.x10 = (float)(rand() % 100) / 100.0;
-model->K_j.x11 = (float)(rand() % 100) / 100.0;
-model->K_j.x12 = (float)(rand() % 100) / 100.0;
-model->K_j.x13 = (float)(rand() % 100) / 100.0;
-model->K_j.x14 = (float)(rand() % 100) / 100.0;
-model->K_j.x15 = (float)(rand() % 100) / 100.0;
-model->K_j.x16 = (float)(rand() % 100) / 100.0;
-model->K_j.x17 = (float)(rand() % 100) / 100.0;
-model->K_j.x18 = (float)(rand() % 100) / 100.0;
-model->K_j.x19 = (float)(rand() % 100) / 100.0;
-```
-
-- 
-```c
-model->dataset.x0 = 0.0;
-model->dataset.x1 = 0.0;
-model->dataset.x2 = 0.0;
-model->dataset.x3 = 0.0;
-model->dataset.x4 = 0.0;
-model->dataset.x5 = 0.0;
-model->dataset.x6 = 0.0;
-model->dataset.x7 = 0.0;
-model->dataset.x8 = 0.0;
-model->dataset.x9 = 0.0;
-model->dataset.x10 = 0.0;
-model->dataset.x11 = 0.0;
-model->dataset.x12 = 0.0;
-model->dataset.x13 = 0.0;
-model->dataset.x14 = 0.0;
-model->dataset.x15 = 0.0;
-model->dataset.x16 = 0.0;
-model->dataset.x17 = 0.0;
-model->dataset.x18 = 0.0;
-model->dataset.x19 = 0.0;
-model->dataset.x20 = 0.0;
-model->dataset.x21 = 0.0;
-model->dataset.x22 = 0.0;
-model->dataset.x23 = 0.0;
-```
-
-- 
-```c
-// scale : 1 / 2048
-IMU imu1 = {-24, -60, 27, 0.000488281, 0.000488281, 0.000488281, 0, 0, 0, 0.017444444, 0.017444444, 0.017444444, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-IMU imu2 = {75, -25, -18, 0.000488281, 0.000488281, 0.000488281, 0, 0, 0, 0.017444444, 0.017444444, 0.017444444, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-```
-
-- 
-```c
-Encoder reactionEncoder = {1736, 0, 0, 0, 0, 0};
-Encoder rollingEncoder = {3020, 0, 0, 0, 0, 0};
-```
-
-- 
-```c
-CurrentSensor reactionCurrentSensor = {32000.0, 0, 0, 0};
-CurrentSensor rollingCurrentSensor = {32000.0, 0, 0, 0};
-```
-
-- 
-```c
-model->imu1 = imu1;
-model->imu2 = imu2;
-model->reactionEncoder = reactionEncoder;
-model->rollingEncoder = rollingEncoder;
-model->reactionCurrentSensor = reactionCurrentSensor;
-model->rollingCurrentSensor = rollingCurrentSensor;
-model->reactionPWM = 0.0;
-model->rollingPWM = 0.0;
-```
-
 ## The Convergence of Selected Algebraic Riccati Equation Solution Parameters
 
 Convergence of selected algebraic Riccati equation solution parameters. The adaptive controller based on value iteration converges to the ARE solution in real time without knowing the system matrix (including the inertia matrix, and the torque and the electromotive force constants of the motors.)
@@ -1362,3 +1029,5 @@ Convergence of selected algebraic Riccati equation solution parameters. The adap
 8. Richard M. Murray, Zexiang Li, and S. Shankar Sastry, *A Mathematical Introduction to Robotic Manipulation*, CRC-Press, March 22, 1994, ISBN 9780849379819, 0849379814.
 
 9. S. Haykin, Adaptive Filter Theory, Prentice-Hall, Englewood-Cliffs, NJ, 1986.
+
+10. Richard S. Sutton and Andrew G. Barto, Reinforcement Learning (An Introduction), second edition, 2018, The MIT Press, Cambridge, Massachusetts, London, England, ISBN: 978-0-262-19398-6.
