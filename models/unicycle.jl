@@ -7,8 +7,8 @@ using Porta
 
 figuresize = (1920, 1080)
 modelname = "unicycle"
-maxplotnumber = 50
-headers = ["AX1", "AY1", "AZ1", "AX2", "AY2", "AZ2", "roll", "pitch", "encT", "encB", "k", "j", "x0", "x1", "x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "P0", "P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11"]
+maxplotnumber = 30
+headers = ["AX1", "AY1", "AZ1", "AX2", "AY2", "AZ2", "GX1", "GY1", "GZ1", "GX2", "GY2", "GZ2", "roll", "pitch", "encT", "encB", "j", "x0", "x1", "x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "P0", "P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11"]
 clientside = nothing
 run = false
 readings = Dict()
@@ -78,9 +78,9 @@ chassis_stl_path = joinpath("data", "unicycle", "unicycle_chassis.STL")
 rollingwheel_stl_path = joinpath("data", "unicycle", "unicycle_main_wheel.STL")
 reactionwheel_stl_path = joinpath("data", "unicycle", "unicycle_reaction_wheel.STL")
 
-chassis_colormap = :cyclic_protanopic_deuteranopic_bwyk_16_96_c31_n256
-rollingwheel_colormap = :linear_bmy_10_95_c78_n256
-reactionwheel_colormap = :cividis
+chassis_colormap = :RdBu_8
+rollingwheel_colormap = :Reds_3
+reactionwheel_colormap = :diverging_tritanopic_cwr_75_98_c20_n256
 
 pivot_observable = Observable(pivot)
 point1_observable = Observable(p1)
@@ -99,11 +99,9 @@ buttonlabels = ["Run", "Stop", "Connect", "Disconnect"]
 buttons = [Button(fig, label=l, buttoncolor=buttoncolor) for l in buttonlabels]
 statustext = Observable("Not connected.")
 statuslabel = Label(fig, statustext, fontsize = 15)
-kindextext = Observable("k: 1")
 jindextext = Observable("j: 1")
-kindexlabel = Label(fig, kindextext, fontsize = 30)
 jindexlabel = Label(fig, jindextext, fontsize = 30)
-fig[1, 2] = grid!(hcat(kindexlabel, jindexlabel, statuslabel, buttons...), tellheight=false, tellwidth=false)
+fig[1, 2] = grid!(hcat(jindexlabel, statuslabel, buttons...), tellheight=false, tellwidth=false)
 
 graphpoints = Observable([Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)]])
 graphpoints2 = Observable([Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)]])
@@ -199,7 +197,7 @@ update_cam!(lscene.scene, Vec3f(eyeposition...), Vec3f(lookat...), Vec3f(up...))
 reaction_angle = 0.0
 rolling_angle = 0.0
 ylims!(ax1, -1.0, 1.0)
-ylims!(ax2, -1e3, 1e3)
+ylims!(ax2, -1e2, 1e2)
 
 
 disconnect(clientside) = begin
@@ -264,7 +262,6 @@ on(buttons[1].clicks) do n
             P9 = readings["P9"]
             P10 = readings["P10"]
             P11 = readings["P11"]
-            kindextext[] = "k: $(readings["k"])"
             jindextext[] = "j: $(readings["j"])"
             # delta_time = readings["dt"]
 
