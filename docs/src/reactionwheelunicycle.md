@@ -16,227 +16,120 @@ System states in real time. Even though the matrix of inertia (among other physi
 
 ## The Z-Euler Angle Is Not Observable
 
-
-- 
 ```c
 void updateIMU(LinearQuadraticRegulator *model)
-```
-
-- 
-```c
-updateIMU1(&(model->imu1));
-updateIMU2(&(model->imu2));
-```
-
-- 
-```c
-typedef struct
 {
-  int16_t accX_offset;
-  int16_t accY_offset;
-  int16_t accZ_offset;
-  float accX_scale;
-  float accY_scale;
-  float accZ_scale;
-  int16_t gyrX_offset;
-  int16_t gyrY_offset;
-  int16_t gyrZ_offset;
-  float gyrX_scale;
-  float gyrY_scale;
-  float gyrZ_scale;
-  int16_t rawAccX;
-  int16_t rawAccY;
-  int16_t rawAccZ;
-  int16_t rawGyrX;
-  int16_t rawGyrY;
-  int16_t rawGyrZ;
-  float accX;
-  float accY;
-  float accZ;
-  float gyrX;
-  float gyrY;
-  float gyrZ;
-  float roll;
-  float pitch;
-  float yaw;
-  float roll_velocity;
-  float pitch_velocity;
-  float yaw_velocity;
-  float roll_acceleration;
-  float pitch_acceleration;
-  float yaw_acceleration;
-} IMU;
-```
+  updateIMU1(&(model->imu1));
+  updateIMU2(&(model->imu2));
+  setIndexVec3(&(model->imu1.R), 0, model->imu1.accX);
+  setIndexVec3(&(model->imu1.R), 1, model->imu1.accY);
+  setIndexVec3(&(model->imu1.R), 2, model->imu1.accZ);
+  setIndexVec3(&(model->imu2.R), 0, model->imu2.accX);
+  setIndexVec3(&(model->imu2.R), 1, model->imu2.accY);
+  setIndexVec3(&(model->imu2.R), 2, model->imu2.accZ);
 
-- 
-```c
-R1[0] = model->imu1.accX;
-R1[1] = model->imu1.accY;
-R1[2] = model->imu1.accZ;
-R2[0] = model->imu2.accX;
-R2[1] = model->imu2.accY;
-R2[2] = model->imu2.accZ;
-```
-
-- 
-```c
-_R1[0] = 0.0;
-_R1[1] = 0.0;
-_R1[2] = 0.0;
-_R2[0] = 0.0;
-_R2[1] = 0.0;
-_R2[2] = 0.0;
-for (int i = 0; i < 3; i++)
-{
-  for (int j = 0; j < 3; j++)
+  for (int i = 0; i < 3; i++)
   {
-    _R1[i] += B_A1_R[i][j] * R1[j];
-    _R2[i] += B_A2_R[i][j] * R2[j];
+    setIndexVec3(&(model->imu1._R), i, 0.0);
+    setIndexVec3(&(model->imu2._R), i, 0.0);
   }
-}
-```
 
-- 
-```c
-for (int i = 0; i < 3; i++)
-{
-  Matrix[i][0] = _R1[i];
-  Matrix[i][1] = _R2[i];
-}
-```
-
-- 
-```c
-for (int i = 0; i < 3; i++)
-{
-  for (int j = 0; j < 4; j++)
+  for (int i = 0; i < 3; i++)
   {
-    Q[i][j] = 0.0;
-    for (int k = 0; k < 2; k++)
+    for (int j = 0; j < 3; j++)
     {
-      Q[i][j] += Matrix[i][k] * X[k][j];
+      setIndexVec3(&(model->imu1._R), i, getIndexVec3(model->imu1._R, i) + getIndexMat3(model->imu1.B_A_R, i, j) * getIndexVec3(model->imu1.R, j));
+      setIndexVec3(&(model->imu2._R), i, getIndexVec3(model->imu2._R, i) + getIndexMat3(model->imu2.B_A_R, i, j) * getIndexVec3(model->imu2.R, j));
     }
   }
-}
-```
 
-- 
-```c
-g[0] = Q[0][0];
-g[1] = Q[1][0];
-g[2] = Q[2][0];
-```
-
-- 
-```c
-beta = atan2(-g[0], sqrt(pow(g[1], 2) + pow(g[2], 2)));
-```
-
-- 
-```c
-gamma1 = atan2(g[1], g[2]);
-```
-
-- 
-```c
-G1[0] = model->imu1.gyrX;
-G1[1] = model->imu1.gyrY;
-G1[2] = model->imu1.gyrZ;
-G2[0] = model->imu2.gyrX;
-G2[1] = model->imu2.gyrY;
-G2[2] = model->imu2.gyrZ;
-```
-
-- 
-```c
-_G1[0] = 0.0;
-_G1[1] = 0.0;
-_G1[2] = 0.0;
-_G2[0] = 0.0;
-_G2[1] = 0.0;
-_G2[2] = 0.0;
-for (int i = 0; i < 3; i++)
-{
-  for (int j = 0; j < 3; j++)
+  for (int i = 0; i < 3; i++)
   {
-    _G1[i] += B_A1_R[i][j] * G1[j];
-    _G2[i] += B_A2_R[i][j] * G2[j];
+    setIndexMat32(&(model->Matrix), i, 0, getIndexVec3(model->imu1._R, i));
+    setIndexMat32(&(model->Matrix), i, 1, getIndexVec3(model->imu2._R, i));
   }
-}
-```
 
-- 
-```c
-for (int i = 0; i < 3; i++)
-{
-  r[i] = (_G1[i] + _G2[i]) / 2.0;
-}
-```
-
-- 
-```
-E[0][0] = 0.0;
-E[0][1] = sin(gamma1) / cos(beta);
-E[0][2] = cos(gamma1) / cos(beta);
-E[1][0] = 0.0;
-E[1][1] = cos(gamma1);
-E[1][2] = -sin(gamma1);
-E[2][0] = 1.0;
-E[2][1] = sin(gamma1) * tan(beta);
-E[2][2] = cos(gamma1) * tan(beta);
-```
-
-- 
-```c
-r_dot[0] = 0.0;
-r_dot[1] = 0.0;
-r_dot[2] = 0.0;
-for (int i = 0; i < 3; i++)
-{
-  for (int j = 0; j < 3; j++)
+  for (int i = 0; i < 3; i++)
   {
-    r_dot[i] += E[i][j] * r[j];
-    r_dot[i] += E[i][j] * r[j];
-    r_dot[i] += E[i][j] * r[j];
-    r_dot[i] += E[i][j] * r[j];
+    for (int j = 0; j < 4; j++)
+    {
+      setIndexMat34(&(model->Q), i, j, 0.0);
+      for (int k = 0; k < 2; k++)
+      {
+        setIndexMat34(&(model->Q), i, j, getIndexMat34(model->Q, i, j) + getIndexMat32(model->Matrix, i, k) * getIndexMat24(model->X, k, j));
+      }
+    }
   }
+  setIndexVec3(&(model->g), 0, getIndexMat34(model->Q, 0, 0));
+  setIndexVec3(&(model->g), 1, getIndexMat34(model->Q, 1, 0));
+  setIndexVec3(&(model->g), 2, getIndexMat34(model->Q, 2, 0));
+  model->beta = atan2(-getIndexVec3(model->g, 0), sqrt(pow(getIndexVec3(model->g, 1), 2) + pow(getIndexVec3(model->g, 2), 2)));
+  model->gamma = atan2(getIndexVec3(model->g, 1), getIndexVec3(model->g, 2));
+
+  setIndexVec3(&(model->imu1.G), 0, model->imu1.gyrX);
+  setIndexVec3(&(model->imu1.G), 1, model->imu1.gyrY);
+  setIndexVec3(&(model->imu1.G), 2, model->imu1.gyrZ);
+  setIndexVec3(&(model->imu2.G), 0, model->imu2.gyrX);
+  setIndexVec3(&(model->imu2.G), 1, model->imu2.gyrY);
+  setIndexVec3(&(model->imu2.G), 2, model->imu2.gyrZ);
+
+  for (int i = 0; i < 3; i++)
+  {
+    setIndexVec3(&(model->imu1._G), i, 0.0);
+    setIndexVec3(&(model->imu2._G), i, 0.0);
+  }
+
+  for (int i = 0; i < 3; i++)
+  {
+    for (int j = 0; j < 3; j++)
+    {
+      setIndexVec3(&(model->imu1._G), i, getIndexVec3(model->imu1._G, i) + getIndexMat3(model->imu1.B_A_R, i, j) * getIndexVec3(model->imu1.G, j));
+      setIndexVec3(&(model->imu2._G), i, getIndexVec3(model->imu2._G, i) + getIndexMat3(model->imu2.B_A_R, i, j) * getIndexVec3(model->imu2.G, j));
+    }
+  }
+  for (int i = 0; i < 3; i++)
+  {
+    setIndexVec3(&(model->r), i, (getIndexVec3(model->imu1._G, i) + getIndexVec3(model->imu2._G, i)) / 2.0);
+  }
+
+  setIndexMat3(&(model->E), 0, 0, 0.0);
+  setIndexMat3(&(model->E), 0, 1, sin(model->gamma) / cos(model->beta));
+  setIndexMat3(&(model->E), 0, 2, cos(model->gamma) / cos(model->beta));
+  setIndexMat3(&(model->E), 1, 0, 0.0);
+  setIndexMat3(&(model->E), 1, 1, cos(model->gamma));
+  setIndexMat3(&(model->E), 1, 2, -sin(model->gamma));
+  setIndexMat3(&(model->E), 2, 0, 1.0);
+  setIndexMat3(&(model->E), 2, 1, sin(model->gamma) * tan(model->beta));
+  setIndexMat3(&(model->E), 2, 2, cos(model->gamma) * tan(model->beta));
+
+  for (int i = 0; i < 3; i++)
+  {
+    setIndexVec3(&(model->rDot), i, 0.0);
+  }
+
+  for (int i = 0; i < 3; i++)
+  {
+    for (int j = 0; j < 3; j++)
+    {
+      setIndexVec3(&(model->rDot), i, getIndexVec3(model->rDot, i) + getIndexMat3(model->E, i, j) * getIndexVec3(model->r, j));
+    }
+  }
+
+  model->fusedBeta = model->kappa1 * model->beta + (1.0 - model->kappa1) * (model->fusedBeta + model->dt * (getIndexVec3(model->rDot, 1) / 180.0 * M_PI));
+  model->fusedGamma = model->kappa2 * model->gamma + (1.0 - model->kappa2) * (model->fusedGamma + model->dt * (getIndexVec3(model->rDot, 2) / 180.0 * M_PI));
+  model->imu1.yaw += model->dt * getIndexVec3(model->rDot, 0);
+
+  float _roll = model->fusedBeta;
+  float _pitch = -model->fusedGamma;
+  float _roll_velocity = ((getIndexVec3(model->rDot, 1) / 180.0 * M_PI) + (_roll - model->imu1.roll) / model->dt) / 2.0;
+  float _pitch_velocity = ((-getIndexVec3(model->rDot, 2) / 180.0 * M_PI) + (_pitch - model->imu1.pitch) / model->dt) / 2.0;
+  model->imu1.roll_acceleration = _roll_velocity - model->imu1.roll_velocity;
+  model->imu1.pitch_acceleration = _pitch_velocity - model->imu1.pitch_velocity;
+  model->imu1.roll_velocity = _roll_velocity;
+  model->imu1.pitch_velocity = _pitch_velocity;
+  model->imu1.roll = _roll;
+  model->imu1.pitch = _pitch;
 }
-```
-
-- 
-```c
-fused_beta = kappa1 * beta + (1.0 - kappa1) * (fused_beta + model->dt * (r_dot[1] / 180.0 * M_PI));
-```
-
-- 
-```c
-fused_gamma = kappa2 * gamma1 + (1.0 - kappa2) * (fused_gamma + model->dt * (r_dot[2] / 180.0 * M_PI));
-```
-
-- 
-```c
-float _roll = fused_beta;
-float _pitch = -fused_gamma;
-```
-
-- 
-```c
-float _roll_velocity = ((r_dot[1] / 180.0 * M_PI) + (_roll - model->imu1.roll) / model->dt) / 2.0;
-float _pitch_velocity = ((-r_dot[2] / 180.0 * M_PI) + (_pitch - model->imu1.pitch) / model->dt) / 2.0;
-```
-
-- 
-```c
-model->imu1.roll_acceleration = _roll_velocity - model->imu1.roll_velocity;
-model->imu1.pitch_acceleration = _pitch_velocity - model->imu1.pitch_velocity;
-```
-
-- 
-```c
-model->imu1.roll_velocity = _roll_velocity;
-model->imu1.pitch_velocity = _pitch_velocity;
-model->imu1.roll = _roll;
-model->imu1.pitch = _pitch;
 ```
 
 ## Stepping Through the Implementation
@@ -271,10 +164,7 @@ if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_0) == 0)
 else
 {
   model.active = 0;
-  model.reactionPWM = 0.0;
-  model.rollingPWM = 0.0;
-  TIM2->CCR1 = 0;
-  TIM2->CCR2 = 0;
+  resetActuators(&model);
 }
 ```
 
@@ -292,7 +182,16 @@ When the reaction wheel unicycle falls over, the roll and pitch angles of the ch
 The controller stops spinning and stays that way, unless one of the above are performed by the user.
 
 ```c
-if (fabs(model.imu1.roll) > roll_safety_angle || fabs(model.imu1.pitch) > pitch_safety_angle || model.k > max_episode_length)
+if (fabs(model.imu1.roll) > model.rollSafetyAngle || fabs(model.imu1.pitch) > model.pitchSafetyAngle || model.j > model.maxEpisodeLength)
+{
+  model.outOfBoundsCounter = model.outOfBoundsCounter + 1;
+}
+else
+{
+  model.outOfBoundsCounter = fmax(0, model.outOfBoundsCounter - 1);
+}
+
+if (model.outOfBoundsCounter > model.maxOutOfBounds)
 {
   model.active = 0;
   HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
@@ -305,7 +204,32 @@ If the model is set to be active, then the controller takes one step forward. Th
 ```c
 if (model.active == 1)
 {
-  stepForward(&model);
+  model.logPeriod = 20;
+  for (int i = 0; i < 5; i++)
+  {
+    t1 = DWT->CYCCNT;
+    updateSensors(&model);
+    computeFeedbackPolicy(&model);
+    applyFeedbackPolicy(&model);
+    stepForward(&model);
+    model.logCounter = model.logCounter + 1;
+    t2 = DWT->CYCCNT;
+    diff = t2 - t1;
+    model.dt = (float)diff / model.cpuClock;
+  }
+  updateControlPolicy(&model);
+}
+else
+{
+  model.logPeriod = 80;
+  t1 = DWT->CYCCNT;
+  resetActuators(&model);
+  updateSensors(&model);
+  computeFeedbackPolicy(&model);
+  model.logCounter = model.logCounter + 1;
+  t2 = DWT->CYCCNT;
+  diff = t2 - t1;
+  model.dt = (float)diff / model.cpuClock;
 }
 ```
 
@@ -320,43 +244,16 @@ Finally, the Inertial Measurement Unit (IMU) is updated by calling the `updateIM
 
 3. The tilt estimation given the accelerometers is enhanced by fusing it with gyroscopic measurements.
 
-```c
-else
-{
-  model.reactionPWM = 0.0;
-  model.rollingPWM = 0.0;
-  TIM2->CCR1 = 0;
-  TIM2->CCR2 = 0;
-  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_RESET);
-  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_RESET);
-  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2, GPIO_PIN_RESET);
-  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, GPIO_PIN_RESET);
-  encodeWheel(&model.reactionEncoder, TIM3->CNT);
-  encodeWheel(&model.rollingEncoder, TIM4->CNT);
-  senseCurrent(&(model.reactionCurrentSensor), &(model.rollingCurrentSensor));
-  updateIMU(&model);
-}
-```
-
 - 
 An episode is defined as one or more sequential interactions with the environment. An episode is started by pressing the blue push button on the robot, or updating a control policy. An episode is finished once the robot falls over or when the control policy is updated. The field `k` of the model counts the number of environment interactions in an episode. Since the `stepForward` function is essentially a Recursive Least Squares (RLS) algorithm, it will make the filter matrix `W_n` and the inverse autocorrelation matrix `P_n` converge to their respective final values after a finite number of runs. The exact number of runs for the RLS to converge is not constant, but we can assume that it is small when the robot approaches a state in which opposing angular momenta are balanced. While the RLS converges we expect to evaluate a minimal change to filter coefficients less than the quantity specified by the name `minimumChange`. Therefore, by counting the number of `stepForward` function calls we can insert control policy updates periodically and occasionally depending on the filter coefficients changes.
 
 The function `updateControlPolicy` is given a pointer to the model object and its side effect is an update to the feedback policy matrix `K_j`. The index of the feeback policy matrix is different from the index of the filter matrix `W_n` and the inverse autocorrelation matrix `P_n`. A second counter variable `j` is incremented every time the control policy is updated, whereas the variable `k` counts the number of calls to the `stepForward` function. However, if the update period is higher than one control cycle then the variable `j` counts at a slower rate than the variable `k`. The variable `updatePolicyPeriod` equals the time out of the active policy. The condition `model.k % updatePolicyPeriod == 0` ensures that no active policy can act more times than the quantity specified with the name `updatePolicyPeriod`. During the value iteration process in the `stepForward` function call, one of the side effects is triggering a control policy update as soon as the RLS algorithm converges. The convergence condition is satisfied whenever the reduce sum of the absolute value of the corrections to the filter coefficients is less than the quantity `minimumChange`. Minimum change is a way to to see if there is any update to the filter coefficients or not. Therefore, the binary `or` operator `||` determines if a control policy update should be done at any given control cycle, between two arguments: A. **the update policy time out period** and B. **the coefficients convergence update trigger**. Variable policy update rates save energy consumption as they keep good policies active for longer episodes.
 
-```c
-if (model.k % updatePolicyPeriod == 0 || triggerUpdate == 1)
-{
-  updateControlPolicy(&model);
-  triggerUpdate = 0;
-}
-```
-
 - 
 In order to monitor the controller and debug issues we write the logs periodically to the standard input / output console. The variable `log_counter` is incremented by one every control cycle. Then, the log counter is compared to the constnt `LOG_CYCLE` for finding out if a cycle should be logged. But it is not a sufficient condition for logging because a second fuse bit is also rquired for permission to log. The second fuse bit is connected to the port C of the general purpose input / output, pin 1. Whenever the fuse bit pin is grounded it is activated. Once the fuse bit is active, the transmission flag `transmit` is set at the appropriate control cycle count. The reason for `LOG_CYCLE` is to limit the total number of logs per second, as the Micro-Controller Unit (MCU) is too fast for a continuous report. And the second fuse bit is there to turn off logging for saving time, as log transmissions takes time away from the control processes. So by using the logical "and" operator `&&` we can combine the logging cycle condition with the logging fuse bit, in order to regulate the frequnecy of transmissions.
 
 ```c
-log_counter++;
-if (log_counter > LOG_CYCLE && HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_1) == 0)
+if (model.logCounter > model.logPeriod && HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_1) == 0)
 {
   transmit = 1;
 }
@@ -365,7 +262,7 @@ if (log_counter > LOG_CYCLE && HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_1) == 0)
 - 
 
 If the `transmit` variable is equal to one, then the log counter is cleard along with the `transmit` variable before transmission. The function `sprintf` is called with a message buffer `MSG` and a formatted character string to populate the buffer with numbers. A log message can be anything, but for finding the matrix of known parameters in tilt estimation, the accelerometrs data must be included. After the message is composed, it is given as an argument to the function `HAL_UART_Transmit`, which stands for: Hardware Abstraction Layer, Universal Asynchronous Receiver / Transmitter, Transmit. The function also requires a pointer to `uart6`, which is a micro-controller peripheral for serial communication, and the size of the message buffer, along with a time out delay. Printing and transmitting the log finishes the main control loop. The console on the other side of tranmission receives a line like this:
-`AX1: 0.34, AY1: 0.03, AZ1: 0.95, | AX2: 0.34, AY2: 0.02, AZ2: 0.94, | roll: -0.34, pitch: -0.03, | encT: 0.00, encB: 0.00, | k: 1, j: 1, | x0: 0.00, x1: 0.00, x2: 0.00, x3: 0.00, x4: 0.00, x5: 0.00, x6: 0.00, x7: 0.00, x8: 0.00, x9: 0.00, x10: 0.00, x11: 0.00, | P0: 0.12, P1: 1.00, P2: 1.00, P3: 1.00, P4: 1.00, P5: 1.00, P6: 1.00, P7: 1.00, P8: 1.00, P9: 1.00, P10: 1.00, P11: 1.00, dt: 0.001847`.
+`AX1: -0.01, AY1: 1.03, AZ1: 0.00, | AX2: -0.05, AY2: 0.97, AZ2: -0.04, | roll: 0.03, pitch: -1.59, | encT: 0.46, encB: 4.31, | j: 1038.000000, | x0: -0.02, x1: -0.12, x2: 0.03, x3: -1.22, x4: -0.90, x5: 0.05, x6: 0.09, x7: -0.04, x8: 0.00, x9: -0.01, x10: 0.00, x11: 0.00, | P0: -96.08, P1: 0.27, P2: 2.04, P3: 1.18, P4: 1.36, P5: 0.34, P6: 0.03, P7: 0.77, P8: 0.08, P9: 0.57, P10: 62.48, P11: 62.48, dt: 0.001947`.
 
 You can visualize this example message using the [Unicycle](https://github.com/iamazadi/Porta.jl/blob/master/models/unicycle.jl) script. The example includes: the tri-axis acceleromer measurements of IMU 1 and IMU 2, the roll and pitch angles after sensor fusion, the absolute position of both encoders, and the diagonal entries of the inverse auto-correlation matrix `P_n`. Different messages can be composed for different use cases, for example printing raw sensor readings for calibrating the zero point and the scale of the accelerometers axes.
 
@@ -373,10 +270,12 @@ You can visualize this example message using the [Unicycle](https://github.com/i
 if (transmit == 1)
 {
   transmit = 0;
-  log_counter = 0;
+  model.logCounter = 0;
+
   sprintf(MSG,
-          "AX1: %0.2f, AY1: %0.2f, AZ1: %0.2f, | AX2: %0.2f, AY2: %0.2f, AZ2: %0.2f, | roll: %0.2f, pitch: %0.2f, | encT: %0.2f, encB: %0.2f, | k: %f, j: %f, | x0: %0.2f, x1: %0.2f, x2: %0.2f, x3: %0.2f, x4: %0.2f, x5: %0.2f, x6: %0.2f, x7: %0.2f, x8: %0.2f, x9: %0.2f, x10: %0.2f, x11: %0.2f, | P0: %0.2f, P1: %0.2f, P2: %0.2f, P3: %0.2f, P4: %0.2f, P5: %0.2f, P6: %0.2f, P7: %0.2f, P8: %0.2f, P9: %0.2f, P10: %0.2f, P11: %0.2f, dt: %0.6f\r\n",
-          model.imu1.accX, model.imu1.accY, model.imu1.accZ, model.imu2.accX, model.imu2.accY, model.imu2.accZ, model.imu1.roll, model.imu1.pitch, model.reactionEncoder.radianAngle, model.rollingEncoder.radianAngle, (float) model.k, (float) model.j, model.dataset.x0, model.dataset.x1, model.dataset.x2, model.dataset.x3, model.dataset.x4, model.dataset.x5, model.dataset.x6, model.dataset.x7, model.dataset.x8, model.dataset.x9, model.dataset.x10, model.dataset.x11, getIndex(model.P_n, 0, 0), getIndex(model.P_n, 1, 1), getIndex(model.P_n, 2, 2), getIndex(model.P_n, 3, 3), getIndex(model.P_n, 4, 4), getIndex(model.P_n, 5, 5), getIndex(model.P_n, 6, 6), getIndex(model.P_n, 7, 7), getIndex(model.P_n, 8, 8), getIndex(model.P_n, 9, 9), getIndex(model.P_n, 10, 10), getIndex(model.P_n, 11, 11), dt);
+          "AX1: %0.2f, AY1: %0.2f, AZ1: %0.2f, | AX2: %0.2f, AY2: %0.2f, AZ2: %0.2f, | roll: %0.2f, pitch: %0.2f, | encT: %0.2f, encB: %0.2f, | j: %0.1f, | x0: %0.2f, x1: %0.2f, x2: %0.2f, x3: %0.2f, x4: %0.2f, x5: %0.2f, x6: %0.2f, x7: %0.2f, x8: %0.2f, x9: %0.2f, x10: %0.2f, x11: %0.2f, | P0: %0.2f, P1: %0.2f, P2: %0.2f, P3: %0.2f, P4: %0.2f, P5: %0.2f, P6: %0.2f, P7: %0.2f, P8: %0.2f, P9: %0.2f, P10: %0.2f, P11: %0.2f, dt: %0.6f\r\n",
+          model.imu1.accX, model.imu1.accY, model.imu1.accZ, model.imu2.accX, model.imu2.accY, model.imu2.accZ, model.imu1.roll, model.imu1.pitch, model.reactionEncoder.radianAngle, model.rollingEncoder.radianAngle, (float)model.j, model.dataset.x0, model.dataset.x1, model.dataset.x2, model.dataset.x3, model.dataset.x4, model.dataset.x5, model.dataset.x6, model.dataset.x7, model.dataset.x8, model.dataset.x9, model.dataset.x10, model.dataset.x11, getIndexMat12(model.P_n, 0, 0), getIndexMat12(model.P_n, 1, 1), getIndexMat12(model.P_n, 2, 2), getIndexMat12(model.P_n, 3, 3), getIndexMat12(model.P_n, 4, 4), getIndexMat12(model.P_n, 5, 5), getIndexMat12(model.P_n, 6, 6), getIndexMat12(model.P_n, 7, 7), getIndexMat12(model.P_n, 8, 8), getIndexMat12(model.P_n, 9, 9), getIndexMat12(model.P_n, 10, 10), getIndexMat12(model.P_n, 11, 11), model.dt);
+
   HAL_UART_Transmit(&huart6, MSG, sizeof(MSG), 1000);
 }
 // Rinse and repeat :)
@@ -415,80 +314,16 @@ void stepForward(LinearQuadraticRegulator *model)
 - 
 The vector `x_k` is initialized as an array of element type `float` with the model data set. The data set (xₖ, uₖ, xₖ₊₁, uₖ₊₁) contains data from two consecutive time steps `k` and `k + 1`. The number of dimensions of the `x_k` vector is equal to n = 10, storing the system state at time `k`. Each element of the state vector xₖ ∈ ℝⁿ has a name that represents a physical quantity. The order of the feature names are the same in both time indices: the roll angle, the roll angular velocity, the roll angular acceleration, the pitch angle, the pitch angular velocity, the pitch angular acceleration, the angular velocity of the reaction wheel, the angular velocity of the rolling wheel, the electric current velocity of the reaction motor, and the electric current velocity of the rolling motor.
 
-```c
-x_k[0] = model->dataset.x0;
-x_k[1] = model->dataset.x1;
-x_k[2] = model->dataset.x2;
-x_k[3] = model->dataset.x3;
-x_k[4] = model->dataset.x4;
-x_k[5] = model->dataset.x5;
-x_k[6] = model->dataset.x6;
-x_k[7] = model->dataset.x7;
-x_k[8] = model->dataset.x8;
-x_k[9] = model->dataset.x9;
-```
-
 - 
 After initializing the state buffer `x_k`, another buffer is initialized with the feedback policy matrix `K_j`. The matrix Kⱼ ∈ ℝᵐˣⁿ has m = 2 rows since there are two inputs and it has n = 10 columns as there are ten states. The only reason for initializing `K_j` in the `stepForward` function is to execute a feedback policy action right before performing the measurements of the next time step `k + 1`. So the matrix and its index `j` stay constant throughout this function call.
-
-```c
-K_j[0][0] = model->K_j.x00;
-K_j[0][1] = model->K_j.x01;
-K_j[0][2] = model->K_j.x02;
-K_j[0][3] = model->K_j.x03;
-K_j[0][4] = model->K_j.x04;
-K_j[0][5] = model->K_j.x05;
-K_j[0][6] = model->K_j.x06;
-K_j[0][7] = model->K_j.x07;
-K_j[0][8] = model->K_j.x08;
-K_j[0][9] = model->K_j.x09;
-K_j[1][0] = model->K_j.x10;
-K_j[1][1] = model->K_j.x11;
-K_j[1][2] = model->K_j.x12;
-K_j[1][3] = model->K_j.x13;
-K_j[1][4] = model->K_j.x14;
-K_j[1][5] = model->K_j.x15;
-K_j[1][6] = model->K_j.x16;
-K_j[1][7] = model->K_j.x17;
-K_j[1][8] = model->K_j.x18;
-K_j[1][9] = model->K_j.x19;
-```
 
 - 
 The inputs of the system are stored in a vector uₖ ∈ ℝᵐ, which is the result of a matrix-vector product. The input is a function of the current system state at time step `k`. The feedback policy matrix `K_j` times the state vector `x_k` equals the negative of the input `u_k`. It is called the input because the product produces m = 2 floating point numbers that are used to modulate the duty cycle of the motors.
 
 - 
-```c
-u_k[0] = 0.0;
-u_k[1] = 0.0;
-for (int i = 0; i < model->m; i++)
-{
-  for (int j = 0; j < model->n; j++)
-  {
-    u_k[i] += -K_j[i][j] * x_k[j];
-  }
-}
-```
-
-- 
 The data set (xₖ, uₖ, xₖ₊₁, uₖ₊₁) of the Linear Quadratic Regulator (LQR) model directly sums up the ststem state `x_k` and the system input `u_k`. The roll and pitch angles and their derivatives with respect to time are divided by π in order to normalize the anglular values. The velocities of the wheels and the current rates of the motors are also normalized to be in the closed interval [-1, 1]. But those normalizations are encapsulated inside the `encodeWheel` and `senseCurrent` functions respectively. Since the RLS algorithm is an iterative computation, normalizing data makes the numerical results stable by limiting the absolute value of the elements of the matrices `W_n` and `P_n`. The first half of the data set pertains to the time step `k`, which occurs before the action is executed. The second half of the data set is assiged after the action has taken place.
 
 ``(x_k, u_k, x_{k + 1}, u_{k + 1})``
-
-```c
-model->dataset.x0 = model->imu1.roll / M_PI;
-model->dataset.x1 = model->imu1.roll_velocity / M_PI;
-model->dataset.x2 = model->imu1.roll_acceleration / M_PI;
-model->dataset.x3 = model->imu1.pitch / M_PI;
-model->dataset.x4 = model->imu1.pitch_velocity / M_PI;
-model->dataset.x5 = model->imu1.pitch_acceleration / M_PI;
-model->dataset.x6 = model->reactionEncoder.velocity;
-model->dataset.x7 = model->rollingEncoder.velocity;
-model->dataset.x8 = model->reactionCurrentSensor.currentVelocity;
-model->dataset.x9 = model->rollingCurrentSensor.currentVelocity;
-model->dataset.x10 = u_k[0];
-model->dataset.x11 = u_k[1];
-```
 
 - 
 The LQR inputs are bidirectional and analog. The LQR regulates the roll and pitch angles by a choice of a suitable input. There are four digital input pins: **1A**, **2A**, **3A**, **4A**, and a pair of analog enable pins: **1,2En** and **3,4EN**. The enable pins control the speeds of rotation with a 16-bit resolution, whereas the logical input pins: **1A**, **2A**, **3A** and **4A** control the direction of rotation. A motor rotates in reverse by swapping the values of Input 1 with Input 2, switching 2 values in the memory. Therefore, LQR controls the roll and pitch angles by making changes to two variables: `rollingPWM` corresponding to **1,2EN** and `reactionPWM` corresponding to **3,4EN**. LQR adds / subtracts from the two variables when it acts in the environment. To drive a direct current actuator, the driver generates an electric potential at the two ends of the actuator's coil. An electric current in the power terminals (**1Y** and **2Y**, or, **3Y** and **4Y**) occurs whenever the electric potential at the two end points are sufficiently different in intensity. The duty cycle of a PWM signal shapes the line graph of an analog voltage. In a Voltage versus Time graph, the PWM signal is a point on the graph and varies with time. There are two independent PWM signals: the reaction wheel's motor enable pin and the rolling wheel's motor enable pin. In turn, the duty cycles of the PWM signals, tell the Integrated Circuit (IC) to adjust the electric potential at the output pins of the IC: **1Y**, **2Y**, **3Y** and **4Y**. Making changes to the duty cycles with the given feedback policy `u_k`, the registers of channels one and two of Timer 2 are changed after scaling the variables and casting them to integer values.
@@ -497,69 +332,22 @@ The LQR inputs are bidirectional and analog. The LQR regulates the roll and pitc
 
 The control policy takes an action by writing to MCU registers. The MCU is capable of writing to millions of registers in less than one second. However, it takes about 2 to 5 milliseconds to solve for 2 input variables in a multi-input / multi-output system. By integrating the input vector `u_k` with a suitable step size, the duty cycle becomes approximately continuous. A big pulse step results in overshooting input adjustments in the pursuit of the equiblirium state. Since the harware power (in terms of revolutions per second and output torque) varies from motor to motor, the variable `pulseStep` helps limit changes to the input. Therefore, fine motor functions are acheived with a calibrated value of the parameter `pulseStep`.
 
-```c
-model->reactionPWM += (255.0 * pulseStep) * u_k[0];
-model->rollingPWM += (255.0 * pulseStep) * u_k[1];
-model->reactionPWM = fmin(255.0 * 255.0, model->reactionPWM);
-model->reactionPWM = fmax(-255.0 * 255.0, model->reactionPWM);
-model->rollingPWM = fmin(255.0 * 255.0, model->rollingPWM);
-model->rollingPWM = fmax(-255.0 * 255.0, model->rollingPWM);
-TIM2->CCR1 = (int)fabs(model->rollingPWM);
-TIM2->CCR2 = (int)fabs(model->reactionPWM);
-if (model->reactionPWM < 0)
-{
-  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_RESET);
-  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_SET);
-}
-else
-{
-  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_SET);
-  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_RESET);
-}
-if (model->rollingPWM < 0)
-{
-  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2, GPIO_PIN_RESET);
-  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, GPIO_PIN_SET);
-}
-else
-{
-  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2, GPIO_PIN_SET);
-  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, GPIO_PIN_RESET);
-}
-```
-
 - 
 After the action, the agent begins sensing the environment for feedback. The first to update is the encoder of the reaction wheel. There is an encoder wheel at the opposite the end of the reaction wheel's motor. Since the gearbox reduces the speed of rotation of the reaction wheel in exchange for multiplying the output torque, the encoder's wheel rotates faster than the reaction wheel. The difference in the speed of rotation between the output reaction wheel and the input encoder wheel allows the encoder to be more precise. Also in the motor / encoder assembley, there is an array of small magnets on the circumference of the encoder's wheel. The resolution of the encoder depends on the number of magnets in the circular array and the gearbox ratio. A Hall effect sensor produces a voltage proportional to an axial component of the magnetic field vector produced by the magnetic array. The encoder measures the absolute position of the wheel using two channels. A pair of Hall effect sensors are mounted near the surface of the encoder's wheel, such that the magnets pass by the Hall effect sensors. Timer 3 of the MCU is set up to work in encoder mode, with a register of the absolute position of the encoder's wheel. When Timer 3 is in the encoder mode, it compares the pair of channels at each rising edge of the signals to find the position. Therefore, we call the `encodeWheel` function with a pointer to the `Encoder` object of the reaction wheel along with the value of the counter register of Timer 3. The function `encodeWheel` updates the velocity field of the reaction wheel's encoder struct to be used in the LQR model as a system state.
-
-```c
-encodeWheel(&(model->reactionEncoder), TIM3->CNT);
-```
 
 ![motorb](./assets/reactionwheelunicycle/schematics/motorb.jpeg)
 
 - 
 The rolling wheel's encoder works the same as the reaction wheel's encoder, except for the fact that the hardware of the channels sensors is photonic rather than magnetic. The rolling wheel encoder's disk has an alternating pattern of stripes on it for a pair of infrared light emmiting diodes and a pair of photo transistors to sense its rotation. The IR LEDs send light from one side of the wheel to be received by photo transistors on the other side through the alternating pattern. The amount of light received by the photo transistors is translated to two channels of representative electrical signals, which are fed to Timer 4 of the MCU. Supplying the `encodeWheel` function with a pointer to the rolling wheel's encoder object and the value of the counter register of Timer 4, the function call updates the wheel velocity. Before connecting the encoder signals to the MCU timer, a voltage division is applied for making sure the amplitudes of the signals do not exceed 3.3 volts.
 
-```c
-encodeWheel(&(model->rollingEncoder), TIM4->CNT);
-```
-
 ![motora](./assets/reactionwheelunicycle/schematics/motora.jpeg)
 
 - The `senseCurrent` function computes the current rates of the reaction and rolling motors. The function accepts two pointers of the `CurrentSensor` type and updates the `currentVelocity` field of the respective arguments. Measuring the electric current rate is the result of two Analog to Digital Conversion (ADC) channels, as peripherals of the MCU (pins `PC4` and `PA4` of the ADC unit). A pair of Hall effect sensors are powered using a regulated 5-Volt direct current source. To measure the current rate of the driver's output, two of the wires that connect the driver IC pins (**1Y** and **4Y**) to the respective motor coils (**MotorA2** and **MotorB2**), are routed in such a way that they pass by the respective current sensing Hall effect sensors. When the IC drives a voltage across the motor terminals (**MA1** and **MA2**, or **MB1** and **MB2**), the Hall effect sensors measure the magnetic field vector that is caused by the electric field inside the wires between the motors and the driver. The ratio-metric readings from the magnetic field vectors represent the flows of the electric current of the reaction motor's and the rolling motor's coils. The LQR model observes the current rates and regulates them to zero by generating suitable inputs.
-
-```c
-senseCurrent(&(model->reactionCurrentSensor), &(model->rollingCurrentSensor));
-```
 
 ![currentsensing](./assets/reactionwheelunicycle/schematics/currentsensing.jpeg)
 
 - 
 The function `updateIMU` provides the main source of data for the objective of the system. Through this function, the MCU talks to the IMU modules 1 and 2 for updating the roll and pitch angles along with their first and second derivatives. This is done by calling the function and giving it a pointer to the LQR model object. Although both IMUs are used for tilt estimation, the final result is assigned to the field of IMU 1. This function encapsulates matrix-vector multiplications for coordinate transformations, the singular value decomposition for obtaining the gravity vector, and sensor fusion between the tri-axis accelerometers and the tri-axis gyroscopes. Knowing about the position and orientation of each IMU with respect to the body, the function excludes linear accelerations from calculations. So, `UpdateIMU` gathers the latest inertial measurements form multiple sensor units and computes the roll and pitch angles using known parameters of the system configuration.
-
-```c
-updateIMU(model);
-```
 
 In terms of connectivity, The MCU peripheral USART1 is used to talk to IMU #2 (GY-95T). Set the baudrate of uart1 to 115200 Bits/s for the GY-95 IMU module. Set the Pin6 (PS: IIC/USART output mode selection) of IMU #2 (GY-25T) to zero, in order to use the I2C protocol. The I2C cock speed is set at 100000 Hz in the stanard mode. For saving MCU clock cycles and time, added a DMA request with USART1_RX and DMA2 Stream 2 from peripheral to memory and low priority. The mode is circular and the request call is made once in the main function by passing the usart1 handle and the receive buffer. The request increments the address of memory. The data width is one Byte for both the preipheral and memory.
 
@@ -567,20 +355,6 @@ In terms of connectivity, The MCU peripheral USART1 is used to talk to IMU #2 (G
 
 - 
 Once the action is complete and the sensory information is refreshed, the second half of the data set is assigned. The elements `x12` through `x23` mirror the elements `x0` through `x11`, with the only difference being the respective time indices `k + 1` and `k`. There should be about a 5-millisecond interval between `k` and `k + 1`, which is long enough to judge the quality of the action. The two consecutive time steps are separated by an action happening in time step `k` using the input `u_k`, and the subsequent sensor measurements.
-
-```
-// dataset = (xₖ, uₖ, xₖ₊₁, uₖ₊₁)
-model->dataset.x12 = model->imu1.roll / M_PI;
-model->dataset.x13 = model->imu1.roll_velocity / M_PI;
-model->dataset.x14 = model->imu1.roll_acceleration / M_PI;
-model->dataset.x15 = model->imu1.pitch / M_PI;
-model->dataset.x16 = model->imu1.pitch_velocity / M_PI;
-model->dataset.x17 = model->imu1.pitch_acceleration / M_PI;
-model->dataset.x18 = model->reactionEncoder.velocity;
-model->dataset.x19 = model->rollingEncoder.velocity;
-model->dataset.x20 = model->reactionCurrentSensor.currentVelocity;
-model->dataset.x21 = model->rollingCurrentSensor.currentVelocity;
-```
 
 - 
 After the action, the model determines the quality of the system state. The ideal state is where the first half of the data set is approximately equal to zero and at the same time equal to the second half. In other words, the best quality means that each element of the data set with index `k` is equal to its counterpart element with index `k + 1`. Unlike the pair of elements `x10` and `x11` (input `u_k` of step `k`), the pair of elements `x22` and `x23` (input `u_k1` of step `k + 1`) are not used for action until the next call to the `stepForward` function. But, one can see that `u_k1` will be applied to the action of step `k + 1` at the next `stepForward` function call, if the `j` index is the same across the consecutive calls. The input vector `u_k1` of the time step `k + 1` is the result of a matrix-vector multiplication between the policy matrix `K_j` and the next system state vector `x_k1`. Even though `u_k1` is not used for action at step `k`, it informs the model about the future of the system trajectory in case the filter matrix `W_n` and the inverse auto-correlation matrix `P_n` are not updated. When the last two elements of the data set (`x22` and `x23`) are computed, the value iteration algorithm can calculate an error and correct the priors of the model to find the next filter matrix Wⱼ₊₁, such that the error is minimized.
@@ -593,33 +367,6 @@ After the action, the model determines the quality of the system state. The idea
 
 ``u_{k + 1} = -K^j x_{k + 1}``
 
-```c
-x_k1[0] = model->dataset.x12;
-x_k1[1] = model->dataset.x13;
-x_k1[2] = model->dataset.x14;
-x_k1[3] = model->dataset.x15;
-x_k1[4] = model->dataset.x16;
-x_k1[5] = model->dataset.x17;
-x_k1[6] = model->dataset.x18;
-x_k1[7] = model->dataset.x19;
-x_k1[8] = model->dataset.x20;
-x_k1[9] = model->dataset.x21;
-
-u_k1[0] = 0.0;
-u_k1[1] = 0.0;
-
-for (int i = 0; i < model->m; i++)
-{
-  for (int j = 0; j < model->n; j++)
-  {
-    u_k1[i] += -K_j[i][j] * x_k1[j];
-  }
-}
-
-model->dataset.x22 = u_k1[0];
-model->dataset.x23 = u_k1[1];
-```
-
 - 
 The data set can be thought of as a pair of vectors in an abstract vector space. A vector with index `k` and another with index `k + 1`. At this stage, compute the quadratic basis sets ϕ(zₖ) and ϕ(zₖ₊₁). Here, the transformation ϕ is the identity matrix. These are a pair of besis sets that are separated by a policy implementation and so differ in a time index.
 
@@ -629,39 +376,6 @@ The data set can be thought of as a pair of vectors in an abstract vector space.
 
 ``\left\{ \begin{array}{l} \phi(z_k) &\\ \phi(z_{k + 1}) \end{array} \right.``
 
-```c
-z_k[0] = model->dataset.x0;
-z_k[1] = model->dataset.x1;
-z_k[2] = model->dataset.x2;
-z_k[3] = model->dataset.x3;
-z_k[4] = model->dataset.x4;
-z_k[5] = model->dataset.x5;
-z_k[6] = model->dataset.x6;
-z_k[7] = model->dataset.x7;
-z_k[8] = model->dataset.x8;
-z_k[9] = model->dataset.x9;
-z_k[10] = model->dataset.x10;
-z_k[11] = model->dataset.x11;
-
-z_k1[0] = model->dataset.x12;
-z_k1[1] = model->dataset.x13;
-z_k1[2] = model->dataset.x14;
-z_k1[3] = model->dataset.x15;
-z_k1[4] = model->dataset.x16;
-z_k1[5] = model->dataset.x17;
-z_k1[6] = model->dataset.x18;
-z_k1[7] = model->dataset.x19;
-z_k1[8] = model->dataset.x20;
-z_k1[9] = model->dataset.x21;
-z_k1[10] = model->dataset.x22;
-z_k1[11] = model->dataset.x23;
-
-for (int i = 0; i < (model->n + model->m); i++)
-{
-  basisset0[i] = z_k[i];
-  basisset1[i] = z_k1[i];
-}
-```
 
 The vector of filter coefficients ``\textbf{w}_n = \begin{bmatrix} w_n(0) & w_n(1) & \ldots & w_n(p) \end{bmatrix}^T`` at time ``n`` minimizes the weighted least squares error. The weighted least squares error is equal to the squared norm of the error at time ``i`` times an exponential weighting factor, sumed over the observation interval. ``\Epsilon (n) = \sum_{i = 0}^{n} \lambda^{n - i} | e(i) |^2``. The exponential weighting (forgetting) factor ``\lambda`` is greater than zero and, less than or equal to one. ``0 < \lambda \leq 1``. The error at time ``i`` is equal to the difference between the desired signal and the filter output. ``e(i) = d(i) - y(i) = d(i) - \textbf{w}_n^T x(i)``. In the definition of the error, ``d(i)`` is the desired signal at time ``i``, and ``y(i)`` is the filter output at time ``i``. The filter output is the result of the matrix-vector product of the filter coefficients and the new data vector. The latest set of filter coefficients ``\textbf{w}_n(k)`` is used for minimizing the weighted least squares error ``\Epsilon (n)``. Also, it is assumed that the weights ``\textbf{w}_n`` are constant over the observation interval ``[0, n]`` with end points zero and ``n``.
 
@@ -690,29 +404,28 @@ Writing the inverse of the deterministic autocorrelation matrix using Woodbury's
 ``\left\{ \begin{array}{l} \textbf{R}_x(n) \textbf{w}_n = \textbf{r}_{dx}(n) &\\ \textbf{R}_x(n) \textbf{g}(n) = \textbf{x}^*(n) \end{array} \right.``
 
 ```c
-z_k_dot_z_n = 0.0;
+model->x_n_dot_z_n = 0.0;
 float buffer = 0.0;
 for (int i = 0; i < (model->n + model->m); i++)
 {
-  buffer = z_k1[i] * z_n[i];
+  buffer = getIndexVec12(model->dataset, i) * getIndexVec12(model->z_n, i);
   if (isnanf(buffer) == 0)
   {
-    z_k_dot_z_n += buffer;
+    model->x_n_dot_z_n += buffer;
   }
 }
-
-if (fabs(model->lambda + z_k_dot_z_n) > 0)
+if (fabs(model->lambda + model->x_n_dot_z_n) > 0)
 {
   for (int i = 0; i < (model->n + model->m); i++)
   {
-    g_n[i] = (1.0 / (model->lambda + z_k_dot_z_n)) * z_n[i];
+    setIndexVec12(&(model->g_n), i, (1.0 / (model->lambda + model->x_n_dot_z_n)) * getIndexVec12(model->z_n, i));
   }
 }
 else
 {
   for (int i = 0; i < (model->n + model->m); i++)
   {
-    g_n[i] = (1.0 / model->lambda) * z_n[i];
+    setIndexVec12(&(model->g_n), i, (1.0 / model->lambda) * getIndexVec12(model->z_n, i));
   }
 }
 ```
@@ -730,13 +443,13 @@ Given these two facts, the time-update of the filter coefficients at time ``n`` 
 ```c
 for (int i = 0; i < (model->n + model->m); i++)
 {
-  alpha_n[i] = 0.0;
+  setIndexVec12(&(model->alpha_n), i, 0.0);
 }
 for (int i = 0; i < (model->n + model->m); i++)
 {
   for (int j = 0; j < (model->n + model->m); j++)
   {
-    alpha_n[i] +=  0.0 - getIndex(model->W_n, i, j) * basisset1[j];
+    setIndexVec12(&(model->alpha_n), i, getIndexVec12(model->alpha_n, i) + 0.0 - getIndexMat12(model->W_n, i, j) * getIndexVec12(model->dataset, j));
   }
 }
 ```
@@ -750,13 +463,13 @@ The *a priori error* ``\alpha(n)`` is defined as the error that would occur if t
 ```c
 for (int i = 0; i < (model->n + model->m); i++)
 {
-  z_n[i] = 0.0;
+  setIndexVec12(&(model->z_n), i, 0.0);
 }
 for (int i = 0; i < (model->n + model->m); i++)
 {
   for (int j = 0; j < (model->n + model->m); j++)
   {
-    z_n[i] += getIndex(model->P_n, i, j) * z_k1[j];
+    setIndexVec12(&(model->z_n), i, getIndexVec12(model->z_n, i) + getIndexMat12(model->P_n, i, j) * getIndexVec12(model->dataset, j));
   }
 }
 ```
@@ -770,25 +483,16 @@ The filtered information vector ``z(n)`` at time ``n`` is the transformation of 
 ``\left\{ \begin{array}{l} \textbf{g}(n) = \frac{1}{\lambda + \textbf{x}^T(n) \textbf{z}(n)} \textbf{z}(n) &\\ \textbf{P}(n) = \frac{1}{\lambda} [\textbf{P}(n - 1) - \textbf{g}(n) \textbf{z}^H(n)] \end{array} \right.``
 
 ```c
-updateChange = 0.0;
-float correction = 0.0;
 for (int i = 0; i < (model->n + model->m); i++)
 {
   for (int j = 0; j < (model->n + model->m); j++)
   {
-    correction = alpha_n[i] * g_n[j];
-    // sum the absolute value of the corrections to the filter coefficients to see if there is any update
-    updateChange += fabs(getIndex(model->W_n, i, j) - correction);
-    buffer = getIndex(model->W_n, i, j) + correction;
+    buffer = getIndexMat12(model->W_n, i, j) + getIndexVec12(model->alpha_n, i) * getIndexVec12(model->g_n, j);
     if (isnanf(buffer) == 0)
     {
-      setIndex(&(model->W_n), i, j, buffer); 
+      setIndexMat12(&(model->W_n), i, j, buffer);
     }
   }
-}
-// trigger a policy update if the RLS algorithm has converged
-if (fabs(updateChange) < minimumChange) {
-  triggerUpdate = 1;
 }
 ```
 
@@ -802,14 +506,14 @@ for (int i = 0; i < (model->n + model->m); i++)
 {
   for (int j = 0; j < (model->n + model->m); j++)
   {
-    buffer = (1.0 / model->lambda) * (getIndex(model->P_n, i, j) - g_n[i] * z_n[j]);
+    buffer = (1.0 / model->lambda) * (getIndexMat12(model->P_n, i, j) - getIndexVec12(model->g_n, i) * getIndexVec12(model->z_n, j));
     if (isnanf(buffer) == 0)
     {
-      if (fabs(buffer) > clipping)
+      if (fabs(buffer) > model->clippingValue)
       {
         scaleFlag = 1;
       }
-      setIndex(&(model->P_n), i, j, buffer);
+      setIndexMat12(&(model->P_n), i, j, buffer);
     }
   }
 }
@@ -819,7 +523,7 @@ if (scaleFlag == 1)
   {
     for (int j = 0; j < (model->n + model->m); j++)
     {
-      setIndex(&(model->P_n), i, j, clippingFactor * getIndex(model->P_n, i, j));
+      setIndexMat12(&(model->P_n), i, j, model->clippingFactor * getIndexMat12(model->P_n, i, j));
     }
   }
 }
@@ -868,97 +572,57 @@ model->k = model->k + 1;
 - 
 ```c
 void updateControlPolicy(LinearQuadraticRegulator *model)
-```
-
-- 
-```c
-// unpack the vector Wⱼ₊₁ into the kernel matrix
-// Q(xₖ, uₖ) ≡ 0.5 * transpose([xₖ; uₖ]) * S * [xₖ; uₖ] = 0.5 * transpose([xₖ; uₖ]) * [Sₓₓ Sₓᵤ; Sᵤₓ Sᵤᵤ] * [xₖ; uₖ]
-model->k = 1;
-model->j = model->j + 1;
-```
-
-- 
-``u_k = -S_{uu}^{-1} S_{ux} x_k``
-
-```c
-// initialize the filter matrix
-// putBuffer(model->m + model->n, model->m + model->n, W_n, model->W_n);
-
-for (int i = 0; i < model->m; i++)
 {
-  for (int j = 0; j < model->n; j++)
-  {
-    S_ux[i][j] = getIndex(model->W_n, model->n + i, j);
-  }
-}
-```
+  // unpack the vector Wⱼ₊₁ into the kernel matrix
+  // Q(xₖ, uₖ) ≡ 0.5 * transpose([xₖ; uₖ]) * S * [xₖ; uₖ] = 0.5 * transpose([xₖ; uₖ]) * [Sₓₓ Sₓᵤ; Sᵤₓ Sᵤᵤ] * [xₖ; uₖ]
+  model->k = 1;
+  model->j = model->j + 1;
 
-- 
-```c
-for (int i = 0; i < model->m; i++)
-{
-  for (int j = 0; j < model->m; j++)
-  {
-    S_uu[i][j] = getIndex(model->W_n, model->n + i, model->n + j);
-  }
-}
-```
-
-- 
-```c
-// Perform the control update using (S24), which is uₖ = -S⁻¹ᵤᵤ * Sᵤₓ * xₖ
-// uₖ = -S⁻¹ᵤᵤ * Sᵤₓ * xₖ
-float determinant = S_uu[1][1] * S_uu[2][2] - S_uu[1][2] * S_uu[2][1];
-// check the rank of S_uu to see if it's equal to 2 (invertible matrix)
-```
-
-- 
-```c
-if (fabs(determinant) > 0.0001) // greater than zero
-{
-  S_uu_inverse[0][0] = S_uu[1][1] / determinant;
-  S_uu_inverse[0][1] = -S_uu[0][1] / determinant;
-  S_uu_inverse[1][0] = -S_uu[1][0] / determinant;
-  S_uu_inverse[1][1] = S_uu[0][0] / determinant;
-  // initialize the gain matrix
   for (int i = 0; i < model->m; i++)
   {
     for (int j = 0; j < model->n; j++)
     {
-      K_j[i][j] = 0.0;
+      setIndexMat210(&(model->Sux), i, j, getIndexMat12(model->W_n, model->n + i, j));
     }
   }
   for (int i = 0; i < model->m; i++)
   {
-    for (int j = 0; j < model->n; j++)
+    for (int j = 0; j < model->m; j++)
     {
-      for (int k = 0; k < model->m; k++)
+      setIndexMat2(&(model->Suu), i, j, getIndexMat12(model->W_n, model->n + i, model->n + j));
+    }
+  }
+
+  // Perform the control update using (S24), which is uₖ = -S⁻¹ᵤᵤ * Sᵤₓ * xₖ
+  // uₖ = -S⁻¹ᵤᵤ * Sᵤₓ * xₖ
+  float determinant = getIndexMat2(model->Suu, 1, 1) * getIndexMat2(model->Suu, 2, 2) - getIndexMat2(model->Suu, 1, 2) * getIndexMat2(model->Suu, 2, 1);
+  // check the rank of S_uu to see if it's equal to 2 (invertible matrix)
+  if (fabs(determinant) > 0.001) // greater than zero
+  {
+    setIndexMat2(&(model->SuuInverse), 0, 0, getIndexMat2(model->Suu, 1, 1) / determinant);
+    setIndexMat2(&(model->SuuInverse), 0, 1, -getIndexMat2(model->Suu, 0, 1) / determinant);
+    setIndexMat2(&(model->SuuInverse), 1, 0, -getIndexMat2(model->Suu, 1, 0) / determinant);
+    setIndexMat2(&(model->SuuInverse), 1, 1, getIndexMat2(model->Suu, 0, 0) / determinant);
+    // initialize the gain matrix
+    for (int i = 0; i < model->m; i++)
+    {
+      for (int j = 0; j < model->n; j++)
       {
-        K_j[i][j] += S_uu_inverse[i][k] * S_ux[k][j];
+        setIndexMat210(&(model->K_j), i, j, 0.0);
+      }
+    }
+    for (int i = 0; i < model->m; i++)
+    {
+      for (int j = 0; j < model->n; j++)
+      {
+        for (int k = 0; k < model->m; k++)
+        {
+          setIndexMat210(&(model->K_j), i, j, getIndexMat210(model->K_j, i, j) + getIndexMat2(model->SuuInverse, i, k) * getIndexMat210(model->Sux, k, j));
+        }
       }
     }
   }
-  model->K_j.x00 = K_j[0][0];
-  model->K_j.x01 = K_j[0][1];
-  model->K_j.x02 = K_j[0][2];
-  model->K_j.x03 = K_j[0][3];
-  model->K_j.x04 = K_j[0][4];
-  model->K_j.x05 = K_j[0][5];
-  model->K_j.x06 = K_j[0][6];
-  model->K_j.x07 = K_j[0][7];
-  model->K_j.x08 = K_j[0][8];
-  model->K_j.x09 = K_j[0][9];
-  model->K_j.x10 = K_j[1][0];
-  model->K_j.x11 = K_j[1][1];
-  model->K_j.x12 = K_j[1][2];
-  model->K_j.x13 = K_j[1][3];
-  model->K_j.x14 = K_j[1][4];
-  model->K_j.x15 = K_j[1][5];
-  model->K_j.x16 = K_j[1][6];
-  model->K_j.x17 = K_j[1][7];
-  model->K_j.x18 = K_j[1][8];
-  model->K_j.x19 = K_j[1][9];
+  return;
 }
 ```
 
@@ -970,13 +634,16 @@ LinearQuadraticRegulator model;
 
 - 
 ```c
-// Represents a Linear Quadratic Regulator (LQR) model.
 typedef struct
 {
   Mat12 W_n;                           // filter matrix
   Mat12 P_n;                           // inverse autocorrelation matrix
-  Mat210f K_j;                         // feedback policy
-  Vec24f dataset;                      // (xₖ, uₖ, xₖ₊₁, uₖ₊₁)
+  Mat210 K_j;                          // feedback policy
+  Vec12 dataset;                       // (xₖ, uₖ)
+  Vec12 z_n;                           // z_n in RLS
+  Vec12 g_n;                           // g_n in RLS
+  Vec12 alpha_n;                       // alpha_n in RLS
+  float x_n_dot_z_n;                   // the inner product of the x_n (dataset) and z_n
   int j;                               // step number
   int k;                               // time k
   int n;                               // xₖ ∈ ℝⁿ
@@ -984,9 +651,38 @@ typedef struct
   float lambda;                        // exponential wighting factor
   float delta;                         // value used to intialize P(0)
   int active;                          // is the model controller active
+  float cpuClock;                      // the CPU clock
   float dt;                            // period in seconds
-  float reactionPWM;                   // reaction wheel's motor PWM duty cycle
-  float rollingPWM;                    // rolling wheel's motor PWM duty cycle
+  float reactionDutyCycle;             // reaction wheel's motor PWM duty cycle
+  float rollingDutyCycle;              // rolling wheel's motor PWM duty cycle
+  float reactionDutyCycleChange;       // the maximum incremental change in the reaction motor's duty cycle
+  float rollingDutyCycleChnage;        // the maximum incremental change in the rolling motor's duty cycle
+  float clippingValue;                 // the clipping value for any of the P matrix elements at which the clipping is applied
+  float clippingFactor;                // the coefficient by which the P matrix elements are rescaled through scalar multiplication
+  float rollSafetyAngle;               // the roll angle in radian beyond which the controller must become deactive for safety
+  float pitchSafetyAngle;              // the pitch angle in radian beyond which the controller must become deactive for safety
+  float kappa1;                        // tuning parameters to minimize estimate variance (the ratio between the accelerometer and the gyroscope in sensor fusion)
+  float kappa2;                        // tuning parameters to minimize estimate variance (the ratio between the accelerometer and the gyroscope in sensor fusion)
+  int maxEpisodeLength;                // the maximum number of interactions with the nevironment before the model becomes deactive for safety
+  int logPeriod;                       // the period between printing two log messages in terms of control cycles
+  int logCounter;                      // the number of control cycles elpased since the last log message printing
+  int maxOutOfBounds;                  // the maximum number of consecutive cycles where states are out of the safety bounds
+  int outOfBoundsCounter;              // the number of consecutive times when either of safety angles have been detected out of bounds
+  float beta;                          // y-Euler angle (pitch)
+  float gamma;                         // x-Euler angle (roll)
+  float fusedBeta;                     // y-Euler angle (pitch) as the result of fusing the accelerometer sensor measurements with the gyroscope sensor measurements
+  float fusedGamma;                    // x-Euler angle (roll) as the result of fusing the accelerometer sensor measurements with the gyroscope sensor measurements
+  Mat34 Q;                             // The matrix of unknown parameters
+  Vec3 r;                              // the average of the body angular rate from rate gyro
+  Vec3 rDot;                           // the average of the body angular rate in Euler angles
+  Mat3 E;                              // a matrix transfom from body rates to Euler angular rates
+  Mat24 X;                             // The optimal fusion matrix
+  Mat32 Matrix;                        // all sensor measurements combined
+  Vec3 g;                              // The gravity vector
+  Mat2 Suu;                            // The input-input kernel
+  Mat2 SuuInverse;                     // the inverse of the input-input kernel
+  Mat210 Sux;                          // the input-state kernel
+  Vec2 u_k;                            // the input vector
   IMU imu1;                            // the first inertial measurement unit
   IMU imu2;                            // the second inertial measurement unit
   Encoder reactionEncoder;             // the reaction wheel encoder

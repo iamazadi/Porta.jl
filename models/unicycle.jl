@@ -8,7 +8,7 @@ using Porta
 figuresize = (1920, 1080)
 modelname = "unicycle"
 maxplotnumber = 30
-headers = ["AX1", "AY1", "AZ1", "AX2", "AY2", "AZ2", "GX1", "GY1", "GZ1", "GX2", "GY2", "GZ2", "roll", "pitch", "encT", "encB", "j", "x0", "x1", "x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "P0", "P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11"]
+headers = ["AX1", "AY1", "AZ1", "AX2", "AY2", "AZ2", "roll", "pitch", "encT", "encB", "j", "x0", "x1", "x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "P0", "P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11"]
 clientside = nothing
 run = false
 readings = Dict()
@@ -39,12 +39,16 @@ ê = [Vec3f(1, 0, 0), Vec3f(0, 1, 0), Vec3f(0, 0, 1)]
 O_B_R = [ê[1] ê[2] ê[3]]
 B_O_R = inv(O_B_R)
 # The rotation of the local frame of the sensor i to the robot frame B̂
-imu2angle = -30.0 / 180.0 * π
+α = -30.0 / 180.0 * π # imu2angle
 A1_B_R = [ê[1] ê[2] ê[3]]
-A2_B_R = [ê[1] ê[2] ê[3]]
-# A2_B_R = [(cos(imu2angle) * ê[1] - sin(imu2angle) * ê[2]) (sin(imu2angle) * ê[1] + cos(imu2angle) * ê[2]) ê[3]]
+# A2_B_R = [ê[1] ê[2] ê[3]]
+# A2_B_R = [(cos(α) * ê[1] - sin(α) * ê[2]) (sin(α) * ê[1] + cos(α) * ê[2]) ê[3]]
 B_A1_R = inv(A1_B_R)
-B_A2_R = inv(A2_B_R)
+# B_A2_R = inv(A2_B_R)
+B_A2_R = [-sin(α) -cos(α) 0.0; cos(α) -sin(α) 0.0; 0.0 0.0 1.0]
+A2_B_R = inv(B_A2_R)
+# _B_A2_R = inv(B_A_R)
+
 
 P = [[1.0; vec(p1 - pivot)] [1.0; vec(p2 - pivot)]]
 X = transpose(P) * inv(P * transpose(P))
@@ -92,15 +96,15 @@ pl = PointLight(Point3f(0), RGBf(0.0862, 0.0862, 0.0862))
 al = AmbientLight(RGBf(0.9, 0.9, 0.9))
 backgroundcolor = RGBf(1.0, 1.0, 1.0)
 lscene = LScene(fig[1, 1], show_axis=false, scenekw=(lights=[pl, al], clear=true, backgroundcolor=:black))
-ax1 = Axis(fig[2, 1], xlabel="Time (s)", ylabel="System States", xlabelsize = 30, ylabelsize = 30)
-ax2 = Axis(fig[2, 2], xlabel="Time (s)", ylabel="P Matrix Parameters", xlabelsize = 30, ylabelsize = 30)
+ax1 = Axis(fig[2, 1], xlabel="Time (s)", ylabel="System States", xlabelsize=30, ylabelsize=30)
+ax2 = Axis(fig[2, 2], xlabel="Time (s)", ylabel="P Matrix Parameters", xlabelsize=30, ylabelsize=30)
 buttoncolor = RGBf(0.3, 0.3, 0.3)
 buttonlabels = ["Run", "Stop", "Connect", "Disconnect"]
 buttons = [Button(fig, label=l, buttoncolor=buttoncolor) for l in buttonlabels]
 statustext = Observable("Not connected.")
-statuslabel = Label(fig, statustext, fontsize = 15)
+statuslabel = Label(fig, statustext, fontsize=15)
 jindextext = Observable("j: 1")
-jindexlabel = Label(fig, jindextext, fontsize = 30)
+jindexlabel = Label(fig, jindextext, fontsize=30)
 fig[1, 2] = grid!(hcat(jindexlabel, statuslabel, buttons...), tellheight=false, tellwidth=false)
 
 graphpoints = Observable([Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)]])
@@ -150,12 +154,12 @@ R2_tail = vec(p2)
 R1 = [0.0; 0.0; -1.0] .* arrowscale
 R2 = [0.0; 0.0; -1.0] .* arrowscale
 
-ps = Observable([Point3f(R1_tail...), Point3f(R2_tail...)])
-ns = Observable([Vec3f(R1...), Vec3f(R2...)])
+acceleration_vector_tails = Observable([Point3f(R1_tail...), Point3f(R2_tail...)])
+acceleration_vector_heads = Observable([Vec3f(R1...), Vec3f(R2...)])
 arrowsize = Observable(Vec3f(0.02, 0.02, 0.04))
 linewidth = Observable(0.015)
 arrows!(lscene,
-    ps, ns, fxaa=true, # turn on anti-aliasing
+    acceleration_vector_tails, acceleration_vector_heads, fxaa=true, # turn on anti-aliasing
     color=[:orange, :lime, :pink, :purple],
     linewidth=linewidth, arrowsize=arrowsize,
     align=:origin
@@ -167,10 +171,10 @@ ball2 = meshscatter!(lscene, point2_observable, markersize=0.01, color=:lime)
 
 pivot_ps = Observable([pivot_observable[], pivot_observable[], pivot_observable[]])
 pivot_ns = Observable(map(x -> x .* smallarrowscale, ê))
-ps1 = Observable([point1_observable[], point1_observable[], point1_observable[]])
-ps2 = Observable([point2_observable[], point2_observable[], point2_observable[]])
-ns1 = Observable(map(x -> smallarrowscale .* B_O_R * x, [B_A1_R * ê[1], B_A1_R * ê[2], B_A1_R * ê[3]]))
-ns2 = Observable(map(x -> smallarrowscale .* B_O_R * x, [B_A2_R * ê[1], B_A2_R * ê[2], B_A2_R * ê[3]]))
+sensor1frame_tails = Observable([point1_observable[], point1_observable[], point1_observable[]])
+sensor2frame_tails = Observable([point2_observable[], point2_observable[], point2_observable[]])
+sensor1frame_heads = Observable(map(x -> smallarrowscale .* B_O_R * x, [B_A1_R * ê[1], B_A1_R * ê[2], B_A1_R * ê[3]]))
+sensor2frame_heads = Observable(map(x -> smallarrowscale .* B_O_R * x, [B_A2_R * ê[1], B_A2_R * ê[2], B_A2_R * ê[3]]))
 arrowsize1 = Observable(Vec3f(0.02, 0.02, 0.04))
 linewidth1 = Observable(0.01)
 arrows!(lscene,
@@ -180,13 +184,13 @@ arrows!(lscene,
     align=:origin
 )
 arrows!(lscene,
-    ps1, ns1, fxaa=true, # turn on anti-aliasing
+    sensor1frame_tails, sensor1frame_heads, fxaa=true, # turn on anti-aliasing
     color=[:red, :green, :blue],
     linewidth=linewidth1, arrowsize=arrowsize1,
     align=:origin
 )
 arrows!(lscene,
-    ps2, ns2, fxaa=true, # turn on anti-aliasing
+    sensor2frame_tails, sensor2frame_heads, fxaa=true, # turn on anti-aliasing
     color=[:red, :green, :blue],
     linewidth=linewidth1, arrowsize=arrowsize1,
     align=:origin
@@ -215,194 +219,6 @@ mat33(q::ℍ) = begin
 end
 
 
-on(buttons[1].clicks) do n
-    global run = true
-    errormonitor(@async while (isopen(clientside) && run)
-        text = readline(clientside, keep=true)
-        println(text)
-        # x1k: -13.76, x2k: 1.60, u1k: -40.00, u2k: 43.36, x1k+: -13.76, x2k+: 1.60, u1k+: -40.00, u2k+: 43.36, dt: 0.000006
-        filtered = replace(text, "\0" => "")
-        filtered = replace(filtered, "\r\n" => "")
-        global readings = parsetext(filtered, headers)
-        # calculate(readings)
-        allkeys = keys(readings)
-        flag = all([x ∈ allkeys for x in headers]) && all([!isnothing(readings[x]) for x in headers])
-        if flag
-            acc1 = [readings["AX1"]; readings["AY1"]; readings["AZ1"]]          # acc2 = [-(cos(imu2angle) * readings["aY2"] - sin(imu2angle) * readings["aX2"]); -(sin(imu2angle) * readings["aX2"] + cos(imu2angle) * readings["aY2"]); -readings["aZ2"]] .* (1.0 / 8092.0)
-            acc2 = [readings["AX2"], readings["AY2"], readings["AZ2"]]
-
-            # acc2 = [-(cos(imu2angle) * readings["aY2"] - sin(imu2angle) * readings["aX2"]); -(sin(imu2angle) * readings["aX2"] + cos(imu2angle) * readings["aY2"]); -readings["aZ2"]] .* (1.0 / 8092.0)
-            # gyr1 = [readings["gX1"]; readings["gY1"]; readings["gZ1"]]
-            # gyr2 = [readings["gX2"]; readings["gY2"]; readings["gZ2"]]
-            roll = readings["roll"]
-            pitch = readings["pitch"]
-            rolling_angle = readings["encB"]
-            reaction_angle = -readings["encT"]
-            x0 = readings["x0"]
-            x1 = readings["x1"]
-            x2 = readings["x2"]
-            x3 = readings["x3"]
-            x4 = readings["x4"]
-            x5 = readings["x5"]
-            x6 = readings["x6"]
-            x7 = readings["x7"]
-            x8 = readings["x8"]
-            x9 = readings["x9"]
-            x10 = readings["x10"]
-            x11 = readings["x11"]
-            P0 = readings["P0"]
-            P1 = readings["P1"]
-            P2 = readings["P2"]
-            P3 = readings["P3"]
-            P4 = readings["P4"]
-            P5 = readings["P5"]
-            P6 = readings["P6"]
-            P7 = readings["P7"]
-            P8 = readings["P8"]
-            P9 = readings["P9"]
-            P10 = readings["P10"]
-            P11 = readings["P11"]
-            jindextext[] = "j: $(readings["j"])"
-            # delta_time = readings["dt"]
-
-            global R1 = acc1
-            global R2 = acc2
-
-            M = [B_A1_R * R1 B_A2_R * R2]
-            ĝ = (M*X)[:, 1]
-            β = atan(-ĝ[1], √(ĝ[2]^2 + ĝ[3]^2))
-            γ = atan(ĝ[2], ĝ[3])
-            println("β: $β, γ: $γ.")
-            # roll = β
-            # pitch = -γ
-            q = ℍ(roll, x̂) * ℍ(pitch, ŷ)
-            O_B_R = mat33(q)
-            B_O_R = mat33(-q)
-
-            # g = q * chassis_q0
-            # rotate!(robot, Quaternion(g))
-            pivot_observable[] = Point3f(O_B_R * (pivot - origin) + origin)
-            point1_observable[] = Point3f(O_B_R * (p1 - origin) + origin)
-            point2_observable[] = Point3f(O_B_R * (p2 - origin) + origin)
-
-            ps[] = [Point3f(point1_observable[]...), Point3f(point2_observable[]...)]
-            ns[] = map(x -> x .* arrowscale, [Vec3f(O_B_R * [R1[2]; -R1[1]; R1[3]]...), Vec3f(O_B_R * [R2[2]; -R2[1]; R2[3]]...)])
-
-            pivot_ps[] = [Point3f(pivot_observable[]...), Point3f(pivot_observable[]...), Point3f(pivot_observable[]...)]
-            ps1[] = [Point3f(point1_observable[]...), Point3f(point1_observable[]...), Point3f(point1_observable[]...)]
-            ps2[] = [Point3f(point2_observable[]...), Point3f(point2_observable[]...), Point3f(point2_observable[]...)]
-
-            ns1[] = map(x -> x .* norm(R1) .* smallarrowscale, [B_O_R * B_A1_R * ê[1], B_O_R * B_A1_R * ê[2], B_O_R * B_A1_R * ê[3]])
-            ns2[] = map(x -> x .* norm(R2) .* smallarrowscale, [B_O_R * B_A2_R * ê[1], B_O_R * B_A2_R * ê[2], B_O_R * B_A2_R * ê[3]])
-
-            # plot the system state graph
-            _graphpoints = graphpoints[]
-            _x0points = _graphpoints[1]
-            _x1points = _graphpoints[2]
-            _x2points = _graphpoints[3]
-            _x3points = _graphpoints[4]
-            _x4points = _graphpoints[5]
-            _x5points = _graphpoints[6]
-            _x6points = _graphpoints[7]
-            _x7points = _graphpoints[8]
-            _x8points = _graphpoints[9]
-            _x9points = _graphpoints[10]
-            _x10points = _graphpoints[11]
-            _x11points = _graphpoints[12]
-            timestamp = vec(_x0points[end])[1] + 1.0
-            push!(_x0points, Point2f(timestamp, x0))
-            push!(_x1points, Point2f(timestamp, x1))
-            push!(_x2points, Point2f(timestamp, x2))
-            push!(_x3points, Point2f(timestamp, x3))
-            push!(_x4points, Point2f(timestamp, x4))
-            push!(_x5points, Point2f(timestamp, x5))
-            push!(_x6points, Point2f(timestamp, x6))
-            push!(_x7points, Point2f(timestamp, x7))
-            push!(_x8points, Point2f(timestamp, x8))
-            push!(_x9points, Point2f(timestamp, x9))
-            push!(_x10points, Point2f(timestamp, x10))
-            push!(_x11points, Point2f(timestamp, x11))
-            # plot the P Matrix
-            _graphpoints2 = graphpoints2[]
-            _P0points = _graphpoints2[1]
-            _P1points = _graphpoints2[2]
-            _P2points = _graphpoints2[3]
-            _P3points = _graphpoints2[4]
-            _P4points = _graphpoints2[5]
-            _P5points = _graphpoints2[6]
-            _P6points = _graphpoints2[7]
-            _P7points = _graphpoints2[8]
-            _P8points = _graphpoints2[9]
-            _P9points = _graphpoints2[10]
-            _P10points = _graphpoints2[11]
-            _P11points = _graphpoints2[12]
-            push!(_P0points, Point2f(timestamp, P0))
-            push!(_P1points, Point2f(timestamp, P1))
-            push!(_P2points, Point2f(timestamp, P2))
-            push!(_P3points, Point2f(timestamp, P3))
-            push!(_P4points, Point2f(timestamp, P4))
-            push!(_P5points, Point2f(timestamp, P5))
-            push!(_P6points, Point2f(timestamp, P6))
-            push!(_P7points, Point2f(timestamp, P7))
-            push!(_P8points, Point2f(timestamp, P8))
-            push!(_P9points, Point2f(timestamp, P9))
-            push!(_P10points, Point2f(timestamp, P10))
-            push!(_P11points, Point2f(timestamp, P11))
-            number = length(_x0points)
-            if number > maxplotnumber
-                _x0points = _x0points[number-maxplotnumber+1:end]
-                _x1points = _x1points[number-maxplotnumber+1:end]
-                _x2points = _x2points[number-maxplotnumber+1:end]
-                _x3points = _x3points[number-maxplotnumber+1:end]
-                _x4points = _x4points[number-maxplotnumber+1:end]
-                _x5points = _x5points[number-maxplotnumber+1:end]
-                _x6points = _x6points[number-maxplotnumber+1:end]
-                _x7points = _x7points[number-maxplotnumber+1:end]
-                _x8points = _x8points[number-maxplotnumber+1:end]
-                _x9points = _x9points[number-maxplotnumber+1:end]
-                _x10points = _x10points[number-maxplotnumber+1:end]
-                _x11points = _x11points[number-maxplotnumber+1:end]
-                # P matrix graph
-                _P0points = _P0points[number-maxplotnumber+1:end]
-                _P1points = _P1points[number-maxplotnumber+1:end]
-                _P2points = _P2points[number-maxplotnumber+1:end]
-                _P3points = _P3points[number-maxplotnumber+1:end]
-                _P4points = _P4points[number-maxplotnumber+1:end]
-                _P5points = _P5points[number-maxplotnumber+1:end]
-                _P6points = _P6points[number-maxplotnumber+1:end]
-                _P7points = _P7points[number-maxplotnumber+1:end]
-                _P8points = _P8points[number-maxplotnumber+1:end]
-                _P9points = _P9points[number-maxplotnumber+1:end]
-                _P10points = _P10points[number-maxplotnumber+1:end]
-                _P11points = _P11points[number-maxplotnumber+1:end]
-                @assert(length(_x0points) == maxplotnumber)
-                graphpoints[] = [_x0points, _x1points, _x2points, _x3points, _x4points, _x5points, _x6points, _x7points, _x8points, _x9points, _x10points, _x11points]
-                graphpoints2[] = [_P0points, _P1points, _P2points, _P3points, _P4points, _P5points, _P6points, _P7points, _P8points, _P9points, _P10points, _P11points]
-            else
-                graphpoints[] = [_x0points, _x1points, _x2points, _x3points, _x4points, _x5points, _x6points, _x7points, _x8points, _x9points, _x10points, _x11points]
-                graphpoints2[] = [_P0points, _P1points, _P2points, _P3points, _P4points, _P5points, _P6points, _P7points, _P8points, _P9points, _P10points, _P11points]
-            end
-            xlims!(ax1, timestamp - maxplotnumber, timestamp)
-            xlims!(ax2, timestamp - maxplotnumber, timestamp)
-            
-            #######
-
-            # q = ℍ(roll, x̂) * ℍ(pitch, ŷ)
-            O_B_R = mat3(q)
-
-            g = q * chassis_q0
-            GLMakie.rotate!(robot, Quaternion(g))
-            pivot_observable[] = Point3f(O_B_R * (pivot - origin) + origin)
-
-            pivot_ps[] = [Point3f(pivot_observable[]...), Point3f(pivot_observable[]...), Point3f(pivot_observable[]...)]
-            rq = Quaternion(ℍ(reaction_angle, x̂))
-            mq = Quaternion(ℍ(rolling_angle, ẑ))
-            GLMakie.rotate!(rollingwheel, mq)
-            GLMakie.rotate!(reactionwheel, rq)
-        end
-    end)
-end
-
 on(buttons[2].clicks) do n
     global run = false
 end
@@ -424,5 +240,213 @@ on(buttons[4].clicks) do n
         statustext[] = "Connected."
     else
         statustext[] = "Disconnected."
+    end
+end
+
+function stepforward()
+    text = readline(clientside, keep=true)
+    # println(text)
+    # x1k: -13.76, x2k: 1.60, u1k: -40.00, u2k: 43.36, x1k+: -13.76, x2k+: 1.60, u1k+: -40.00, u2k+: 43.36, dt: 0.000006
+    filtered = replace(text, "\0" => "")
+    filtered = replace(filtered, "\r\n" => "")
+    global readings = parsetext(filtered, headers)
+    # calculate(readings)
+    allkeys = keys(readings)
+    flag = all([x ∈ allkeys for x in headers]) && all([!isnothing(readings[x]) for x in headers])
+    if flag
+        acc1 = [readings["AX1"]; readings["AY1"]; readings["AZ1"]]          # acc2 = [-(cos(imu2angle) * readings["aY2"] - sin(imu2angle) * readings["aX2"]); -(sin(imu2angle) * readings["aX2"] + cos(imu2angle) * readings["aY2"]); -readings["aZ2"]] .* (1.0 / 8092.0)
+        acc2 = [readings["AX2"], readings["AY2"], readings["AZ2"]]
+
+        # acc2 = [-(cos(imu2angle) * readings["aY2"] - sin(imu2angle) * readings["aX2"]); -(sin(imu2angle) * readings["aX2"] + cos(imu2angle) * readings["aY2"]); -readings["aZ2"]] .* (1.0 / 8092.0)
+        # gyr1 = [readings["gX1"]; readings["gY1"]; readings["gZ1"]]
+        # gyr2 = [readings["gX2"]; readings["gY2"]; readings["gZ2"]]
+        roll = readings["roll"]
+        pitch = readings["pitch"]
+        rolling_angle = readings["encB"]
+        reaction_angle = -readings["encT"]
+        x0 = readings["x0"]
+        x1 = readings["x1"]
+        x2 = readings["x2"]
+        x3 = readings["x3"]
+        x4 = readings["x4"]
+        x5 = readings["x5"]
+        x6 = readings["x6"]
+        x7 = readings["x7"]
+        x8 = readings["x8"]
+        x9 = readings["x9"]
+        x10 = readings["x10"]
+        x11 = readings["x11"]
+        P0 = readings["P0"]
+        P1 = readings["P1"]
+        P2 = readings["P2"]
+        P3 = readings["P3"]
+        P4 = readings["P4"]
+        P5 = readings["P5"]
+        P6 = readings["P6"]
+        P7 = readings["P7"]
+        P8 = readings["P8"]
+        P9 = readings["P9"]
+        P10 = readings["P10"]
+        P11 = readings["P11"]
+        jindextext[] = "j: $(readings["j"])"
+        # delta_time = readings["dt"]
+
+        global R1 = acc1
+        global R2 = acc2
+
+        M = [B_A1_R * R1 B_A2_R * R2]
+        ĝ = (M*X)[:, 1]
+        β = atan(-ĝ[1], √(ĝ[2]^2 + ĝ[3]^2))
+        γ = atan(ĝ[2], ĝ[3])
+        @assert(isapprox(β, roll, atol = 1e-1), "The roll angle $roll is not equal to beta $β.")
+        @assert(isapprox(-γ, pitch, atol = 1e-1), "The pitch angle $pitch is not equal to minus gamma $γ.")
+        # println("β: $β, γ: $γ.")
+        # roll = β
+        # pitch = -γ
+        q = ℍ(roll, x̂) * ℍ(pitch, ŷ)
+        O_B_R = mat33(q)
+        B_O_R = mat33(-q)
+
+        # g = q * chassis_q0
+        # rotate!(robot, Quaternion(g))
+        pivot_observable[] = Point3f(O_B_R * (pivot - origin) + origin)
+        point1_observable[] = Point3f(O_B_R * (p1 - origin) + origin)
+        point2_observable[] = Point3f(O_B_R * (p2 - origin) + origin)
+
+        acceleration_vector_tails[] = [Point3f(point1_observable[]...), Point3f(point2_observable[]...)]
+        reorder(x) = [x[2]; -x[1]; x[3]]
+        acceleration_vector_heads[] = map(x -> x .* arrowscale, [Vec3f(O_B_R * reorder(B_A1_R * R1)...), Vec3f(O_B_R * reorder(B_A2_R * R2)...)])
+
+        pivot_ps[] = [Point3f(pivot_observable[]...), Point3f(pivot_observable[]...), Point3f(pivot_observable[]...)]
+        sensor1frame_tails[] = [Point3f(point1_observable[]...), Point3f(point1_observable[]...), Point3f(point1_observable[]...)]
+        sensor2frame_tails[] = [Point3f(point2_observable[]...), Point3f(point2_observable[]...), Point3f(point2_observable[]...)]
+
+        sensor1frame_heads[] = map(x -> x .* norm(R1) .* smallarrowscale, [B_O_R * reorder(B_A1_R * ê[1]), B_O_R * reorder(B_A1_R * ê[2]), B_O_R * reorder(B_A1_R * ê[3])])
+        sensor2frame_heads[] = map(x -> x .* norm(R2) .* smallarrowscale, [B_O_R * reorder(B_A2_R * ê[1]), B_O_R * reorder(B_A2_R * ê[2]), B_O_R * reorder(B_A2_R * ê[3])])
+
+        # plot the system state graph
+        _graphpoints = graphpoints[]
+        _x0points = _graphpoints[1]
+        _x1points = _graphpoints[2]
+        _x2points = _graphpoints[3]
+        _x3points = _graphpoints[4]
+        _x4points = _graphpoints[5]
+        _x5points = _graphpoints[6]
+        _x6points = _graphpoints[7]
+        _x7points = _graphpoints[8]
+        _x8points = _graphpoints[9]
+        _x9points = _graphpoints[10]
+        _x10points = _graphpoints[11]
+        _x11points = _graphpoints[12]
+        timestamp = vec(_x0points[end])[1] + 1.0
+        push!(_x0points, Point2f(timestamp, x0))
+        push!(_x1points, Point2f(timestamp, x1))
+        push!(_x2points, Point2f(timestamp, x2))
+        push!(_x3points, Point2f(timestamp, x3))
+        push!(_x4points, Point2f(timestamp, x4))
+        push!(_x5points, Point2f(timestamp, x5))
+        push!(_x6points, Point2f(timestamp, x6))
+        push!(_x7points, Point2f(timestamp, x7))
+        push!(_x8points, Point2f(timestamp, x8))
+        push!(_x9points, Point2f(timestamp, x9))
+        push!(_x10points, Point2f(timestamp, x10))
+        push!(_x11points, Point2f(timestamp, x11))
+        # plot the P Matrix
+        _graphpoints2 = graphpoints2[]
+        _P0points = _graphpoints2[1]
+        _P1points = _graphpoints2[2]
+        _P2points = _graphpoints2[3]
+        _P3points = _graphpoints2[4]
+        _P4points = _graphpoints2[5]
+        _P5points = _graphpoints2[6]
+        _P6points = _graphpoints2[7]
+        _P7points = _graphpoints2[8]
+        _P8points = _graphpoints2[9]
+        _P9points = _graphpoints2[10]
+        _P10points = _graphpoints2[11]
+        _P11points = _graphpoints2[12]
+        push!(_P0points, Point2f(timestamp, P0))
+        push!(_P1points, Point2f(timestamp, P1))
+        push!(_P2points, Point2f(timestamp, P2))
+        push!(_P3points, Point2f(timestamp, P3))
+        push!(_P4points, Point2f(timestamp, P4))
+        push!(_P5points, Point2f(timestamp, P5))
+        push!(_P6points, Point2f(timestamp, P6))
+        push!(_P7points, Point2f(timestamp, P7))
+        push!(_P8points, Point2f(timestamp, P8))
+        push!(_P9points, Point2f(timestamp, P9))
+        push!(_P10points, Point2f(timestamp, P10))
+        push!(_P11points, Point2f(timestamp, P11))
+        number = length(_x0points)
+        if number > maxplotnumber
+            _x0points = _x0points[number-maxplotnumber+1:end]
+            _x1points = _x1points[number-maxplotnumber+1:end]
+            _x2points = _x2points[number-maxplotnumber+1:end]
+            _x3points = _x3points[number-maxplotnumber+1:end]
+            _x4points = _x4points[number-maxplotnumber+1:end]
+            _x5points = _x5points[number-maxplotnumber+1:end]
+            _x6points = _x6points[number-maxplotnumber+1:end]
+            _x7points = _x7points[number-maxplotnumber+1:end]
+            _x8points = _x8points[number-maxplotnumber+1:end]
+            _x9points = _x9points[number-maxplotnumber+1:end]
+            _x10points = _x10points[number-maxplotnumber+1:end]
+            _x11points = _x11points[number-maxplotnumber+1:end]
+            # P matrix graph
+            _P0points = _P0points[number-maxplotnumber+1:end]
+            _P1points = _P1points[number-maxplotnumber+1:end]
+            _P2points = _P2points[number-maxplotnumber+1:end]
+            _P3points = _P3points[number-maxplotnumber+1:end]
+            _P4points = _P4points[number-maxplotnumber+1:end]
+            _P5points = _P5points[number-maxplotnumber+1:end]
+            _P6points = _P6points[number-maxplotnumber+1:end]
+            _P7points = _P7points[number-maxplotnumber+1:end]
+            _P8points = _P8points[number-maxplotnumber+1:end]
+            _P9points = _P9points[number-maxplotnumber+1:end]
+            _P10points = _P10points[number-maxplotnumber+1:end]
+            _P11points = _P11points[number-maxplotnumber+1:end]
+            @assert(length(_x0points) == maxplotnumber)
+            graphpoints[] = [_x0points, _x1points, _x2points, _x3points, _x4points, _x5points, _x6points, _x7points, _x8points, _x9points, _x10points, _x11points]
+            graphpoints2[] = [_P0points, _P1points, _P2points, _P3points, _P4points, _P5points, _P6points, _P7points, _P8points, _P9points, _P10points, _P11points]
+        else
+            graphpoints[] = [_x0points, _x1points, _x2points, _x3points, _x4points, _x5points, _x6points, _x7points, _x8points, _x9points, _x10points, _x11points]
+            graphpoints2[] = [_P0points, _P1points, _P2points, _P3points, _P4points, _P5points, _P6points, _P7points, _P8points, _P9points, _P10points, _P11points]
+        end
+        xlims!(ax1, timestamp - maxplotnumber, timestamp)
+        xlims!(ax2, timestamp - maxplotnumber, timestamp)
+
+        #######
+
+        # q = ℍ(roll, x̂) * ℍ(pitch, ŷ)
+        O_B_R = mat3(q)
+
+        g = q * chassis_q0
+        GLMakie.rotate!(robot, Quaternion(g))
+        pivot_observable[] = Point3f(O_B_R * (pivot - origin) + origin)
+
+        pivot_ps[] = [Point3f(pivot_observable[]...), Point3f(pivot_observable[]...), Point3f(pivot_observable[]...)]
+        rq = Quaternion(ℍ(reaction_angle, x̂))
+        mq = Quaternion(ℍ(rolling_angle, ẑ))
+        GLMakie.rotate!(rollingwheel, mq)
+        GLMakie.rotate!(reactionwheel, rq)
+    end
+end
+
+on(buttons[1].clicks) do n
+    stepforward()
+end
+
+
+on(events(fig).tick) do tick
+    if !isnothing(clientside) && isopen(clientside)
+        stepforward()
+    end
+end
+
+fps = 20
+record(lscene.scene, joinpath("gallery", "$modelname.mp4"); framerate=fps) do io
+    for i = 1:100
+        sleep(1 / fps)
+        # stepforward()
+        recordframe!(io)
     end
 end
