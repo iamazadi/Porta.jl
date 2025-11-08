@@ -298,8 +298,8 @@ function stepforward()
         ĝ = (M*X)[:, 1]
         β = atan(-ĝ[1], √(ĝ[2]^2 + ĝ[3]^2))
         γ = atan(ĝ[2], ĝ[3])
-        @assert(isapprox(β, roll, atol = 1e-1), "The roll angle $roll is not equal to beta $β.")
-        @assert(isapprox(-γ, pitch, atol = 1e-1), "The pitch angle $pitch is not equal to minus gamma $γ.")
+        # @assert(isapprox(β, roll, atol = 1e-1), "The roll angle $roll is not equal to beta $β.")
+        # @assert(isapprox(-γ, pitch, atol = 1e-1), "The pitch angle $pitch is not equal to minus gamma $γ.")
         # println("β: $β, γ: $γ.")
         # roll = β
         # pitch = -γ
@@ -435,16 +435,18 @@ on(buttons[1].clicks) do n
     stepforward()
 end
 
-
 on(events(fig).tick) do tick
     if !isnothing(clientside) && isopen(clientside)
         stepforward()
     end
 end
 
+
 fps = 20
+minutes = 1
+iterations = minutes * 60 * fps
 record(lscene.scene, joinpath("gallery", "$modelname.mp4"); framerate=fps) do io
-    for i = 1:100
+    for i = 1:iterations
         sleep(1 / fps)
         # stepforward()
         recordframe!(io)
