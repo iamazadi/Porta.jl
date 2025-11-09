@@ -6953,7 +6953,7 @@ Description = "Describes the mathematical model of a reaction wheel unicycle rob
 </div>
 ```
 
-![1](./assets/reactionwheelunicycle/1.jpeg)
+![two_axis_accelerometer](./assets/reactionwheelunicycle/two_axis_accelerometer.jpeg)
 
 ``\alpha = tan^{-1}(\frac{A_X}{A_Y})``
 
@@ -6967,7 +6967,7 @@ Description = "Describes the mathematical model of a reaction wheel unicycle rob
 </div>
 ```
 
-![2](./assets/reactionwheelunicycle/2.jpeg)
+![tri_axis_accelerometer](./assets/reactionwheelunicycle/tri_axis_accelerometer.jpeg)
 
 ``\left\{ \begin{array}{l} \alpha = tan^{-1}(\frac{A_X}{\sqrt{A_Y^2 + A_Z^2}}) &\\ \beta = tan^{-1}(\frac{A_Y}{\sqrt{A_X^2 + A_Z^2}}) &\\ \gamma = tan^{-1} (\frac{\sqrt{A_X^2 + A_Y^2}}{A_Z}) \end{array} \right.``
 
@@ -6986,7 +6986,7 @@ Description = "Describes the mathematical model of a reaction wheel unicycle rob
 </div>
 ```
 
-![3](./assets/reactionwheelunicycle/3.jpeg)
+![estimating_the_road_slope](./assets/reactionwheelunicycle/estimating_the_road_slope.jpeg)
 
 ```@raw html
 <div dir = "rtl">
@@ -7033,7 +7033,7 @@ Description = "Describes the mathematical model of a reaction wheel unicycle rob
 </div>
 ```
 
-![4](./assets/reactionwheelunicycle/4.jpeg)
+![tri_axis_gyroscope](./assets/reactionwheelunicycle/tri_axis_gyroscope.jpeg)
 
 ```@raw html
 <div dir = "rtl">
@@ -7080,7 +7080,7 @@ Description = "Describes the mathematical model of a reaction wheel unicycle rob
 </div>
 ```
 
-![5](./assets/reactionwheelunicycle/5.jpeg)
+![sensor_fusion](./assets/reactionwheelunicycle/sensor_fusion.jpeg)
 
 ```@raw html
 <div dir = "rtl">
@@ -8641,7 +8641,7 @@ void updateIMU(LinearQuadraticRegulator *model)
 </div>
 ```
 
-![6](./assets/reactionwheelunicycle/6.jpeg)
+![balance_robot_inverted_pendulum_on_cart](./assets/reactionwheelunicycle/balance_robot_inverted_pendulum_on_cart.jpeg)
 
 ```@raw html
 <div dir = "rtl">
@@ -8749,7 +8749,7 @@ void updateIMU(LinearQuadraticRegulator *model)
 
 ``\omega_{enc} = \omega_{W} - \dot{\theta} = \frac{\dot{x}}{r} - \dot{\theta}``
 
-![7](./assets/reactionwheelunicycle/7.jpeg)
+![unicycle_modelling_rolling](./assets/reactionwheelunicycle/unicycle_modelling_rolling.jpeg)
 
 ```@raw html
 <div dir = "rtl">
@@ -8814,7 +8814,7 @@ void updateIMU(LinearQuadraticRegulator *model)
 </div>
 ```
 
-![8](./assets/reactionwheelunicycle/8.jpeg)
+![unicycle_modelling_reaction](./assets/reactionwheelunicycle/unicycle_modelling_reaction.jpeg)
 
 ```@raw html
 <div dir = "rtl">
@@ -8890,7 +8890,7 @@ void updateIMU(LinearQuadraticRegulator *model)
 </div>
 ```
 
-![9](./assets/reactionwheelunicycle/9.jpeg)
+![electronics_system](./assets/reactionwheelunicycle/electronics_system.jpeg)
 
 ```@raw html
 <div dir = "rtl">
