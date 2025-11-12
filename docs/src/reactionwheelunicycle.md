@@ -4,12 +4,36 @@ Description = "How the reaction wheel unicycle works."
 
 # How the Reaction Wheel Unicycle Works
 
+![gravity_vector_estimation_upright](./assets/reactionwheelunicycle/gravity_vector_estimation_upright.png)
+
 This is a model of a unicycle with two symmetrically attached rotors. One of the reasons the matrix of inertia is not trivial is that the rotors’ axes of rotation do not intersect at a point. The constraint on the system is conservation of angular momentum. The angular velocity of the body is related to the rotor velocities. That relation gives rise to a differential equation in the rotation group Special Orthogonal (3) for the robot’s body. Using the Euler parameters of SO(3) we obtain a local coordinate description of the differential equation, in terms of the roll, pitch and yaw angles. The robot can be repositioned by controlling the rotor velocities. The Linear Quadratic Regulator regulates the roll and pitch angles by a choice of a suitable input.
 
-## An Optimal Adaptive Controller
+![gravity_vector_estimation_lean_back](./assets/reactionwheelunicycle/gravity_vector_estimation_lean_back.png)
 
-System states in real time. Even though the matrix of inertia (among other physical parameters) is unknown, the adaptive controller based on value iteration keeps the states stable and regulates them to zero. The index `j` counts the number of policy updates.
+## Unicycle Balance Control
 
+Here we deal with non-linear control systems that are described in terms of either differential equations or difference equations. In other words we consider the follwoing two types:
+
+1. Differential equations: ``\left\{ \begin{array}{l} \dot{x}(t) = f(x(t), u(t)) &\\ y(t) = h(x(t), u(t)) \end{array} \right.``
+
+2. Difference equations: ``\left\{ \begin{array}{l} x(k + 1) = f(x(k), u(k)) &\\ y(k) = h(x(k), u(k)) \end{array} \right.``
+
+The variable ``x`` denotes the system state, the variable ``u`` denotes the control input to the system, and finally, the ``y`` variable denotes the output of the system. In the following, we explain how the system works through a robotics application. In this section, we see how the system works. But in the next section, we build a regulator to control the system state by generating suitable inputs for a given time frame.
+
+The policy function produces the control inputs ``u(t)`` (or ``u(k)`` in the descrete case). The feeadback policy is called optimal control whenever it makes the system state ``x`` approximately equal to zero as the result of its application. The feeback policy is able to adapt through periodic policy updates. Between each two consecutive policy updates, a recursive relation updates filter coefficients, blocks of which are used to update the policy function. The policy update loop is slower whereas the filter coefficients update loop is faster.
+
+The function ``h``, which produces the output ``y``, and the quality ``Q(x, u)`` are similar functions. The similarity of ``h(x, u)`` and the quality function ``Q(x, u)`` is first because both have the same parameter signature that includes the statem state vector ``x`` and the input vector ``u``. Second, because both ``h`` and ``Q`` produce verifiable statements about the value of the ststem state at the next time step ``k + 1`` or ``t`` in the immediate future. Later in the next section, we see how a least squares relation can be used to calculate a difference equation between the desired state and the measured state, as a feedback signal for enhancing the quality function ``Q`` and producing accurate outputs ``y`` over time.
+
+On one hand, the filter coefficients play the role of a critic that evaluates the quality of being in state ``x`` and having taken input ``u``. On the other hand, the policy plays the role of an actor that uses the system state ``x`` as input to a matrix-vector product that produces the feedback policy ``u``. The Actor/Critic architechture uses the first principles of reinforcement learning for adapting the optimal control inputs. The adpativeness of the controller increases the probability that the quality of the system state ``x`` is measured higher as the time variable ``t`` in differential equations (or ``k`` in the case of difference equations) progresses forward in time.
+
+![system_state_a](./assets/reactionwheelunicycle/system_state_a.png)
+
+System states in real time. Even though the matrix of inertia (among other physical parameters) is unknown, the adaptive controller based on value iteration keeps the states stable and regulates them to zero.
+
+![system_state_b](./assets/reactionwheelunicycle/system_state_b.png)
+
+
+![balance_robot_inverted_pendulum_on_cart](./assets/reactionwheelunicycle/balance_robot_inverted_pendulum_on_cart.jpeg)
 
 ## The Z-Euler Angle Is Not Observable
 
@@ -72,6 +96,8 @@ The function `updateIMU` provides the main source of data for the objective of t
 In terms of connectivity, The MCU peripheral USART1 is used to talk to IMU #2 (GY-95T). Set the baudrate of uart1 to 115200 Bits/s for the GY-95 IMU module. Set the Pin6 (PS: IIC/USART output mode selection) of IMU #2 (GY-25T) to zero, in order to use the I2C protocol. The I2C clock speed is set at 100000 Hz in the stanard mode. For saving MCU clock cycles and time, added a DMA request with USART1_RX and DMA2 Stream 2 from peripheral to memory and low priority. The mode is circular and the request call is made once in the main function by passing the usart1 handle and the receive buffer. The request increments the address of memory. The data width is one Byte for both the preipheral and memory.
 
 ![the_problem_setup](./assets/reactionwheelunicycle/theproblemsetup.jpeg)
+
+
 
 ```c
 void updateIMU(LinearQuadraticRegulator *model)
@@ -640,9 +666,13 @@ void updateControlPolicy(LinearQuadraticRegulator *model)
 
 ## The Convergence of Selected Algebraic Riccati Equation Solution Parameters
 
+![p_matrix_parameters_a](./assets/reactionwheelunicycle/p_matrix_parameters_a.png)
+
 Convergence of selected algebraic Riccati equation solution parameters. The adaptive controller based on value iteration converges to the ARE solution in real time without knowing the system matrix (including the inertia matrix, and the torque and the electromotive force constants of the motors.)
 
 ``Q(x_k, u_k) = \frac{1}{2} \begin{bmatrix} x_k \\ u_k \end{bmatrix} \begin{bmatrix} A^T P A + Q & B^T P A \\ A^T P B & B^T P B + R \end{bmatrix} \begin{bmatrix} x_k \\ u_k \end{bmatrix}``
+
+![p_matrix_parameters_b](./assets/reactionwheelunicycle/p_matrix_parameters_b.png)
 
 ## The Controllability of the Z-Euler Angle
 
@@ -653,8 +683,6 @@ Convergence of selected algebraic Riccati equation solution parameters. The adap
 ## Steering Second-Order Canonical Systems
 
 ## Attitude Control of A Space Platform / Manipulator System Using Internal Motion
-
-![balance_robot_inverted_pendulum_on_cart](./assets/reactionwheelunicycle/balance_robot_inverted_pendulum_on_cart.jpeg)
 
 ![unicycle_modelling_rolling](./assets/reactionwheelunicycle/unicycle_modelling_rolling.jpeg)
 
