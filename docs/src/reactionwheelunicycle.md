@@ -85,8 +85,6 @@ Estimating the slope of the road through measuring the direction of gravity usin
 
 Sensitivity to vibrations and dependence on dynamical accelerations, make it necessary to get help from other sensors such as gyroscopes and the magnetic field sensor (the electronic compass) for measuring the direction of the Earth's gravity.
 
-![sensor_fusion](./assets/reactionwheelunicycle/sensor_fusion.jpeg)
-
 To choose an accelerometer, one should pay attention to the measurement range, the sampling rate, the interface (the analog or digital communication protocol) and also the number of axes that are needed in the project (the number dimensions). Other parameters that should be considered in MEMS accelerometers are sensitivity to temperature and supply voltage changes, and the existence of an initial offset (the value read at zero acceleration), which is corrected with calbration. Here, we show how to use three-axis accelerometers.
 
 ### Gyroscopes
@@ -103,6 +101,36 @@ A three-axis gyroscope measures the angular velocity about three mutually perpen
 
 When choosing a gyroscope, one should consider its measurable velocity range, the sampling rate, the way to communicate with it (analog or digital), and also the number of required axes in the project (the number of dimensions). In addition to those parameters, consider issues such as the sensitivity to temperature and supply voltage changes, the initial offset (the value read in the stationary state) and the cross-sxis sensitivity. If a gyroscope is rotated around an axis perpendicular to the measurement axis, it should measure the value zero, but it is not the case in practice. The gyroscope can show sensitivity to rotation in directions other than the one that is to be measured. This value, which must be as small as possible, represents the cross-axis sensitivity and is expressed in terms of the error percentage.
 
+### Fusing the Output Data of Accelerometers with that of Gyroscopes
+
+In this section we want to use the data of both accelerometers and gyroscopes in order to estimate the correct direction of gravity. A tri-axis accelerometer alone can be used to find the orientation with respect to the gravity vector. However, this estimate is correct only when there are no accelerations acting on the system other than the static gravitational acceleration. This is not possible in mobile robots. On top of that, an accelerometer is very sensitive to vibrations and due to too much noise, its output does not have much value on its own. In contrast, gyroscopes have their own disadvantages, the most important of which is the gradual drifting of the calculated angle from the real value, which is calculated using integration over time. Fortunately, the errors existing in acclerometers and gyroscopes are completely different in nature, such that by using the sensors in the proper way, one can correct both errors. For an effective application of the two sensors, one must fuse their data together in a way that the fused result is more valid than the result of each sensor on its own.
+
+Assuming that there are no long-term dynamical accelerations acting on the system, and so assuming that the direction of gravity has been calculated in a correct way, you can subtract the gravity vector of the Earth (the direction of which is known and its magnitude is approximately equal to ``9.8 \frac{m}{s^2}``) from the filtered information of the accelerometer to get the dynamical acceleration of the motion. By integrating the dynamical acceleration you can calculate the velocity of motion and the position of the robot. But these results are valid short-term because of the integral operation. To prevent the accumulation of error over a long period of time, it is necessary to add another positioning sensor such as the Global Positioning System (GPS) to the set.
+
+![sensor_fusion](./assets/reactionwheelunicycle/sensor_fusion.jpeg)
+
+As you know, in a positioning system including tri-axis gyroscopes and accelerometers (having six degrees of freedom), the gravity vector calculated using the accelerometer is like a yardstick that counteracts the effect of the gradual drift of the gyroscope from the estimation of the direction of gravity. But this vector does not have any projections on the horizontal plane. In addition, knowing the direction and magnitude of a known vector (like the gravity vector) in an orthogonal coordinate system, it is not possible to determine the direction of all three coordinate axes at the same time. In fact, one can show that there are an infinite number of coordinate systems that measure a particular vector the same (if you rotate a coordinate system about an axis parallel to that particular vector, all coordinate systems that are created as a result of rotating the coordinate system through various angles about the axis, measure the said vector the same). To detect the orientation of a coordinate system in the three-dimensional space, we have to have the measurement results of a pair of non-parallel vectors in the coordinate system. The coordinate system that we want to find the orientation of, is our Inertial Measurement Unit (IMU). That is why the output of a data fusion algorithm that uses the information of tri-axis accelerometers and gyroscopes, is not a valid source to find the orientation around the vertical axis (the Z-axis). To solve this problem one must use another vector that has a substantial projection on the horizontal plane. An electronic compass can accomplish this goal. Positioning systems in flying machines generally take advantage of all three sensors: compasses, gyroscopes and accelerometers (having nine degrees of freedom), and the fusion algorithms in them process the information of all of the sensors.
+
+## Estimating Tilt Using Accelerometers
+
+### The Problem Setup
+
+![the_problem_setup](./assets/reactionwheelunicycle/theproblemsetup.jpeg)
+
+### The Optimal Estimation of the Gravity Vector
+
+### The Full Estimation Lemma
+
+### The Proof of the Full Estimation Lemma
+
+### The Partial Estimation Lemma
+
+### The Proof of the Partial Estimation Lemma
+
+### Tilt Estimation
+
+### The Implementation of the Tilt Estimation Algorithm
+
 ![electronics_system](./assets/reactionwheelunicycle/electronics_system.jpeg)
 
 The function `updateIMU` provides the main source of data for the objective of the system. Through this function, the Micro-Controller Unit (MCU) talks to the Inertial Measurement Unit (IMU) modules 1 and 2 for updating the roll and pitch angles along with their first and second derivatives. This is done by calling the function and giving it a pointer to the Linear Quadratic Regulator (LQR) model object. Although both IMUs are used for tilt estimation, the final result is assigned to the field of IMU 1. This function encapsulates matrix-vector multiplications for coordinate transformations, the singular value decomposition for obtaining the gravity vector, and sensor fusion between the tri-axis accelerometers and the tri-axis gyroscopes. Knowing about the position and orientation of each IMU with respect to the body, the function excludes linear accelerations from calculations. So, `UpdateIMU` gathers the latest inertial measurements form multiple sensor units and computes the roll and pitch angles using known parameters of the system configuration.
@@ -110,9 +138,6 @@ The function `updateIMU` provides the main source of data for the objective of t
 ![inertialmeasurementunits](./assets/reactionwheelunicycle/schematics/inertialmeasurementunits.jpeg)
 
 In terms of connectivity, The MCU peripheral USART1 is used to talk to IMU #2 (GY-95T). Set the baudrate of uart1 to 115200 Bits/s for the GY-95 IMU module. Set the Pin6 (PS: IIC/USART output mode selection) of IMU #2 (GY-25T) to zero, in order to use the I2C protocol. The I2C clock speed is set at 100000 Hz in the stanard mode. For saving MCU clock cycles and time, added a DMA request with USART1_RX and DMA2 Stream 2 from peripheral to memory and low priority. The mode is circular and the request call is made once in the main function by passing the usart1 handle and the receive buffer. The request increments the address of memory. The data width is one Byte for both the preipheral and memory.
-
-![the_problem_setup](./assets/reactionwheelunicycle/theproblemsetup.jpeg)
-
 
 
 ```c
@@ -609,7 +634,6 @@ The recursive updating of the filter coefficients ``\textbf{w}_n`` and the inver
 
 But setting an initial zero vector for the filter coefficients does not minimize the weighted least squares error ``\Epsilon(0)``, and so ``\textbf{w}_0`` is not an optimal initial vector. However, with an exponential weighting factor less than one, ``\lambda < 1``, the bias in the least squares solution goes to zero as ``n`` increases.
 
-- 
 An adaptive control algorithm based on Q learning that converges to the solution to the discrete-time LQR problem. This is accomplished by solving athe algebraic Riccati equation in real time without knowing the system dynamics by using data measured along the system trajectories.
 
 Q learning is implemented by repeatedly performing the iterations ``W_{j + 1}^T (\phi (z_k) - \gamma \phi (z_{k + 1})) = r (x_k, h_j(x_k))`` and ``h_{j + 1} (x_k) = \underset{u}{arg \ min} (W_{j + 1}^T \phi (x_k, u))``, for all ``x \in X``. In it is seen that the LQR Q function is quadratic in the states and inputs so that ``Q(x_k, u_k) = Q(z_k) \equiv (\frac{1}{2}) z_k^T S z_k`` where ``z_k = \begin{bmatrix} x_k^T &\\ u_k^T \end{bmatrix}``.
