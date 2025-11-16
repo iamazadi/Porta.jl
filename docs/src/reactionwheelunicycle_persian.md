@@ -7821,7 +7821,7 @@ Description = "Describes the mathematical model of a reaction wheel unicycle rob
 
 ``Y^* \in \mathbb{R}^{L \times q}``
 
-``\underset{Y}{min} \ \mathbb{E} \ [|| MY - Q ||_F^2]``  (19)
+``\underset{Y}{min} \ \mathbb{E} \ [|| MY - Q_1 ||_F^2]``  (19)
 
 ```@raw html
 <div dir = "rtl">
@@ -8023,7 +8023,7 @@ Description = "Describes the mathematical model of a reaction wheel unicycle rob
 
 ``\exists \lambda \neq 0 \in \mathbb{R}^4 : \forall i = 1, ..., L``
 
-``\lambda_1 \ ^{B}p_{i, x} + \lambda_2 \ ^{B}p_{i, y} + \lambda_3 \ ^{B}p_{i, z} = -\lambda_4``
+``\lambda_1 \ ^{B}p_{i, x} + \lambda_2 \ ^{B}p_{i, y} + \lambda_3 \ ^{B}p_{i, z} = -\lambda_4``  (22)
 
 ``^{B}p_{i, x}, \ ^{B}p_{i, y}, \ ^{B}p_{i, z} \in \mathbb{R}``
 

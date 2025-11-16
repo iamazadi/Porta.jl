@@ -2,15 +2,13 @@
 Description = "How the reaction wheel unicycle works."
 ```
 
-# How the Reaction Wheel Unicycle Works
+# How the Reaction-Wheel Unicycle Works
 
 ![gravity_vector_estimation_upright](./assets/reactionwheelunicycle/gravity_vector_estimation_upright.png)
 
 This is a model of a unicycle with two symmetrically attached rotors. One of the reasons the matrix of inertia is not trivial is that the rotors’ axes of rotation do not intersect at a point. The constraint on the system is conservation of angular momentum. The angular velocity of the body is related to the rotor velocities. That relation gives rise to a differential equation in the rotation group Special Orthogonal of real dimension 3 for the robot’s body. Using the Euler parameters of ``SO(3)`` we obtain a local coordinate description of the differential equation, in terms of the roll, pitch and yaw angles. The robot can be repositioned by controlling the rotor velocities. The Linear Quadratic Regulator regulates the roll and pitch angles by a choice of a suitable input.
 
-![gravity_vector_estimation_lean_back](./assets/reactionwheelunicycle/gravity_vector_estimation_lean_back.png)
-
-## Unicycle Balance Control
+## The Control of the Balancing Unicycle
 
 Here we deal with non-linear control systems that are described in terms of either differential equations or difference equations. In other words we consider the follwoing two types:
 
@@ -113,25 +111,292 @@ As you know, in a positioning system including tri-axis gyroscopes and accelerom
 
 ## Estimating Tilt Using Accelerometers
 
+In this section, we find an estimator for the roll and pitch angles of a rigid body that has only rotational degrees of freedom. This estimate is based on the measurements of multiple accelerometers that are mounted on the rigid body, such that it is assumed that we know their mounting positions and their directions of orientation. First, we describe the roblem setup in a formal way. Then, we find an estimate of the gravity vector in the frame of the robot. Finally, we use the gravity vector in order to calculate the roll and pitch angles. In this section, we follow the setup described in Sebastian Trimpe and Raffaello D’Andrea (2010) [2].
+
 ### The Problem Setup
+
+Suppose there is a rigid body that is standing on a fixed pivot point without friction. Therefore, the body has three rotational degrees of freedom, but has no translational degrees of freedom. The origin of the coordinate system of the body, which is denoted by ``\hat{B}``, is at the center of rotation. The inertial reference frame is denoted by ``\hat{O}``, the origin of which is coincident with the origin of the body's frame ``\hat{B}``. On the body, there are ``L`` sensors that are mounted at specific locations ``p_i``, for ``i = 1, ..., L``. It is assumed that the position of sesnors ``^Bp_i`` is known in the reference frame of the body. Each sensor ``\hat{A}_i`` measures the local acceleration along three directions in its local frame. Two rotation matrices are introduced to describe the rotation of the rigid body and the mounting orientaton of the sensors: the first matrix describes the rotation of the inertial reference frame ``\hat{O}`` with respect to the body's frame ``\hat{B}``, and the second matrix determines the rotation of the ``i``th sensor's local reference frame with respect to the body's frame.
+
+``\left\{ \begin{array}{l} ^{O}_{B}R &\\ ^{A_i}_{B}R \end{array} \right.``
+
+For example, a vector ``^Bv`` in the body's reference frame can be represented in the inertial reference frame with a matrix-vector multiplication ``^{O}v = ^{O}_{B}R \ ^{B}v``.
 
 ![the_problem_setup](./assets/reactionwheelunicycle/theproblemsetup.jpeg)
 
+An accelerometer, measures ``^{A_i}m_i`` the acceleration vector ``^O\ddot{p}_i`` at its mounting position in addition to the gravity vector ``^Og``, which is rotated with respect to its local frame ``\hat{A}_i``.
+
+``^{A_i}m_i = ^{A_i}_{B}R \ ^{B}_{O}R (^{O}\ddot{p}_i + ^{O}g) + ^{A_i}n_i``  (Equation 1)
+
+In equation 1, the measurement of the accelerometer is denoted by ``^{A_i}m_i \in \mathbb{R}^3`` and the measurement noise is denoted by ``^{A_i}n_i \in \mathbb{R}^3``. It is assumed that it is the white noise, and its value ``\mathbb{E}[^{A}n_i \ (^{A}n_i)^T] = \sigma_n^2 I_3`` is limited by the zero mean ``\mathbb{E}[^{A}n_i] = 0`` and the standard deviation ``\sigma_n``. Here, the mathematical expected value is denoted by ``\mathbb{E}`` and the matrix ``I_3 \in \mathbb{R}^{3 \times 3}`` is the identity matrix of real dimension three. This model of noise is reasonable for acclerometers that are based on the MEMS technology provided that the bias is subtracted from it.
+
+Using the coordinate transformation ``^Op_i = ^O_BR ^Bp_i`` and the fact that ``^Bp_i`` is constant in time ``\frac{d \ ^{B}p_i}{dt} = 0``, we arrive at the conclusion that the acceleration ``^O\ddot{p_i}`` in terms of the inertial reference frame ``\hat{O}`` is calculated using the second derivative of the rotation matrix ``^O_B\ddot{R}`` with respect to time ``\frac{d^2 \ ^{O}_{B}R}{dt^2} = ^{O}_{B}\ddot{R}``. The matrix ``^O_B\ddot{R}`` captures the dynamic terms of the rigid body: the rotational and centripetal acceleration terms.
+
+``^{O}\ddot{p}_i = ^{O}_{B}\ddot{R} \ ^{B}p_i``  (Equation 2)
+
+Using equation 2, one can rewrite the acceleration measurement in equation 1 as follows:
+
+``^{A_i}m_i = ^{A_i}_{B}R \ ^{B}_{O}R (^{O}_{B}\ddot{R} \ ^{B}p_i + ^{O}g) + ^{A_i}n_i``  (Equation 3)
+
+Since all of the rotational orientations of the sensors, denoted by ``^{A_i}_BR``, are assumed to be known, we can represent the sensor measurements ``^{A_i}m_i`` in terms of the body's frame of reference ``\hat{B}`` by multiplying equation 3 on the left with the transpose of the rotation matrix ``^B_{A_i}R = ^{A_i}_BR^T``.
+
+``^{B}m_i = \tilde{R} ^{B}p_i + ^{B}g + ^{B}n_i``  (Equation 4)
+
+In equation 4, the matrix ``\tilde{R}`` combines the rotation of the body ``^{B}_{O}R`` and the dynamic terms of the motion of the body ``^{O}_{B}\ddot{R}`` using a matrix-matrix product: ``\tilde{R} := ^{B}_{O}R \ ^{O}_{B}\ddot{R}``.
+
+``^{B}g = ^{B}_{O}R \ ^{O}g``  (Equation 5)
+
+Also in equation 4, the gravity vector ``^{B}g`` is represented in terms of the body's reference fame ``\hat{B}``, and the noise vector ``^{B}n_i`` is rotated with respect to the body's frame ``^{B}n_i = ^{B}_{A_i}R \ ^{A_i}n_i``. The mean of the noise after the coordinate transformation is still equal to zero ``\mathbb{E}[^{B}n_i] = 0``, and the standard deviation of the noise is still limited to the scalar multiplication of ``\sigma_n^2`` with the three-dimensional identity matrix: ``\mathbb{E}[^{B}n_i (^{B}n_i)^T] = \sigma_n^2 I_3``.
+
+Suppose that the measurements are done at a rate ``T`` and the time index is introduced as ``k``. So we can rewrite equation 4 like the following:
+
+``^{B}m_i(k) = \tilde{R}(k) \ ^{B}p_i + ^{B}g(k) + ^{B}n_i(k)``  (Equation 6)
+
+With the given measurements that are done in equation 6 for every sensor from ``i`` through ``L`` at time ``k``, the objective is to estimate the tilt of the rigid body at time ``k``, which is captured by the matrix ``^B_OR``. As an intermediate step, an estimate of the gravity vector ``^Bg(k)`` at time ``k`` (and as a side product) an estimate of the matrix ``\tilde{R}(k)`` is derived. Then, the estimate of the gravity vector is used to find the roll and pitch angles of the rigid body.
+
+
 ### The Optimal Estimation of the Gravity Vector
+
+In this section, the problem of the estimation of the gravity vector ``^Bg`` in the reference frame of the robot's body ``\hat{B}`` using the acceleration measurements ``^Bm_i`` in equation 6, for ``i = 1, ..., L``, is described as a least-squares problem. All of the measurements in equation 6, which are ``L`` in number, are combined in a matrix equation where the time index ``k`` is removed for convenience.
+
+``M = QP + N``  (Equation 7)
+
+In equation 7, the matrix denoted by ``M`` combines the measurements of all sensors, ``Q`` denotes the matrix of unknown parameters, whereas ``P`` denotes the matrix of known parameters.
+
+``M := \begin{bmatrix} ^{B}m_1 & ^{B}m_2 & \ldots & ^{B}m_L \end{bmatrix} \in \mathbb{R}^{3 \times L}``  (Equation 8)
+
+``Q := \begin{bmatrix} ^{B}g & \tilde{R} \end{bmatrix} \in \mathbb{R}^{3 \times 4}``  (Equation 9)
+
+``P := \begin{bmatrix} 1 & 1 & \ldots & 1 \\ ^{B}p_1 & ^{B}p_2 & \ldots & ^{B}p_L \end{bmatrix} \in \mathbb{R}^{4 \times L}``  (Equation 10)
+
+``N := \begin{bmatrix} ^{B}n_1 & ^{B}n_2 & \ldots & ^{B}n_L \end{bmatrix} \in \mathbb{R}^{3 \times L}``
+
+The letter ``N`` in equation 7 denotes the matrix that combines all of the noise vectors, meaning its expected value is equal to zero ``\mathbb{E}[N] = 0``, and its standard deviation is limited by the scalar multiplication of the ``L``-dimensional identity matrix ``I_L`` with ``\sigma_N^2 := \sqrt{3} \sigma_n``:
+
+``\mathbb{E}[N^T N] = 3\sigma_n^2 I_L = \sigma_N^2 I_L``.
+
+Other than the gravity vector ``^Bg``, which is what we are after, the unknown parameters matrix ``Q`` also contains the matrix ``\tilde{R}``, combining the rotation of the body ``^{B}_{O}R`` and the dynamic terms of the motion of the body ``^{O}_{B}\ddot{R}``. In the follwoing, a scheme for the optimal estimation of the entire matrix ``Q`` is described, even though the gravity vector motivates the tilt estimation. In other applications, one might also be interested in estimating the dynamic terms, denoted by ``\ddot{R}``, which is derived from the matrix ``\tilde{R} = ^{B}_{O}R \ ^{O}_{B}\ddot{R}`` once the rotation matrix ``^B_OR`` is found.
+
+The objective is to find an estimate of the optimal matrix ``\hat{Q}^*`` of the unknown parameters matrix ``Q`` such that the expected value of the optimization error is minimized (see equation 11 where ``||.||_F`` denots the Frobenius matrix norm), subjected to the fact that ``\mathbb{E} [\hat{Q}] = Q`` the expected value of the matrix ``\hat{Q}^*`` equals the matrix ``Q``.
+
+``\underset{\hat{Q}}{min} \ \mathbb{E} \ [|| \hat{Q} - Q ||^2_F]``  (Equation 11)
+
+The estimate of the matrix ``\hat{Q}`` is restricted to linear combinations of the measurements ``M``, that is, we look for an optimal matrix ``X^*`` so that we can decompose the matrix ``Q`` as a matrix-matrix product ``\hat{Q} = MX``. This way results in a straight-forward implementation: at each time step, the estimate of the matrix ``Q`` is calculated by a matrix-matrix product. Note that in equation 7, the matrices ``M``, ``Q`` and ``N`` are variable in time. At each time ``k``, according to the measurements of the matrix ``M``, we want to find an optimal estimate of the unknown parameters matrix ``Q``. The next lemma, states the best unbiased linear estimate of the full parameter matrix ``Q``.
 
 ### The Full Estimation Lemma
 
+Given the real matrices ``P \in \mathbb{R}^{4 \times L}`` and ``M \in \mathbb{R}^{3 \times L}`` satisfying ``M = QP + N`` with unknown matrix ``Q \in \mathbb{R}^{3 \times 4}`` and the matrix random variable ``N \in \mathbb{R}^{3 \times L}`` with ``\mathbb{E}[N] = 0``, ``\mathbb{E}[N^T N] = \sigma_N^2 I_L``. Assuming ``P`` has full row rank, the (unique) minimizer ``X^* \in \mathbb{R}^{L \times 4}`` of
+
+``\underset{X}{min} \ \mathbb{E} \ [||MX - Q||_F^2]`` subjected to ``\mathbb{E} \ [MX] = Q`` (Equation 12)
+
+is given by
+
+``X^* = P^T (PP^T)^{-1}``.  (Equation 13)
+
+The minimum estimation error is
+
+``\mathbb{E} \ [|| MX^* - Q ||_F^2] = \sigma_N^2 \sum_{i = 1}^4 \frac{1}{s_i^2(P)}``,  (Equation 14)
+
+where ``s_i(P)`` denotes the ``i``th largest singular value of ``P``. 
+
 ### The Proof of the Full Estimation Lemma
 
-### The Partial Estimation Lemma
+Since ``\mathbb{E}[MX] = \mathbb{E}[M]X = QPX``, it is required that
 
-### The Proof of the Partial Estimation Lemma
+``PX = I``  (Equation 15)
+
+to satisfy ``\mathbb{E}[MX] = Q``. Next, consider the singular value decomposition (SVD) of ``P``,
+
+``P = U \begin{bmatrix} \Sigma & 0 \end{bmatrix} \begin{bmatrix} V_1^T \\ V_2^T \end{bmatrix}``,  (Equation 16)
+
+with ``U \in \mathbb{R}^{4 \times 4}`` unitary, ``\Sigma \in \mathbb{R}^{4 \times 4}`` diagonal, ``V_1 \in \mathbb{R}^{L \times 4}``, ``V_2 \in \mathbb{R}^{L \times (L - 4)}``, and ``V = \begin{bmatrix} V_1 & V_2 \end{bmatrix}`` unitary. From the full row rank assumption on ``P``, it follows that ``\Sigma`` is positive definite. Therefore, a parameterization of all ``X`` that satisfy equation (15) is given by
+
+``X = V_1 \Sigma^{-1}U^T + V_2 \bar{X}``,  (Equation 17)
+
+where ``\bar{X} \in \mathbb{R}^{(L - 4) \times 4}`` is a free parameter matrix. Thus, ``\bar{X}`` needs to be chosen such that equation (12) is minimized: Using equations (7), (15) and basic peoperties of the trace operation, yields
+
+``\mathbb{E} \ [||MX - Q||_F^2] = \mathbb{E} \ [||NX||_F^2]``
+
+``= \mathbb{E} \ [trace(X^T N^T N X)] = trace(\mathbb{E} \ [N^T N] X X^T)``
+
+``= \sigma_N^2 \ trace(X X^T) = \sigma_N^2 \ trace(V^T X (V^T X)^T)``
+
+``= \sigma_N^2 ||\begin{bmatrix} \Sigma^{-1} U^T \\ \bar{X} \end{bmatrix}||_F^2``,  (Equation 18)
+
+which is minimized by ``\bar{X} = 0``. Therefore,
+
+``X^* = V_1 \Sigma^{-1} U^T = P^T (P P^T)^{-1}``,
+
+which can readily be seen by inserting equation (16) for ``P``, and
+
+``\mathbb{E}[||MX^* - Q||_F^2] = \sigma_N^2 ||\Sigma^{-1} U^T||_F^2 = \sigma_N^2 ||\Sigma^{-1}||_F^2``.
+
+``\square``
+
+The optimal estimate ``\hat{Q} = MX^*`` includes both the optimal estimate of the gravity vector ``^Bg`` and of the dynamics matrix ``\tilde{R}``. Since, for tilt estimation, only the former is of interest, one needs to ask if ``X^*`` is also optimal if one seeks only an estimate of parts of the unknown matrix ``Q``. The following lemma states that this is indeed the case.
+
+### The Partitioned Estimation Lemma
+
+Let the matrices ``Q``, ``P``, ``N`` and ``M`` be defined as in the full estimation lemma. Furthermore, let ``Q = \begin{bmatrix} Q_1 & Q_2 \end{bmatrix}``, with
+
+``\left\{ \begin{array}{l} Q_1 \in \mathbb{R}^{3 \times q} &\\ Q_2 \in \mathbb{R}^{3 \times (4 - q)} \end{array} \right.``
+
+where ``1 \leq q \leq 4``. Assuming ``P`` has full row rank, the (unique) minimizer ``Y^* \in \mathbb{R}^{L \times q}`` of
+
+``\underset{Y}{min} \ \mathbb{E} \ [|| MY - Q_1 ||_F^2]`` subjected to ``\mathbb{E} \ [MY] = Q_1``  (Equation 19)
+
+is ``Y^* = X_1^*``, where ``X^* = \begin{bmatrix} X_1^* & X_2^* \end{bmatrix}`` is the solution of the full estimation lemma.
+
+### The Proof of the Partitioned Estimation Lemma
+
+It needs to be shown that ``Y = X_1^*`` satisfies equation (19). First, since ``X^* = \begin{bmatrix} X_1^* & X_2^* \end{bmatrix}`` satisfies ``\mathbb{E} \ [M X] = Q`` in equation (12),
+
+``\mathbb{E} \ [ \begin{bmatrix} M X_1^* & M X_2^* \end{bmatrix} ] = \mathbb{E} \ [M X^*] = Q = \begin{bmatrix} Q_1 & Q_2 \end{bmatrix} \longrightarrow``
+
+``\left\{ \begin{array}{l} \mathbb{E} \ [M X_1^*] = Q_1 &\\ \mathbb{E} \ [M X_2^*] = Q_2 \end{array} \right.``.
+
+Then,
+
+``|| M X^* - Q ||_F^2 = || \begin{bmatrix} M X_1^* - Q_1 & M X_2^* - Q_2 \end{bmatrix} ||_F^2 = || M X_1^* - Q_1 ||_F^2 + || M X_2^* - Q_2 ||_F^2``
+
+i.e. ``X^*`` minimizes both terms in the last expression separately and ``X_1^*`` thus minimizes ``|| M X_1^* - Q_1 ||_F^2`` alone.
+
+``\square``
+
+Applying the partitioned estimation lemma with ``q = 1`` yields the optimal gravity vector estimate ``^B\hat{g}(k)`` at time ``k`` given all sensor measurements ``M(k)``,
+
+``^{B}\hat{g}(k) = M(k) X_1^*``,  (Equation 20)
+
+with ``X_1^* \in \mathbb{R}^{L \times 1}``. The *optimal fusion vector* ``X_1^*`` is static and completely defined by the geometry of the problem (through ``P``) and can thus be computed offline.
+
+Note that the gravity vector estimate in equation (20) is independent of the rigid body dynamics, which are captured in ``^O_B\ddot{R}`` (and thus in ``\tilde{R}``). This can be seen from
+
+``^{B}\hat{g} = M X_1^* = Q P X_1^* + N X_1^*``
+
+``= \begin{bmatrix} ^{B}g & \tilde{R} \end{bmatrix} \ U \Sigma V_1^T \ V_1 \Sigma^{-1} U_1^T \ + N X_1^*``
+
+``= \begin{bmatrix} ^{B}g & \tilde{R} \end{bmatrix} \ P \ X_1^* \ + N X_1^*``
+
+``= \begin{bmatrix} ^{B}g & \tilde{R} \end{bmatrix} \begin{bmatrix} U_1 \\ U_2 \end{bmatrix} U_1^T + N X_1^*``
+
+``= \begin{bmatrix} ^{B}g & \tilde{R} \end{bmatrix} \begin{bmatrix} 1 \\ 0 \end{bmatrix} + N X_1^* = ^{B}g + N X_1^*``,
+
+where the SVD of ``P`` in equation (16) has been used. Clearly, the matrix ``\tilde{R}`` does not appear in the estimate, i.e. the gravity vector observation is not corrupted by any dynamic terms. As expected, the sensor noise does enter the estimation equation.
+
+### The Physical Interpretation of the Full Row Rank Condition
+
+Both in the full estimation lemma and the partitioned estimation lemma, the matrix ``P``, which contains the sensor locations on the rigid body, is assumed to have full row rank. In the following, a physical interpretation of this rank condition is given.
+
+Consider the case where ``P`` does not have full row rank. Then, there exists a nontrivial linear combination of the rows of ``P``,
+
+``\exists \lambda \neq 0 \in \mathbb{R}^4 : \lambda_1 p_x + \lambda_2 p_y + \lambda_3 p_z + \lambda_4 \textbf{1} = 0``,  (Equation 21)
+
+where ``p_x^T, \ p_y^T, \ p_z^T \in \mathbb{R}^{1 \times L}``, denote the last three rows of ``P`` (the vectors of ``x``, ``y`` and ``z``-coordinates of all sensor locations, respectively) and ``\textbf{1}^T \in \mathbb{R}^{1 \times L}``, the vector of all ones, is the first row of ``P``. Expression (21) is equivalent to
+
+``\exists \lambda \neq 0 \in \mathbb{R}^4 : \forall i = 1, ..., L``
+
+``\lambda_1 \ ^{B}p_{i, x} + \lambda_2 \ ^{B}p_{i, y} + \lambda_3 \ ^{B}p_{i, z} = -\lambda_4``  (Equation 22)
+
+where ``^{B}p_{i, x}, \ ^{B}p_{i, y}, \ ^{B}p_{i, z} \in \mathbb{R}`` denote the ``x``, ``y`` and ``z``-coordinate of the ``i``th sensor location in the body frame. Since the equation ``\lambda_1 x + \lambda_2 y + \lambda_3 z = -\lambda_4`` defines a plane in ``(x,y,z)``-space, condition (22) is equivalent to *all* ``L`` sensors lying on the same plane. Therefore, the full row rank condition on ``P`` is satisfied if and only if *not* all sensors lie on a plane, this also implies that at least four tri-axis accelerometers are required for the proposed method.
+
+Note that the gravity vector estimate given in the partitioned estimation lemma is optimal under the assumption that ``P`` has full row rank. These results can be extended and the rank condition on ``P`` can be relaxed when one only seeks only the gravity vector. For example, one could directly measure gravity with a single tri-axis accelerometer at the pivot, where the dynamic terms do not enter the measurements.However, this is not possible for the balancing unicycle application.
 
 ### Tilt Estimation
 
-### The Implementation of the Tilt Estimation Algorithm
+With the estimate ``^B\hat{g}`` of the gravity vector in the body frame, one can use equation (5) to estimate the body rotation, since the direction of the gravity vector in the inertial frame is known. In this project, the attitude of the rigid body is represented by ``z``-``y``-``x``-Euler angles (yaw, pitch, roll), i.e. the body frame ``\hat{B}`` is obtained by rotating the inertial frame ``\hat{O}`` succesively about its ``z``-axis, then the resulting ``y``- and ``x``-axis,
+
+``^{O}_{B}R = R_z(\alpha) \ R_y(\beta) \ R_x(\gamma)``,  (Equation 23)
+
+``\left\{ \begin{array}{l} R_z(\alpha) := \begin{bmatrix} cos(\alpha) & -sin(\alpha) & 0 \\ sin(\alpha) & cos(\alpha) & 0 \\ 0 & 0 & 1 \end{bmatrix} &\\ R_y(\beta) := \begin{bmatrix} cos(\beta) & 0 & sin(\beta) \\ 0 & 1 & 0 \\ -sin(\beta) & 0 & cos(\beta) \end{bmatrix} &\\ R_x(\gamma) := \begin{bmatrix}  1 & 0 & 0 \\ 0 & cos(\gamma) & -sin(\gamma) \\ 0 & sin(\gamma) & cos(\gamma) \end{bmatrix} \end{array} \right.``,
+
+where ``\alpha``, ``\beta`` and ``\gamma`` are the yaw, pitch and roll Euler angles, respectively. With this representation, the tilt of the rigid body is captured by ``\beta`` and ``\gamma``. Using equation (23), equation (5) can be written as
+
+``^{B}g = ^{O}_{B}R^T \ ^{O}g = R^T_x(\gamma) \ R^T_y(\beta) \ R^T_z(\alpha) \ ^{O}g``.  (Equation 24)
+
+Using ``^{O}g = \begin{bmatrix} 0 & 0 & g_0 \end{bmatrix}^T`` with gravity constant ``g_0`` and the definitions of the rotation matrices, equation (24) simplifies to
+
+``^{B}g = R^T_x(\gamma) \ R^T_y(\beta) \ ^{O}g = g_0 \begin{bmatrix} -sin(\beta) \\ sin(\gamma) cos(\beta) \\ cos(\gamma) cos(\beta) \end{bmatrix}``.  (Equation 25)
+
+It follows that the ``z``-Euler angle ``\alpha`` is not observable from the accelerometer measurements.
+
+Given the estimate of the gravity vector in equation (20), the *accelerometric estimates* for the ``y``- and ``x``-Euler angles at time ``k`` are:
+
+``\left\{ \begin{array}{l} \hat{\beta}_a(k) = atan2(-^{B}\hat{g}_x(k), \sqrt{^{B}\hat{g}_y^2(k) + ^{B}\hat{g}_z^2(k)}) &\\ \hat{\gamma}_a(k) = atan2(^{B}\hat{g}_y(k), ^{B}\hat{g}_z(k)) \end{array} \right.``,  (Equation 26)
+
+where ``atan2`` is the four-quadrant inverse tangent. Note that one does not need to know the gravity constant ``g_0`` for estimating tilt.
+
+The variance of the angle estimates can be obtained from the variance of the gravity vector estimate, which can in turn be calculated from equation (18) and the SVD of ``P`` in equation (16).
+
+### The Application of Tilt Estimation to the Balancing Unicycle
+
+The tilt estimation algorithm is applied to the balancing unicycle robot. The passive structure of the unicycle is balanced on a wheel. There is a reaction wheel that is mounted on top of the rolling wheel, generating torque in the perpendicular direction for keeping the robot in equilibrium. The pitch and roll angles of the robot are estimated from measurements of two inertial measurement units (IMUs) with tri-axis accelerometers and rate gyros using the algorithm presented in the section above. The noise level of the estimate is further reduced by straightforward fusion with data from the rate gyros. Experimental results are provided in the next section.
+
+The balancing unicycle robot consists of a rigid body in the shape of a rectangular cuboid with two orthogonally attached rotors. The objective is to balance the robot on the bottom wheel. In this configuration, the rigid body has three rotational degrees of freedom, and one translational degree of freedom. One can assume that the robot pivot does not slip due to friction, but rolls freely along a straight line. On the robot chassis, a pair of IMUs are mounted that measure accelerations and angular velocities each along three axes.
+
+The wheels are actuated by DC motors and rotate relative to the robot structure. When the wheels rotate, they exert inertia reactional and ground reactional forces (by generating angular momenta and towing force) on the robot structure. An absolute encoder is used on each motor to measure the angle of a wheel relative to its mounting axle. Furthermore, the robot carries its own power unit and a computer that is connected to the sensors and the DC motors. The computer is also connected to a WiFi module to broadcast all its local sensor measurements to the terminal of a workstation.
 
 ![electronics_system](./assets/reactionwheelunicycle/electronics_system.jpeg)
+
+A state feedback controller is designed that stabalizes the unstable equilibrium of an upright standing robot. Estimates for the chassis angles are obtained from the tilt estimation algorithm of the section above. Although the details of the controller design are explained in the next section, a brief explanation of the control system follows.
+
+Foe both wheels, an inner feedback loop is closed for the chassis velocity. The inner-loop controller, which is the critic loop in the Actor/Critic architecture, ensures that velocity commands are tracked at a faster rate than the natural dynamics of the chassis. This way, one can neglect nonlinear effects such as friction and backlash in the actuation mechanism. A linear dynamical model (a linear quadratic regulator) about the equilibrium that takes into account the effect of the inner loop is obtained using a two-timescale technique, where the outer loop updates the actor of the controller. Updating the control policy in the outer-loop results in a stabalizing controller.
+
+The sensors can generate estimates of all system states: the wheels' angular velocities are calculated using measurements by encoders, estimates of the motors' electrical current rates result from a difference equation using measurements by Hall effect sensors, and estimates of the robot's pitch and roll angles and their rates and accelerations are derived from the IMU measurements. Note that for balancing, knowledge of yaw is not required. Hence, a centralized full-state feedback LQR controller can be designed for stabalizing the system.
+
+#### The Implemetation of the Tilt Estimation Algorithm
+
+The coordinate frame definitions and the locations of the two IMUs and the pivot point on the robot's chassis are indicated in the figure below.
+
+![gravity_vector_estimation_lean_back](./assets/reactionwheelunicycle/gravity_vector_estimation_lean_back.png)
+
+The position vectors of the sensors are
+
+``^Op_1 = \begin{bmatrix} -0.1400 & -0.0650 & -0.0620 \end{bmatrix}^T`` and
+
+``^Op_2 = \begin{bmatrix} -0.0400 & -0.0600 & -0.0600 \end{bmatrix}^T``.
+
+Also the position of the pivot point in the inertial coordinate frame is
+
+``^Opivot = \begin{bmatrix} -0.097 & -0.1 & -0.032 \end{bmatrix}^T``
+
+With this data, matrix ``P`` can be constructed as in equation (10).
+
+``P \in \mathbb{R}^{4 \times L}``
+
+``L = 2``
+
+``P \in \mathbb{R}^{4 \times 2}``
+
+[the unicycle graphical dashboard for taking the measurements](https://github.com/iamazadi/Porta.jl/blob/master/models/development/unicycle.jl)
+
+``^Op_1 = \begin{bmatrix} p_{1x} \\ p_{1y} \\ p_{1z} \end{bmatrix}``
+
+``^Op_2 = \begin{bmatrix} p_{2x} \\ p_{2y} \\ p_{2z} \end{bmatrix}``
+
+``^Opivot = \begin{bmatrix} pivot_x \\ pivot_y \\ pivot_z \end{bmatrix}``
+
+``P = \begin{bmatrix} 1 & 1 \\ p_{1x} - pivot_x & p_{2x} - pivot_x \\ p_{1y} - pivot_y & p_{2y} - pivot_y \\ p_{1z} - pivot_z & p_{2z} - pivot_z \end{bmatrix}``
+
+Applying the partitioned estimation lemma yields the optimal fusion matrix for estimating the gravity vector in the robot's body frame,
+
+``X = P^T (P P^T)^{-1} \in \mathbb{R}^{L \times 4} \longrightarrow X \in \mathbb{R}^{2 \times 4}``,
+
+``X_1^* = \begin{bmatrix} 0.586913 & -11.3087 & 0.747681 & 0.0 \\ 0.446183 & 8.92749 & -3.54337 & 0.0 \end{bmatrix}``.
+
+In the implementation of the algorithm, all accelerometer measurements are rotated to the body frame and stacked into the matrix ``M(k)`` as in equation (8) at each time step. Then, equations (20) and (26) are implemented to obtain the accelerometric estimates for the pitch and roll angles, ``\hat{\beta}_a(k)`` and ``\hat{\gamma}_a(k)``.
+
+In order to reduce the noise level of the accelerometer-based estimates, a straightforward scheme for data fusion with the tri-axis rate gyro measurements may be used. Let ``r(k) \in \mathbb{R}^3`` denote the body angular rate at time ``k``, which is directly measured by a gyro that is mounted on the body. Thus, an estimate ``\hat{r}(k)`` of this quantity may be obtained by averaging the measurements of all two gyros. The body rates are transformed to Euler angular rates by
+
+``\begin{bmatrix} \hat{\dot{\alpha}}(k) \\ \hat{\dot{\beta}}(k) \\ \hat{\dot{\gamma}}(k) \end{bmatrix} = \begin{bmatrix} 0 & sin(\hat{\gamma}) / cos(\hat{\beta}) & cos(\hat{\gamma}) / cos(\hat{\beta}) \\ 0 & cos(\hat{\gamma}) & -sin(\hat{\gamma}) \\ 1 & sin(\hat{\gamma}) tan(\hat{\beta}) & cos(\hat{\gamma}) tan(\hat{\beta}) \end{bmatrix} \hat{r}(k)``,  (Equation 27)
+
+which requires estimates of the Euler angles ``\hat{\beta}`` and ``\hat{\gamma}``. For a straightforward implementation, the most recent estimate may be used as an approximation, i.e. ``\hat{\beta} = \hat{\beta}(k - 1)`` and ``\hat{\gamma} = \hat{\gamma}(k - 1)``.
+
+Integrating the rate estimates in equation (27) yields estimates for the Euler angles that are based on the rate gyro measurements. Thus, the accelerometer- and gyro-based estimates can be fused to obtain a better overall estimate of the robot pitch and roll angles,
+
+``\left\{ \begin{array}{l} \hat{\beta}(k) = \kappa_1 \hat{\beta}_a(k) + (1 - \kappa_1) (\hat{\beta}(k - 1) + T \hat{\dot{\beta}}(k)) &\\ \hat{\gamma}(k) = \kappa_2 \hat{\gamma}_a(k) + (1 - \kappa_2) (\hat{\gamma}(k - 1) + T \hat{\dot{\gamma}}(k)) \end{array} \right.``,  (Equation 28)
+
+where ``T`` is the sampling time (the same as `dt` in the LQR struct) and ``\kappa_1`` and ``\kappa_2`` are tuning parameters that may be chosen such that the variance of the estimate is minimized given the noise specifications of accelerometers and rate gyros. For the application presented in this project, ``\kappa_1 = \kappa_2 = 0.03`` was used.
+
+#### The Micro-Controller Program
 
 The function `updateIMU` provides the main source of data for the objective of the system. Through this function, the Micro-Controller Unit (MCU) talks to the Inertial Measurement Unit (IMU) modules 1 and 2 for updating the roll and pitch angles along with their first and second derivatives. This is done by calling the function and giving it a pointer to the Linear Quadratic Regulator (LQR) model object. Although both IMUs are used for tilt estimation, the final result is assigned to the field of IMU 1. This function encapsulates matrix-vector multiplications for coordinate transformations, the singular value decomposition for obtaining the gravity vector, and sensor fusion between the tri-axis accelerometers and the tri-axis gyroscopes. Knowing about the position and orientation of each IMU with respect to the body, the function excludes linear accelerations from calculations. So, `UpdateIMU` gathers the latest inertial measurements form multiple sensor units and computes the roll and pitch angles using known parameters of the system configuration.
 
