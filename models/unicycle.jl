@@ -309,7 +309,8 @@ function stepforward()
         global R2 = acc2
 
         M = [B_A1_R * R1 B_A2_R * R2]
-        ĝ = (M*X)[:, 1]
+        # ĝ = (M*X)[:, 1]
+        ĝ = deepcopy(R1)
         β = atan(-ĝ[1], √(ĝ[2]^2 + ĝ[3]^2))
         γ = atan(ĝ[2], ĝ[3])
 
