@@ -6,18 +6,26 @@ using Porta
 
 
 figuresize = (1920, 1080)
-modelname = "unicycle"
-maxplotnumber = 30
-headers = ["AX1", "AY1", "AZ1", "AX2", "AY2", "AZ2", "roll", "pitch", "encT", "encB", "j", "x0", "x1", "x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "P0", "P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11"]
+modelname = "unicycle_tilt_estimation"
+maxplotnumber = 200
+headers = ["AX1", "AY1", "AZ1", "AX2", "AY2", "AZ2", "roll", "pitch", "encT", "encB", "j", "x0", "x1", "x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "P0", "P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "changes", "time"]
 clientside = nothing
 run = false
 readings = Dict()
+segments = 30
+fps = 24
+minutes = 1
+iterations = minutes * 60 * fps
+ipaddress = "192.168.4.1"
+portnumber = 10000
 
 x̂ = ℝ³([1.0; 0.0; 0.0])
 ŷ = ℝ³([0.0; 1.0; 0.0])
 ẑ = ℝ³([0.0; 0.0; 1.0])
 
-eyeposition = normalize([0.0, 1.0, 1.0]) .* 0.5
+reorder(x) = [x[2]; -x[1]; x[3]]
+
+eyeposition = [-0.32583746; -0.38208738; 0.18327934]
 lookat = [-0.1, -0.1, 0.1]
 up = [0.0; 0.0; 1.0]
 arrowsize = Observable(Vec3f(0.03, 0.03, 0.06))
@@ -82,9 +90,9 @@ chassis_stl_path = joinpath("data", "unicycle", "unicycle_chassis.STL")
 rollingwheel_stl_path = joinpath("data", "unicycle", "unicycle_main_wheel.STL")
 reactionwheel_stl_path = joinpath("data", "unicycle", "unicycle_reaction_wheel.STL")
 
-chassis_colormap = :RdBu_8
-rollingwheel_colormap = :Reds_3
-reactionwheel_colormap = :diverging_tritanopic_cwr_75_98_c20_n256
+chassis_colormap = :twilight
+rollingwheel_colormap = :Paired_10
+reactionwheel_colormap = :oleron
 
 pivot_observable = Observable(pivot)
 point1_observable = Observable(p1)
@@ -96,44 +104,42 @@ pl = PointLight(Point3f(0), RGBf(0.0862, 0.0862, 0.0862))
 al = AmbientLight(RGBf(0.9, 0.9, 0.9))
 backgroundcolor = RGBf(1.0, 1.0, 1.0)
 lscene = LScene(fig[1, 1], show_axis=false, scenekw=(lights=[pl, al], clear=true, backgroundcolor=:black))
-ax1 = Axis(fig[2, 1], xlabel="Time (s)", ylabel="System States", xlabelsize=30, ylabelsize=30)
-ax2 = Axis(fig[2, 2], xlabel="Time (s)", ylabel="P Matrix Parameters", xlabelsize=30, ylabelsize=30)
+ax1 = Axis(fig[2, 1], xlabel="Time (s)", ylabel="x-Euler angle (rad)", xlabelsize=30, ylabelsize=30)
+ax2 = Axis(fig[2, 2], xlabel="Time (s)", ylabel="y-Euler angle (rad)", xlabelsize=30, ylabelsize=30)
+ax3 = Axis(fig[1, 2], xlabel="Time (s)", ylabel="P Matrix Parameters", xlabelsize=30, ylabelsize=30)
 buttoncolor = RGBf(0.3, 0.3, 0.3)
-buttonlabels = ["Run", "Stop", "Connect", "Disconnect"]
+buttonlabels = ["Connect", "Disconnect", "Record", "Stop"]
 buttons = [Button(fig, label=l, buttoncolor=buttoncolor) for l in buttonlabels]
 statustext = Observable("Not connected.")
-statuslabel = Label(fig, statustext, fontsize=15)
+statuslabel = Label(fig, statustext, fontsize = 15)
 jindextext = Observable("j: 1")
-jindexlabel = Label(fig, jindextext, fontsize=30)
-fig[1, 2] = grid!(hcat(jindexlabel, statuslabel, buttons...), tellheight=false, tellwidth=false)
+jindexlabel = Label(fig, jindextext, fontsize = 30)
+recordtext = Observable("Not recording.")
+recordlabel = Label(fig, recordtext, fontsize = 30)
+fig[3, 1] = grid!(hcat(statuslabel, jindexlabel, recordlabel), tellheight=true, tellwidth=false)
+fig[3, 2] = grid!(hcat(buttons...), tellheight=true, tellwidth=false)
 
-graphpoints = Observable([Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)]])
-graphpoints2 = Observable([Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)]])
+graphpoints1 = Observable([Point2f[(0, 0)], Point2f[(0, 0)]])
+graphpoints2 = Observable([Point2f[(0, 0)], Point2f[(0, 0)]])
+graphpoints3 = Observable([Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)]])
 
-P0_lineobject = scatter!(ax2, @lift(($graphpoints2)[1]), color=:red)
-P1_lineobject = scatter!(ax2, @lift(($graphpoints2)[2]), color=:green)
-P2_lineobject = scatter!(ax2, @lift(($graphpoints2)[3]), color=:blue)
-P3_lineobject = scatter!(ax2, @lift(($graphpoints2)[4]), color=:yellow)
-P4_lineobject = scatter!(ax2, @lift(($graphpoints2)[5]), color=:orange)
-P5_lineobject = scatter!(ax2, @lift(($graphpoints2)[6]), color=:gold)
-P6_lineobject = scatter!(ax2, @lift(($graphpoints2)[7]), color=:purple)
-P7_lineobject = scatter!(ax2, @lift(($graphpoints2)[8]), color=:pink)
-P8_lineobject = scatter!(ax2, @lift(($graphpoints2)[9]), color=:white)
-P9_lineobject = scatter!(ax2, @lift(($graphpoints2)[10]), color=:lime)
-P10_lineobject = scatter!(ax2, @lift(($graphpoints2)[11]), color=:brown)
-P11_lineobject = scatter!(ax2, @lift(($graphpoints2)[12]), color=:navyblue)
-x0_lineobject = scatter!(ax1, @lift(($graphpoints)[1]), color=:red)
-x1_lineobject = scatter!(ax1, @lift(($graphpoints)[2]), color=:green)
-x2_lineobject = scatter!(ax1, @lift(($graphpoints)[3]), color=:orange)
-x3_lineobject = scatter!(ax1, @lift(($graphpoints)[4]), color=:pink)
-x4_lineobject = scatter!(ax1, @lift(($graphpoints)[5]), color=:blue)
-x5_lineobject = scatter!(ax1, @lift(($graphpoints)[6]), color=:yellow)
-x6_lineobject = scatter!(ax1, @lift(($graphpoints)[7]), color=:purple)
-x7_lineobject = scatter!(ax1, @lift(($graphpoints)[8]), color=:brown)
-x8_lineobject = scatter!(ax1, @lift(($graphpoints)[9]), color=:white)
-x9_lineobject = scatter!(ax1, @lift(($graphpoints)[10]), color=:grey)
-x10_lineobject = scatter!(ax1, @lift(($graphpoints)[11]), color=:gold)
-x11_lineobject = scatter!(ax1, @lift(($graphpoints)[12]), color=:silver)
+
+x_euler_angle_raw_lineobject = scatter!(ax1, @lift(($graphpoints1)[1]), color=:green)
+y_euler_angle_raw_lineobject = scatter!(ax2, @lift(($graphpoints2)[1]), color=:blue)
+x_euler_angle_estimate_lineobject = scatter!(ax1, @lift(($graphpoints1)[2]), color=:lightgreen)
+y_euler_angle_estimate_lineobject = scatter!(ax2, @lift(($graphpoints2)[2]), color=:lightblue)
+P0_lineobject = scatter!(ax3, @lift(($graphpoints3)[1]), color=:lavenderblush)
+P1_lineobject = scatter!(ax3, @lift(($graphpoints3)[2]), color=:plum1)
+P2_lineobject = scatter!(ax3, @lift(($graphpoints3)[3]), color=:thistle)
+P3_lineobject = scatter!(ax3, @lift(($graphpoints3)[4]), color=:orchid2)
+P4_lineobject = scatter!(ax3, @lift(($graphpoints3)[5]), color=:mediumorchid1)
+P5_lineobject = scatter!(ax3, @lift(($graphpoints3)[6]), color=:magenta2)
+P6_lineobject = scatter!(ax3, @lift(($graphpoints3)[7]), color=:lavenderblush4)
+P7_lineobject = scatter!(ax3, @lift(($graphpoints3)[8]), color=:magenta3)
+P8_lineobject = scatter!(ax3, @lift(($graphpoints3)[9]), color=:plum4)
+P9_lineobject = scatter!(ax3, @lift(($graphpoints3)[10]), color=:mediumorchid4)
+P10_lineobject = scatter!(ax3, @lift(($graphpoints3)[11]), color=:mediumpurple4)
+P11_lineobject = scatter!(ax3, @lift(($graphpoints3)[12]), color=:purple4)
 
 chassis_stl = load(chassis_stl_path)
 reactionwheel_stl = load(reactionwheel_stl_path)
@@ -173,8 +179,8 @@ pivot_ps = Observable([pivot_observable[], pivot_observable[], pivot_observable[
 pivot_ns = Observable(map(x -> x .* smallarrowscale, ê))
 sensor1frame_tails = Observable([point1_observable[], point1_observable[], point1_observable[]])
 sensor2frame_tails = Observable([point2_observable[], point2_observable[], point2_observable[]])
-sensor1frame_heads = Observable(map(x -> smallarrowscale .* B_O_R * x, [B_A1_R * ê[1], B_A1_R * ê[2], B_A1_R * ê[3]]))
-sensor2frame_heads = Observable(map(x -> smallarrowscale .* B_O_R * x, [B_A2_R * ê[1], B_A2_R * ê[2], B_A2_R * ê[3]]))
+sensor1frame_heads = Observable(map(x -> smallarrowscale .* B_O_R * x, [reorder(B_A1_R * ê[1]), reorder(B_A1_R * ê[2]), reorder(B_A1_R * ê[3])]))
+sensor2frame_heads = Observable(map(x -> smallarrowscale .* B_O_R * x, [reorder(B_A2_R * ê[1]), reorder(B_A2_R * ê[2]), reorder(B_A2_R * ê[3])]))
 arrowsize1 = Observable(Vec3f(0.02, 0.02, 0.04))
 linewidth1 = Observable(0.01)
 arrows!(lscene,
@@ -196,12 +202,27 @@ arrows!(lscene,
     align=:origin
 )
 
+lspaceθ = range(π / 2, stop = -π / 2, length = segments)
+lspaceϕ = range(-π, stop = float(π), length = segments)
+sphere_radius_p1 = norm(p1 - pivot)
+sphere_radius_p2 = norm(p2 - pivot)
+spherematrix_p1 = Observable([ℝ³(p1) + convert_to_cartesian([sphere_radius_p1; θ; ϕ]) for ϕ in lspaceϕ, θ in lspaceθ])
+spherematrix_p2 = Observable([ℝ³(p2) + convert_to_cartesian([sphere_radius_p2; θ; ϕ]) for ϕ in lspaceϕ, θ in lspaceθ])
+sphere_color_p1 = [RGBAf(1.0, 1.0, 0.0, 0.5) for ϕ in lspaceϕ, θ in lspaceθ]
+sphere_color_p2 = [RGBAf(0.0, 1.0, 0.0, 0.5) for ϕ in lspaceϕ, θ in lspaceθ]
+sphereobservable_p1 = buildsurface(lscene, spherematrix_p1, sphere_color_p1, transparency = true)
+sphereobservable_p2 = buildsurface(lscene, spherematrix_p2, sphere_color_p2, transparency = true)
+# updatesurface!(spherematrix_p1, sphereobservable_p1)
+# updatesurface!(spherematrix_p2, sphereobservable_p2)
+
 lookat = deepcopy(pivot)
 update_cam!(lscene.scene, Vec3f(eyeposition...), Vec3f(lookat...), Vec3f(up...))
 reaction_angle = 0.0
 rolling_angle = 0.0
-ylims!(ax1, -1.0, 1.0)
-ylims!(ax2, -1e2, 1e2)
+default_ylims = [-π / 8; π / 8]
+ylims!(ax1, default_ylims[1], default_ylims[2])
+ylims!(ax2, default_ylims[1], default_ylims[2])
+ylims!(ax3, -1e2, 1e2)
 
 
 disconnect(clientside) = begin
@@ -219,14 +240,16 @@ mat33(q::ℍ) = begin
 end
 
 
-on(buttons[2].clicks) do n
+on(buttons[4].clicks) do n
     global run = false
 end
 
-on(buttons[3].clicks) do n
-    disconnect(clientside)
+on(buttons[1].clicks) do n
+    if !isnothing(clientside)
+        disconnect(clientside)
+    end
     # execute the command nc 192.168.4.1 10000 in terminal for testing
-    global clientside = connect("192.168.4.1", 10000)
+    global clientside = connect(ipaddress, portnumber)
     if isopen(clientside)
         statustext[] = "Connected."
     else
@@ -234,7 +257,7 @@ on(buttons[3].clicks) do n
     end
 end
 
-on(buttons[4].clicks) do n
+on(buttons[2].clicks) do n
     disconnect(clientside)
     if !isnothing(clientside) && isopen(clientside)
         statustext[] = "Connected."
@@ -244,7 +267,9 @@ on(buttons[4].clicks) do n
 end
 
 function stepforward()
-    text = readline(clientside, keep=true)
+    if !isnothing(clientside) && isopen(clientside)
+        text = readline(clientside, keep=true)
+    end
     # println(text)
     # x1k: -13.76, x2k: 1.60, u1k: -40.00, u2k: 43.36, x1k+: -13.76, x2k+: 1.60, u1k+: -40.00, u2k+: 43.36, dt: 0.000006
     filtered = replace(text, "\0" => "")
@@ -254,28 +279,9 @@ function stepforward()
     allkeys = keys(readings)
     flag = all([x ∈ allkeys for x in headers]) && all([!isnothing(readings[x]) for x in headers])
     if flag
+        elapsed_time = readings["time"]
         acc1 = [readings["AX1"]; readings["AY1"]; readings["AZ1"]]          # acc2 = [-(cos(imu2angle) * readings["aY2"] - sin(imu2angle) * readings["aX2"]); -(sin(imu2angle) * readings["aX2"] + cos(imu2angle) * readings["aY2"]); -readings["aZ2"]] .* (1.0 / 8092.0)
         acc2 = [readings["AX2"], readings["AY2"], readings["AZ2"]]
-
-        # acc2 = [-(cos(imu2angle) * readings["aY2"] - sin(imu2angle) * readings["aX2"]); -(sin(imu2angle) * readings["aX2"] + cos(imu2angle) * readings["aY2"]); -readings["aZ2"]] .* (1.0 / 8092.0)
-        # gyr1 = [readings["gX1"]; readings["gY1"]; readings["gZ1"]]
-        # gyr2 = [readings["gX2"]; readings["gY2"]; readings["gZ2"]]
-        roll = readings["roll"]
-        pitch = readings["pitch"]
-        rolling_angle = readings["encB"]
-        reaction_angle = -readings["encT"]
-        x0 = readings["x0"]
-        x1 = readings["x1"]
-        x2 = readings["x2"]
-        x3 = readings["x3"]
-        x4 = readings["x4"]
-        x5 = readings["x5"]
-        x6 = readings["x6"]
-        x7 = readings["x7"]
-        x8 = readings["x8"]
-        x9 = readings["x9"]
-        x10 = readings["x10"]
-        x11 = readings["x11"]
         P0 = readings["P0"]
         P1 = readings["P1"]
         P2 = readings["P2"]
@@ -288,6 +294,14 @@ function stepforward()
         P9 = readings["P9"]
         P10 = readings["P10"]
         P11 = readings["P11"]
+
+        # acc2 = [-(cos(imu2angle) * readings["aY2"] - sin(imu2angle) * readings["aX2"]); -(sin(imu2angle) * readings["aX2"] + cos(imu2angle) * readings["aY2"]); -readings["aZ2"]] .* (1.0 / 8092.0)
+        # gyr1 = [readings["gX1"]; readings["gY1"]; readings["gZ1"]]
+        # gyr2 = [readings["gX2"]; readings["gY2"]; readings["gZ2"]]
+        roll = readings["roll"]
+        pitch = readings["pitch"]
+        rolling_angle = readings["encB"]
+        reaction_angle = -readings["encT"]
         jindextext[] = "j: $(readings["j"])"
         # delta_time = readings["dt"]
 
@@ -298,11 +312,15 @@ function stepforward()
         ĝ = (M*X)[:, 1]
         β = atan(-ĝ[1], √(ĝ[2]^2 + ĝ[3]^2))
         γ = atan(ĝ[2], ĝ[3])
-        # @assert(isapprox(β, roll, atol = 1e-1), "The roll angle $roll is not equal to beta $β.")
-        # @assert(isapprox(-γ, pitch, atol = 1e-1), "The pitch angle $pitch is not equal to minus gamma $γ.")
-        # println("β: $β, γ: $γ.")
-        # roll = β
-        # pitch = -γ
+
+        x_euler_angle_raw = β
+        x_euler_angle_estimate = roll
+        y_euler_angle_raw = -γ
+        y_euler_angle_estimate = pitch
+        # @assert(isapprox(β, roll, atol = 1e-2), "The roll angle $roll is not equal to beta $β.")
+        # @assert(isapprox(-γ, pitch, atol = 1e-2), "The pitch angle $pitch is not equal to minus gamma -$γ.")
+        # println("roll: $roll, γ: $γ, pitch: $pitch, β: $β.")
+        # println("x_euler_angle_raw: $x_euler_angle_raw, x_euler_angle_estimate: $x_euler_angle_estimate, y_euler_angle_raw: $y_euler_angle_raw, y_euler_angle_estimate: $y_euler_angle_estimate.")
         q = ℍ(roll, x̂) * ℍ(pitch, ŷ)
         O_B_R = mat33(q)
         B_O_R = mat33(-q)
@@ -313,8 +331,10 @@ function stepforward()
         point1_observable[] = Point3f(O_B_R * (p1 - origin) + origin)
         point2_observable[] = Point3f(O_B_R * (p2 - origin) + origin)
 
+        spherematrix_p1[] = [ℝ³(to_value(point1_observable)) + convert_to_cartesian([sphere_radius_p1; θ; ϕ]) for ϕ in lspaceϕ, θ in lspaceθ]
+        spherematrix_p2[] = [ℝ³(to_value(point2_observable)) + convert_to_cartesian([sphere_radius_p2; θ; ϕ]) for ϕ in lspaceϕ, θ in lspaceθ]
+
         acceleration_vector_tails[] = [Point3f(point1_observable[]...), Point3f(point2_observable[]...)]
-        reorder(x) = [x[2]; -x[1]; x[3]]
         acceleration_vector_heads[] = map(x -> x .* arrowscale, [Vec3f(O_B_R * reorder(B_A1_R * R1)...), Vec3f(O_B_R * reorder(B_A2_R * R2)...)])
 
         pivot_ps[] = [Point3f(pivot_observable[]...), Point3f(pivot_observable[]...), Point3f(pivot_observable[]...)]
@@ -324,47 +344,32 @@ function stepforward()
         sensor1frame_heads[] = map(x -> x .* norm(R1) .* smallarrowscale, [B_O_R * reorder(B_A1_R * ê[1]), B_O_R * reorder(B_A1_R * ê[2]), B_O_R * reorder(B_A1_R * ê[3])])
         sensor2frame_heads[] = map(x -> x .* norm(R2) .* smallarrowscale, [B_O_R * reorder(B_A2_R * ê[1]), B_O_R * reorder(B_A2_R * ê[2]), B_O_R * reorder(B_A2_R * ê[3])])
 
-        # plot the system state graph
-        _graphpoints = graphpoints[]
-        _x0points = _graphpoints[1]
-        _x1points = _graphpoints[2]
-        _x2points = _graphpoints[3]
-        _x3points = _graphpoints[4]
-        _x4points = _graphpoints[5]
-        _x5points = _graphpoints[6]
-        _x6points = _graphpoints[7]
-        _x7points = _graphpoints[8]
-        _x8points = _graphpoints[9]
-        _x9points = _graphpoints[10]
-        _x10points = _graphpoints[11]
-        _x11points = _graphpoints[12]
-        timestamp = vec(_x0points[end])[1] + 1.0
-        push!(_x0points, Point2f(timestamp, x0))
-        push!(_x1points, Point2f(timestamp, x1))
-        push!(_x2points, Point2f(timestamp, x2))
-        push!(_x3points, Point2f(timestamp, x3))
-        push!(_x4points, Point2f(timestamp, x4))
-        push!(_x5points, Point2f(timestamp, x5))
-        push!(_x6points, Point2f(timestamp, x6))
-        push!(_x7points, Point2f(timestamp, x7))
-        push!(_x8points, Point2f(timestamp, x8))
-        push!(_x9points, Point2f(timestamp, x9))
-        push!(_x10points, Point2f(timestamp, x10))
-        push!(_x11points, Point2f(timestamp, x11))
-        # plot the P Matrix
+        # plot the x-Euler and y-Euler angles
+        _graphpoints1 = graphpoints1[]
         _graphpoints2 = graphpoints2[]
-        _P0points = _graphpoints2[1]
-        _P1points = _graphpoints2[2]
-        _P2points = _graphpoints2[3]
-        _P3points = _graphpoints2[4]
-        _P4points = _graphpoints2[5]
-        _P5points = _graphpoints2[6]
-        _P6points = _graphpoints2[7]
-        _P7points = _graphpoints2[8]
-        _P8points = _graphpoints2[9]
-        _P9points = _graphpoints2[10]
-        _P10points = _graphpoints2[11]
-        _P11points = _graphpoints2[12]
+        _x_euler_angle_raw_points = _graphpoints1[1]
+        _y_euler_angle_raw_points = _graphpoints2[1]
+        _x_euler_angle_estimate_points = _graphpoints1[2]
+        _y_euler_angle_estimate_points = _graphpoints2[2]
+        timestamp = elapsed_time
+        push!(_x_euler_angle_raw_points, Point2f(timestamp, x_euler_angle_raw))
+        push!(_y_euler_angle_raw_points, Point2f(timestamp, y_euler_angle_raw))
+        push!(_x_euler_angle_estimate_points, Point2f(timestamp, x_euler_angle_estimate))
+        push!(_y_euler_angle_estimate_points, Point2f(timestamp, y_euler_angle_estimate))
+        # plot the P Matrix
+        _graphpoints3 = graphpoints3[]
+        _P0points = _graphpoints3[1]
+        _P1points = _graphpoints3[2]
+        _P2points = _graphpoints3[3]
+        _P3points = _graphpoints3[4]
+        _P4points = _graphpoints3[5]
+        _P5points = _graphpoints3[6]
+        _P6points = _graphpoints3[7]
+        _P7points = _graphpoints3[8]
+        _P8points = _graphpoints3[9]
+        _P9points = _graphpoints3[10]
+        _P10points = _graphpoints3[11]
+        _P11points = _graphpoints3[12]
         push!(_P0points, Point2f(timestamp, P0))
         push!(_P1points, Point2f(timestamp, P1))
         push!(_P2points, Point2f(timestamp, P2))
@@ -377,20 +382,12 @@ function stepforward()
         push!(_P9points, Point2f(timestamp, P9))
         push!(_P10points, Point2f(timestamp, P10))
         push!(_P11points, Point2f(timestamp, P11))
-        number = length(_x0points)
+        number = length(_x_euler_angle_raw_points)
         if number > maxplotnumber
-            _x0points = _x0points[number-maxplotnumber+1:end]
-            _x1points = _x1points[number-maxplotnumber+1:end]
-            _x2points = _x2points[number-maxplotnumber+1:end]
-            _x3points = _x3points[number-maxplotnumber+1:end]
-            _x4points = _x4points[number-maxplotnumber+1:end]
-            _x5points = _x5points[number-maxplotnumber+1:end]
-            _x6points = _x6points[number-maxplotnumber+1:end]
-            _x7points = _x7points[number-maxplotnumber+1:end]
-            _x8points = _x8points[number-maxplotnumber+1:end]
-            _x9points = _x9points[number-maxplotnumber+1:end]
-            _x10points = _x10points[number-maxplotnumber+1:end]
-            _x11points = _x11points[number-maxplotnumber+1:end]
+            _x_euler_angle_raw_points = _x_euler_angle_raw_points[number-maxplotnumber+1:end]
+            _y_euler_angle_raw_points = _y_euler_angle_raw_points[number-maxplotnumber+1:end]
+            _x_euler_angle_estimate_points = _x_euler_angle_estimate_points[number-maxplotnumber+1:end]
+            _y_euler_angle_estimate_points = _y_euler_angle_estimate_points[number-maxplotnumber+1:end]
             # P matrix graph
             _P0points = _P0points[number-maxplotnumber+1:end]
             _P1points = _P1points[number-maxplotnumber+1:end]
@@ -404,16 +401,30 @@ function stepforward()
             _P9points = _P9points[number-maxplotnumber+1:end]
             _P10points = _P10points[number-maxplotnumber+1:end]
             _P11points = _P11points[number-maxplotnumber+1:end]
-            @assert(length(_x0points) == maxplotnumber)
-            graphpoints[] = [_x0points, _x1points, _x2points, _x3points, _x4points, _x5points, _x6points, _x7points, _x8points, _x9points, _x10points, _x11points]
-            graphpoints2[] = [_P0points, _P1points, _P2points, _P3points, _P4points, _P5points, _P6points, _P7points, _P8points, _P9points, _P10points, _P11points]
+            @assert(length(_x_euler_angle_raw_points) == maxplotnumber)
+            graphpoints1[] = [_x_euler_angle_raw_points, _x_euler_angle_estimate_points]
+            graphpoints2[] = [_y_euler_angle_raw_points, _y_euler_angle_estimate_points]
+            graphpoints3[] = [_P0points, _P1points, _P2points, _P3points, _P4points, _P5points, _P6points, _P7points, _P8points, _P9points, _P10points, _P11points]
         else
-            graphpoints[] = [_x0points, _x1points, _x2points, _x3points, _x4points, _x5points, _x6points, _x7points, _x8points, _x9points, _x10points, _x11points]
-            graphpoints2[] = [_P0points, _P1points, _P2points, _P3points, _P4points, _P5points, _P6points, _P7points, _P8points, _P9points, _P10points, _P11points]
+            graphpoints1[] = [_x_euler_angle_raw_points, _x_euler_angle_estimate_points]
+            graphpoints2[] = [_y_euler_angle_raw_points, _y_euler_angle_estimate_points]
+            graphpoints3[] = [_P0points, _P1points, _P2points, _P3points, _P4points, _P5points, _P6points, _P7points, _P8points, _P9points, _P10points, _P11points]
         end
-        xlims!(ax1, timestamp - maxplotnumber, timestamp)
-        xlims!(ax2, timestamp - maxplotnumber, timestamp)
-
+        P_parameters = []
+        for x in to_value(graphpoints3[])
+            for y in x
+                push!(P_parameters, y[2])
+            end
+        end
+        xlims!(ax1, timestamp - 15.0, timestamp)
+        xlims!(ax2, timestamp - 15.0, timestamp)
+        xlims!(ax3, timestamp - 15.0, timestamp)
+        ylims1 = [min(map(x -> x[2], _x_euler_angle_estimate_points)...) - 0.01; max(map(x -> x[2], _x_euler_angle_estimate_points)...) + 0.01]
+        ylims2 = [min(map(x -> x[2], _y_euler_angle_estimate_points)...) - 0.01; max(map(x -> x[2], _y_euler_angle_estimate_points)...) + 0.01]
+        ylims3 = [min(P_parameters...) - 0.01; max(P_parameters...) + 0.01]
+        ylims!(ax1, ylims1[1], ylims1[2])
+        ylims!(ax2, ylims2[1], ylims2[2])
+        ylims!(ax3, ylims3[1], ylims3[2])
         #######
 
         # q = ℍ(roll, x̂) * ℍ(pitch, ŷ)
@@ -431,24 +442,26 @@ function stepforward()
     end
 end
 
-on(buttons[1].clicks) do n
-    stepforward()
+on(buttons[3].clicks) do n
+    global run = true
+    record(lscene.scene, joinpath("gallery", "$modelname.mp4"); framerate=fps) do io
+        for i = 1:iterations
+            if run == false
+                recordtext[] = "Not recording."
+                break
+            end
+            sleep(1 / fps)
+            # stepforward()
+            recordframe!(io)
+            # println("Recorded frame $i out of $iterations frames.")
+            recordtext[] = "Recorded frame $i out of $iterations frames."
+        end
+        global run = false
+    end
 end
 
 on(events(fig).tick) do tick
     if !isnothing(clientside) && isopen(clientside)
         stepforward()
-    end
-end
-
-
-fps = 20
-minutes = 1
-iterations = minutes * 60 * fps
-record(lscene.scene, joinpath("gallery", "$modelname.mp4"); framerate=fps) do io
-    for i = 1:iterations
-        sleep(1 / fps)
-        # stepforward()
-        recordframe!(io)
     end
 end
