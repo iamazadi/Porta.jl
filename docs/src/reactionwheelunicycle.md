@@ -394,7 +394,7 @@ Integrating the rate estimates in equation (27) yields estimates for the Euler a
 
 ``\left\{ \begin{array}{l} \hat{\beta}(k) = \kappa_1 \hat{\beta}_a(k) + (1 - \kappa_1) (\hat{\beta}(k - 1) + T \hat{\dot{\beta}}(k)) &\\ \hat{\gamma}(k) = \kappa_2 \hat{\gamma}_a(k) + (1 - \kappa_2) (\hat{\gamma}(k - 1) + T \hat{\dot{\gamma}}(k)) \end{array} \right.``,  (Equation 28)
 
-where ``T`` is the sampling time (the same as `dt` in the LQR struct) and ``\kappa_1`` and ``\kappa_2`` are tuning parameters that may be chosen such that the variance of the estimate is minimized given the noise specifications of accelerometers and rate gyros. For the application presented in this project, ``\kappa_1 = \kappa_2 = 0.03`` was used.
+where ``T`` is the sampling time (the same as `dt` in the LQR struct) and ``\kappa_1`` and ``\kappa_2`` are tuning parameters that may be chosen such that the variance of the estimate is minimized given the noise specifications of accelerometers and rate gyros. For the application presented in this project, ``\kappa_1 = \kappa_2 = 0.01`` was used.
 
 #### The Micro-Controller Program
 
@@ -536,14 +536,14 @@ typedef struct
   Vec12 g_n;                           // g_n in RLS
   Vec12 alpha_n;                       // alpha_n in RLS
   float x_n_dot_z_n;                   // the inner product of the x_n (dataset) and z_n
-  int j;                               // step number (policy iteration)
-  int k;                               // time k (value iteration)
-  int n;                               // the state estimation vector xₖ ∈ ℝⁿ
-  int m;                               // the system input vector uₖ ∈ ℝᵐ
+  int j;                               // step number
+  int k;                               // time k
+  int n;                               // xₖ ∈ ℝⁿ
+  int m;                               // uₖ ∈ ℝᵐ
   float lambda;                        // exponential wighting factor
   float delta;                         // value used to intialize P(0)
   int active;                          // is the model controller active
-  float cpuClock;                      // the CPU clock
+  float CPUClock;                      // the CPU clock
   float dt;                            // period in seconds
   float reactionDutyCycle;             // reaction wheel's motor PWM duty cycle
   float rollingDutyCycle;              // rolling wheel's motor PWM duty cycle
@@ -564,6 +564,10 @@ typedef struct
   float gamma;                         // x-Euler angle (roll)
   float fusedBeta;                     // y-Euler angle (pitch) as the result of fusing the accelerometer sensor measurements with the gyroscope sensor measurements
   float fusedGamma;                    // x-Euler angle (roll) as the result of fusing the accelerometer sensor measurements with the gyroscope sensor measurements
+  int noiseQuotient;                   // the quotient of the random number for generating the probing noise
+  float noiseScale;                    // the scale of by which the remainder of the probing noise is to be divided
+  float time;                          // the time that has elapsed since the start up of the microcontroller in seconds
+  float changes;                       // the magnitude of the changes to the filter coefficients after one step forward
   Mat34 Q;                             // The matrix of unknown parameters
   Vec3 r;                              // the average of the body angular rate from rate gyro
   Vec3 rDot;                           // the average of the body angular rate in Euler angles
@@ -590,6 +594,7 @@ There are two fuse bits on the robot for configuration without flashing a progra
 ![buttonsandlights](./assets/reactionwheelunicycle/schematics/buttonsandlights.jpeg)
 
 ```c
+elapsedTime1 = DWT->CYCCNT;
 if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_0) == 0)
 {
   if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13) == 0)
@@ -653,20 +658,19 @@ In the case where the model is active, the critic loop is run for a few times be
 ```c
 if (model.active == 1)
 {
-  model.logPeriod = 20;
-  for (int i = 0; i < 5; i++)
+  t1 = DWT->CYCCNT;
+  updateSensors(&model);
+  computeFeedbackPolicy(&model);
+  applyFeedbackPolicy(&model);
+  stepForward(&model);
+  if (fabs(model.changes) < 2.0)
   {
-    t1 = DWT->CYCCNT;
-    updateSensors(&model);
-    computeFeedbackPolicy(&model);
-    applyFeedbackPolicy(&model);
-    stepForward(&model);
-    model.logCounter = model.logCounter + 1;
-    t2 = DWT->CYCCNT;
-    diff = t2 - t1;
-    model.dt = (float)diff / model.cpuClock;
+    updateControlPolicy(&model);
   }
-  updateControlPolicy(&model);
+  model.logCounter = model.logCounter + 1;
+  t2 = DWT->CYCCNT;
+  diff = t2 - t1;
+  model.dt = (float)diff / model.CPUClock;
 }
 else
 {
@@ -699,6 +703,7 @@ You can visualize this example message using the [Unicycle](https://github.com/i
 ```c
 if (transmit == 1)
 {
+  t1 = DWT->CYCCNT;
   transmit = 0;
   model.logCounter = 0;
 
@@ -707,8 +712,14 @@ if (transmit == 1)
           model.imu1.accX, model.imu1.accY, model.imu1.accZ, model.imu2.accX, model.imu2.accY, model.imu2.accZ, model.imu1.roll, model.imu1.pitch, model.reactionEncoder.radianAngle, model.rollingEncoder.radianAngle, (float)model.j, model.dataset.x0, model.dataset.x1, model.dataset.x2, model.dataset.x3, model.dataset.x4, model.dataset.x5, model.dataset.x6, model.dataset.x7, model.dataset.x8, model.dataset.x9, model.dataset.x10, model.dataset.x11, getIndexMat12(model.P_n, 0, 0), getIndexMat12(model.P_n, 1, 1), getIndexMat12(model.P_n, 2, 2), getIndexMat12(model.P_n, 3, 3), getIndexMat12(model.P_n, 4, 4), getIndexMat12(model.P_n, 5, 5), getIndexMat12(model.P_n, 6, 6), getIndexMat12(model.P_n, 7, 7), getIndexMat12(model.P_n, 8, 8), getIndexMat12(model.P_n, 9, 9), getIndexMat12(model.P_n, 10, 10), getIndexMat12(model.P_n, 11, 11), model.dt);
 
   HAL_UART_Transmit(&huart6, MSG, sizeof(MSG), 1000);
+  t2 = DWT->CYCCNT;
+  diff = t2 - t1;
+  model.dt += (float)diff / model.CPUClock;
 }
 // Rinse and repeat :)
+elapsedTime2 = DWT->CYCCNT;
+elapsedTime = elapsedTime2 - elapsedTime1;
+model.time += (float)elapsedTime / model.CPUClock;
 ```
 
 In order to enable the function `sprintf` to use floating point numbers, do the following steps:

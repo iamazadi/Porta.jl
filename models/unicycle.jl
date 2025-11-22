@@ -7,8 +7,9 @@ using Porta
 
 figuresize = (1920, 1080)
 modelname = "unicycle_tilt_estimation"
-maxplotnumber = 200
-headers = ["AX1", "AY1", "AZ1", "AX2", "AY2", "AZ2", "roll", "pitch", "encT", "encB", "j", "x0", "x1", "x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "P0", "P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "changes", "time"]
+maxplotnumber = 100
+timeaxiswindow = 7.5
+headers = ["AX1", "AY1", "AZ1", "AX2", "AY2", "AZ2", "roll", "pitch", "encT", "encB", "j", "x0", "x1", "x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "P0", "P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "changes", "time", "active"]
 clientside = nothing
 run = false
 readings = Dict()
@@ -18,6 +19,11 @@ minutes = 1
 iterations = minutes * 60 * fps
 ipaddress = "192.168.4.1"
 portnumber = 10000
+fontsize = 30
+chassis_colormap = :sun
+rollingwheel_colormap = :redgreensplit
+reactionwheel_colormap = :vangogh
+recordedtime = 0.0
 
 x̂ = ℝ³([1.0; 0.0; 0.0])
 ŷ = ℝ³([0.0; 1.0; 0.0])
@@ -25,8 +31,9 @@ ẑ = ℝ³([0.0; 0.0; 1.0])
 
 reorder(x) = [x[2]; -x[1]; x[3]]
 
-eyeposition = [-0.32583746; -0.38208738; 0.18327934]
-lookat = [-0.1, -0.1, 0.1]
+eyeposition = [0.24; -0.27; 0.12]
+view_direction = normalize([-0.867103; 0.4348146; -0.24304059])
+lookat = eyeposition + view_direction
 up = [0.0; 0.0; 1.0]
 arrowsize = Observable(Vec3f(0.03, 0.03, 0.06))
 linewidth = Observable(0.01)
@@ -90,10 +97,6 @@ chassis_stl_path = joinpath("data", "unicycle", "unicycle_chassis.STL")
 rollingwheel_stl_path = joinpath("data", "unicycle", "unicycle_main_wheel.STL")
 reactionwheel_stl_path = joinpath("data", "unicycle", "unicycle_reaction_wheel.STL")
 
-chassis_colormap = :twilight
-rollingwheel_colormap = :Paired_10
-reactionwheel_colormap = :oleron
-
 pivot_observable = Observable(pivot)
 point1_observable = Observable(p1)
 point2_observable = Observable(p2)
@@ -104,25 +107,26 @@ pl = PointLight(Point3f(0), RGBf(0.0862, 0.0862, 0.0862))
 al = AmbientLight(RGBf(0.9, 0.9, 0.9))
 backgroundcolor = RGBf(1.0, 1.0, 1.0)
 lscene = LScene(fig[1, 1], show_axis=false, scenekw=(lights=[pl, al], clear=true, backgroundcolor=:black))
-ax1 = Axis(fig[2, 1], xlabel="Time (s)", ylabel="x-Euler angle (rad)", xlabelsize=30, ylabelsize=30)
-ax2 = Axis(fig[2, 2], xlabel="Time (s)", ylabel="y-Euler angle (rad)", xlabelsize=30, ylabelsize=30)
-ax3 = Axis(fig[1, 2], xlabel="Time (s)", ylabel="P Matrix Parameters", xlabelsize=30, ylabelsize=30)
+ax1 = Axis(fig[2, 1], xlabel="Time (sec)", ylabel="x-Euler angle (rad)", xlabelsize=fontsize, ylabelsize=fontsize)
+ax2 = Axis(fig[2, 2], xlabel="Time (sec)", ylabel="y-Euler angle (rad)", xlabelsize=fontsize, ylabelsize=fontsize)
+ax3 = Axis(fig[1, 2], xlabel="Time (sec)", ylabel="P Matrix Parameters", xlabelsize=fontsize, ylabelsize=fontsize)
 buttoncolor = RGBf(0.3, 0.3, 0.3)
 buttonlabels = ["Connect", "Disconnect", "Record", "Stop"]
 buttons = [Button(fig, label=l, buttoncolor=buttoncolor) for l in buttonlabels]
-statustext = Observable("Not connected.")
-statuslabel = Label(fig, statustext, fontsize = 15)
-jindextext = Observable("j: 1")
-jindexlabel = Label(fig, jindextext, fontsize = 30)
+connection_statustext = Observable("Disconnected.")
+connection_statuslabel = Label(fig, connection_statustext, fontsize = fontsize)
+controller_statustext = Observable("Deactive.")
+controller_statuslabel = Label(fig, controller_statustext, fontsize = fontsize)
+jindextext = Observable("time j: 1")
+jindexlabel = Label(fig, jindextext, fontsize = fontsize)
 recordtext = Observable("Not recording.")
-recordlabel = Label(fig, recordtext, fontsize = 30)
-fig[3, 1] = grid!(hcat(statuslabel, jindexlabel, recordlabel), tellheight=true, tellwidth=false)
+recordlabel = Label(fig, recordtext, fontsize = fontsize)
+fig[3, 1] = grid!(hcat(connection_statuslabel, controller_statuslabel, jindexlabel, recordlabel), tellheight=true, tellwidth=false)
 fig[3, 2] = grid!(hcat(buttons...), tellheight=true, tellwidth=false)
 
 graphpoints1 = Observable([Point2f[(0, 0)], Point2f[(0, 0)]])
 graphpoints2 = Observable([Point2f[(0, 0)], Point2f[(0, 0)]])
 graphpoints3 = Observable([Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)]])
-
 
 x_euler_angle_raw_lineobject = scatter!(ax1, @lift(($graphpoints1)[1]), color=:green)
 y_euler_angle_raw_lineobject = scatter!(ax2, @lift(($graphpoints2)[1]), color=:blue)
@@ -147,9 +151,9 @@ rollingwheel_stl = load(rollingwheel_stl_path)
 
 pivot_observable = Observable(pivot)
 
-robot = make_sprite(lscene.scene, lscene.scene, chassis_origin, chassis_rotation, chassis_scale, chassis_stl, chassis_colormap)
-rollingwheel = make_sprite(lscene.scene, robot, rollingwheel_origin, rollingwheel_rotation, rollingwheel_scale, rollingwheel_stl, rollingwheel_colormap)
-reactionwheel = make_sprite(lscene.scene, robot, reactionwheel_origin, reactionwheel_rotation, reactionwheel_scale, reactionwheel_stl, reactionwheel_colormap)
+robot = make_sprite(lscene.scene, lscene.scene, chassis_origin, chassis_rotation, chassis_scale, chassis_stl, chassis_colormap, transparency = true)
+rollingwheel = make_sprite(lscene.scene, robot, rollingwheel_origin, rollingwheel_rotation, rollingwheel_scale, rollingwheel_stl, rollingwheel_colormap, transparency = true)
+reactionwheel = make_sprite(lscene.scene, robot, reactionwheel_origin, reactionwheel_rotation, reactionwheel_scale, reactionwheel_stl, reactionwheel_colormap, transparency = true)
 
 pivotball = meshscatter!(lscene, pivot_observable, markersize=0.01, color=:gold)
 
@@ -208,12 +212,10 @@ sphere_radius_p1 = norm(p1 - pivot)
 sphere_radius_p2 = norm(p2 - pivot)
 spherematrix_p1 = Observable([ℝ³(p1) + convert_to_cartesian([sphere_radius_p1; θ; ϕ]) for ϕ in lspaceϕ, θ in lspaceθ])
 spherematrix_p2 = Observable([ℝ³(p2) + convert_to_cartesian([sphere_radius_p2; θ; ϕ]) for ϕ in lspaceϕ, θ in lspaceθ])
-sphere_color_p1 = [RGBAf(1.0, 1.0, 0.0, 0.5) for ϕ in lspaceϕ, θ in lspaceθ]
-sphere_color_p2 = [RGBAf(0.0, 1.0, 0.0, 0.5) for ϕ in lspaceϕ, θ in lspaceθ]
+sphere_color_p1 = [RGBAf(abs(θ / (π / 2)), abs(ϕ / π), 0.0, 0.75) for ϕ in lspaceϕ, θ in lspaceθ]
+sphere_color_p2 = [RGBAf(0.0, abs(θ / (π / 2)), 0.0, 0.75) for ϕ in lspaceϕ, θ in lspaceθ]
 sphereobservable_p1 = buildsurface(lscene, spherematrix_p1, sphere_color_p1, transparency = true)
 sphereobservable_p2 = buildsurface(lscene, spherematrix_p2, sphere_color_p2, transparency = true)
-# updatesurface!(spherematrix_p1, sphereobservable_p1)
-# updatesurface!(spherematrix_p2, sphereobservable_p2)
 
 lookat = deepcopy(pivot)
 update_cam!(lscene.scene, Vec3f(eyeposition...), Vec3f(lookat...), Vec3f(up...))
@@ -251,25 +253,31 @@ on(buttons[1].clicks) do n
     # execute the command nc 192.168.4.1 10000 in terminal for testing
     global clientside = connect(ipaddress, portnumber)
     if isopen(clientside)
-        statustext[] = "Connected."
+        connection_statustext[] = "Connected."
     else
-        statustext[] = "Disconnected."
+        connection_statustext[] = "Disconnected."
     end
 end
 
 on(buttons[2].clicks) do n
     disconnect(clientside)
     if !isnothing(clientside) && isopen(clientside)
-        statustext[] = "Connected."
+        connection_statustext[] = "Connected."
     else
-        statustext[] = "Disconnected."
+        connection_statustext[] = "Disconnected."
     end
 end
 
 function stepforward()
-    if !isnothing(clientside) && isopen(clientside)
-        text = readline(clientside, keep=true)
+    text = []
+    try
+        if !isnothing(clientside) && isopen(clientside)
+            push!(text, readline(clientside, keep=true))
+        end
+    catch e
+        println(e)
     end
+    text = length(text) > 0 ? text[1] : ""
     # println(text)
     # x1k: -13.76, x2k: 1.60, u1k: -40.00, u2k: 43.36, x1k+: -13.76, x2k+: 1.60, u1k+: -40.00, u2k+: 43.36, dt: 0.000006
     filtered = replace(text, "\0" => "")
@@ -279,7 +287,8 @@ function stepforward()
     allkeys = keys(readings)
     flag = all([x ∈ allkeys for x in headers]) && all([!isnothing(readings[x]) for x in headers])
     if flag
-        elapsed_time = readings["time"]
+        global recordedtime = readings["time"] 
+        iscontrolleractive = readings["active"]
         acc1 = [readings["AX1"]; readings["AY1"]; readings["AZ1"]]          # acc2 = [-(cos(imu2angle) * readings["aY2"] - sin(imu2angle) * readings["aX2"]); -(sin(imu2angle) * readings["aX2"] + cos(imu2angle) * readings["aY2"]); -readings["aZ2"]] .* (1.0 / 8092.0)
         acc2 = [readings["AX2"], readings["AY2"], readings["AZ2"]]
         P0 = readings["P0"]
@@ -304,6 +313,8 @@ function stepforward()
         reaction_angle = -readings["encT"]
         jindextext[] = "j: $(readings["j"])"
         # delta_time = readings["dt"]
+
+        controller_statustext[] = isapprox(iscontrolleractive, 1.0) ? "Active" : "Deactive"
 
         global R1 = acc1
         global R2 = acc2
@@ -352,7 +363,7 @@ function stepforward()
         _y_euler_angle_raw_points = _graphpoints2[1]
         _x_euler_angle_estimate_points = _graphpoints1[2]
         _y_euler_angle_estimate_points = _graphpoints2[2]
-        timestamp = elapsed_time
+        timestamp = recordedtime
         push!(_x_euler_angle_raw_points, Point2f(timestamp, x_euler_angle_raw))
         push!(_y_euler_angle_raw_points, Point2f(timestamp, y_euler_angle_raw))
         push!(_x_euler_angle_estimate_points, Point2f(timestamp, x_euler_angle_estimate))
@@ -417,9 +428,9 @@ function stepforward()
                 push!(P_parameters, y[2])
             end
         end
-        xlims!(ax1, timestamp - 15.0, timestamp)
-        xlims!(ax2, timestamp - 15.0, timestamp)
-        xlims!(ax3, timestamp - 15.0, timestamp)
+        xlims!(ax1, timestamp - timeaxiswindow, timestamp)
+        xlims!(ax2, timestamp - timeaxiswindow, timestamp)
+        xlims!(ax3, timestamp - timeaxiswindow, timestamp)
         ylims1 = [min(map(x -> x[2], _x_euler_angle_estimate_points)...) - 0.01; max(map(x -> x[2], _x_euler_angle_estimate_points)...) + 0.01]
         ylims2 = [min(map(x -> x[2], _y_euler_angle_estimate_points)...) - 0.01; max(map(x -> x[2], _y_euler_angle_estimate_points)...) + 0.01]
         ylims3 = [min(P_parameters...) - 0.01; max(P_parameters...) + 0.01]
@@ -451,11 +462,11 @@ on(buttons[3].clicks) do n
                 recordtext[] = "Not recording."
                 break
             end
-            sleep(1 / fps)
+            sleep(1 / fps * 0.7)
             # stepforward()
             recordframe!(io)
             # println("Recorded frame $i out of $iterations frames.")
-            recordtext[] = "Recorded frame $i out of $iterations frames."
+            recordtext[] = "Recorded frame $i / $iterations."
         end
         global run = false
     end
