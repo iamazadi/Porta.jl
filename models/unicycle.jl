@@ -2,14 +2,16 @@ using FileIO
 using LinearAlgebra
 using GLMakie
 using Sockets
+using CSV
+using DataFrames
 using Porta
 
 
 figuresize = (1920, 1080)
 modelname = "unicycle_tilt_estimation"
-maxplotnumber = 100
-timeaxiswindow = 7.5
-headers = ["AX1", "AY1", "AZ1", "AX2", "AY2", "AZ2", "roll", "pitch", "encT", "encB", "j", "x0", "x1", "x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "P0", "P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "changes", "time", "active"]
+maxplotnumber = 200
+timeaxiswindow = 15
+headers = ["changes", "time", "active", "AX1", "AY1", "AZ1", "AX2", "AY2", "AZ2", "roll", "pitch", "encT", "encB", "j", "k", "P0", "P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11"]
 clientside = nothing
 run = false
 readings = Dict()
@@ -20,10 +22,15 @@ iterations = minutes * 60 * fps
 ipaddress = "192.168.4.1"
 portnumber = 10000
 fontsize = 30
-chassis_colormap = :sun
-rollingwheel_colormap = :redgreensplit
-reactionwheel_colormap = :vangogh
+chassis_colormap = :ocean
+rollingwheel_colormap = :fastie
+reactionwheel_colormap = :websafe
 recordedtime = 0.0
+markersize = 15
+data = Dict()
+for header in headers
+    data[header] = []
+end
 
 x̂ = ℝ³([1.0; 0.0; 0.0])
 ŷ = ℝ³([0.0; 1.0; 0.0])
@@ -31,12 +38,12 @@ ẑ = ℝ³([0.0; 0.0; 1.0])
 
 reorder(x) = [x[2]; -x[1]; x[3]]
 
-eyeposition = [0.24; -0.27; 0.12]
-view_direction = normalize([-0.867103; 0.4348146; -0.24304059])
+eyeposition = normalize([0.04; -0.45; -0.17]) * 0.5
+view_direction = normalize([-0.28; 0.81; 0.50])
 lookat = eyeposition + view_direction
 up = [0.0; 0.0; 1.0]
 arrowsize = Observable(Vec3f(0.03, 0.03, 0.06))
-linewidth = Observable(0.01)
+linewidth = Observable(0.02)
 arrowscale = 0.1
 
 # the robot body origin in the inertial frame Ô
@@ -117,33 +124,35 @@ connection_statustext = Observable("Disconnected.")
 connection_statuslabel = Label(fig, connection_statustext, fontsize = fontsize)
 controller_statustext = Observable("Deactive.")
 controller_statuslabel = Label(fig, controller_statustext, fontsize = fontsize)
-jindextext = Observable("time j: 1")
+jindextext = Observable("j: 1")
 jindexlabel = Label(fig, jindextext, fontsize = fontsize)
+kindextext = Observable("k: 1")
+kindexlabel = Label(fig, kindextext, fontsize = fontsize)
 recordtext = Observable("Not recording.")
 recordlabel = Label(fig, recordtext, fontsize = fontsize)
-fig[3, 1] = grid!(hcat(connection_statuslabel, controller_statuslabel, jindexlabel, recordlabel), tellheight=true, tellwidth=false)
+fig[3, 1] = grid!(hcat(connection_statuslabel, controller_statuslabel, jindexlabel, kindexlabel, recordlabel), tellheight=true, tellwidth=false)
 fig[3, 2] = grid!(hcat(buttons...), tellheight=true, tellwidth=false)
 
 graphpoints1 = Observable([Point2f[(0, 0)], Point2f[(0, 0)]])
 graphpoints2 = Observable([Point2f[(0, 0)], Point2f[(0, 0)]])
 graphpoints3 = Observable([Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)]])
 
-x_euler_angle_raw_lineobject = scatter!(ax1, @lift(($graphpoints1)[1]), color=:green)
-y_euler_angle_raw_lineobject = scatter!(ax2, @lift(($graphpoints2)[1]), color=:blue)
-x_euler_angle_estimate_lineobject = scatter!(ax1, @lift(($graphpoints1)[2]), color=:lightgreen)
-y_euler_angle_estimate_lineobject = scatter!(ax2, @lift(($graphpoints2)[2]), color=:lightblue)
-P0_lineobject = scatter!(ax3, @lift(($graphpoints3)[1]), color=:lavenderblush)
-P1_lineobject = scatter!(ax3, @lift(($graphpoints3)[2]), color=:plum1)
-P2_lineobject = scatter!(ax3, @lift(($graphpoints3)[3]), color=:thistle)
-P3_lineobject = scatter!(ax3, @lift(($graphpoints3)[4]), color=:orchid2)
-P4_lineobject = scatter!(ax3, @lift(($graphpoints3)[5]), color=:mediumorchid1)
-P5_lineobject = scatter!(ax3, @lift(($graphpoints3)[6]), color=:magenta2)
-P6_lineobject = scatter!(ax3, @lift(($graphpoints3)[7]), color=:lavenderblush4)
-P7_lineobject = scatter!(ax3, @lift(($graphpoints3)[8]), color=:magenta3)
-P8_lineobject = scatter!(ax3, @lift(($graphpoints3)[9]), color=:plum4)
-P9_lineobject = scatter!(ax3, @lift(($graphpoints3)[10]), color=:mediumorchid4)
-P10_lineobject = scatter!(ax3, @lift(($graphpoints3)[11]), color=:mediumpurple4)
-P11_lineobject = scatter!(ax3, @lift(($graphpoints3)[12]), color=:purple4)
+x_euler_angle_raw_lineobject = scatter!(ax1, @lift(($graphpoints1)[1]), color=:green, markersize = markersize)
+y_euler_angle_raw_lineobject = scatter!(ax2, @lift(($graphpoints2)[1]), color=:blue, markersize = markersize)
+x_euler_angle_estimate_lineobject = scatter!(ax1, @lift(($graphpoints1)[2]), color=:lightgreen, markersize = markersize)
+y_euler_angle_estimate_lineobject = scatter!(ax2, @lift(($graphpoints2)[2]), color=:lightblue, markersize = markersize)
+P0_lineobject = scatter!(ax3, @lift(($graphpoints3)[1]), color=:lavenderblush, markersize = markersize)
+P1_lineobject = scatter!(ax3, @lift(($graphpoints3)[2]), color=:plum1, markersize = markersize)
+P2_lineobject = scatter!(ax3, @lift(($graphpoints3)[3]), color=:thistle, markersize = markersize)
+P3_lineobject = scatter!(ax3, @lift(($graphpoints3)[4]), color=:orchid2, markersize = markersize)
+P4_lineobject = scatter!(ax3, @lift(($graphpoints3)[5]), color=:mediumorchid1, markersize = markersize)
+P5_lineobject = scatter!(ax3, @lift(($graphpoints3)[6]), color=:magenta2, markersize = markersize)
+P6_lineobject = scatter!(ax3, @lift(($graphpoints3)[7]), color=:lavenderblush4, markersize = markersize)
+P7_lineobject = scatter!(ax3, @lift(($graphpoints3)[8]), color=:magenta3, markersize = markersize)
+P8_lineobject = scatter!(ax3, @lift(($graphpoints3)[9]), color=:plum4, markersize = markersize)
+P9_lineobject = scatter!(ax3, @lift(($graphpoints3)[10]), color=:mediumorchid4, markersize = markersize)
+P10_lineobject = scatter!(ax3, @lift(($graphpoints3)[11]), color=:mediumpurple4, markersize = markersize)
+P11_lineobject = scatter!(ax3, @lift(($graphpoints3)[12]), color=:purple4, markersize = markersize)
 
 chassis_stl = load(chassis_stl_path)
 reactionwheel_stl = load(reactionwheel_stl_path)
@@ -157,8 +166,8 @@ reactionwheel = make_sprite(lscene.scene, robot, reactionwheel_origin, reactionw
 
 pivotball = meshscatter!(lscene, pivot_observable, markersize=0.01, color=:gold)
 
-arrowscale = 0.2
-smallarrowscale = arrowscale * 0.5
+arrowscale = 0.4
+smallarrowscale = arrowscale * 0.7
 R1_tail = vec(p1)
 R2_tail = vec(p2)
 R1 = [0.0; 0.0; -1.0] .* arrowscale
@@ -167,7 +176,7 @@ R2 = [0.0; 0.0; -1.0] .* arrowscale
 acceleration_vector_tails = Observable([Point3f(R1_tail...), Point3f(R2_tail...)])
 acceleration_vector_heads = Observable([Vec3f(R1...), Vec3f(R2...)])
 arrowsize = Observable(Vec3f(0.02, 0.02, 0.04))
-linewidth = Observable(0.015)
+linewidth = Observable(0.02)
 arrows!(lscene,
     acceleration_vector_tails, acceleration_vector_heads, fxaa=true, # turn on anti-aliasing
     color=[:orange, :lime, :pink, :purple],
@@ -186,7 +195,7 @@ sensor2frame_tails = Observable([point2_observable[], point2_observable[], point
 sensor1frame_heads = Observable(map(x -> smallarrowscale .* B_O_R * x, [reorder(B_A1_R * ê[1]), reorder(B_A1_R * ê[2]), reorder(B_A1_R * ê[3])]))
 sensor2frame_heads = Observable(map(x -> smallarrowscale .* B_O_R * x, [reorder(B_A2_R * ê[1]), reorder(B_A2_R * ê[2]), reorder(B_A2_R * ê[3])]))
 arrowsize1 = Observable(Vec3f(0.02, 0.02, 0.04))
-linewidth1 = Observable(0.01)
+linewidth1 = Observable(0.02)
 arrows!(lscene,
     pivot_ps, pivot_ns, fxaa=true, # turn on anti-aliasing
     color=[:red, :green, :blue],
@@ -212,10 +221,10 @@ sphere_radius_p1 = norm(p1 - pivot)
 sphere_radius_p2 = norm(p2 - pivot)
 spherematrix_p1 = Observable([ℝ³(p1) + convert_to_cartesian([sphere_radius_p1; θ; ϕ]) for ϕ in lspaceϕ, θ in lspaceθ])
 spherematrix_p2 = Observable([ℝ³(p2) + convert_to_cartesian([sphere_radius_p2; θ; ϕ]) for ϕ in lspaceϕ, θ in lspaceθ])
-sphere_color_p1 = [RGBAf(abs(θ / (π / 2)), abs(ϕ / π), 0.0, 0.75) for ϕ in lspaceϕ, θ in lspaceθ]
-sphere_color_p2 = [RGBAf(0.0, abs(θ / (π / 2)), 0.0, 0.75) for ϕ in lspaceϕ, θ in lspaceθ]
-sphereobservable_p1 = buildsurface(lscene, spherematrix_p1, sphere_color_p1, transparency = true)
-sphereobservable_p2 = buildsurface(lscene, spherematrix_p2, sphere_color_p2, transparency = true)
+# sphere_color_p1 = [RGBAf(abs(θ / (π / 2)), abs(ϕ / π), 0.0, 0.8) for ϕ in lspaceϕ, θ in lspaceθ]
+# sphere_color_p2 = [RGBAf(0.0, abs(θ / (π / 2)), 0.0, 0.8) for ϕ in lspaceϕ, θ in lspaceθ]
+sphereobservable_p1 = buildsurface(lscene, spherematrix_p1, :yellow, transparency = true)
+sphereobservable_p2 = buildsurface(lscene, spherematrix_p2, :green, transparency = true)
 
 lookat = deepcopy(pivot)
 update_cam!(lscene.scene, Vec3f(eyeposition...), Vec3f(lookat...), Vec3f(up...))
@@ -244,6 +253,10 @@ end
 
 on(buttons[4].clicks) do n
     global run = false
+    dataframe = DataFrame(data)
+    filepath = joinpath("data", "$modelname.csv")
+    CSV.write(filepath, dataframe)
+    recordtext[] = "Recorded $(length(data["time"])) frames."
 end
 
 on(buttons[1].clicks) do n
@@ -268,16 +281,31 @@ on(buttons[2].clicks) do n
     end
 end
 
+previoustext = []
+
 function stepforward()
-    text = []
     try
         if !isnothing(clientside) && isopen(clientside)
-            push!(text, readline(clientside, keep=true))
+            push!(previoustext, readline(clientside, keep=true))
         end
     catch e
         println(e)
     end
-    text = length(text) > 0 ? text[1] : ""
+    # check to see if there are changes
+    if length(previoustext) == 0
+        return
+    elseif length(previoustext) == 1
+        text = previoustext[1]
+    else
+        text1 = previoustext[end]
+        text2 = previoustext[end - 1]
+        if text1 == text2
+            return
+        else
+            text = text1
+        end
+    end
+    
     # println(text)
     # x1k: -13.76, x2k: 1.60, u1k: -40.00, u2k: 43.36, x1k+: -13.76, x2k+: 1.60, u1k+: -40.00, u2k+: 43.36, dt: 0.000006
     filtered = replace(text, "\0" => "")
@@ -312,7 +340,14 @@ function stepforward()
         rolling_angle = readings["encB"]
         reaction_angle = -readings["encT"]
         jindextext[] = "j: $(readings["j"])"
+        kindextext[] = "k: $(readings["k"])"
         # delta_time = readings["dt"]
+
+        if run == true
+            for header in headers
+                push!(data[header], readings[header])
+            end
+        end
 
         controller_statustext[] = isapprox(iscontrolleractive, 1.0) ? "Active" : "Deactive"
 
@@ -451,25 +486,26 @@ function stepforward()
         mq = Quaternion(ℍ(rolling_angle, ẑ))
         GLMakie.rotate!(rollingwheel, mq)
         GLMakie.rotate!(reactionwheel, rq)
+        if run == true
+            recordtext[] = "Recorded frame $(length(data["time"]))."
+        end
     end
 end
 
 on(buttons[3].clicks) do n
     global run = true
-    record(lscene.scene, joinpath("gallery", "$modelname.mp4"); framerate=fps) do io
-        for i = 1:iterations
-            if run == false
-                recordtext[] = "Not recording."
-                break
-            end
-            sleep(1 / fps * 0.7)
-            # stepforward()
-            recordframe!(io)
-            # println("Recorded frame $i out of $iterations frames.")
-            recordtext[] = "Recorded frame $i / $iterations."
-        end
-        global run = false
-    end
+    # record(lscene.scene, joinpath("gallery", "$modelname.mp4"); framerate=fps) do io
+    #     for i = 1:iterations
+    #         if run == false
+    #             recordtext[] = "Not recording."
+    #             break
+    #         end
+    #         recordframe!(io)
+    #         recordtext[] = "Recorded frame $i / $iterations."
+    #         sleep((1 / fps) * 0.01)
+    #     end
+    #     global run = false
+    # end
 end
 
 on(events(fig).tick) do tick
