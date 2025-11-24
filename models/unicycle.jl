@@ -22,9 +22,9 @@ iterations = minutes * 60 * fps
 ipaddress = "192.168.4.1"
 portnumber = 10000
 fontsize = 30
-chassis_colormap = :ocean
-rollingwheel_colormap = :fastie
-reactionwheel_colormap = :websafe
+chassis_colormap = :roma
+rollingwheel_colormap = :cyclic_mrybm_35_75_c68_n256_s25
+reactionwheel_colormap = :diverging_rainbow_bgymr_45_85_c67_n256
 recordedtime = 0.0
 markersize = 15
 data = Dict()
@@ -221,10 +221,10 @@ sphere_radius_p1 = norm(p1 - pivot)
 sphere_radius_p2 = norm(p2 - pivot)
 spherematrix_p1 = Observable([ℝ³(p1) + convert_to_cartesian([sphere_radius_p1; θ; ϕ]) for ϕ in lspaceϕ, θ in lspaceθ])
 spherematrix_p2 = Observable([ℝ³(p2) + convert_to_cartesian([sphere_radius_p2; θ; ϕ]) for ϕ in lspaceϕ, θ in lspaceθ])
-# sphere_color_p1 = [RGBAf(abs(θ / (π / 2)), abs(ϕ / π), 0.0, 0.8) for ϕ in lspaceϕ, θ in lspaceθ]
-# sphere_color_p2 = [RGBAf(0.0, abs(θ / (π / 2)), 0.0, 0.8) for ϕ in lspaceϕ, θ in lspaceθ]
-sphereobservable_p1 = buildsurface(lscene, spherematrix_p1, :yellow, transparency = true)
-sphereobservable_p2 = buildsurface(lscene, spherematrix_p2, :green, transparency = true)
+sphere_color_p1 = [RGBAf(1.0, 1.0, 0.0, 0.8) for ϕ in lspaceϕ, θ in lspaceθ]
+sphere_color_p2 = [RGBAf(0.0, 1.0, 0.0, 0.8) for ϕ in lspaceϕ, θ in lspaceθ]
+sphereobservable_p1 = buildsurface(lscene, spherematrix_p1, sphere_color_p1, transparency = true)
+sphereobservable_p2 = buildsurface(lscene, spherematrix_p2, sphere_color_p2, transparency = true)
 
 lookat = deepcopy(pivot)
 update_cam!(lscene.scene, Vec3f(eyeposition...), Vec3f(lookat...), Vec3f(up...))
