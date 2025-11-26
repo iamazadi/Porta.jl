@@ -51,6 +51,7 @@ end
     include("unicycle_tests/telemetry_tests.jl")
     include("unicycle_tests/recursiveleastsquares_tests.jl")
     include("unicycle_tests/linearquadraticregulator_tests.jl")
+    include("unicycle_tests/graphicalmodel_tests.jl")
 end
 
 elapsed = time() - start

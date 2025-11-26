@@ -35,5 +35,6 @@ include("tangentbundle.jl")
 include("unicycle/telemetry.jl")
 include("unicycle/recursiveleastsquares.jl")
 include("unicycle/linearquadraticregulator.jl")
+include("unicycle/graphicalmodel.jl")
 
 end # module

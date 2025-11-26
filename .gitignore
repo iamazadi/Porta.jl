@@ -39,3 +39,6 @@ data/basemap_mask11.png
 
 # documentation build
 /build
+
+# saved telemetry data CSV files
+/data/csv

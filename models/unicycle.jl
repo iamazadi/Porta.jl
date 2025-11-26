@@ -236,35 +236,68 @@ ylims!(ax2, default_ylims[1], default_ylims[2])
 ylims!(ax3, -1e2, 1e2)
 
 
+on(events(fig).tick) do tick
+    if !isnothing(clientside) && isopen(clientside)
+        previoustext = []
+        try
+            if !isnothing(clientside) && isopen(clientside)
+                push!(previoustext, readline(clientside, keep=true))
+            end
+        catch e
+            println(e)
+        end
+        # check to see if there are changes
+        text = ""
+        if length(previoustext) == 0
+            return
+        elseif length(previoustext) == 1
+            text = previoustext[1]
+        end
+        filtered = replace(text, "\0" => "")
+        filtered = replace(filtered, "\r\n" => "")
+        global readings = parsetext(filtered, headers)
+        # calculate(readings)
+        allkeys = keys(readings)
+        flag = all([x ∈ allkeys for x in headers]) && all([!isnothing(readings[x]) for x in headers])
+        if flag
+            for header in headers
+                readings[header] = text[Symbol(header)]
+            end
+            if run == true
+                for header in headers
+                    push!(data[header], readings[header])
+                end
+            end
+            iscontrolleractive = readings["active"]
+            controller_statustext[] = isapprox(iscontrolleractive, 1.0) ? "Active" : "Deactive"
+            jindextext[] = "j: $(readings["j"])"
+            kindextext[] = "k: $(readings["k"])"
+            if run == true
+                recordtext[] = "Recorded frame $(length(data["time"]))."
+            end
+            stepforward(readings)
+        end
+    end
+end
+
+
+connect(clientside, ipaddress::String, portnumber::Int)= begin
+    if !isnothing(clientside)
+        disconnect(clientside)
+    end
+    # execute the command nc 192.168.4.1 10000 in terminal for testing
+    clientside = Sockets.connect(ipaddress, portnumber)
+    return
+end
+
 disconnect(clientside) = begin
     if !isnothing(clientside)
         close(clientside)
     end
 end
 
-
-mat33(q::ℍ) = begin
-    qw, qx, qy, qz = vec(q)
-    [1.0-2(qy^2)-2(qz^2) 2qx*qy-2qz*qw 2qx*qz+2qy*qw;
-        2qx*qy+2qz*qw 1.0-2(qx^2)-2(qz^2) 2qy*qz-2qx*qw;
-        2qx*qz-2qy*qw 2qy*qz+2qx*qw 1.0-2(qx^2)-2(qy^2)]
-end
-
-
-on(buttons[4].clicks) do n
-    global run = false
-    dataframe = DataFrame(data)
-    filepath = joinpath("data", "$modelname.csv")
-    CSV.write(filepath, dataframe)
-    recordtext[] = "Recorded $(length(data["time"])) frames."
-end
-
 on(buttons[1].clicks) do n
-    if !isnothing(clientside)
-        disconnect(clientside)
-    end
-    # execute the command nc 192.168.4.1 10000 in terminal for testing
-    global clientside = connect(ipaddress, portnumber)
+    clientside = connect(clientside, ipaddress, portnumber)
     if isopen(clientside)
         connection_statustext[] = "Connected."
     else
@@ -281,235 +314,14 @@ on(buttons[2].clicks) do n
     end
 end
 
-previoustext = []
-
-function stepforward()
-    try
-        if !isnothing(clientside) && isopen(clientside)
-            push!(previoustext, readline(clientside, keep=true))
-        end
-    catch e
-        println(e)
-    end
-    # check to see if there are changes
-    if length(previoustext) == 0
-        return
-    elseif length(previoustext) == 1
-        text = previoustext[1]
-    else
-        text1 = previoustext[end]
-        text2 = previoustext[end - 1]
-        if text1 == text2
-            return
-        else
-            text = text1
-        end
-    end
-    
-    # println(text)
-    # x1k: -13.76, x2k: 1.60, u1k: -40.00, u2k: 43.36, x1k+: -13.76, x2k+: 1.60, u1k+: -40.00, u2k+: 43.36, dt: 0.000006
-    filtered = replace(text, "\0" => "")
-    filtered = replace(filtered, "\r\n" => "")
-    global readings = parsetext(filtered, headers)
-    # calculate(readings)
-    allkeys = keys(readings)
-    flag = all([x ∈ allkeys for x in headers]) && all([!isnothing(readings[x]) for x in headers])
-    if flag
-        global recordedtime = readings["time"] 
-        iscontrolleractive = readings["active"]
-        acc1 = [readings["AX1"]; readings["AY1"]; readings["AZ1"]]          # acc2 = [-(cos(imu2angle) * readings["aY2"] - sin(imu2angle) * readings["aX2"]); -(sin(imu2angle) * readings["aX2"] + cos(imu2angle) * readings["aY2"]); -readings["aZ2"]] .* (1.0 / 8092.0)
-        acc2 = [readings["AX2"], readings["AY2"], readings["AZ2"]]
-        P0 = readings["P0"]
-        P1 = readings["P1"]
-        P2 = readings["P2"]
-        P3 = readings["P3"]
-        P4 = readings["P4"]
-        P5 = readings["P5"]
-        P6 = readings["P6"]
-        P7 = readings["P7"]
-        P8 = readings["P8"]
-        P9 = readings["P9"]
-        P10 = readings["P10"]
-        P11 = readings["P11"]
-
-        # acc2 = [-(cos(imu2angle) * readings["aY2"] - sin(imu2angle) * readings["aX2"]); -(sin(imu2angle) * readings["aX2"] + cos(imu2angle) * readings["aY2"]); -readings["aZ2"]] .* (1.0 / 8092.0)
-        # gyr1 = [readings["gX1"]; readings["gY1"]; readings["gZ1"]]
-        # gyr2 = [readings["gX2"]; readings["gY2"]; readings["gZ2"]]
-        roll = readings["roll"]
-        pitch = readings["pitch"]
-        rolling_angle = readings["encB"]
-        reaction_angle = -readings["encT"]
-        jindextext[] = "j: $(readings["j"])"
-        kindextext[] = "k: $(readings["k"])"
-        # delta_time = readings["dt"]
-
-        if run == true
-            for header in headers
-                push!(data[header], readings[header])
-            end
-        end
-
-        controller_statustext[] = isapprox(iscontrolleractive, 1.0) ? "Active" : "Deactive"
-
-        global R1 = acc1
-        global R2 = acc2
-
-        M = [B_A1_R * R1 B_A2_R * R2]
-        # ĝ = (M*X)[:, 1]
-        ĝ = deepcopy(R1)
-        β = atan(-ĝ[1], √(ĝ[2]^2 + ĝ[3]^2))
-        γ = atan(ĝ[2], ĝ[3])
-
-        x_euler_angle_raw = β
-        x_euler_angle_estimate = roll
-        y_euler_angle_raw = -γ
-        y_euler_angle_estimate = pitch
-        # @assert(isapprox(β, roll, atol = 1e-2), "The roll angle $roll is not equal to beta $β.")
-        # @assert(isapprox(-γ, pitch, atol = 1e-2), "The pitch angle $pitch is not equal to minus gamma -$γ.")
-        # println("roll: $roll, γ: $γ, pitch: $pitch, β: $β.")
-        # println("x_euler_angle_raw: $x_euler_angle_raw, x_euler_angle_estimate: $x_euler_angle_estimate, y_euler_angle_raw: $y_euler_angle_raw, y_euler_angle_estimate: $y_euler_angle_estimate.")
-        q = ℍ(roll, x̂) * ℍ(pitch, ŷ)
-        O_B_R = mat33(q)
-        B_O_R = mat33(-q)
-
-        # g = q * chassis_q0
-        # rotate!(robot, Quaternion(g))
-        pivot_observable[] = Point3f(O_B_R * (pivot - origin) + origin)
-        point1_observable[] = Point3f(O_B_R * (p1 - origin) + origin)
-        point2_observable[] = Point3f(O_B_R * (p2 - origin) + origin)
-
-        spherematrix_p1[] = [ℝ³(to_value(point1_observable)) + convert_to_cartesian([sphere_radius_p1; θ; ϕ]) for ϕ in lspaceϕ, θ in lspaceθ]
-        spherematrix_p2[] = [ℝ³(to_value(point2_observable)) + convert_to_cartesian([sphere_radius_p2; θ; ϕ]) for ϕ in lspaceϕ, θ in lspaceθ]
-
-        acceleration_vector_tails[] = [Point3f(point1_observable[]...), Point3f(point2_observable[]...)]
-        acceleration_vector_heads[] = map(x -> x .* arrowscale, [Vec3f(O_B_R * reorder(B_A1_R * R1)...), Vec3f(O_B_R * reorder(B_A2_R * R2)...)])
-
-        pivot_ps[] = [Point3f(pivot_observable[]...), Point3f(pivot_observable[]...), Point3f(pivot_observable[]...)]
-        sensor1frame_tails[] = [Point3f(point1_observable[]...), Point3f(point1_observable[]...), Point3f(point1_observable[]...)]
-        sensor2frame_tails[] = [Point3f(point2_observable[]...), Point3f(point2_observable[]...), Point3f(point2_observable[]...)]
-
-        sensor1frame_heads[] = map(x -> x .* norm(R1) .* smallarrowscale, [B_O_R * reorder(B_A1_R * ê[1]), B_O_R * reorder(B_A1_R * ê[2]), B_O_R * reorder(B_A1_R * ê[3])])
-        sensor2frame_heads[] = map(x -> x .* norm(R2) .* smallarrowscale, [B_O_R * reorder(B_A2_R * ê[1]), B_O_R * reorder(B_A2_R * ê[2]), B_O_R * reorder(B_A2_R * ê[3])])
-
-        # plot the x-Euler and y-Euler angles
-        _graphpoints1 = graphpoints1[]
-        _graphpoints2 = graphpoints2[]
-        _x_euler_angle_raw_points = _graphpoints1[1]
-        _y_euler_angle_raw_points = _graphpoints2[1]
-        _x_euler_angle_estimate_points = _graphpoints1[2]
-        _y_euler_angle_estimate_points = _graphpoints2[2]
-        timestamp = recordedtime
-        push!(_x_euler_angle_raw_points, Point2f(timestamp, x_euler_angle_raw))
-        push!(_y_euler_angle_raw_points, Point2f(timestamp, y_euler_angle_raw))
-        push!(_x_euler_angle_estimate_points, Point2f(timestamp, x_euler_angle_estimate))
-        push!(_y_euler_angle_estimate_points, Point2f(timestamp, y_euler_angle_estimate))
-        # plot the P Matrix
-        _graphpoints3 = graphpoints3[]
-        _P0points = _graphpoints3[1]
-        _P1points = _graphpoints3[2]
-        _P2points = _graphpoints3[3]
-        _P3points = _graphpoints3[4]
-        _P4points = _graphpoints3[5]
-        _P5points = _graphpoints3[6]
-        _P6points = _graphpoints3[7]
-        _P7points = _graphpoints3[8]
-        _P8points = _graphpoints3[9]
-        _P9points = _graphpoints3[10]
-        _P10points = _graphpoints3[11]
-        _P11points = _graphpoints3[12]
-        push!(_P0points, Point2f(timestamp, P0))
-        push!(_P1points, Point2f(timestamp, P1))
-        push!(_P2points, Point2f(timestamp, P2))
-        push!(_P3points, Point2f(timestamp, P3))
-        push!(_P4points, Point2f(timestamp, P4))
-        push!(_P5points, Point2f(timestamp, P5))
-        push!(_P6points, Point2f(timestamp, P6))
-        push!(_P7points, Point2f(timestamp, P7))
-        push!(_P8points, Point2f(timestamp, P8))
-        push!(_P9points, Point2f(timestamp, P9))
-        push!(_P10points, Point2f(timestamp, P10))
-        push!(_P11points, Point2f(timestamp, P11))
-        number = length(_x_euler_angle_raw_points)
-        if number > maxplotnumber
-            _x_euler_angle_raw_points = _x_euler_angle_raw_points[number-maxplotnumber+1:end]
-            _y_euler_angle_raw_points = _y_euler_angle_raw_points[number-maxplotnumber+1:end]
-            _x_euler_angle_estimate_points = _x_euler_angle_estimate_points[number-maxplotnumber+1:end]
-            _y_euler_angle_estimate_points = _y_euler_angle_estimate_points[number-maxplotnumber+1:end]
-            # P matrix graph
-            _P0points = _P0points[number-maxplotnumber+1:end]
-            _P1points = _P1points[number-maxplotnumber+1:end]
-            _P2points = _P2points[number-maxplotnumber+1:end]
-            _P3points = _P3points[number-maxplotnumber+1:end]
-            _P4points = _P4points[number-maxplotnumber+1:end]
-            _P5points = _P5points[number-maxplotnumber+1:end]
-            _P6points = _P6points[number-maxplotnumber+1:end]
-            _P7points = _P7points[number-maxplotnumber+1:end]
-            _P8points = _P8points[number-maxplotnumber+1:end]
-            _P9points = _P9points[number-maxplotnumber+1:end]
-            _P10points = _P10points[number-maxplotnumber+1:end]
-            _P11points = _P11points[number-maxplotnumber+1:end]
-            @assert(length(_x_euler_angle_raw_points) == maxplotnumber)
-            graphpoints1[] = [_x_euler_angle_raw_points, _x_euler_angle_estimate_points]
-            graphpoints2[] = [_y_euler_angle_raw_points, _y_euler_angle_estimate_points]
-            graphpoints3[] = [_P0points, _P1points, _P2points, _P3points, _P4points, _P5points, _P6points, _P7points, _P8points, _P9points, _P10points, _P11points]
-        else
-            graphpoints1[] = [_x_euler_angle_raw_points, _x_euler_angle_estimate_points]
-            graphpoints2[] = [_y_euler_angle_raw_points, _y_euler_angle_estimate_points]
-            graphpoints3[] = [_P0points, _P1points, _P2points, _P3points, _P4points, _P5points, _P6points, _P7points, _P8points, _P9points, _P10points, _P11points]
-        end
-        P_parameters = []
-        for x in to_value(graphpoints3[])
-            for y in x
-                push!(P_parameters, y[2])
-            end
-        end
-        xlims!(ax1, timestamp - timeaxiswindow, timestamp)
-        xlims!(ax2, timestamp - timeaxiswindow, timestamp)
-        xlims!(ax3, timestamp - timeaxiswindow, timestamp)
-        ylims1 = [min(map(x -> x[2], _x_euler_angle_estimate_points)...) - 0.01; max(map(x -> x[2], _x_euler_angle_estimate_points)...) + 0.01]
-        ylims2 = [min(map(x -> x[2], _y_euler_angle_estimate_points)...) - 0.01; max(map(x -> x[2], _y_euler_angle_estimate_points)...) + 0.01]
-        ylims3 = [min(P_parameters...) - 0.01; max(P_parameters...) + 0.01]
-        ylims!(ax1, ylims1[1], ylims1[2])
-        ylims!(ax2, ylims2[1], ylims2[2])
-        ylims!(ax3, ylims3[1], ylims3[2])
-        #######
-
-        # q = ℍ(roll, x̂) * ℍ(pitch, ŷ)
-        O_B_R = mat3(q)
-
-        g = q * chassis_q0
-        GLMakie.rotate!(robot, Quaternion(g))
-        pivot_observable[] = Point3f(O_B_R * (pivot - origin) + origin)
-
-        pivot_ps[] = [Point3f(pivot_observable[]...), Point3f(pivot_observable[]...), Point3f(pivot_observable[]...)]
-        rq = Quaternion(ℍ(reaction_angle, x̂))
-        mq = Quaternion(ℍ(rolling_angle, ẑ))
-        GLMakie.rotate!(rollingwheel, mq)
-        GLMakie.rotate!(reactionwheel, rq)
-        if run == true
-            recordtext[] = "Recorded frame $(length(data["time"]))."
-        end
-    end
-end
-
 on(buttons[3].clicks) do n
     global run = true
-    # record(lscene.scene, joinpath("gallery", "$modelname.mp4"); framerate=fps) do io
-    #     for i = 1:iterations
-    #         if run == false
-    #             recordtext[] = "Not recording."
-    #             break
-    #         end
-    #         recordframe!(io)
-    #         recordtext[] = "Recorded frame $i / $iterations."
-    #         sleep((1 / fps) * 0.01)
-    #     end
-    #     global run = false
-    # end
 end
 
-on(events(fig).tick) do tick
-    if !isnothing(clientside) && isopen(clientside)
-        stepforward()
-    end
+on(buttons[4].clicks) do n
+    global run = false
+    dataframe = DataFrame(data)
+    filepath = joinpath("data", "$modelname.csv")
+    CSV.write(filepath, dataframe)
+    recordtext[] = "Recorded $(length(data["time"])) frames."
 end

@@ -33,7 +33,7 @@ Instantiate a visual object in the `scene` with the given `parent` instance,
 `origin` position, `rotation`, `scale`, `stl` object 3D file and `colormap`.
 """
 function make_sprite(scene::GLMakie.Scene, parent::Any, origin::GLMakie.Point3f,
-    rotation::ℍ, scale::Float64, stl::GeometryBasics.Mesh, colormap::Symbol; transparency = transparency)
+    rotation::ℍ, scale::Float64, stl::GeometryBasics.Mesh, colormap::Symbol; transparency::Bool = true)
     # the type of the parent object should be Union{GLMakie.Mesh, GLMakie.Scene}
     center_of_mass = find_centerofmass(stl)
     # Create a child transformation from the parent
