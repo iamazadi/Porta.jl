@@ -8,14 +8,14 @@ using Porta
 
 
 figuresize = (1920, 1080)
-modelname = "take003_unicycle_tilt_estimation"
+modelname = "take004_unicycle_tilt_estimation"
 headers = ["changes", "time", "active", "AX1", "AY1", "AZ1", "AX2", "AY2", "AZ2", "roll", "pitch", "encT", "encB", "j", "k", "P0", "P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11"]
 readings = Dict()
 segments = 30
 fontsize = 30
-chassis_colormap = :brass
-rollingwheel_colormap = :blackbody
-reactionwheel_colormap = :blackbody
+chassis_colormap = :gist_heat
+rollingwheel_colormap = :navia
+reactionwheel_colormap = :seismic
 markersize = 10
 ballsize = 0.01
 linewidth = 0.01
@@ -64,10 +64,10 @@ for header in headers
     data[header] = []
     readings[header] = []
 end
-filepath = joinpath("data", "$modelname.csv")
+filepath = joinpath("data", "csv", "$modelname.csv")
 file = CSV.File(filepath)
 
-eyeposition = normalize([0.4; 0.6; 0.25]) * 0.5
+eyeposition = normalize([0.5; 0.5; 1.0]) * 0.5
 originaleyeposition = deepcopy(eyeposition)
 up = [0.0; 0.0; 1.0]
 
@@ -123,7 +123,7 @@ record(lscene.scene, joinpath("gallery", "$modelname.mp4"); framerate=fps) do io
                 controller_statustext[] = isapprox(readings["active"], 1.0) ? "Active" : "Deactive"
                 jindextext[] = "j: $(readings["j"])"
                 kindextext[] = "k: $(readings["k"])"
-                global eyeposition = ℝ³(Float64.(vec(lookat))...) + (0.75 * norm(originaleyeposition - lookat) + 0.25 * sin(progress * 9π)) * normalize(rotate(ℝ³(Float64.(vec(originaleyeposition))...) - ℝ³(Float64.(vec(lookat))...), ℍ(cos(progress * π) * float(π), ℝ³(up))))
+                global eyeposition = ℝ³(Float64.(vec(lookat))...) + (0.9 * norm(originaleyeposition - lookat) + 0.1 * cos(progress * 7π)) * normalize(rotate(ℝ³(Float64.(vec(originaleyeposition))...) - ℝ³(Float64.(vec(lookat))...), ℍ(sin(progress * π) * float(π), -ℝ³(up))))
                 update_cam!(lscene.scene, Vec3f(vec(eyeposition)...), Vec3f(vec(lookat)...), Vec3f(vec(up)...))
                 break
             end

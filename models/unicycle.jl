@@ -189,7 +189,7 @@ end
 on(buttons[4].clicks) do n
     global run = false
     dataframe = DataFrame(data)
-    filepath = joinpath("data", "$modelname.csv")
+    filepath = joinpath("data", "csv", "$modelname.csv")
     CSV.write(filepath, dataframe)
     recordtext[] = "$(length(data["time"])) frames"
 end

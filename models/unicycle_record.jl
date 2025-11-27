@@ -84,6 +84,6 @@ while true
 end
 
 dataframe = DataFrame(data)
-filepath = joinpath("data", "$modelname.csv")
+filepath = joinpath("data", "csv", "$modelname.csv")
 CSV.write(filepath, dataframe)
 println("Recorded $(length(data["time"])) frames.")
