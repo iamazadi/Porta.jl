@@ -13,13 +13,13 @@ headers = ["changes", "time", "active", "AX1", "AY1", "AZ1", "AX2", "AY2", "AZ2"
 readings = Dict()
 segments = 30
 fontsize = 30
-chassis_colormap = :cyclic_tritanopic_wrwc_70_100_c20_n256
-rollingwheel_colormap = :berlin
-reactionwheel_colormap = :vanimo
-markersize = 15
+chassis_colormap = :brass
+rollingwheel_colormap = :blackbody
+reactionwheel_colormap = :blackbody
+markersize = 10
 ballsize = 0.01
 linewidth = 0.01
-arrowsize = Vec3f(0.02, 0.02, 0.04)
+arrowsize = Vec3f(0.03, 0.03, 0.06)
 arrowscale = 0.3
 smallarrowscale = arrowscale * 0.6
 chassis_stl_path = joinpath("data", "unicycle", "unicycle_chassis.STL")
@@ -37,9 +37,9 @@ p1 = Point3f(-0.14000000286102293, -0.06500000149011612, -0.06200000151991844)
 p2 = Point3f(-0.04000000286102295, -0.06000000149011612, -0.06000000151991844)
 rollingwheel_origin = Point3f(3.0, -12.0, 0.0)
 reactionwheel_origin = Point3f(0.0, 153.0, 1.0)
-x̂ = ℝ³([1.0; 0.0; 0.0])
-ŷ = ℝ³([0.0; 1.0; 0.0])
-ẑ = ℝ³([0.0; 0.0; 1.0])
+x̂ = ℝ³(1.0, 0.0, 0.0)
+ŷ = ℝ³(0.0, 1.0, 0.0)
+ẑ = ℝ³(0.0, 0.0, 1.0)
 # the vectors of the standard basis for the input space ℝ³
 ê = [Vec3f(vec(x̂)), Vec3f(vec(ŷ)), Vec3f(vec(ẑ))]
 # The rotation of the inertial frame Ô to the body frame B̂
@@ -48,14 +48,14 @@ transformation = [-sin(α) cos(α) 0.0; -cos(α) -sin(α) 0.0; 0.0 0.0 1.0]
 B_O_R = convert(Matrix{Float64}, transformation * [ê[1] ê[2] ê[3]])
 O_B_R = convert(Matrix{Float64}, inv(B_O_R))
 # The rotation of the local frame of the sensor i to the robot frame B̂
-B_A1_R = convert(Matrix{Float64}, [ê[1] ê[2] ê[3]])
+B_A1_R = convert(Matrix{Float64}, transformation * [ê[1] ê[2] ê[3]])
 A1_B_R = convert(Matrix{Float64}, inv(B_A1_R))
 α = 30.0 / 180.0 * π # imu2angle
-B_A2_R = convert(Matrix{Float64}, [cos(α) sin(α) 0.0; -sin(α) cos(α) 0.0; 0.0 0.0 1.0])
+B_A2_R = convert(Matrix{Float64}, [cos(α) sin(α) 0.0; -sin(α) cos(α) 0.0; 0.0 0.0 1.0] * [ê[1] ê[2] ê[3]])
 # B_A2_R = [-sin(α) cos(α) 0.0; -cos(α) -sin(α) 0.0; 0.0 0.0 1.0] # this is equal to B_O_R * B_A2_R the same as the one that is used on the device
 A2_B_R = convert(Matrix{Float64}, inv(B_A2_R))
-maxplotnumber = 400
-timeaxiswindow= 15.0
+maxplotnumber = 800
+timeaxiswindow= 30.0
 fps = 24
 minutes = 1
 iterations = minutes * 60 * fps
@@ -67,9 +67,8 @@ end
 filepath = joinpath("data", "$modelname.csv")
 file = CSV.File(filepath)
 
-eyeposition = normalize([0.27; 0.28; 0.26]) * 0.5
-view_direction = normalize([-0.60; -0.65; -0.45])
-lookat = eyeposition + view_direction
+eyeposition = normalize([0.4; 0.6; 0.25]) * 0.5
+originaleyeposition = deepcopy(eyeposition)
 up = [0.0; 0.0; 1.0]
 
 makefigure() = Figure(size=figuresize)
@@ -84,13 +83,13 @@ ax3 = Axis(fig[3, 1], xlabel="Time (sec)", ylabel="P Matrix Parameters", xlabels
 
 # buttoncolor = RGBf(0.3, 0.3, 0.3)
 # buttons = [Button(fig, label=l, buttoncolor=buttoncolor) for l in buttonlabels]
-controller_statustext = Observable("Deactive.")
+controller_statustext = Observable("Deactive")
 controller_statuslabel = Label(fig, controller_statustext, fontsize = fontsize)
 jindextext = Observable("j: 1")
 jindexlabel = Label(fig, jindextext, fontsize = fontsize)
 kindextext = Observable("k: 1")
 kindexlabel = Label(fig, kindextext, fontsize = fontsize)
-recordtext = Observable("Not recording.")
+recordtext = Observable("Not recording")
 recordlabel = Label(fig, recordtext, fontsize = fontsize)
 fig[4, 1] = grid!(hcat(controller_statuslabel, jindexlabel, kindexlabel, recordlabel), tellheight=true, tellwidth=false)
 colsize!(fig.layout, 1, Relative(1/4))
@@ -99,6 +98,8 @@ unicycle = Unicycle(origin, pivot, p1, p2, B_O_R, B_A1_R, B_A2_R, chassis_scale,
                     rollingwheel_origin, reactionwheel_origin, chassis_stl_path, rollingwheel_stl_path, reactionwheel_stl_path,
                     lscene, ax1, ax2, ax3, arrowscale, smallarrowscale, linewidth, arrowsize, markersize, ballsize, segments,
                     chassis_colormap, rollingwheel_colormap, reactionwheel_colormap, maxplotnumber, timeaxiswindow)
+lookat = deepcopy(pivot)
+update_cam!(lscene.scene, Vec3f(eyeposition...), Vec3f(lookat...), Vec3f(up...))
 
 period = file[end][:time] - file[begin][:time]
 
@@ -119,12 +120,16 @@ record(lscene.scene, joinpath("gallery", "$modelname.mp4"); framerate=fps) do io
                     readings[header] = text[Symbol(header)]
                 end
                 updatemodel(unicycle, readings)
+                controller_statustext[] = isapprox(readings["active"], 1.0) ? "Active" : "Deactive"
+                jindextext[] = "j: $(readings["j"])"
+                kindextext[] = "k: $(readings["k"])"
+                global eyeposition = ℝ³(Float64.(vec(lookat))...) + (0.75 * norm(originaleyeposition - lookat) + 0.25 * sin(progress * 9π)) * normalize(rotate(ℝ³(Float64.(vec(originaleyeposition))...) - ℝ³(Float64.(vec(lookat))...), ℍ(cos(progress * π) * float(π), ℝ³(up))))
+                update_cam!(lscene.scene, Vec3f(vec(eyeposition)...), Vec3f(vec(lookat)...), Vec3f(vec(up)...))
                 break
             end
         end
         sleep(1 / fps)
         recordframe!(io)
-        recordtext[] = "Recorded $i / $iterations."
-        sleep(1 / fps)
+        recordtext[] = "frame $i/$iterations"
     end
 end

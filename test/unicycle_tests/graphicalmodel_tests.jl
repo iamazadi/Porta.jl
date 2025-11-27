@@ -72,3 +72,5 @@ for header in headers
     readings[header] = rand()
 end
 updatemodel(unicycle, readings)
+
+@test length(to_value(unicycle.graphpoints1)) > 0

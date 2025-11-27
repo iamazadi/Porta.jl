@@ -16,7 +16,10 @@ ê = [Vec3f(vec(x̂)), Vec3f(vec(ŷ)), Vec3f(vec(ẑ))]
 """
     Represents the graphical components of a balancing unicycle.
 
-fields: .
+fields: origin, pivot, p1, p2, B_O_R, O_B_R, A1_B_R, B_A1_R, A2_B_R, B_A2_R, P, X, sphere1, sphere2, graphpoints1, graphpoints2, graphpoints3,
+        robot, rollingwheel, reactionwheel, acceleration_vector_tails, acceleration_vector_heads, sensor1frame_tails, sensor1frame_heads,
+        sensor2frame_tails, sensor2frame_heads, pivot_ps, pivot_ns, pivot_observable, point1_observable, point2_observable, maxplotnumber,
+        timeaxiswindow, chassisrotation, segments, arrowscale, smallarrowscale, axis1, axis2, and axis3.
 """
 struct Unicycle
     origin::Point3f
@@ -149,6 +152,7 @@ struct Unicycle
         sensor2frame_tails = Observable([point2_observable[], point2_observable[], point2_observable[]])
         sensor1frame_heads = Observable(map(x -> Vec3f(B_O_R * x .* smallarrowscale), [B_A1_R * ê[1], B_A1_R * ê[2], B_A1_R * ê[3]]))
         sensor2frame_heads = Observable(map(x -> Vec3f(B_O_R * x .* smallarrowscale), [B_A2_R * ê[1], B_A2_R * ê[2], B_A2_R * ê[3]]))
+
         arrowcolors = [:red, :green, :blue]
         arrows!(lscene,
             pivot_ps, pivot_ns, fxaa=true, # turn on anti-aliasing
@@ -272,8 +276,8 @@ function updatemodel(unicycle::Unicycle, readings::Dict)
     unicycle.sensor1frame_tails[] = [Point3f(unicycle.point1_observable[]...), Point3f(unicycle.point1_observable[]...), Point3f(unicycle.point1_observable[]...)]
     unicycle.sensor2frame_tails[] = [Point3f(unicycle.point2_observable[]...), Point3f(unicycle.point2_observable[]...), Point3f(unicycle.point2_observable[]...)]
 
-    unicycle.sensor1frame_heads[] = map(x -> Vec3f(B_O_R * x .* norm(R1) .* unicycle.smallarrowscale), [unicycle.B_A1_R * ê[1], unicycle.B_A1_R * ê[2], unicycle.B_A1_R * ê[3]])
-    unicycle.sensor2frame_heads[] = map(x -> Vec3f(B_O_R * x .* norm(R2) .* unicycle.smallarrowscale), [unicycle.B_A2_R * ê[1], unicycle.B_A2_R * ê[2], unicycle.B_A2_R * ê[3]])
+    unicycle.sensor1frame_heads[] = map(x -> Vec3f(O_B_R * x .* norm(R1) .* unicycle.smallarrowscale), [unicycle.B_A1_R * ê[1], unicycle.B_A1_R * ê[2], unicycle.B_A1_R * ê[3]])
+    unicycle.sensor2frame_heads[] = map(x -> Vec3f(O_B_R * x .* norm(R2) .* unicycle.smallarrowscale), [unicycle.B_A2_R * ê[1], unicycle.B_A2_R * ê[2], unicycle.B_A2_R * ê[3]])
 
     # plot the x-Euler and y-Euler angles
     _graphpoints1 = unicycle.graphpoints1[]
