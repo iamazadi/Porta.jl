@@ -992,6 +992,14 @@ Convergence of selected algebraic Riccati equation solution parameters. The adap
 
 ![p_matrix_parameters_b](./assets/reactionwheelunicycle/p_matrix_parameters_b.png)
 
+![times j and k and filter changes 1](./assets/reactionwheelunicycle/jkchanges1.png)
+
+![times j and k and filter changes 2](./assets/reactionwheelunicycle/jkchanges2.png)
+
+![times j and k and filter changes 3](./assets/reactionwheelunicycle/jkchanges3.png)
+
+![times j and k and filter changes 4](./assets/reactionwheelunicycle/jkchanges4.png)
+
 ## The Controllability of the Z-Euler Angle
 
 ## Nonholonomic Motion Planning
