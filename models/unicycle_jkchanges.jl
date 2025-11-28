@@ -12,7 +12,11 @@ modelname = "$(datafilename)_jkchanges"
 headers = ["changes", "time", "active", "AX1", "AY1", "AZ1", "AX2", "AY2", "AZ2", "roll", "pitch", "encT", "encB", "j", "k", "P0", "P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11"]
 readings = Dict()
 fontsize = 30
-markersize = 10
+markersize = 15
+xminorticksize = 20.0
+jlinecolor = :yellow
+klinecolor = :green
+changeslinecolor = :blue
 data = Dict()
 for header in headers
     data[header] = []
@@ -20,20 +24,42 @@ for header in headers
 end
 filepath = joinpath("data", "csv", "$datafilename.csv")
 file = CSV.File(filepath)
+number = length(file)
+begintime = file[begin][:time]
+endtime = file[end][:time]
+period = endtime - begintime
+beginsecond = Int(floor(begintime))
+endsecond = Int(floor(endtime))
+sequence = beginsecond:5:endsecond
+xticks = (sequence, ["$(round(x))" for x in sequence])
 
 makefigure() = Figure(size=figuresize)
 fig = with_theme(makefigure, theme_black())
-ax1 = Axis(fig[1, 1], title = "Time j for counting the number of policy updates", xlabel="Time (sec)", ylabel="time j", xlabelsize=fontsize, ylabelsize=fontsize)
-ax2 = Axis(fig[1, 2], title = "Time k for the Recursive Least Squares (RLS) iterations", xlabel="Time (sec)", ylabel="time k", xlabelsize=fontsize, ylabelsize=fontsize)
-ax3 = Axis(fig[2, 1], title = "The sum of changes to the filter coefficients after an iteration of the RLS", xlabel="Time (sec)", ylabel="changes", xlabelsize=fontsize, ylabelsize=fontsize)
-ax4 = Axis(fig[2, 2], title = "The diagonal parameters of the inverse autocorrelation matrix", xlabel="Time (sec)", ylabel="P Matrix Parameters", xlabelsize=fontsize, ylabelsize=fontsize)
+ax1 = Axis(fig[1, 1], title = "Time k (value iteration) x Time j (policy iteration)", xlabel = "Time (sec)", ylabel = "time j",
+           yticklabelcolor = jlinecolor, xlabelsize = fontsize, ylabelsize=fontsize, xminorticksvisible = true, xminorgridvisible = true,
+           xminorticksize = xminorticksize, xticks = xticks)
+
+ax2 = Axis(fig[1, 1], xlabel="Time (sec)",
+           ylabel = "time k", xlabelsize = fontsize, ylabelsize = fontsize, xminorticksvisible = true, xminorgridvisible = true,
+           yticklabelcolor = klinecolor, yaxisposition = :right, xminorticksize = xminorticksize)
+hidespines!(ax2)
+hidexdecorations!(ax2)
+
+ax3 = Axis(fig[1, 2], title = "Sum of W_n - W_{n-1} after an iteration of RLS x The inverse auto-correlation matrix P", xlabel = "Time (sec)", ylabel = "changes",
+           yticklabelcolor = changeslinecolor, xlabelsize = fontsize, ylabelsize = fontsize, xminorticksvisible = true,
+           xminorgridvisible = true, xminorticksize = xminorticksize, xticks = xticks)
+
+ax4 = Axis(fig[1, 2], xlabel="Time (sec)",
+           ylabel = "P Matrix Parameters", xlabelsize = fontsize, ylabelsize = fontsize, xminorticksvisible = true, xminorgridvisible = true,
+           yticklabelcolor = :purple, yaxisposition = :right, xminorticksize = xminorticksize)
+hidespines!(ax4)
+hidexdecorations!(ax4)
 
 graphpoints1 = Point2f[(0, 0)]
 graphpoints2 = Point2f[(0, 0)]
 graphpoints3 = Point2f[(0, 0)]
 graphpoints4 = [Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)], Point2f[(0, 0)]]
 
-number = length(file)
 for i in 1:number
     text = file[i]
     for header in headers
@@ -71,26 +97,26 @@ for i in 1:number
     push!(graphpoints4[11], Point2f(timestamp, P10))
     push!(graphpoints4[12], Point2f(timestamp, P11))
 end
+jline = scatter!(ax1, graphpoints1, color = jlinecolor, markersize = markersize, marker = :rect)
+kline = scatter!(ax2, graphpoints2, color = klinecolor, markersize = markersize)
+changesline = scatter!(ax3, graphpoints3, color = changeslinecolor, markersize = markersize, marker = :rect)
+p0line = scatter!(ax4, graphpoints4[1], color=:lavenderblush, markersize = markersize)
+p1line = scatter!(ax4, graphpoints4[2], color=:plum1, markersize = markersize)
+p2line = scatter!(ax4, graphpoints4[3], color=:thistle, markersize = markersize)
+p3line = scatter!(ax4, graphpoints4[4], color=:orchid2, markersize = markersize)
+p4line = scatter!(ax4, graphpoints4[5], color=:mediumorchid1, markersize = markersize)
+p5line = scatter!(ax4, graphpoints4[6], color=:magenta2, markersize = markersize)
+p6line = scatter!(ax4, graphpoints4[7], color=:lavenderblush4, markersize = markersize)
+p7line = scatter!(ax4, graphpoints4[8], color=:magenta3, markersize = markersize)
+p8line = scatter!(ax4, graphpoints4[9], color=:plum4, markersize = markersize)
+p9line = scatter!(ax4, graphpoints4[10], color=:mediumorchid4, markersize = markersize)
+p10line = scatter!(ax4, graphpoints4[11], color=:mediumpurple4, markersize = markersize)
+p11line = scatter!(ax4, graphpoints4[12], color=:purple4, markersize = markersize)
 
-scatter!(ax1, graphpoints1, color=:red, markersize = markersize)
-scatter!(ax2, graphpoints2, color=:green, markersize = markersize)
-scatter!(ax3, graphpoints3, color=:blue, markersize = markersize)
-scatter!(ax4, graphpoints4[1], color=:lavenderblush, markersize = markersize)
-scatter!(ax4, graphpoints4[2], color=:plum1, markersize = markersize)
-scatter!(ax4, graphpoints4[3], color=:thistle, markersize = markersize)
-scatter!(ax4, graphpoints4[4], color=:orchid2, markersize = markersize)
-scatter!(ax4, graphpoints4[5], color=:mediumorchid1, markersize = markersize)
-scatter!(ax4, graphpoints4[6], color=:magenta2, markersize = markersize)
-scatter!(ax4, graphpoints4[7], color=:lavenderblush4, markersize = markersize)
-scatter!(ax4, graphpoints4[8], color=:magenta3, markersize = markersize)
-scatter!(ax4, graphpoints4[9], color=:plum4, markersize = markersize)
-scatter!(ax4, graphpoints4[10], color=:mediumorchid4, markersize = markersize)
-scatter!(ax4, graphpoints4[11], color=:mediumpurple4, markersize = markersize)
-scatter!(ax4, graphpoints4[12], color=:purple4, markersize = markersize)
-
-begintime = file[begin][:time]
-endtime = file[end][:time]
-period = endtime - begintime
+axislegend(ax1, [jline, kline], ["time j", "time k"], "Time j x Time k", position = :cc, orientation = :horizontal, framevisible = false)
+axislegend(ax3, [changesline, p0line, p1line, p2line, p3line, p4line, p5line, p6line, p7line, p8line, p9line, p10line, p11line],
+                ["W_n - W_{n-1}", "P0", "P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11"],
+                "Incremental W_n filter changes x The diagonal parameters of P matrix", position = :cc, orientation = :horizontal, framevisible = false)
 
 # to find the upper and lower bounds of data distribution
 P_parameters = []
