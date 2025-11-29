@@ -296,7 +296,7 @@ where ``p_x^T, \ p_y^T, \ p_z^T \in \mathbb{R}^{1 \times L}``, denote the last t
 
 ``\lambda_1 \ ^{B}p_{i, x} + \lambda_2 \ ^{B}p_{i, y} + \lambda_3 \ ^{B}p_{i, z} = -\lambda_4``  (Equation 22)
 
-where ``^{B}p_{i, x}, \ ^{B}p_{i, y}, \ ^{B}p_{i, z} \in \mathbb{R}`` denote the ``x``, ``y`` and ``z``-coordinate of the ``i``th sensor location in the body frame. Since the equation ``\lambda_1 x + \lambda_2 y + \lambda_3 z = -\lambda_4`` defines a plane in ``(x,y,z)``-space, condition (22) is equivalent to *all* ``L`` sensors lying on the same plane. Therefore, the full row rank condition on ``P`` is satisfied if and only if *not* all sensors lie on a plane, this also implies that at least four tri-axis accelerometers are required for the proposed method.
+where ``^{B}p_{i, x}, \ ^{B}p_{i, y}, \ ^{B}p_{i, z} \in \mathbb{R}`` denote the ``x``, ``y`` and ``z``-coordinate of the ``i``th sensor location in the body frame. Since the equation ``\lambda_1 x + \lambda_2 y + \lambda_3 z = -\lambda_4`` defines a plane in ``(x,y,z)``-space, condition (22) is equivalent to *all* ``L`` sensors lying on the same plane. Therefore, the full row rank condition on ``P`` is satisfied if and if only *not* all sensors lie on a plane, this also implies that at least four tri-axis accelerometers are required for the proposed method.
 
 Note that the gravity vector estimate given in the partitioned estimation lemma is optimal under the assumption that ``P`` has full row rank. These results can be extended and the rank condition on ``P`` can be relaxed when one only seeks only the gravity vector. For example, one could directly measure gravity with a single tri-axis accelerometer at the pivot, where the dynamic terms do not enter the measurements.However, this is not possible for the balancing unicycle application.
 
@@ -395,6 +395,72 @@ Integrating the rate estimates in equation (27) yields estimates for the Euler a
 ``\left\{ \begin{array}{l} \hat{\beta}(k) = \kappa_1 \hat{\beta}_a(k) + (1 - \kappa_1) (\hat{\beta}(k - 1) + T \hat{\dot{\beta}}(k)) &\\ \hat{\gamma}(k) = \kappa_2 \hat{\gamma}_a(k) + (1 - \kappa_2) (\hat{\gamma}(k - 1) + T \hat{\dot{\gamma}}(k)) \end{array} \right.``,  (Equation 28)
 
 where ``T`` is the sampling time (the same as `dt` in the LQR struct) and ``\kappa_1`` and ``\kappa_2`` are tuning parameters that may be chosen such that the variance of the estimate is minimized given the noise specifications of accelerometers and rate gyros. For the application presented in this project, ``\kappa_1 = \kappa_2 = 0.01`` was used.
+
+### The Experimental Results
+
+The accelerometer-based tilt estimator was implemented on the Balancing Unicycle as described above. In the Balancing Unicycle application, the bias of the Euler angle estimates is corrected prior to operation in a calibration procedure, which accounts to first order for the accelerometer biases (see the struct fields `accXOffset`, `accYOffset` and `accZOffset`).
+
+
+```c
+typedef struct
+{
+  int16_t accXOffset;
+  int16_t accYOffset;
+  int16_t accZOffset;
+  float accXScale;
+  float accYScale;
+  float accZScale;
+  int16_t gyrXOffset;
+  int16_t gyrYOffset;
+  int16_t gyrZOffset;
+  float gyrXScale;
+  float gyrYScale;
+  float gyrZScale;
+  int16_t rawAccX;
+  int16_t rawAccY;
+  int16_t rawAccZ;
+  int16_t rawGyrX;
+  int16_t rawGyrY;
+  int16_t rawGyrZ;
+  float accX;
+  float accY;
+  float accZ;
+  float gyrX;
+  float gyrY;
+  float gyrZ;
+  float roll;
+  float pitch;
+  float yaw;
+  float roll_velocity;
+  float pitch_velocity;
+  float yaw_velocity;
+  float roll_acceleration;
+  float pitch_acceleration;
+  float yaw_acceleration;
+  Mat3 B_A_R; // The rotation of the local frame of the sensor i to the robot frame B̂
+  Vec3 R;     // accelerometer sensor measurements in the local frame of the sensors
+  Vec3 _R;    // accelerometer sensor measurements in the robot body frame
+  Vec3 G;     // gyro sensor measurements in the local frame of the sensors
+  Vec3 _G;    // gyro sensor measurements in the robot body frame
+} IMU;
+```
+
+To demonstrate the accelerometer-based tilt estimator, the robot was put on the rolling wheel and moved by hand (and also by the LQR controller) about the upright equilibrium position, which corresponds to the Euler angles ``\gamma \approx 0`` and ``\beta \approx 0``. The results are shown in the following figures. Clearly, the accelerometric estimate is accurate both for slow and fast motion of the robot. In contrast to the tilt estimation method, the same experiment is shown, but now only a single tri-axis accelerometer (sensor i = 1) is used to observe the gravity vector. When the robot is static (away from peaks and valleys), the estimate is accurate. However, when the robot is being moved the estimate suffers from the dynamic terms that act as disturbances to the static estimator. This demonstrates that the dynamics are not negligible. For the closed-loop operation of the system, i.e. for balancing the robot using the LQR model, the improved estimate for the robot angles (up triangles in orange) using both accelerometer and rate gyro data was used.
+
+Estimation data during balancing of the robot: comparison of Euler angle estimates if only a single tri-axis accelerometer is used
+(green) to the accelerometric estimate of x- and y-Euler angles (blue), and to the accelerometric estimate fused with rate gyro data (orange).
+
+Data sample 1:
+![tilt estimation graph data sample 1](./assets/reactionwheelunicycle/tilt_estimation_graph1.png)
+
+Data sample 2:
+![tilt estimation graph data sample 2](./assets/reactionwheelunicycle/tilt_estimation_graph2.png)
+
+Data sample 3:
+![tilt estimation graph data sample 3](./assets/reactionwheelunicycle/tilt_estimation_graph3.png)
+
+Data sample 4:
+![tilt estimation graph data sample 4](./assets/reactionwheelunicycle/tilt_estimation_graph4.png)
 
 #### The Micro-Controller Program
 
@@ -1006,7 +1072,7 @@ void updateControlPolicy(LinearQuadraticRegulator *model)
 
 ### The Causal Relation Between Time k and the Incremental Changes to Filter Coefficients
 
-Time *j* is incremented only if time *k* is reset to the value of 1. But, time k is reset after the RLS algorithm converges. The incremental *changes* that are made to the filter coefficients ``\Delta W_n = \Sigma (W_n - W_{n - 1})`` is calculated by summing up the absolute value of the incremental updates to the filter coefficients.
+Time *j* is incremented if only time *k* is reset to the value of 1. But, time k is reset after the RLS algorithm converges. The incremental *changes* that are made to the filter coefficients ``\Delta W_n = \Sigma (W_n - W_{n - 1})`` is calculated by summing up the absolute value of the incremental updates to the filter coefficients.
 
 ```c
 float calculateChanges(Mat12 W_1, Mat12 W_2)

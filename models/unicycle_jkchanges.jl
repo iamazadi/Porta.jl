@@ -14,9 +14,14 @@ readings = Dict()
 fontsize = 30
 markersize = 15
 xminorticksize = 20.0
+labelsize = 20
+titlesize = 25
 jlinecolor = :yellow
 klinecolor = :green
 changeslinecolor = :blue
+legendposition1 = :cc
+# legendposition2 = :cb
+legendposition2 = :cc
 data = Dict()
 for header in headers
     data[header] = []
@@ -37,7 +42,7 @@ makefigure() = Figure(size=figuresize)
 fig = with_theme(makefigure, theme_black())
 ax1 = Axis(fig[1, 1], title = "Time k (value iteration) x Time j (policy iteration)", xlabel = "Time (sec)", ylabel = "time j",
            yticklabelcolor = jlinecolor, xlabelsize = fontsize, ylabelsize=fontsize, xminorticksvisible = true, xminorgridvisible = true,
-           xminorticksize = xminorticksize, xticks = xticks)
+           xminorticksize = xminorticksize, xticks = xticks, titlesize = titlesize)
 
 ax2 = Axis(fig[1, 1], xlabel="Time (sec)",
            ylabel = "time k", xlabelsize = fontsize, ylabelsize = fontsize, xminorticksvisible = true, xminorgridvisible = true,
@@ -45,9 +50,9 @@ ax2 = Axis(fig[1, 1], xlabel="Time (sec)",
 hidespines!(ax2)
 hidexdecorations!(ax2)
 
-ax3 = Axis(fig[1, 2], title = "Sum of W_n - W_{n-1} after an iteration of RLS x The inverse auto-correlation matrix P", xlabel = "Time (sec)", ylabel = "changes",
+ax3 = Axis(fig[1, 2], title = "The incremental changes to filter coefficients x Diagonal parameters of P matrix", xlabel = "Time (sec)", ylabel = "changes",
            yticklabelcolor = changeslinecolor, xlabelsize = fontsize, ylabelsize = fontsize, xminorticksvisible = true,
-           xminorgridvisible = true, xminorticksize = xminorticksize, xticks = xticks)
+           xminorgridvisible = true, xminorticksize = xminorticksize, xticks = xticks, titlesize = titlesize)
 
 ax4 = Axis(fig[1, 2], xlabel="Time (sec)",
            ylabel = "P Matrix Parameters", xlabelsize = fontsize, ylabelsize = fontsize, xminorticksvisible = true, xminorgridvisible = true,
@@ -113,10 +118,12 @@ p9line = scatter!(ax4, graphpoints4[10], color=:mediumorchid4, markersize = mark
 p10line = scatter!(ax4, graphpoints4[11], color=:mediumpurple4, markersize = markersize)
 p11line = scatter!(ax4, graphpoints4[12], color=:purple4, markersize = markersize)
 
-axislegend(ax1, [jline, kline], ["time j", "time k"], "Time j x Time k", position = :cc, orientation = :horizontal, framevisible = false)
+axislegend(ax1, [jline, kline], ["time j", "time k"], "Time j x Time k", position = legendposition1, orientation = :horizontal,
+           framevisible = false, labelsize = labelsize, titlesize = titlesize)
 axislegend(ax3, [changesline, p0line, p1line, p2line, p3line, p4line, p5line, p6line, p7line, p8line, p9line, p10line, p11line],
-                ["W_n - W_{n-1}", "P0", "P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11"],
-                "Incremental W_n filter changes x The diagonal parameters of P matrix", position = :cc, orientation = :horizontal, framevisible = false)
+                ["changes", "P0", "P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11"],
+           "changes x P matrix parameters", position = legendposition2, orientation = :horizontal,
+           framevisible = false, labelsize = labelsize, titlesize = titlesize)
 
 # to find the upper and lower bounds of data distribution
 P_parameters = []
@@ -138,6 +145,5 @@ ylims!(ax1, ylims1[1], ylims1[2])
 ylims!(ax2, ylims2[1], ylims2[2])
 ylims!(ax3, ylims3[1], ylims3[2])
 ylims!(ax4, ylims4[1], ylims4[2])
-
 
 save(joinpath("gallery", "$modelname.png"), fig)
