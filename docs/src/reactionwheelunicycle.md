@@ -526,6 +526,7 @@ void updateIMU(LinearQuadraticRegulator *model)
 In this section, we step through the implementation of the robot's controller in the order of execution. The controller is implemented in the C programming language. It runs on a STM32F401RE mictocontroller, which is clocked at 84 MHz. Starting from first principles, there are at least two loops in a reinforcement learning program: the actor loop and the critic loop. The critic loop operates at a faster timescale and finds filter coefficients by taking actions, making mesurements and computing a recursive algorithm. In contrast, the actor loop is slower and updates the control policy, which is a function that produces actions. Even though actions are taken in the critic loop, the feedback policy function is the same across multiple runs of the loop. The actor loop is where the feedback policy is updated as a function of the latest set of filter coefficients. The state estimations and matrix parameters of the controller are stored in a data structure. The `LinearQuadraticRegulator` type is instantiated and initialized once, before either of the loops begin execution.
 
 ```c
+// Represents a Linear Quadratic Regulator (LQR) model.
 typedef struct
 {
   Mat12 W_n;                           // filter matrix
@@ -568,6 +569,7 @@ typedef struct
   float noiseScale;                    // the scale of by which the remainder of the probing noise is to be divided
   float time;                          // the time that has elapsed since the start up of the microcontroller in seconds
   float changes;                       // the magnitude of the changes to the filter coefficients after one step forward
+  float convergenceThreshold;          // the threshold value of the changes to filter coefficients below which the RLS is assumed to be converged
   Mat34 Q;                             // The matrix of unknown parameters
   Vec3 r;                              // the average of the body angular rate from rate gyro
   Vec3 rDot;                           // the average of the body angular rate in Euler angles
@@ -689,7 +691,15 @@ else
 In order to monitor the controller and debug issues, we write the logs periodically to the standard input / output console. The variable `log_counter` is incremented by one every control cycle. Then, the log counter variable `logCounter` is compared to the constnt `logPeriod` for finding out if a cycle should be logged. But it is not a sufficient condition for logging, because a second fuse bit is also rquired for permission to log. The second fuse bit is connected to the port C of the general purpose input / output, pin 1. Whenever the fuse bit pin is grounded, it is activated. Once the fuse bit is active, the local transmission flag `transmit` is set at the relevant control cycle count. The reason for `logPeriod` is to limit the total number of logs per second, as the Micro-Controller Unit (MCU) is too fast for a continuous report. And the second fuse bit is there to turn off logging for saving time, as log transmission takes time away from the control processes. So by using the logical "and" operator `&&` we can combine the logging period condition with the logging fuse bit, in order to manage the frequnecy of transmissions.
 
 ```c
-if (model.logCounter > model.logPeriod && HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_1) == 0)
+if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_1) == 0)
+{
+  model.logPeriod = 5;
+}
+else
+{
+  model.logPeriod = 40;
+}
+if (model.logCounter > model.logPeriod)
 {
   transmit = 1;
 }
@@ -708,8 +718,8 @@ if (transmit == 1)
   model.logCounter = 0;
 
   sprintf(MSG,
-          "AX1: %0.2f, AY1: %0.2f, AZ1: %0.2f, | AX2: %0.2f, AY2: %0.2f, AZ2: %0.2f, | roll: %0.2f, pitch: %0.2f, | encT: %0.2f, encB: %0.2f, | j: %0.1f, | x0: %0.2f, x1: %0.2f, x2: %0.2f, x3: %0.2f, x4: %0.2f, x5: %0.2f, x6: %0.2f, x7: %0.2f, x8: %0.2f, x9: %0.2f, x10: %0.2f, x11: %0.2f, | P0: %0.2f, P1: %0.2f, P2: %0.2f, P3: %0.2f, P4: %0.2f, P5: %0.2f, P6: %0.2f, P7: %0.2f, P8: %0.2f, P9: %0.2f, P10: %0.2f, P11: %0.2f, dt: %0.6f\r\n",
-          model.imu1.accX, model.imu1.accY, model.imu1.accZ, model.imu2.accX, model.imu2.accY, model.imu2.accZ, model.imu1.roll, model.imu1.pitch, model.reactionEncoder.radianAngle, model.rollingEncoder.radianAngle, (float)model.j, model.dataset.x0, model.dataset.x1, model.dataset.x2, model.dataset.x3, model.dataset.x4, model.dataset.x5, model.dataset.x6, model.dataset.x7, model.dataset.x8, model.dataset.x9, model.dataset.x10, model.dataset.x11, getIndexMat12(model.P_n, 0, 0), getIndexMat12(model.P_n, 1, 1), getIndexMat12(model.P_n, 2, 2), getIndexMat12(model.P_n, 3, 3), getIndexMat12(model.P_n, 4, 4), getIndexMat12(model.P_n, 5, 5), getIndexMat12(model.P_n, 6, 6), getIndexMat12(model.P_n, 7, 7), getIndexMat12(model.P_n, 8, 8), getIndexMat12(model.P_n, 9, 9), getIndexMat12(model.P_n, 10, 10), getIndexMat12(model.P_n, 11, 11), model.dt);
+          "active: %0.1f, changes: %0.2f, AX1: %0.2f, AY1: %0.2f, AZ1: %0.2f, | AX2: %0.2f, AY2: %0.2f, AZ2: %0.2f, | roll: %0.2f, pitch: %0.2f, | encT: %0.2f, encB: %0.2f, | j: %0.1f, k: %0.1f, | P0: %0.2f, P1: %0.2f, P2: %0.2f, P3: %0.2f, P4: %0.2f, P5: %0.2f, P6: %0.2f, P7: %0.2f, P8: %0.2f, P9: %0.2f, P10: %0.2f, P11: %0.2f, time: %0.2f, dt: %0.6f\r\n",
+          (float)model.active, model.changes, model.imu1.accX, model.imu1.accY, model.imu1.accZ, model.imu2.accX, model.imu2.accY, model.imu2.accZ, model.imu1.roll, model.imu1.pitch, model.reactionEncoder.radianAngle, model.rollingEncoder.radianAngle, (float)model.j, (float)model.k, getIndexMat12(model.P_n, 0, 0), getIndexMat12(model.P_n, 1, 1), getIndexMat12(model.P_n, 2, 2), getIndexMat12(model.P_n, 3, 3), getIndexMat12(model.P_n, 4, 4), getIndexMat12(model.P_n, 5, 5), getIndexMat12(model.P_n, 6, 6), getIndexMat12(model.P_n, 7, 7), getIndexMat12(model.P_n, 8, 8), getIndexMat12(model.P_n, 9, 9), getIndexMat12(model.P_n, 10, 10), getIndexMat12(model.P_n, 11, 11), model.time, model.dt);
 
   HAL_UART_Transmit(&huart6, MSG, sizeof(MSG), 1000);
   t2 = DWT->CYCCNT;
@@ -856,10 +866,13 @@ The filtered information vector ``z(n)`` at time ``n`` is the transformation of 
 ``\left\{ \begin{array}{l} \textbf{g}(n) = \frac{1}{\lambda + \textbf{x}^T(n) \textbf{z}(n)} \textbf{z}(n) &\\ \textbf{P}(n) = \frac{1}{\lambda} [\textbf{P}(n - 1) - \textbf{g}(n) \textbf{z}^H(n)] \end{array} \right.``
 
 ```c
+// a backup of old filter coefficients before updating for calculating the magnitude of changes
+Mat12 W_1;
 for (int i = 0; i < (model->n + model->m); i++)
 {
   for (int j = 0; j < (model->n + model->m); j++)
   {
+    setIndexMat12(&W_1, i, j, getIndexMat12(model->W_n, i, j));
     buffer = getIndexMat12(model->W_n, i, j) + getIndexVec12(model->alpha_n, i) * getIndexVec12(model->g_n, j);
     if (isnanf(buffer) == 0)
     {
@@ -867,6 +880,7 @@ for (int i = 0; i < (model->n + model->m); i++)
     }
   }
 }
+model->changes = calculateChanges(W_1, model->W_n);
 ```
 
 In short, we derived five equations for minimizing the weighted least squares error ``\Epsilon (n)`` in a recursive way: the filtered information vector, the *a priori error*, the gain vector, the filter coefficients, and the inverse of the autocorrelation matrix. These equations are parts of what is called the exponentially weighted Recursive Least Squares (RLS) algorithm.
@@ -920,7 +934,15 @@ The counter variable `k` is incremented every time the `stepForward` function is
 model->k = model->k + 1;
 ```
 
-## Update Control Policy
+## The Convergence of Selected Algebraic Riccati Equation Solution Parameters
+
+![p_matrix_parameters_a](./assets/reactionwheelunicycle/p_matrix_parameters_a.png)
+
+Convergence of selected algebraic Riccati equation solution parameters. The adaptive controller based on value iteration converges to the ARE solution in real time without knowing the system matrix (including the inertia matrix, and the torque and the electromotive force constants of the motors.)
+
+``Q(x_k, u_k) = \frac{1}{2} \begin{bmatrix} x_k \\ u_k \end{bmatrix} \begin{bmatrix} A^T P A + Q & B^T P A \\ A^T P B & B^T P B + R \end{bmatrix} \begin{bmatrix} x_k \\ u_k \end{bmatrix}``
+
+![p_matrix_parameters_b](./assets/reactionwheelunicycle/p_matrix_parameters_b.png)
 
 
 ```c
@@ -982,23 +1004,42 @@ void updateControlPolicy(LinearQuadraticRegulator *model)
 ``Q(x_k, u_k) = \frac{1}{2} {\begin{bmatrix} x_k \\ u_k \end{bmatrix}}^T S \begin{bmatrix} x_k \\ u_k \end{bmatrix} = \frac{1}{2} {\begin{bmatrix} x_k \\ u_k \end{bmatrix}}^T \begin{bmatrix} S_{xx} & S_{xu} \\ S_{ux} & S_{uu} \end{bmatrix} \begin{bmatrix} x_k \\ u_k \end{bmatrix}``
 
 
-## The Convergence of Selected Algebraic Riccati Equation Solution Parameters
+### The Causal Relation Between Time k and the Incremental Changes to Filter Coefficients
 
-![p_matrix_parameters_a](./assets/reactionwheelunicycle/p_matrix_parameters_a.png)
+Time *j* is incremented only if time *k* is reset to the value of 1. But, time k is reset after the RLS algorithm converges. The incremental *changes* that are made to the filter coefficients ``\Delta W_n = \Sigma (W_n - W_{n - 1})`` is calculated by summing up the absolute value of the incremental updates to the filter coefficients.
 
-Convergence of selected algebraic Riccati equation solution parameters. The adaptive controller based on value iteration converges to the ARE solution in real time without knowing the system matrix (including the inertia matrix, and the torque and the electromotive force constants of the motors.)
-
-``Q(x_k, u_k) = \frac{1}{2} \begin{bmatrix} x_k \\ u_k \end{bmatrix} \begin{bmatrix} A^T P A + Q & B^T P A \\ A^T P B & B^T P B + R \end{bmatrix} \begin{bmatrix} x_k \\ u_k \end{bmatrix}``
-
-![p_matrix_parameters_b](./assets/reactionwheelunicycle/p_matrix_parameters_b.png)
+```c
+float calculateChanges(Mat12 W_1, Mat12 W_2)
+{
+  float changes = 0.0;
+  for (int i = 0; i < 12; i++)
+  {
+    for (int j = 0; j < 12; j++)
+    {
+      changes += fabs(getIndexMat12(W_2, i, j) - getIndexMat12(W_1, i, j));
+    }
+  }
+  return changes;
+}
+```
 
 ![times j and k and filter changes 1](./assets/reactionwheelunicycle/jkchanges1.png)
 
+In the plot below, we see that time *j* stops incrementing before 52 seconds. The direct cause is that time *k* keeps increasing strictly at the same time stamp. Time *k* is reset back to 1 whenever the incremental *changes* are less than 2.0, ``\Delta W_n < 2.0``. The large *changes* that we see in the plot beginning from 62 seconds should be a consequence of not updating the policy for an extended period of time (for about 20 seconds).
+
 ![times j and k and filter changes 2](./assets/reactionwheelunicycle/jkchanges2.png)
+
+In the following figure, time *k* has a large value increase at about 40 seconds. Immediately after that, we see that time *j* has an steady increase over a 55-second interval. However, from 41 seconds until 96 seconds, time *k* deviates from the lower bound 1 for 7 steps at maximum, which are shown as 7 horizontal lines in green. The behavior of the graph of time *k* is reasonable in this case because the value of *k* changes in a regular way. Except for three data points before 41 seconds, the deviation of time *k* is standard as we add probing noise to the input for persistent excitation. The *changes* (as in ``\Delta W_n``) are scattered predominantly around the zero point. For most anomolies in the filter *changes* we have a corresponding anomoly in P matrix parameters. The anomolies of *changes* and *P matrix parameters* occur at the same time, because at those times the model is surprised (a great error value) and so adjusts the P matrix parameters to minimize the error.
 
 ![times j and k and filter changes 3](./assets/reactionwheelunicycle/jkchanges3.png)
 
+In the left-side graph of the figure below, time *k* has sudden increases in steps at approximately: 34, 44, 54, 59, 64, 75 and 79 seconds. The same time stamps also show anomolies in the right-hand side graph of *changes*. But the *changes* are made zero, and that's why the greater *changes* snap back to approximately zero quickly. As a fact to be expected, the P matrix parameters have anomolous data points at approximately 35, 42, 54 and 65 seconds, which are coincident with great *changes* in the incremental changes in the filter coefficients. So the figure below shows simultaneous anomolies in time *k*, incremental *changes* in filter coefficients, and *P matrix parameters*. It is normal since a drop in time *k* means small *changes* and that means a policy update to then decrease the least squares error.
+
 ![times j and k and filter changes 4](./assets/reactionwheelunicycle/jkchanges4.png)
+
+The criteria to determine when the RLS algorithm converges seems to work when the threshold of the *changes* (``\Delta W_n < 2.0``) is set equal to 2.0. A threshold equal to 1.0 results in suboptimal policies and performance, whereas a threshold of 3.0 produces useless policies.
+
+
 
 ## The Controllability of the Z-Euler Angle
 
