@@ -400,7 +400,6 @@ where ``T`` is the sampling time (the same as `dt` in the LQR struct) and ``\kap
 
 The accelerometer-based tilt estimator was implemented on the Balancing Unicycle as described above. In the Balancing Unicycle application, the bias of the Euler angle estimates is corrected prior to operation in a calibration procedure, which accounts to first order for the accelerometer biases (see the struct fields `accXOffset`, `accYOffset` and `accZOffset`).
 
-
 ```c
 typedef struct
 {
@@ -469,7 +468,6 @@ The function `updateIMU` provides the main source of data for the objective of t
 ![inertialmeasurementunits](./assets/reactionwheelunicycle/schematics/inertialmeasurementunits.jpeg)
 
 In terms of connectivity, The MCU peripheral USART1 is used to talk to IMU #2 (GY-95T). Set the baudrate of uart1 to 115200 Bits/s for the GY-95 IMU module. Set the Pin6 (PS: IIC/USART output mode selection) of IMU #2 (GY-25T) to zero, in order to use the I2C protocol. The I2C clock speed is set at 100000 Hz in the stanard mode. For saving MCU clock cycles and time, added a DMA request with USART1_RX and DMA2 Stream 2 from peripheral to memory and low priority. The mode is circular and the request call is made once in the main function by passing the usart1 handle and the receive buffer. The request increments the address of memory. The data width is one Byte for both the preipheral and memory.
-
 
 ```c
 void updateIMU(LinearQuadraticRegulator *model)
@@ -813,7 +811,6 @@ Set the baudrate of `uart6` to 921600, for the wifi module HC-25. The HC-25 modu
 4. Change the port number from *8080* to *10000*.
 5. Set the *Baud Rate* parameter to 921600 Bits/s.
 
-
 ## Step Forward
 
 The function `stepForward` identifies the Q function using RLS with the given pointer to the `model`. The algorithm updates the Q function at each step. As a result, the filter matrix `W_n` and the inverse auto-correlation matrix `P_n` are updated. Performs a one-step update in the parameter vector W by applying RLS to equation.
@@ -1105,8 +1102,6 @@ In the left-side graph of the figure below, time *k* has sudden increases in ste
 
 The criteria to determine when the RLS algorithm converges seems to work when the threshold of the *changes* (``\Delta W_n < 2.0``) is set equal to 2.0. A threshold equal to 1.0 results in suboptimal policies and performance, whereas a threshold of 3.0 produces useless policies.
 
-
-
 ## The Controllability of the Z-Euler Angle
 
 ## Nonholonomic Motion Planning
@@ -1117,11 +1112,201 @@ The criteria to determine when the RLS algorithm converges seems to work when th
 
 ## Attitude Control of A Space Platform / Manipulator System Using Internal Motion
 
+### A Balancing Robot Compared to an Inverted Pendulum on a Cart
+
 ![balance_robot_inverted_pendulum_on_cart](./assets/reactionwheelunicycle/balance_robot_inverted_pendulum_on_cart.jpeg)
 
-![unicycle_modelling_rolling](./assets/reactionwheelunicycle/unicycle_modelling_rolling.jpeg)
+### Deriving the Equations of the Robot to See How It Works
 
-![unicycle_modelling_reaction](./assets/reactionwheelunicycle/unicycle_modelling_reaction.jpeg)
+In this section we separately model the motion of the robot in two different directions, which have different dynamics. The relations between the supply voltage and the output torque of the DC motor is summarized as follows:
+
+``\tau = k_\tau i``
+
+``v = R i + L \frac{di}{dt} + e \approx R i + e``
+
+``e = k_e \omega_{enc}``
+
+When the motor's current changes, due to the motor's inductance, it generates a voltage in opposition to the changing current via Faraday's law. While the motor's armature is spinning in a magnetic field with constant current, the Back-ElectroMotive Force (Back-EMF) is non-zero, because the motor acts as a generator while moving. The back-EMF is a function of the magnitude of the motor's rotational velocity (speed). So, the back-EMF is zero when the rotation speed is zero.
+
+![ElectroMotive Force 1](./assets/reactionwheelunicycle/emf1.JPG)
+![ElectroMotive Force 2](./assets/reactionwheelunicycle/emf2.JPG)
+![ElectroMotive Force 3](./assets/reactionwheelunicycle/emf3.JPG)
+
+``v \approx R \frac{\tau}{k_\tau} + k_e \omega_{enc}``  (Equation 1)
+
+In equation 1 the term ``k_tau`` is called the torque constant, and ``k_e`` is called the back-EMF constant. The parameters ``R`` and ``L`` denote the resistance and the inductance of the motor's coils in the armature. Since the electrical behavior of the robot is much faster than its mechanical behavior, lower time constant, the inductance property that underlies the electrodynamics of the motor's coils is negligible and has been removed from the equation. The angular velocity of the output axis of the motor relative to the body's coordinate frame ``\hat{B}`` is denoted by ``\omega_{enc}`` and is equal to the difference between the angular velocity of the wheel and the chassis (or the motor's body) in the inertial coordinate frame ``\hat{O}``.
+
+After removing the inductance property of the motor ``L``, equation 1 becomes an approximation of the applied voltage in terms of torque and velocity. In an ideal motor, the torque constant ``k_\tau`` and the back-electromotive constant ``k_e`` are equal. But, in reality this isn’t the case and they have different values to be measured in an experimental way (might require opening the motor's casing). Based to physical features of the robot and the laws of Newtonian motion, we derive the equations that explain how the robot works. Also in this section, the method of Lagrangian mechanics is useful. In the configuration diagrams, the total mass of the robot is asumed to be located at its center of mass.
+
+#### Modeling the Main Wheel’s Behavior
+
+First we derive the mathematical model of the robot's motion in the forward/backward direction, and its deviation from the upright equilibrium position. This motion is controlled by the robot's main wheel and is similar to the dynamics of a two-wheel balancing robot.
+
+![unicycle modelling rolling wheel](./assets/reactionwheelunicycle/unicycle_modelling_rolling.jpeg)
+
+Using Newton's laws for the acceleration of the main wheel and the robot's body in the ``xz``-plane, we have:
+
+``m_W \ddot{x} = f_F - f_H \longrightarrow f_F = m_W \ddot{x} + f_H``  (Equation 2)
+
+In the figure above, the mass of the robot and its main wheel are denoted by ``m_R`` and ``m_W``, and their rotational moment of inertia are denoted by ``I_R`` and ``I_w``, respectively. 
+
+The name ``m_R`` denotes the mass of all of the robot's parts, excluding the main wheel, and is located at the center of mass.
+
+``\tau - f_F r_W = I_W \dot{\omega}_W \overset{\omega = \frac{\dot{x}}{r}}{\longrightarrow} \tau - f_F r_W = I_W \frac{\ddot{x}}{r}``  (Equation 3)
+
+The parameter ``I_R`` denotes the rotational moment of inertia of all of the robot's parts, except for the main wheel, about the axis through the center of mass (parallel to the axis passing through the main wheel). For calculating ``m_R`` and ``I_R``, the reaction wheel is assumed to be a static part of the robot's body. The names ``m_W`` and ``I_W`` represent the main wheel's mass and rotational moment of inertia, respectively.
+
+The letters ``H``, ``V`` and ``F`` stand for Horizontal, Vertical and Friction, respectively. They represent the horizontal, vertical and friction forces.
+
+``m_R \ddot{x}_R = f_H \overset{x_R = x + l sin(\theta), \ sin(\theta) \approx \theta}{\longrightarrow} m_R (\ddot{x} + l \ddot{\theta}) = f_H``  (Equation 4)
+
+``m_R \ddot{z}_R = f_v - m_R g \overset{z_R = l (1 - cos(\theta)), \ cos(\theta) \approx 1}{\longrightarrow} f_v = m_R g``  (Equation 5)
+
+``f_v l sin(\theta) - f_H l cos(\theta) - \tau = I_R \ddot{\theta} \overset{sin(\theta) \approx \theta, \ cos(\theta) \approx 1}{\longrightarrow} f_v l \theta - f_H l - \tau = I_R \ddot{\theta}``  (Equation 6)
+
+By solving equations 1-6 simultaneously, we find the equations that describe the system. To extract the state equations, begin with equation 1:
+
+``V \approx R \frac{\tau}{k_\tau} + k_e \omega_{enc}``
+
+``-R \frac{\tau}{k_\tau} \approx k_e \omega_{enc} - V``
+
+``\tau \approx \frac{V k_\tau}{R} - \frac{k_e k_\tau \omega_{enc}}{R}``
+
+Insert that into equation 3:
+
+``\frac{V k_\tau - k_e k_\tau \omega_{enc}}{R} - f_F r_W = \frac{I_W}{r} \ddot{x}``
+
+``\overset{\omega_{enc} = \omega_W - \dot{\theta} = \frac{\dot{x}}{r} - \dot{\theta}}{\longrightarrow} \frac{V k_\tau - k_e k_\tau (\frac{\dot{x}}{r} - \dot{\theta})}{R} - f_F r_W = \frac{I_W}{r} \ddot{x}``
+
+``V r k_\tau - k_e k_\tau \dot{x} + r k_e k_\tau \dot{\theta} - f_F r_W r R = R I_W \ddot{x}``
+
+Then, substitute equation 2:
+
+``V r k_\tau - k_e k_\tau \dot{x} + k_e k_\tau \dot{\theta} r - r R m_W \ddot{x} r_W - r R r_W f_H = R I_W \ddot{x}``
+
+Then, substitute equation 4:
+
+``V r k_\tau - k_e k_\tau \dot{x} + k_e k_\tau \dot{\theta} r - m_W \ddot{x} r_W r R - I_W \ddot{x} R = m_R (\ddot{x} + l \ddot{\theta}) r_W r R``
+
+``(-k_e k_\tau) \dot{x} + (k_e k_\tau r) \dot{\theta} - (r R m_W r_W + r R m_R r_W + I_W R) \ddot{x} - (m_R r_W L r R) \ddot{\theta} = -(r k_\tau) V``
+
+Then, divide both sides of the equation by ``-r \ R``:
+
+``\frac{k_\tau}{R} V = \frac{k_e k_\tau}{r R} \dot{x} - \frac{k_e k_\tau}{R} \dot{\theta} + (m_W r_W + m_R r_W + \frac{I_W}{r}) \ddot{x} + (m_R r_W l) \ddot{\theta}``  (Equation 7)
+
+That is one of the state equations. Now, begin with equation 6 again, for finding the other equation.
+
+``f_v l \theta - f_H l - \tau = I_R \ddot{\theta}``
+
+Next, insert equations 4 and 5 into equation 6:
+
+``\left\{ \begin{array}{l} m_R (\ddot{x} + l \ddot{\theta}) = f_H &\\ f_v = m_R g \end{array} \right. \longrightarrow m_R g l \theta - l (m_R (\ddot{x} + l \dot{\theta})) - \tau = I_R \ddot{\theta}``
+
+From equation 1 we have:
+
+``\tau \approx \frac{V k_\tau}{R} - \frac{k_e k_\tau \omega_{enc}}{R}``
+
+Therefore,
+
+``m_R g l \theta - l (m_R (\ddot{x} + l \dot{\theta})) - I_R \ddot{\theta} = \tau``
+
+``m_R g l \theta - l m_R (\ddot{x} + l \dot{\theta}) - I_R \ddot{\theta} = \frac{V k_\tau}{R} - \frac{k_e k_\tau \omega_{enc}}{R}``
+
+``\overset{\omega_{enc} = \omega_W - \dot{\theta} = \frac{\dot{x}}{r} - \dot{\theta}}{\longrightarrow} m_R g l \theta - l m_R (\ddot{x} + l \dot{\theta}) - I_R \ddot{\theta} = \frac{V k_\tau}{R} - \frac{k_e k_\tau (\frac{\dot{x}}{r} - \dot{\theta})}{R}``
+
+Looks like we need to replace the value of ``V``. But, from using equation 7 we can write the following equation.
+
+``V = \frac{k_e}{r_W} \dot{x} - k_e \dot{\theta} + \frac{R m_W r_W + R m_R r_W + \frac{R}{r_W} I_W}{k_\tau} \ddot{x} + \frac{R m_R r_W l}{k_\tau} \ddot{\theta}``
+
+Therefore the following equation can take its final form.
+
+``m_R g l \theta - l m_R (\ddot{x} + l \dot{\theta}) - I_R \ddot{\theta} = \frac{V k_\tau}{R} - \frac{k_e k_\tau (\frac{\dot{x}}{r} - \dot{\theta})}{R}``
+
+``m_R g l \theta - l m_R (\ddot{x} + l \dot{\theta}) - I_R \ddot{\theta} = \frac{k_\tau}{R} (\frac{k_e}{r} \dot{x} - k_e \dot{\theta} + \frac{R m_W r_W + R m_R r_W + \frac{R}{r} I_W}{k_\tau} \ddot{x} + \frac{R m_R r_W l}{k_\tau} \ddot{\theta}) - \frac{k_e k_\tau (\frac{\dot{x}}{r} - \dot{\theta})}{R}``
+
+After a rearrangement.
+
+``\ddot{x} (-l m_R - m_W r_W - m_R r_W - \frac{I_W}{r}) + \dot{x} (\frac{k_e k_\tau}{r_W R} - \frac{k_e k_\tau}{r_W R}) + \theta (m_R g l) + \ddot{\theta} (-I_R - m_R r_W l) + \dot{\theta} (-l^2 m_R + \frac{k_e k_\tau}{R} - \frac{k_e k_\tau}{R}) = 0``
+
+The final form of the main wheel's second equation:
+
+``-(r_W m_W + r_W m_R + l m_R + \frac{I_W}{r_W}) \ddot{x} + (m_R g l) \theta - (l^2 m_R) \dot{\theta} - (I_R + r_W m_R l) \ddot{\theta} = 0``  (Equation 8)
+
+Equations 7 and 8 determine the robot's behavior in the direction of the x-axis and its deviation in rotating about the y-axis (angle ``\theta``) in terms of the main motor's supply voltage. Next, we derive the mathematical model of the robot rotating around the x-axis (angle ``\phi``) and the effect of the reaction wheel.
+
+#### Modeling the Reaction Wheel’s Behavior
+
+In this figure, the mass of all of the robot's parts (including the body, the main wheel and the reaction wheel) is denoted by ``m_R`` and is concentrated at the center of mass. The rotational inertia of all of the parts of the robot, excluding the reaction wheel, is denoted by ``I_R``. And the rotational inertia of the reaction wheel is identified with ``I_W``.
+
+![unicycle modelling reaction wheel](./assets/reactionwheelunicycle/unicycle_modelling_reaction.jpeg)
+
+The parameter ``I_W`` is calculated about the reaction wheel's axis. And the parameter ``I_R`` is calculated about an axis parallel to the axis of the reaction wheel, but at the ground contact of the main wheel (axis 2). Note that the whole body of the robot oscillates about this axis.
+
+In addition to gravity, we have a thin flexible band over the circumference of the main wheel at the ground contact of the wheel. The flexible belt effectively acts as a spring that resists side-to-side motions of the robot (angle ``\phi``) and tries to keep the robot upright. The force from this spring is given by the Hooke's law:
+
+``f_{spring} = -k_s x = -k_s l \phi``  (Equation 9)
+
+In equation 9, ``k_s`` denotes the spring constant and ``l`` denotes the length between the center of mass of the robot's body and the contact point on axis 2. The equations that govern the reaction wheel’s driver are similar to those of the main motor, as equation 10 suggests.
+
+``\tau \approx \frac{V - k_e \omega_{enc}}{R} k_\tau - f_{spring}``  (Equation 10)
+
+``\left\{ \begin{array}{l} \omega_{enc} = \dot{\phi}_W - \dot{\phi}_R &\\ f_{spring} = -k_s l \phi_R \end{array} \right.``
+
+Here is the equation governing the angular motion of the reaction wheel about its axis.
+
+``\tau \approx I_W \ddot{\phi}_W``  (Equation 11)
+
+The equation ruling the rotational motion of the entire robot about axis 2 at the ground contact point:
+
+``m g l sin(\phi_R) - \tau \approx I_R \ddot{\phi}_R``  (Equation 12)
+
+In the equations above the parameters ``m_R`` and ``I_R`` are written for the whole robot, including the reaction wheel since gravity applies to all parts. The parameters ``m_W`` and ``I_W`` are specifically related to the reaction wheel. Note that the rotational inertia ``I_R`` and ``I_W`` are calculated about two different axes. By solving equations 9 through 12 simultaneously, and assuming the linear approximation that ``sin(\phi)`` is approximately equal to ``\phi`` for small angles, the equations describing the system state are derived.
+
+``\frac{v - k_e \omega_{enc}}{R} k_\tau - f_{spring} = I_W \ddot{\phi}_W``
+
+``\frac{v - k_e (\dot{\phi}_W - \dot{\phi}_R)}{R} k_\tau - k_s l \phi_R = I_W \ddot{\phi}_W``
+
+``\frac{-k_e \dot{\phi}_W + k_e \dot{\phi}_R}{R} k_\tau - k_s l \phi_R + \frac{V}{R} k_\tau = I_W \ddot{\phi}_W``
+
+``\dot{\phi}_W (\frac{-k_e}{R} k_\tau) + \dot{\phi}_R (\frac{k_e}{R} k_\tau) + \phi_R (-k_s l) + \frac{V}{R} k_\tau = I_W \ddot{\phi}_W``
+
+``\dot{\phi}_W (-k_e) + \dot{\phi}_R (k_e) + \phi_R (\frac{-k_s l R}{k_\tau}) + V = \frac{R I_W}{k_\tau} \ddot{\phi}_W``
+
+``-k_e \dot{\phi}_W + k_e \dot{\phi}_R - \frac{k_s l R}{k_\tau} \phi_R - \frac{R I_W}{k_\tau} \ddot{\phi}_W = -V``
+
+``k_e \dot{\phi}_W - k_e \dot{\phi}_R + \frac{k_s l R}{k_\tau} \phi_R + \frac{R I_W}{k_\tau} \ddot{\phi}_W = V``  (Equation 13)
+
+Equation 13 without the force of the spring takes a different form, which makes sense because it should depend on the angle ``\phi``.
+
+``k_e \dot{\phi}_R - k_e \dot{\phi}_W - \frac{R I_W}{k_\tau} \ddot{\phi}_W = -V``
+
+Also, equation 13 defines the first state equation of the reaction wheel’s controller. Next, we find the other half of the system state equations. 
+
+``m g l sin(\phi_R) - \frac{V - k_e (\dot{\phi}_W - \dot{\phi}_R)}{R} k_\tau + k_s l \phi_R = I_R \ddot{\phi}_R``
+
+``\overset{sin(\phi) \approx \phi}{\longrightarrow}``
+
+``m g l \phi_R + \frac{k_e (\dot{\phi}_W - \dot{\phi}_R)}{R} k_\tau + k_s l \phi_R - \frac{V k_\tau}{R} \approx I_R \ddot{\phi}_R``
+
+``m g l \phi_R + \frac{k_e \dot{\phi_W} - k_e \dot{\phi}_R}{R} k_\tau + k_s l \phi_R - \frac{V k_\tau}{R} \approx I_R \ddot{\phi}_R``
+
+``\phi_R (m g l + k_s l) - \dot{\phi}_R (\frac{k_e}{R} k_\tau) + \dot{\phi}_W (\frac{k_e}{R} k_\tau) - \frac{V k_\tau}{R} - I_R \ddot{\phi}_R \approx 0``
+
+``\phi_R \frac{m g l R + k_s l R}{k_\tau} - \dot{\phi}_R k_e + k_e \dot{\phi}_W - V - \frac{I_R R}{k_\tau} \ddot{\phi}_R \approx 0``
+
+``\phi_R (\frac{m g l R + k_s l R}{k_\tau}) - k_e \dot{\phi}_R + k_e \dot{\phi}_W - V - \frac{I_R R}{k_\tau} \ddot{\phi}_R \approx 0``
+
+``\left\{ \begin{array}{l} \phi_R \frac{m g l R + k_s l R}{k_\tau} - k_e \dot{\phi}_R + k_e \dot{\phi}_W - \frac{I_R R}{k_\tau} \ddot{\phi}_R - V \approx 0 &\\ k_e \dot{\phi}_R - k_e \dot{\phi}_W - \frac{k_s l R}{k_\tau} \phi_R - \frac{R I_W}{k_\tau} \ddot{\phi}_W = -V \end{array} \right.``
+
+``\phi_R \frac{m g l R + k_s l R}{k_\tau} - k_e \dot{\phi}_R + k_e \dot{\phi}_W - \frac{I_R R}{k_\tau} \ddot{\phi}_R + (k_e \dot{\phi}_R - k_e \dot{\phi}_W - \frac{k_s l R}{k_\tau} \phi_R - \frac{R I_W}{k_\tau} \ddot{\phi}_W) \approx 0``
+
+The result is equation 14 after simplification, completing the second half of the system state equations.
+
+``I_R \ddot{\phi}_R + I_W \ddot{\phi}_W - (m g l) \phi_R \approx 0``  (Equation 14)
+
+Here, we derived two different mathematical models for the motion of the robot about two mutually perpendicular axes. Using the equations that describe these motions (equations 7 and 8 or equations 13 and 14) we can extract the system's transform matrix of that motion, or find its state space. The system state at time-step ``n`` equals the transform of the system state at time-step ``n - 1``. Finally, keeping balance in two different directions based on these equations requires two separate controllers. The controller that controls angle ``\theta`` and motion along the x-axis commands The main motor, whereas the controller that controls angle ``\phi`` commands the motor of the reaction wheel.
+
+### The Electronic Circuits and Power Supply
 
 ![microcontroller](./assets/reactionwheelunicycle/schematics/microcontroller.jpeg)
 
