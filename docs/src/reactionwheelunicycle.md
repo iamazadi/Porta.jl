@@ -1067,7 +1067,7 @@ void updateControlPolicy(LinearQuadraticRegulator *model)
 ``Q(x_k, u_k) = \frac{1}{2} {\begin{bmatrix} x_k \\ u_k \end{bmatrix}}^T S \begin{bmatrix} x_k \\ u_k \end{bmatrix} = \frac{1}{2} {\begin{bmatrix} x_k \\ u_k \end{bmatrix}}^T \begin{bmatrix} S_{xx} & S_{xu} \\ S_{ux} & S_{uu} \end{bmatrix} \begin{bmatrix} x_k \\ u_k \end{bmatrix}``
 
 
-### The Causal Relation Between Time k and the Incremental Changes to Filter Coefficients
+### The Relation Between Time k and the Incremental Changes to Filter Coefficients
 
 Time *j* is incremented if only time *k* is reset to the value of 1. But, time k is reset after the RLS algorithm converges. The incremental *changes* that are made to the filter coefficients ``\Delta W_n = \Sigma (W_n - W_{n - 1})`` is calculated by summing up the absolute value of the incremental updates to the filter coefficients.
 
@@ -1112,13 +1112,28 @@ The criteria to determine when the RLS algorithm converges seems to work when th
 
 ## Attitude Control of A Space Platform / Manipulator System Using Internal Motion
 
+
+In this section we separately model the motion of the robot in two different directions, which have different dynamics. In principle, an inverted pendulum is defined as a similar mechincal structure that is not stable in an intrinsic way (or has an unstable balance) and becomes balanced using a control system. Inverted pendulums have been interesting to control and systems labs for years, since their unstable and non-linear nature provides the opportunity to investigate the effectiveness of control algorithms. Similar structures are found in nature as well, for example the walking of humans. Because the cross section of the bottom of the human foot is not that big, the human body is not balanced in a very stable way, and what keeps the balance while walking, running, or even standing, is a series of control commands sent from the brain to muscles.
+
+To model and perform dynamical calculations it is necessary to know the center of mass of the robot. For doing complementary calculations, it is also required to know the inertial momentum of the set of the wheel and the motor, and the rotational inertia of the robot's chassis about the horizontal axis passing through the center of mass, and the parameters of the motor. Finding the center of mass of the built robot is easy. Since the structure of the robot has bilateral symmetry, the center of mass of the robot is located on the axis of symmetry. Now, for determining the exact location of the center of mass, it is sufficient to put the robot on a triangular shape (like a seesaw) and then try to balance the robot. Having found the position of the center of mass, for subsequent calculations one can assume that the entire mass of the robot is located at that position, which is a certain distance away from the axis of the main wheel and the ground surface.
+
+The center of mass of a multi-point mass, which is located at a determined position in a reference coordinate frame, can be calculated as ``r_{CM} = \frac{\Sigma m_k r_k}{\Sigma m_k}``, where ``m_k`` denotes mass number ``k``, and ``r_k`` denotes the position vector of that mass in terms of the reference frame. The rotational moment of inertia of the wheel is estimated approximately by measuring the mass and the radius. The moment of inertial of a uniform disk about its axis is equal to ``I = \frac{m r^2}{2}``. The moment of inertial of a uniform circular loop about its axis is equal to ``I = m r^2``. Becasue the wheel that we use has a structure between the two shapes (a disk and a circle), the moment of inertia is approximately equal to a value between the two equations. Besides, one can build the model of the wheel using a mechanical design software such as Catia, or perform precise experiments to find the exact value.
+
+In modeling a balncing robot, the torques of the motors enter the equations describing the motion of the robot, rather than their velocities. In fact, describing the balance of the robot and providing a state transition funcation or a state space model based on the velocity of the motor is specially complicated. That is why most robot makers use Direct Current (DC) motors in their balancing robots in order to make the mathematical modeling simple. In addition, direct current motors have higher power compared to stepper motors of similar dimensions and mass.
+
+As the rotor is small in size and mass, its moment of inertia is much less than that of the wheel. However, because of the gearbox, the rotor rotates at a higher velocity than the wheel. Therefore, the moment of inertia of the rotor is multiplied by the gearbox transformation ratio to measure the effective moment of inetia of the rotor from outside of the gearbox. This value is not negligible usually. But, for calculating its effect on the motion of the robot one should know the direction of rotation of the rotor with respect to the wheel (the same direction or the opposite direction) since because of the gearbox the direction of rotation is not necessarily the same. Here, the moment of inertia of the rotor has been ignored in calculations. But you can consider its effect to make the calculations more accurate. The moment of inertia of the rotor and the internal parts of the gearbox are provided in the specifications sheet of the motor and gearbox, and are also measurable through experimentation. Here, we have ignored the moment of inertia of the set of the rotor and the gearbox parts. For calculating the rotational moment of inertial of the robot, we consider a simple model of the chassis and the motors, which represent the position of the mass of each part.
+
+Some robot makers design the robot in mechanical simulation softwares such as Modelica, Dymola, Simulink, and Simscape Multibody. They consider a mathematical model according to the behavior of the robot based on the motor speed. The calculations for finding the mathematical model of balancing robots are gnerally based on either of the two methods: the Lagrange energy method or the analysis of Newtonian forces. In the inverted pendulum model that is connected to a moving system using a joint, the internal torque between the robot and its wheel does not have much effect on the motion of the robot. This case is made when the rotational moment of inertia of the wheel is negligible compared to that of the robot.
+
 ### A Balancing Robot Compared to an Inverted Pendulum on a Cart
+
+
 
 ![balance_robot_inverted_pendulum_on_cart](./assets/reactionwheelunicycle/balance_robot_inverted_pendulum_on_cart.jpeg)
 
 ### Deriving the Equations of the Robot to See How It Works
 
-In this section we separately model the motion of the robot in two different directions, which have different dynamics. The relations between the supply voltage and the output torque of the DC motor is summarized as follows:
+The relations between the supply voltage and the output torque of the DC motor is summarized as follows:
 
 ``\tau = k_\tau i``
 
@@ -1146,7 +1161,7 @@ First we derive the mathematical model of the robot's motion in the forward/back
 
 Using Newton's laws for the acceleration of the main wheel and the robot's body in the ``xz``-plane, we have:
 
-``m_W \ddot{x} = f_F - f_H \longrightarrow f_F = m_W \ddot{x} + f_H``  (Equation 2)
+``m_W \ddot{x} = f_F - f_h \longrightarrow f_F = m_W \ddot{x} + f_h``  (Equation 2)
 
 In the figure above, the mass of the robot and its main wheel are denoted by ``m_R`` and ``m_W``, and their rotational moment of inertia are denoted by ``I_R`` and ``I_w``, respectively. 
 
@@ -1158,11 +1173,11 @@ The parameter ``I_R`` denotes the rotational moment of inertia of all of the rob
 
 The letters ``H``, ``V`` and ``F`` stand for Horizontal, Vertical and Friction, respectively. They represent the horizontal, vertical and friction forces.
 
-``m_R \ddot{x}_R = f_H \overset{x_R = x + l sin(\theta), \ sin(\theta) \approx \theta}{\longrightarrow} m_R (\ddot{x} + l \ddot{\theta}) = f_H``  (Equation 4)
+``m_R \ddot{x}_R = f_h \overset{x_R = x + l sin(\theta), \ sin(\theta) \approx \theta}{\longrightarrow} m_R (\ddot{x} + l \ddot{\theta}) = f_h``  (Equation 4)
 
 ``m_R \ddot{z}_R = f_v - m_R g \overset{z_R = l (1 - cos(\theta)), \ cos(\theta) \approx 1}{\longrightarrow} f_v = m_R g``  (Equation 5)
 
-``f_v l sin(\theta) - f_H l cos(\theta) - \tau = I_R \ddot{\theta} \overset{sin(\theta) \approx \theta, \ cos(\theta) \approx 1}{\longrightarrow} f_v l \theta - f_H l - \tau = I_R \ddot{\theta}``  (Equation 6)
+``f_v l sin(\theta) - f_h l cos(\theta) - \tau = I_R \ddot{\theta} \overset{sin(\theta) \approx \theta, \ cos(\theta) \approx 1}{\longrightarrow} f_v l \theta - f_h l - \tau = I_R \ddot{\theta}``  (Equation 6)
 
 By solving equations 1-6 simultaneously, we find the equations that describe the system. To extract the state equations, begin with equation 1:
 
@@ -1182,7 +1197,7 @@ Insert that into equation 3:
 
 Then, substitute equation 2:
 
-``V r k_\tau - k_e k_\tau \dot{x} + k_e k_\tau \dot{\theta} r - r R m_W \ddot{x} r_W - r R r_W f_H = R I_W \ddot{x}``
+``V r k_\tau - k_e k_\tau \dot{x} + k_e k_\tau \dot{\theta} r - r R m_W \ddot{x} r_W - r R r_W f_h = R I_W \ddot{x}``
 
 Then, substitute equation 4:
 
@@ -1196,11 +1211,11 @@ Then, divide both sides of the equation by ``-r \ R``:
 
 That is one of the state equations. Now, begin with equation 6 again, for finding the other equation.
 
-``f_v l \theta - f_H l - \tau = I_R \ddot{\theta}``
+``f_v l \theta - f_h l - \tau = I_R \ddot{\theta}``
 
 Next, insert equations 4 and 5 into equation 6:
 
-``\left\{ \begin{array}{l} m_R (\ddot{x} + l \ddot{\theta}) = f_H &\\ f_v = m_R g \end{array} \right. \longrightarrow m_R g l \theta - l (m_R (\ddot{x} + l \dot{\theta})) - \tau = I_R \ddot{\theta}``
+``\left\{ \begin{array}{l} m_R (\ddot{x} + l \ddot{\theta}) = f_h &\\ f_v = m_R g \end{array} \right. \longrightarrow m_R g l \theta - l (m_R (\ddot{x} + l \dot{\theta})) - \tau = I_R \ddot{\theta}``
 
 From equation 1 we have:
 
