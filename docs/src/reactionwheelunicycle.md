@@ -1143,7 +1143,9 @@ The situation is a little different in the case of the coefficients ``k_1`` and 
 
 For the selection of the body of the robot, one should consider a few facts so that making it balance does not become too difficult. In an inverted pendulum, if the center of mass of the pendulum is close to the axis of rotation (a short pendulum) then controlling the balance will become difficult. But this is not necessarily the case for a balancing robot. The difference between these two originates from the effect of the force of the motor in recovering the balance. In the inverted pendulum, the force of the motor causes the base of the pendulum to move, and in an indirect way affect the pendulum, because the mechanical joint between the pendulum and the cart is a simple hinge. In contrast, in the balancing robot, the force of the motor not only affects the balance through moving the robot, but also the (reactive) internal torque between the motor and the wheel also helps with recovering the balance, and this is because of the rotational moment of inertia of the wheel. As an example, suppose that the wheels of the robot are touching the ground (infinite moment of inertia for the wheels). In this case, the torque that the motor applies to the wheel directly rotates the robot's body and the motor's body, without making a linear motion. You might have seen very small balancing robots where the size of the wheels are significant compared to the dimensions of the robot. Controlling such a robot is so easy. Although such a robot will not be able to make quick moves and perform much powerful maneuvers.
 
-### Deriving the Equations of the Robot to See How It Works
+### Deriving the Equations of Motion of the Robot
+
+For correctly determining the behavior of the robot, we need to know its dynamical behavior. For that reason we produce a mathematical model of it, whcih describes the performance of our robot based on the applied input (the supply voltage of the motor). First, we review the mathematical relations governing the DC motor. Among different equations written for the torque, velocity, and supply voltage of a DC motor, we only explain those that are directly related to modeling the balancing robot. In a linear DC motor, the relation below show the connection between the output torque of the motor in terms of the applied voltage and its velocity:
 
 The relations between the supply voltage and the output torque of the DC motor is summarized as follows:
 
@@ -1153,17 +1155,26 @@ The relations between the supply voltage and the output torque of the DC motor i
 
 ``e = k_e \omega_{enc}``
 
-When the motor's current changes, due to the motor's inductance, it generates a voltage in opposition to the changing current via Faraday's law. While the motor's armature is spinning in a magnetic field with constant current, the Back-ElectroMotive Force (Back-EMF) is non-zero, because the motor acts as a generator while moving. The back-EMF is a function of the magnitude of the motor's rotational velocity (speed). So, the back-EMF is zero when the rotation speed is zero.
+``v \approx R \frac{\tau}{K_\tau} + K_e \omega_{enc}``
+
+In the relations above, the term ``\omega_{enc}`` represents the angular velocity of the axis of the motor, which is measured by the *enc*oder. In the case of electric motors, if one of the supply lines is cut, because of the magnetic flux in the core and an electromagnetic medium in the coil, a voltage is induced in this coil. The letter ``e`` denotes the Back-ElectroMotive Force (Back-EMF). The term ``K_\tau`` is known by the name *constant of torque* and the term ``K_e`` denotes the *Back-EMF constant*. Parameters ``R`` and ``L`` respectively denote the **resistance** and **inductance** properties of the motor's coils. Since the electric behavior of a motor is orders of magnitude faster than its mechanical behavior (has a smaller time constant) the inductance property of the coil, which shows in the electrodynamic behavior of the coil, has a negligible effect in the equations of this robot, and therefore after using the approximate equality sign ``\approx`` they are removed from the relations.
+
+When the electric current, which flows through the motor's coil, varies in time, due to the motor's inductance, it generates a voltage in opposition to the changing current as Michael Faraday's law (1831) predicts. While the motor's armature is spinning in a magnetic field with constant current, the Back-ElectroMotive Force (Back-EMF) is non-zero, because the motor acts as a generator while moving. The back-EMF is a function of the magnitude of the motor's rotational velocity (speed). So, the back-EMF is zero if the motor's speed is zero.
 
 ![ElectroMotive Force 1](./assets/reactionwheelunicycle/emf1.JPG)
 ![ElectroMotive Force 2](./assets/reactionwheelunicycle/emf2.JPG)
 ![ElectroMotive Force 3](./assets/reactionwheelunicycle/emf3.JPG)
 
-``v \approx R \frac{\tau}{k_\tau} + k_e \omega_{enc}``  (Equation 1)
+In an ideal motor, all of the electric energy is converted to mechanical output, making the values ``K_\tau`` and ``K_e`` equal, ``K_\tau = K_e``. But in cheap DC motors, which have low production quality, there is a big difference between these two ``K_\tau \neq K_e``. In the Physics lab, each one of these constants are calculated by performing experiments on the motor.
 
-In equation 1 the term ``k_tau`` is called the torque constant, and ``k_e`` is called the back-EMF constant. The parameters ``R`` and ``L`` denote the resistance and the inductance of the motor's coils in the armature. Since the electrical behavior of the robot is much faster than its mechanical behavior, lower time constant, the inductance property that underlies the electrodynamics of the motor's coils is negligible and has been removed from the equation. The angular velocity of the output axis of the motor relative to the body's coordinate frame ``\hat{B}`` is denoted by ``\omega_{enc}`` and is equal to the difference between the angular velocity of the wheel and the chassis (or the motor's body) in the inertial coordinate frame ``\hat{O}``.
+In the following equations, we have ignored the inductance property of the motor's coil. The velocity of the rotation of the output axis of the motor relative to the motor's body is denoted by ``\omega_{enc} = \omega_W - \dot{\theta} = \frac{\dot{x}}{r} - \dot{\theta}``, and is equal to the difference between the rotational velocity of the wheel ``\omega_W`` and the body of the robot (or the body of the motor) ``\dot{\theta}`` in the inertial coordinate frame ``\hat{O}``.
 
-After removing the inductance property of the motor ``L``, equation 1 becomes an approximation of the applied voltage in terms of torque and velocity. In an ideal motor, the torque constant ``k_\tau`` and the back-electromotive constant ``k_e`` are equal. But, in reality this isn’t the case and they have different values to be measured in an experimental way (might require opening the motor's casing). Based to physical features of the robot and the laws of Newtonian motion, we derive the equations that explain how the robot works. Also in this section, the method of Lagrangian mechanics is useful. In the configuration diagrams, the total mass of the robot is asumed to be located at its center of mass.
+``\tau \approx \frac{V - K_e \omega_{enc}}{R} K_\tau``
+
+
+``V \approx R \frac{\tau}{k_\tau} + k_e \omega_{enc}``  (Equation 1)
+
+After removing the inductance property of the motor ``L``, equation 1 becomes an approximation of the applied voltage ``V`` in terms of torque ``\tau`` and velocity ``\omega_{enc}``. Based on the physical features of the robot and the laws of Newtonian motion, we derive the equations that explain how the robot works. Also in this section, the method of Lagrangian mechanics is useful. In the configuration diagrams, the total mass of the robot is asumed to be located at its center of mass.
 
 #### Modeling the Main Wheel’s Behavior
 
@@ -1331,7 +1342,7 @@ The result is equation 14 after simplification, completing the second half of th
 
 ``I_R \ddot{\phi}_R + I_W \ddot{\phi}_W - (m g l) \phi_R \approx 0``  (Equation 14)
 
-Here, we derived two different mathematical models for the motion of the robot about two mutually perpendicular axes. Using the equations that describe these motions (equations 7 and 8 or equations 13 and 14) we can extract the system's transform matrix of that motion, or find its state space. The system state at time-step ``n`` equals the transform of the system state at time-step ``n - 1``. Finally, keeping balance in two different directions based on these equations requires two separate controllers. The controller that controls angle ``\theta`` and motion along the x-axis commands The main motor, whereas the controller that controls angle ``\phi`` commands the motor of the reaction wheel.
+Here, we derived two different mathematical models for the motion of the robot about two mutually perpendicular axes. Using the equations that describe these motions (equations 7 and 8 or equations 13 and 14) we can extract the system's transform matrix of that motion, or find its state space. The system state at time-step ``n`` equals the transform of the system state at time-step ``n - 1``. Finally, keeping balance in two different directions based on these equations requires two separate controllers. The controller that regulates angle ``\theta`` and motion along the ``x``-axis commands the main motor, whereas the controller that regulates angle ``\phi`` commands the motor of the reaction wheel.
 
 ### The Electronic Circuits and Power Supply
 
