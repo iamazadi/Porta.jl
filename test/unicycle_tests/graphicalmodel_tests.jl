@@ -22,10 +22,13 @@ reactionwheel_stl_path = joinpath("../data", "unicycle", "unicycle_reaction_whee
 chassis_scale = 0.001
 rollingwheel_scale = 1.0
 reactionwheel_scale = 1.0
+radius = 0.075
+offset = 0.012 + radius
 # the robot body origin in the inertial frame Ô
 origin = Point3f(-0.1, -0.1, -0.02)
 # the pivot point B̂ in the inertial frame Ô
-pivot = Point3f(-0.097, -0.1, -0.032)
+center = Point3f(-0.097, -0.1, -0.032)
+pivot = center - Point3f(0.0, 0.0, rand())
 # the position of sensors mounted on the body in the body frame of reference
 p1 = Point3f(-0.14000000286102293, -0.06500000149011612, -0.06200000151991844)
 p2 = Point3f(-0.04000000286102295, -0.06000000149011612, -0.06000000151991844)
@@ -61,7 +64,7 @@ ax1 = Axis(fig[1, 1], xlabel="Time (sec)", ylabel="x-Euler angle (rad)", xlabels
 ax2 = Axis(fig[2, 1], xlabel="Time (sec)", ylabel="y-Euler angle (rad)", xlabelsize=fontsize, ylabelsize=fontsize)
 ax3 = Axis(fig[3, 1], xlabel="Time (sec)", ylabel="P Matrix Parameters", xlabelsize=fontsize, ylabelsize=fontsize)
 
-unicycle = Unicycle(origin, pivot, p1, p2, B_O_R, B_A1_R, B_A2_R, chassis_scale, rollingwheel_scale, reactionwheel_scale,
+unicycle = Unicycle(origin, offset, pivot, p1, p2, B_O_R, B_A1_R, B_A2_R, chassis_scale, rollingwheel_scale, reactionwheel_scale,
                     rollingwheel_origin, reactionwheel_origin, chassis_stl_path, rollingwheel_stl_path, reactionwheel_stl_path,
                     lscene, ax1, ax2, ax3, arrowscale, smallarrowscale, linewidth, arrowsize, markersize, ballsize, segments,
                     chassis_colormap, rollingwheel_colormap, reactionwheel_colormap, maxplotnumber, timeaxiswindow)

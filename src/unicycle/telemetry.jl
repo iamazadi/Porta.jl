@@ -27,7 +27,7 @@ end
 
 
 """
-    make_sprite(scene, parent, origin, rotation, scale, stl, colormap)
+    make_sprite(scene, parent, origin, pivotoffset, rotation, scale, stl, colormap)
 
 Instantiate a visual object in the `scene` with the given `parent` instance,
 `origin` position, `rotation`, `scale`, `stl` object 3D file and `colormap`.

@@ -36,5 +36,7 @@ include("unicycle/telemetry.jl")
 include("unicycle/recursiveleastsquares.jl")
 include("unicycle/linearquadraticregulator.jl")
 include("unicycle/graphicalmodel.jl")
+include("unicycle/graphicalmodel_singleimu.jl")
+
 
 end # module

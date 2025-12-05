@@ -9,12 +9,13 @@ using Porta
 
 ipaddress = "192.168.4.1"
 portnumber = 10000
-headers = ["changes", "time", "active", "AX1", "AY1", "AZ1", "AX2", "AY2", "AZ2", "roll", "pitch", "encT", "encB", "j", "k", "P0", "P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11"]
-modelname = "unicycle_tilt_estimation"
+# headers = ["changes", "time", "active", "AX1", "AY1", "AZ1", "AX2", "AY2", "AZ2", "roll", "pitch", "encT", "encB", "j", "k", "P0", "P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11"]
+headers = ["changes", "time", "active", "AX1", "AY1", "AZ1", "roll", "pitch", "encT", "encB", "j", "k", "P0", "P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11"]
+modelname = "sample5_dec4_unicycle_tiltestimation"
 readings = Dict()
 clientside = nothing
 fps = 24
-minutes = 1
+minutes = 2
 iterations = minutes * 60 * fps
 data = Dict()
 for header in headers
