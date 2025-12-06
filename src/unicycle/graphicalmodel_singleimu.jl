@@ -52,6 +52,7 @@ struct Unicycle1
     axis1::Axis
     axis2::Axis
     axis3::Axis
+    translation::Observable{ℝ³}
     Unicycle1(origin::Point3f, offset::Float64, pivot::Point3f, point::Point3f, B_O_R::Matrix{Float64}, B_A1_R::Matrix{Float64},
               chassis_scale::Float64, rollingwheel_scale::Float64, reactionwheel_scale::Float64, rollingwheel_origin::Point3f,
               reactionwheel_origin::Point3f, chassis_stl_path::String, rollingwheel_stl_path::String, reactionwheel_stl_path::String,
@@ -132,7 +133,7 @@ struct Unicycle1
         arrows!(lscene,
             acceleration_vector_tails, acceleration_vector_heads, fxaa=true, # turn on anti-aliasing
             color = acceleration_vector_colors,
-            linewidth=linewidth, arrowsize=arrowsize,
+            linewidth = linewidth, arrowsize = arrowsize,
             align=:origin
         )
 
@@ -162,7 +163,7 @@ struct Unicycle1
         lspaceϕ = range(-π, stop = float(π), length = segments)
         sphere_radius = norm(point - pivot)
         spherematrix = [ℝ³(point) + convert_to_cartesian([sphere_radius; θ; ϕ]) for ϕ in lspaceϕ, θ in lspaceθ]
-        sphere_color = [RGBAf(1.0, 0.64, 0.0, 0.33) for ϕ in lspaceϕ, θ in lspaceθ]
+        sphere_color = [RGBAf(1.0, 0.64, 0.0, 0.25) for ϕ in lspaceϕ, θ in lspaceθ]
         sphereobservable = buildsurface(lscene, spherematrix, sphere_color, transparency = true)
 
         default_ylims = [-π / 8; π / 8]
@@ -171,11 +172,12 @@ struct Unicycle1
         ylims!(ax3, -1e2, 1e2)
         O_B_R = convert(Matrix{Float64}, inv(B_O_R))
         A1_B_R = convert(Matrix{Float64}, inv(B_A1_R))
+        translation = Observable(ℝ³(0.0, 0.0, 0.0))
         new(origin, pivot, point, B_O_R, O_B_R, A1_B_R, B_A1_R, sphereobservable,
             graphpoints1, graphpoints2, graphpoints3, robot, rollingwheel, reactionwheel, acceleration_vector_tails,
             acceleration_vector_heads, sensorframe_tails, sensorframe_heads,
             pivot_ps, pivot_ns, pivot_observable, point_observable, maxplotnumber, timeaxiswindow, chassisrotation,
-            segments, arrowscale, smallarrowscale, ax1, ax2, ax3)
+            segments, arrowscale, smallarrowscale, ax1, ax2, ax3, translation)
     end
 end
 
@@ -220,10 +222,14 @@ function updatemodel(unicycle::Unicycle1, readings::Dict)
     O_B_R = mat33(q)
     B_O_R = inv(O_B_R)
 
+    wheelradius = 0.075
+    offset = 0.012 + wheelradius
+    distance = -rolling_angle * wheelradius
+
     # g = q * chassis_q0
     # rotate!(robot, Quaternion(g))
-    unicycle.pivot_observable[] = Point3f(O_B_R * (unicycle.pivot - unicycle.origin) + unicycle.origin)
-    unicycle.point_observable[] = Point3f(O_B_R * (unicycle.point - unicycle.origin) + unicycle.origin)
+    # unicycle.pivot_observable[] = Point3f(O_B_R * (unicycle.pivot - unicycle.origin) + unicycle.origin)
+    unicycle.point_observable[] = Point3f(O_B_R * (unicycle.point - (unicycle.origin - Point3f(0.0, 0.0, offset))) + Point3f(distance, 0, 0) + (unicycle.origin - Point3f(0.0, 0.0, offset)))
     sphere_radius = norm(unicycle.point - unicycle.pivot)
     lspaceθ = range(π / 2, stop = -π / 2, length = unicycle.segments)
     lspaceϕ = range(-π, stop = float(π), length = unicycle.segments)
@@ -323,11 +329,14 @@ function updatemodel(unicycle::Unicycle1, readings::Dict)
     # q = ℍ(roll, x̂) * ℍ(pitch, ŷ)
     # O_B_R = mat3(q)
 
-    distance = readings["encB"] * 0.075
-
     g = q * unicycle.chassisrotation
     GLMakie.rotate!(unicycle.robot, Quaternion(g))
-    unicycle.pivot_observable[] = Point3f(distance, 0.0, 0.0) + Point3f((unicycle.pivot - unicycle.origin) + unicycle.origin)
+    
+    # unicycle.pivot_observable[] = Point3f(distance, 0.0, 0.0) + Point3f((unicycle.pivot - unicycle.origin) + unicycle.origin)
+    unicycle.pivot_observable[] = Point3f((unicycle.pivot - unicycle.origin) + unicycle.origin)
+    translation = ℝ³(Point3f(distance, 0.0, 0.0) + unicycle.origin - Point3f(0.0, 0.0, offset))
+    unicycle.translation[] = translation
+    GLMakie.translate!(unicycle.robot, Point3f(vec(translation)))
 
     unicycle.pivot_ps[] = [Point3f(unicycle.pivot_observable[]...), Point3f(unicycle.pivot_observable[]...), Point3f(unicycle.pivot_observable[]...)]
     unicycle.pivot_ns[] = map(x -> Vec3f(x .* unicycle.smallarrowscale), ê)
