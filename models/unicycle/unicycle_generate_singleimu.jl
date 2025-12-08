@@ -8,15 +8,15 @@ using Porta
 
 
 figuresize = (1920, 1080)
-modelname = "sample2_dec4_unicycle_tiltestimation"
+modelname = "sample2_dec6_unicycle_tiltestimation"
 headers = ["changes", "time", "active", "AX1", "AY1", "AZ1", "roll", "pitch", "encT", "encB", "j", "k", "P0", "P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11"]
 readings = Dict()
-segments = 30
+segments = 360
 fontsize = 30
 textfontsize = 0.05
-chassis_colormap = :Accent_8
-rollingwheel_colormap = :cyclic_protanopic_deuteranopic_wywb_55_96_c33_n256
-reactionwheel_colormap = :avocado
+chassis_colormap = :brass
+rollingwheel_colormap = :sun
+reactionwheel_colormap = :PuBuGn_9
 markersize = 10
 ballsize = 0.01
 linewidth = 0.01
@@ -65,9 +65,9 @@ for header in headers
 end
 filepath = joinpath("data", "csv", "$modelname.csv")
 file = CSV.File(filepath)
-mask = load("data/basemap_mask.png")
+color = load("data/basemap_mask.png")
 
-eyeposition = normalize([0.0; 0.25; 1.0]) * 0.4
+eyeposition = normalize([-1.0; 0.25; 0.05]) * 0.7
 originaleyeposition = deepcopy(eyeposition)
 up = [0.0; 0.0; 1.0]
 
@@ -76,7 +76,7 @@ fig = with_theme(makefigure, theme_black())
 pl = PointLight(RGBf(0.0862, 0.0862, 0.0862), Point3f(0))
 al = AmbientLight(RGBf(0.9, 0.9, 0.9))
 backgroundcolor = RGBf(1.0, 1.0, 1.0)
-lscene = LScene(fig[1:4, 2], show_axis = true, scenekw = (lights = [pl, al], clear = true, backgroundcolor = :black))
+lscene = LScene(fig[1:4, 2], show_axis = true, scenekw = (lights = [pl, al], clear = true, backgroundcolor = :white))
 ax1 = Axis(fig[1, 1], xlabel = "Time (sec)", ylabel = "x-Euler angle (rad)", xlabelsize = fontsize, ylabelsize = fontsize)
 ax2 = Axis(fig[2, 1], xlabel = "Time (sec)", ylabel = "y-Euler angle (rad)", xlabelsize = fontsize, ylabelsize = fontsize)
 ax3 = Axis(fig[3, 1], xlabel = "Time (sec)", ylabel = "P Matrix Parameters", xlabelsize = fontsize, ylabelsize = fontsize)
@@ -108,7 +108,7 @@ text!(lscene,
                                                       $(unicycle.sensorframe_tails)[2] + $(unicycle.sensorframe_heads)[2],
                                                       $(unicycle.sensorframe_tails)[3] + $(unicycle.sensorframe_heads)[3]])),
     text = titles,
-    color = [:red, :green, :blue, :red, :green, :blue],
+    color = [:red, :green, :blue, :crimson, :chartreuse4, :indigo],
     rotation = rotation,
     align = (:left, :baseline),
     fontsize = textfontsize,
@@ -116,10 +116,9 @@ text!(lscene,
 )
 
 lspaceθ = range(π / 2, stop = -π / 2, length = segments)
-lspaceϕ = range(-π, stop = float(π), length = segments)
-planematrix = [project(convert_to_cartesian([1.0; θ; ϕ]))- ℝ³(0.0, 0.0, 2offset) for θ in lspaceθ, ϕ in lspaceϕ]
-planeobservable = buildsurface(lscene, planematrix, mask, transparency = true)
-# updatesurface!(planematrix, planeobservable)
+lspaceϕ = range(float(π), stop = float(-π), length = segments)
+planematrix = [project(convert_to_cartesian([1.0; θ; ϕ]))- ℝ³(0.0, 0.0, 1.23 * offset) for θ in lspaceθ, ϕ in lspaceϕ]
+planeobservable = buildsurface(lscene, planematrix, color, transparency = true)
 
 lookat = deepcopy(pivot) + [0.0; 0.0; offset]
 update_cam!(lscene.scene, Vec3f(eyeposition...), Vec3f(lookat...), Vec3f(up...))
@@ -146,8 +145,11 @@ record(lscene.scene, joinpath("gallery", "$modelname.mp4"); framerate=fps) do io
                 controller_statustext[] = isapprox(readings["active"], 1.0) ? "Active" : "Deactive"
                 jindextext[] = "j: $(readings["j"])"
                 kindextext[] = "k: $(readings["k"])"
+                # planematrix = [project(convert_to_cartesian([1.0; θ; ϕ - progress * 2π]))- ℝ³(0.0, 0.0, 2offset) for θ in lspaceθ, ϕ in lspaceϕ]
+                # updatesurface!(planematrix, planeobservable)
                 global lookat = vec(to_value(unicycle.translation) + ℝ³(0.0, 0.0, offset))
-                global eyeposition = ℝ³(Float64.(vec(lookat))...) + (0.95 * norm(originaleyeposition - lookat) + 0.05 * cos(progress * π)) * normalize(rotate(ℝ³(Float64.(vec(originaleyeposition))...) - ℝ³(Float64.(vec(lookat))...), ℍ(sin(progress * 2π) * float(π / 2), ℝ³(up))))
+                # global eyeposition = ℝ³(Float64.(vec(lookat))...) + (0.95 * norm(originaleyeposition - lookat) + 0.05 * cos(progress * π)) * normalize(rotate(ℝ³(Float64.(vec(originaleyeposition))...) - ℝ³(Float64.(vec(lookat))...), ℍ(sin(progress * 2π) * float(π / 4), ℝ³(up))))
+                global eyeposition = ℝ³(Float64.(vec(lookat))...) + (0.9 * norm(originaleyeposition - lookat) + 0.1 * cos(progress * 5π)) * normalize(ℝ³(Float64.(vec(originaleyeposition))...) - ℝ³(Float64.(vec(lookat))...))
                 update_cam!(lscene.scene, Vec3f(vec(eyeposition)...), Vec3f(vec(lookat)...), Vec3f(vec(up)...))
                 break
             end

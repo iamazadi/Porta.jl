@@ -129,7 +129,7 @@ struct Unicycle1
 
         acceleration_vector_tails = Observable([Point3f(R1_tail...)])
         acceleration_vector_heads = Observable([Vec3f(R1...),])
-        acceleration_vector_colors = [:orange]
+        acceleration_vector_colors = [:lime]
         arrows!(lscene,
             acceleration_vector_tails, acceleration_vector_heads, fxaa=true, # turn on anti-aliasing
             color = acceleration_vector_colors,
@@ -152,6 +152,7 @@ struct Unicycle1
             linewidth = linewidth, arrowsize = arrowsize,
             align = :origin
         )
+        arrowcolors = [:crimson, :chartreuse4, :indigo]
         arrows!(lscene,
             sensorframe_tails, sensorframe_heads, fxaa=true, # turn on anti-aliasing
             color = arrowcolors,
@@ -163,7 +164,7 @@ struct Unicycle1
         lspaceϕ = range(-π, stop = float(π), length = segments)
         sphere_radius = norm(point - pivot)
         spherematrix = [ℝ³(point) + convert_to_cartesian([sphere_radius; θ; ϕ]) for ϕ in lspaceϕ, θ in lspaceθ]
-        sphere_color = [RGBAf(1.0, 0.64, 0.0, 0.25) for ϕ in lspaceϕ, θ in lspaceθ]
+        sphere_color = [RGBAf(0.19, 0.80, 0.19, 0.2) for ϕ in lspaceϕ, θ in lspaceθ]
         sphereobservable = buildsurface(lscene, spherematrix, sphere_color, transparency = true)
 
         default_ylims = [-π / 8; π / 8]
@@ -220,7 +221,7 @@ function updatemodel(unicycle::Unicycle1, readings::Dict)
     q = ℍ(roll, x̂) * ℍ(pitch, ŷ)
     # O_B_R = unicycle.O_B_R * mat33(q)
     O_B_R = mat33(q)
-    B_O_R = inv(O_B_R)
+    # B_O_R = inv(O_B_R)
 
     wheelradius = 0.075
     offset = 0.012 + wheelradius
@@ -240,7 +241,7 @@ function updatemodel(unicycle::Unicycle1, readings::Dict)
     unicycle.acceleration_vector_heads[] = map(x -> x .* unicycle.arrowscale, [Vec3f(O_B_R * unicycle.B_A1_R * R1...)])
 
     unicycle.sensorframe_tails[] = [Point3f(unicycle.point_observable[]...), Point3f(unicycle.point_observable[]...), Point3f(unicycle.point_observable[]...)]
-    unicycle.sensorframe_heads[] = map(x -> Vec3f(O_B_R * x .* norm(R1) .* unicycle.smallarrowscale), [unicycle.B_A1_R * ê[1], unicycle.B_A1_R * ê[2], unicycle.B_A1_R * ê[3]])
+    unicycle.sensorframe_heads[] = map(x -> Vec3f(O_B_R * x .* unicycle.smallarrowscale), [unicycle.B_A1_R * (0.5 .* ê[1] + ê[1] .* R1[1]), unicycle.B_A1_R * (0.5 .* ê[2] + ê[2] .* R1[2]), unicycle.B_A1_R * (0.5 .* ê[3] + ê[3] .* R1[3])])
     # plot the x-Euler and y-Euler angles
     _graphpoints1 = unicycle.graphpoints1[]
     _graphpoints2 = unicycle.graphpoints2[]
@@ -331,6 +332,7 @@ function updatemodel(unicycle::Unicycle1, readings::Dict)
 
     g = q * unicycle.chassisrotation
     GLMakie.rotate!(unicycle.robot, Quaternion(g))
+    # unicycle.pivot_observable[] = Point3f((unicycle.pivot - unicycle.origin) + unicycle.origin)
     
     # unicycle.pivot_observable[] = Point3f(distance, 0.0, 0.0) + Point3f((unicycle.pivot - unicycle.origin) + unicycle.origin)
     unicycle.pivot_observable[] = Point3f((unicycle.pivot - unicycle.origin) + unicycle.origin)

@@ -32,30 +32,32 @@ reactionwheel_stl_path = joinpath("data", "unicycle", "unicycle_reaction_wheel.S
 chassis_scale = 0.001
 rollingwheel_scale = 1.0
 reactionwheel_scale = 1.0
+wheelradius = 0.075
+offset = 0.012 + wheelradius
 # the robot body origin in the inertial frame Ô
 origin = Point3f(-0.1, -0.1, -0.02)
 # the pivot point B̂ in the inertial frame Ô
-pivot = Point3f(-0.097, -0.1, -0.032)
+center = Point3f(-0.097, -0.1, -0.032)
+pivot = center - Point3f(0.0, 0.0, wheelradius)
 # the position of sensors mounted on the body in the body frame of reference
 p1 = Point3f(-0.14000000286102293, -0.06500000149011612, -0.06200000151991844)
-p2 = Point3f(-0.04000000286102295, -0.06000000149011612, -0.06000000151991844)
-rollingwheel_origin = Point3f(3.0, -12.0, 0.0)
-reactionwheel_origin = Point3f(0.0, 153.0, 1.0)
+# p2 = Point3f(-0.04000000286102295, -0.06000000149011612, -0.06000000151991844)
+p2 = Point3f(-0.205, -0.055, -0.06)
+p2_observable = Observable(p2)
+rollingwheel_origin = Point3f(3.0, -12.0 + (1.0 / chassis_scale) * offset, 0.0)
+reactionwheel_origin = Point3f(0.0, 153.0 + (1.0 / chassis_scale) * offset, 1.0)
 x̂ = ℝ³([1.0; 0.0; 0.0])
 ŷ = ℝ³([0.0; 1.0; 0.0])
 ẑ = ℝ³([0.0; 0.0; 1.0])
 # the vectors of the standard basis for the input space ℝ³
 ê = [Vec3f(vec(x̂)), Vec3f(vec(ŷ)), Vec3f(vec(ẑ))]
-# The rotation of the inertial frame Ô to the body frame B̂
-α = 0.0
-transformation = [-sin(α) cos(α) 0.0; -cos(α) -sin(α) 0.0; 0.0 0.0 1.0]
+transformation = [0.0 1.0 0.0; -1.0 0.0 0.0; 0.0 0.0 1.0]
 B_O_R = convert(Matrix{Float64}, transformation * [ê[1] ê[2] ê[3]])
 O_B_R = convert(Matrix{Float64}, inv(B_O_R))
 # The rotation of the local frame of the sensor i to the robot frame B̂
 B_A1_R = convert(Matrix{Float64}, transformation * [ê[1] ê[2] ê[3]])
 A1_B_R = convert(Matrix{Float64}, inv(B_A1_R))
-α = 30.0 / 180.0 * π # imu2angle
-B_A2_R = convert(Matrix{Float64}, [cos(α) sin(α) 0.0; -sin(α) cos(α) 0.0; 0.0 0.0 1.0] * [ê[1] ê[2] ê[3]])
+B_A2_R = convert(Matrix{Float64}, [ê[1] ê[2] ê[3]])
 # B_A2_R = [-sin(α) cos(α) 0.0; -cos(α) -sin(α) 0.0; 0.0 0.0 1.0] # this is equal to B_O_R * B_A2_R the same as the one that is used on the device
 A2_B_R = convert(Matrix{Float64}, inv(B_A2_R))
 maxplotnumber = 400
@@ -71,15 +73,15 @@ end
 eyeposition = normalize([1.0; 1.0; 1.0]) * 0.5
 up = [0.0; 0.0; 1.0]
 
-makefigure() = Figure(size=figuresize)
+makefigure() = Figure(size = figuresize)
 fig = with_theme(makefigure, theme_black())
 pl = PointLight(RGBf(0.0862, 0.0862, 0.0862), Point3f(0))
 al = AmbientLight(RGBf(0.9, 0.9, 0.9))
 backgroundcolor = RGBf(1.0, 1.0, 1.0)
 lscene = LScene(fig[1:4, 2], show_axis = true, scenekw = (lights = [pl, al], clear = true, backgroundcolor = :black))
-ax1 = Axis(fig[1, 1], xlabel="Time (sec)", ylabel="x-Euler angle (rad)", xlabelsize=fontsize, ylabelsize=fontsize)
-ax2 = Axis(fig[2, 1], xlabel="Time (sec)", ylabel="y-Euler angle (rad)", xlabelsize=fontsize, ylabelsize=fontsize)
-ax3 = Axis(fig[3, 1], xlabel="Time (sec)", ylabel="P Matrix Parameters", xlabelsize=fontsize, ylabelsize=fontsize)
+ax1 = Axis(fig[1, 1], xlabel = "Time (sec)", ylabel = "x-Euler angle (rad)", xlabelsize = fontsize, ylabelsize = fontsize)
+ax2 = Axis(fig[2, 1], xlabel = "Time (sec)", ylabel = "y-Euler angle (rad)", xlabelsize = fontsize, ylabelsize = fontsize)
+ax3 = Axis(fig[3, 1], xlabel = "Time (sec)", ylabel = "P Matrix Parameters", xlabelsize = fontsize, ylabelsize = fontsize)
 buttoncolor = RGBf(0.3, 0.3, 0.3)
 buttonlabels = ["Connect", "Disconnect", "Record", "Stop"]
 buttons = [Button(fig, label=l, buttoncolor=buttoncolor) for l in buttonlabels]
@@ -95,15 +97,16 @@ recordtext = Observable("Not recording")
 recordlabel = Label(fig, recordtext, fontsize = fontsize)
 fig[4, 2] = grid!(hcat(connection_statuslabel, controller_statuslabel, jindexlabel, kindexlabel, recordlabel), tellheight = true, tellwidth = false)
 fig[4, 1] = grid!(hcat(buttons...), tellheight = true, tellwidth = false)
-colsize!(fig.layout, 1, Relative(1/4))
+colsize!(fig.layout, 1, Relative(1 / 4))
 
-unicycle = Unicycle(origin, pivot, p1, p2, B_O_R, B_A1_R, B_A2_R, chassis_scale, rollingwheel_scale, reactionwheel_scale,
+unicycle = Unicycle(origin, offset, pivot, p1, p2, B_O_R, B_A1_R, B_A2_R, chassis_scale, rollingwheel_scale, reactionwheel_scale,
                     rollingwheel_origin, reactionwheel_origin, chassis_stl_path, rollingwheel_stl_path, reactionwheel_stl_path,
                     lscene, ax1, ax2, ax3, arrowscale, smallarrowscale, linewidth, arrowsize, markersize, ballsize, segments,
                     chassis_colormap, rollingwheel_colormap, reactionwheel_colormap, maxplotnumber, timeaxiswindow)
 
 lookat = deepcopy(pivot)
 update_cam!(lscene.scene, Vec3f(eyeposition...), Vec3f(lookat...), Vec3f(up...))
+counter = 0
 
 on(events(fig).tick) do tick
     if !isnothing(clientside) && isopen(clientside)
@@ -128,7 +131,8 @@ on(events(fig).tick) do tick
         # calculate(readings)
         allkeys = keys(readings)
         flag = all([x ∈ allkeys for x in headers]) && all([!isnothing(readings[x]) for x in headers])
-        if flag
+        global counter = counter + 1
+        if flag && isapprox(counter % 5, 0)
             if run == true
                 for header in headers
                     push!(data[header], readings[header])
