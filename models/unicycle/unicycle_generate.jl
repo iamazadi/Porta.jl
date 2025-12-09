@@ -8,15 +8,15 @@ using Porta
 
 
 figuresize = (1920, 1080)
-modelname = "sample2_dec8_unicycle_tiltestimation"
-headers = ["changes", "time", "active", "AX1", "AY1", "AZ1", "AX2", "AY2", "AZ2", "roll", "pitch", "encT", "encB", "j", "k", "P0", "P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11"]
+modelname = "sample2_dec9_unicycle_tiltestimation"
+headers = ["changes", "time", "active", "AX1", "AY1", "AZ1", "AX2", "AY2", "AZ2", "roll", "pitch", "yaw", "encT", "encB", "j", "k", "P0", "P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11"]
 readings = Dict()
-segments = 360
+segments = 180
 fontsize = 30
 textfontsize = 0.05
-chassis_colormap = :matter
-rollingwheel_colormap = :oxy
-reactionwheel_colormap = :delta
+chassis_colormap = :imola
+rollingwheel_colormap = :Dark2_8
+reactionwheel_colormap = :Oranges
 markersize = 10
 ballsize = 0.01
 linewidth = 0.01
@@ -67,6 +67,9 @@ for header in headers
 end
 filepath = joinpath("data", "csv", "$modelname.csv")
 file = CSV.File(filepath)
+framesnumber = length(file)
+period = file[end][:time] - file[begin][:time]
+iterations = Int(floor(period * fps))
 color = load("data/basemap_mask.png")
 
 eyeposition = normalize([0.0; 1.0; 0.0]) * 0.6
@@ -78,7 +81,7 @@ fig = with_theme(makefigure, theme_black())
 pl = PointLight(RGBf(0.0862, 0.0862, 0.0862), Point3f(0))
 al = AmbientLight(RGBf(0.9, 0.9, 0.9))
 backgroundcolor = RGBf(1.0, 1.0, 1.0)
-lscene = LScene(fig[1:4, 2], show_axis = true, scenekw = (lights = [pl, al], clear = true, backgroundcolor = :black))
+lscene = LScene(fig[1:4, 2], show_axis = true, scenekw = (lights = [pl, al], clear = true, backgroundcolor = :white))
 ax1 = Axis(fig[1, 1], xlabel = "Time (sec)", ylabel = "x-Euler angle (rad)", xlabelsize = fontsize, ylabelsize = fontsize)
 ax2 = Axis(fig[2, 1], xlabel = "Time (sec)", ylabel = "y-Euler angle (rad)", xlabelsize = fontsize, ylabelsize = fontsize)
 ax3 = Axis(fig[3, 1], xlabel = "Time (sec)", ylabel = "P Matrix Parameters", xlabelsize = fontsize, ylabelsize = fontsize)
@@ -129,12 +132,8 @@ planeobservable = buildsurface(lscene, planematrix, color, transparency = true)
 lookat = deepcopy(pivot) + [0.0; 0.0; offset]
 update_cam!(lscene.scene, Vec3f(eyeposition...), Vec3f(lookat...), Vec3f(up...))
 
-period = file[end][:time] - file[begin][:time]
 
-record(lscene.scene, joinpath("gallery", "$modelname.mp4"); framerate=fps) do io
-    framesnumber = length(file)
-    iterations = Int(floor(period * fps))
-
+record(lscene.scene, joinpath("gallery", "$modelname.mp4"); framerate = fps) do io
     for i = 1:iterations
         progress = float(i) / float(iterations)
         currenttime =  file[begin][:time] + progress * period
@@ -151,15 +150,22 @@ record(lscene.scene, joinpath("gallery", "$modelname.mp4"); framerate=fps) do io
                 controller_statustext[] = isapprox(readings["active"], 1.0) ? "Active" : "Deactive"
                 jindextext[] = "j: $(readings["j"])"
                 kindextext[] = "k: $(readings["k"])"
+                planematrix = [project(convert_to_cartesian([1.0; θ; ϕ - progress * 2π]))- ℝ³(0.0, 0.0, 1.23 * offset) for θ in lspaceθ, ϕ in lspaceϕ]
+                updatesurface!(planematrix, planeobservable)
                 global lookat = vec(to_value(unicycle.translation) + ℝ³(0.0, 0.0, offset))
-                global eyeposition = ℝ³(Float64.(vec(lookat))...) + (0.95 * norm(originaleyeposition - lookat) + 0.05 * cos(progress * 2π)) * normalize(ℝ³(Float64.(vec(originaleyeposition))...) - ℝ³(Float64.(vec(lookat))...))
-                global eyeposition = (exp(-progress * period * 0.3) * ℝ³(5.0, 5.0, 5.0)) + eyeposition
+                global eyeposition = ℝ³(Float64.(vec(lookat))...) + (0.9 * norm(originaleyeposition - lookat) + 0.1 * cos(progress * 2π)) * normalize(ℝ³(Float64.(vec(originaleyeposition))...) - ℝ³(Float64.(vec(lookat))...))
+                global eyeposition = (exp(-progress * period * 0.5) * ℝ³(5.0, 0.0, 5.0)) + eyeposition
                 update_cam!(lscene.scene, Vec3f(vec(eyeposition)...), Vec3f(vec(lookat)...), Vec3f(vec(up)...))
                 break
             end
         end
         sleep(1 / fps)
-        recordframe!(io)
-        recordtext[] = "frame $i/$iterations"
+        try
+            recordframe!(io)
+            recordtext[] = "frame $i/$iterations"
+        catch e
+            println(e)
+        end
+        
     end
 end

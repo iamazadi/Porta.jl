@@ -253,6 +253,7 @@ function updatemodel(unicycle::Unicycle, readings::Dict)
     P11 = readings["P11"]
     roll = readings["roll"]
     pitch = readings["pitch"]
+    yaw = readings["yaw"]
     rolling_angle = readings["encB"]
     reaction_angle = -readings["encT"]
 
@@ -273,7 +274,7 @@ function updatemodel(unicycle::Unicycle, readings::Dict)
     # @assert(isapprox(-γ, pitch, atol = 1e-2), "The pitch angle $pitch is not equal to minus gamma -$γ.")
     # println("roll: $roll, γ: $γ, pitch: $pitch, β: $β.")
     # println("x_euler_angle_raw: $x_euler_angle_raw, x_euler_angle_estimate: $x_euler_angle_estimate, y_euler_angle_raw: $y_euler_angle_raw, y_euler_angle_estimate: $y_euler_angle_estimate.")
-    q = ℍ(roll, x̂) * ℍ(pitch, ŷ)
+    q = ℍ(yaw, ẑ) * ℍ(roll, x̂) * ℍ(pitch, ŷ)
     # O_B_R = unicycle.O_B_R * mat33(q)
     O_B_R = mat33(q)
     # B_O_R = inv(O_B_R)
@@ -281,11 +282,12 @@ function updatemodel(unicycle::Unicycle, readings::Dict)
     wheelradius = 0.075
     offset = 0.012 + wheelradius
     distance = -rolling_angle * wheelradius
+    movement = rotate(ℝ³(distance, 0.0, 0.0), ℍ(readings["yaw"], ẑ))
 
     # g = q * chassis_q0
     # rotate!(robot, Quaternion(g))
-    unicycle.point1_observable[] = Point3f(O_B_R * (unicycle.point1 - (unicycle.chassisorigin - Point3f(0.0, 0.0, offset))) + Point3f(distance, 0, 0) + (unicycle.chassisorigin - Point3f(0.0, 0.0, offset)))
-    unicycle.point2_observable[] = Point3f(O_B_R * (unicycle.point2 - (unicycle.chassisorigin - Point3f(0.0, 0.0, offset))) + Point3f(distance, 0, 0) + (unicycle.chassisorigin - Point3f(0.0, 0.0, offset)))
+    unicycle.point1_observable[] = Point3f(O_B_R * (unicycle.point1 - (unicycle.chassisorigin - Point3f(0.0, 0.0, offset))) + Point3f(vec(movement)) + (unicycle.chassisorigin - Point3f(0.0, 0.0, offset)))
+    unicycle.point2_observable[] = Point3f(O_B_R * (unicycle.point2 - (unicycle.chassisorigin - Point3f(0.0, 0.0, offset))) + Point3f(vec(movement)) + (unicycle.chassisorigin - Point3f(0.0, 0.0, offset)))
     # unicycle.point1_observable[] = Point3f(O_B_R * (unicycle.p1 - unicycle.origin) + unicycle.origin)
     # unicycle.point2_observable[] = Point3f(O_B_R * (unicycle.p2 - unicycle.origin) + unicycle.origin)
 
@@ -396,14 +398,14 @@ function updatemodel(unicycle::Unicycle, readings::Dict)
 
     # q = ℍ(roll, x̂) * ℍ(pitch, ŷ)
     # O_B_R = mat3(q)
-
     g = q * unicycle.chassisrotation
     GLMakie.rotate!(unicycle.robot, Quaternion(g))
-    unicycle.pivot_observable[] = Point3f(distance, 0.0, 0.0) + unicycle.pivot
-    translation = ℝ³(Point3f(distance, 0.0, 0.0) + unicycle.chassisorigin - Point3f(0.0, 0.0, offset))
+    unicycle.pivot_observable[] = Point3f(vec(movement)) + unicycle.pivot
+    # translation = ℝ³(Point3f(distance, 0.0, 0.0) + unicycle.chassisorigin - Point3f(0.0, 0.0, offset))
+    translation = ℝ³(unicycle.chassisorigin - Point3f(0.0, 0.0, offset)) + movement
     unicycle.translation[] = translation
     GLMakie.translate!(unicycle.robot, Point3f(vec(translation)))
-
+    
     rq = Quaternion(ℍ(reaction_angle, x̂))
     mq = Quaternion(ℍ(rolling_angle, ẑ))
     GLMakie.rotate!(unicycle.rollingwheel, mq)
