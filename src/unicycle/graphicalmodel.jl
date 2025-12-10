@@ -63,6 +63,8 @@ struct Unicycle
     axis2::Axis
     axis3::Axis
     translation::Observable{ℝ³}
+    yaw::Observable{Float64}
+    frameorigin::Observable{ℝ³}
     Unicycle(chassisorigin::Point3f, offset::Float64, pivot::Point3f, point1::Point3f, point2::Point3f, B_O_R::Matrix{Float64}, B_A1_R::Matrix{Float64},
              B_A2_R::Matrix{Float64}, chassis_scale::Float64, rollingwheel_scale::Float64, reactionwheel_scale::Float64,
              rollingwheel_origin::Point3f, reactionwheel_origin::Point3f, chassis_stl_path::String, rollingwheel_stl_path::String,
@@ -72,6 +74,9 @@ struct Unicycle
 
         P = [[1.0; vec(point1 - pivot)] [1.0; vec(point2 - pivot)]]
         X = transpose(P) * inv(P * transpose(P))
+
+        frameobservable = Observable(ℝ³(0.0, 0.0, 0.0))
+        yaw = Observable(0.0)
      
         chassis_qx = ℍ(π / 2, x̂)
         chassis_qy = ℍ(0.0, ŷ)
@@ -153,11 +158,11 @@ struct Unicycle
             align=:origin
         )
 
-        originball = meshscatter!(lscene, pivot, markersize = ballsize, color = :gold)
+        originball = meshscatter!(lscene, @lift(pivot + Point3f(vec($frameobservable))), markersize = ballsize, color = :gold)
         ball1 = meshscatter!(lscene, point1_observable, markersize = ballsize, color = acceleration_vector_colors[1])
         ball2 = meshscatter!(lscene, point2_observable, markersize = ballsize, color = acceleration_vector_colors[2])
 
-        origin_ps = [pivot, pivot, pivot]
+        origin_ps = @lift([pivot + Point3f(vec($frameobservable)), pivot + Point3f(vec($frameobservable)), pivot + Point3f(vec($frameobservable))])
         origin_ns = map(x -> x .* smallarrowscale, ê)
         sensor1frame_tails = Observable([point1_observable[], point1_observable[], point1_observable[]])
         sensor2frame_tails = Observable([point2_observable[], point2_observable[], point2_observable[]])
@@ -199,12 +204,12 @@ struct Unicycle
 
         line1 = @lift([$pivot_observable, $point1_observable])
         line2 = @lift([$pivot_observable, $point2_observable])
-        line3 = @lift([$pivot_observable + Point3f(0.5, 0.0, 0.0), $pivot_observable - Point3f(0.5, 0.0, 0.0)])
+        line3 = @lift([$pivot_observable + Point3f(rotate(ℝ³(Point3f(0.5, 0.0, 0.0)), ℍ($yaw, ẑ))), $pivot_observable - Point3f(rotate(ℝ³(Point3f(0.5, 0.0, 0.0)), ℍ($yaw, ẑ)))])
         linecolors = collect(1:2)
         linewidth = 10
-        lines!(lscene, line1, color = linecolors, linewidth = linewidth, colorrange = (1, 2), colormap = :darkrainbow)
-        lines!(lscene, line2, color = linecolors, linewidth = linewidth, colorrange = (1, 2), colormap = :darkrainbow)
-        lines!(lscene, line3, color = linecolors, linewidth = linewidth / 2, colorrange = (1, 2), colormap = :lightrainbow)
+        lines!(lscene, line1, color = linecolors, linewidth = linewidth, colorrange = (1, 2), colormap = :darkrainbow, transparency = true)
+        lines!(lscene, line2, color = linecolors, linewidth = linewidth, colorrange = (1, 2), colormap = :darkrainbow, transparency = true)
+        lines!(lscene, line3, color = linecolors, linewidth = linewidth / 2, colorrange = (1, 2), colormap = :lightrainbow, transparency = true)
 
         default_ylims = [-π / 8; π / 8]
         ylims!(ax1, default_ylims[1], default_ylims[2])
@@ -218,7 +223,7 @@ struct Unicycle
             graphpoints1, graphpoints2, graphpoints3, robot, rollingwheel, reactionwheel, acceleration_vector_tails,
             acceleration_vector_heads, sensor1frame_tails, sensor1frame_heads, sensor2frame_tails, sensor2frame_heads,
             origin_ps, origin_ns, pivot_observable, point1_observable, point2_observable, maxplotnumber, timeaxiswindow, chassisrotation,
-            segments, arrowscale, smallarrowscale, ax1, ax2, ax3, translation)
+            segments, arrowscale, smallarrowscale, ax1, ax2, ax3, translation, yaw, frameobservable)
     end
 end
 
@@ -282,7 +287,7 @@ function updatemodel(unicycle::Unicycle, readings::Dict)
     wheelradius = 0.075
     offset = 0.012 + wheelradius
     distance = -rolling_angle * wheelradius
-    movement = rotate(ℝ³(distance, 0.0, 0.0), ℍ(readings["yaw"], ẑ))
+    movement = unicycle.frameorigin[] + rotate(ℝ³(distance, 0.0, 0.0), ℍ(readings["yaw"], ẑ))
 
     # g = q * chassis_q0
     # rotate!(robot, Quaternion(g))
@@ -305,8 +310,9 @@ function updatemodel(unicycle::Unicycle, readings::Dict)
 
     unicycle.sensor1frame_tails[] = [Point3f(unicycle.point1_observable[]...), Point3f(unicycle.point1_observable[]...), Point3f(unicycle.point1_observable[]...)]
     unicycle.sensor2frame_tails[] = [Point3f(unicycle.point2_observable[]...), Point3f(unicycle.point2_observable[]...), Point3f(unicycle.point2_observable[]...)]
-    unicycle.sensor1frame_heads[] = map(x -> Vec3f(O_B_R * x .* unicycle.smallarrowscale), [unicycle.B_A1_R * (0.2 .* ê[1] + ê[1] .* R1[1]), unicycle.B_A1_R * (0.2 .* ê[2] + ê[2] .* R1[2]), unicycle.B_A1_R * (0.2 .* ê[3] + ê[3] .* R1[3])])
-    unicycle.sensor2frame_heads[] = map(x -> Vec3f(O_B_R * x .* unicycle.smallarrowscale), [unicycle.B_A2_R * (0.2 .* ê[1] + ê[1] .* R1[1]), unicycle.B_A2_R * (0.2 .* ê[2] + ê[2] .* R1[2]), unicycle.B_A2_R * (0.2 .* ê[3] + ê[3] .* R1[3])])
+    magnituderatio = 0.5
+    unicycle.sensor1frame_heads[] = map(x -> Vec3f(O_B_R * x .* unicycle.smallarrowscale), [unicycle.B_A1_R * (magnituderatio .* ê[1] .* sign(R1[1]) + (1.0 - magnituderatio) .* ê[1] .* R1[1]), unicycle.B_A1_R * (magnituderatio .* ê[2] .* sign(R1[2]) + (1.0 - magnituderatio) .* ê[2] .* R1[2]), unicycle.B_A1_R * (magnituderatio .* ê[3] .* sign(R1[3]) + (1.0 - magnituderatio) .* ê[3] .* R1[3])])
+    unicycle.sensor2frame_heads[] = map(x -> Vec3f(O_B_R * x .* unicycle.smallarrowscale), [unicycle.B_A2_R * (magnituderatio .* ê[1] .* sign(R1[1]) + (1.0 - magnituderatio) .* ê[1] .* R1[1]), unicycle.B_A2_R * (magnituderatio .* ê[2] .* sign(R1[2]) + (1.0 - magnituderatio) .* ê[2] .* R1[2]), unicycle.B_A2_R * (magnituderatio .* ê[3] .* sign(R1[3]) + (1.0 - magnituderatio) .* ê[3] .* R1[3])])
 
     # unicycle.sensor1frame_heads[] = map(x -> Vec3f(O_B_R * x .* norm(R1) .* unicycle.smallarrowscale), [unicycle.B_A1_R * ê[1], unicycle.B_A1_R * ê[2], unicycle.B_A1_R * ê[3]])
     # unicycle.sensor2frame_heads[] = map(x -> Vec3f(O_B_R * x .* norm(R2) .* unicycle.smallarrowscale), [unicycle.B_A2_R * ê[1], unicycle.B_A2_R * ê[2], unicycle.B_A2_R * ê[3]])

@@ -13,7 +13,7 @@ export rotatecamera
 
 Convert a `color` from HSV space to RGB.
 """
-convert_hsvtorgb(color) = begin
+convert_hsvtorgb(color::Vector{Float64}) = begin
     H, S, V = color
     C = V * S
     X = C * (1 - Base.abs((H / 60) % 2 - 1))
@@ -56,7 +56,8 @@ Calculate the orientation of the camera of the given `lscene` for rotating text 
 gettextrotation(lscene::GLMakie.LScene) = begin
     eyeposition_observable = lscene.scene.camera.eyeposition
     rotationaxis = GLMakie.@lift(normalize(ℝ³(Float64.(vec(-$(lscene.scene.camera.view_direction)))...)))
-    rotationangle = GLMakie.@lift(Float64(π / 2 + atan(($eyeposition_observable)[2], ($eyeposition_observable)[1])))
+    # rotationangle = GLMakie.@lift(Float64(π / 2 + atan(($eyeposition_observable)[2], ($eyeposition_observable)[1])))
+    rotationangle = GLMakie.@lift(Float64(π + atan(($eyeposition_observable)[2], ($eyeposition_observable)[1])))
     GLMakie.@lift(GLMakie.Quaternion(ℍ($rotationangle, $rotationaxis) * ℍ(getrotation(ℝ³(0.0, 0.0, 1.0), $rotationaxis)...)))
 end
 

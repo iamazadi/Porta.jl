@@ -7,22 +7,23 @@ using DataFrames
 using Porta
 
 
-figuresize = (1920, 1080)
+figuresize = (1854, 1012)
 modelname = "sample2_dec9_unicycle_tiltestimation"
 headers = ["changes", "time", "active", "AX1", "AY1", "AZ1", "AX2", "AY2", "AZ2", "roll", "pitch", "yaw", "encT", "encB", "j", "k", "P0", "P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11"]
 readings = Dict()
-segments = 180
+segments = 360
 fontsize = 30
 textfontsize = 0.05
-chassis_colormap = :imola
-rollingwheel_colormap = :Dark2_8
-reactionwheel_colormap = :Oranges
+chassis_colormap = :hawaii
+rollingwheel_colormap = :RdPu
+reactionwheel_colormap = :dracula
 markersize = 10
 ballsize = 0.01
 linewidth = 0.01
+boundarylinewidth = 10
 arrowsize = Vec3f(0.03, 0.03, 0.06)
 arrowscale = 0.3
-smallarrowscale = arrowscale * 0.5
+smallarrowscale = arrowscale * 0.6
 chassis_stl_path = joinpath("data", "unicycle", "unicycle_chassis.STL")
 rollingwheel_stl_path = joinpath("data", "unicycle", "unicycle_main_wheel.STL")
 reactionwheel_stl_path = joinpath("data", "unicycle", "unicycle_reaction_wheel.STL")
@@ -71,10 +72,19 @@ framesnumber = length(file)
 period = file[end][:time] - file[begin][:time]
 iterations = Int(floor(period * fps))
 color = load("data/basemap_mask.png")
-
-eyeposition = normalize([0.0; 1.0; 0.0]) * 0.6
-originaleyeposition = deepcopy(eyeposition)
-up = [0.0; 0.0; 1.0]
+## Load the Natural Earth data
+attributespath = "data/naturalearth/geometry-attributes.csv"
+nodespath = "data/naturalearth/geometry-nodes.csv"
+countries = loadcountries(attributespath, nodespath)
+boundary_names = ["Iran"]
+boundary_nodes = Vector{Vector{ℝ³}}()
+for i in eachindex(countries["name"])
+    for name in boundary_names
+        if countries["name"][i] == name
+            push!(boundary_nodes, countries["nodes"][i])
+        end
+    end
+end
 
 makefigure() = Figure(size = figuresize)
 fig = with_theme(makefigure, theme_black())
@@ -86,8 +96,6 @@ ax1 = Axis(fig[1, 1], xlabel = "Time (sec)", ylabel = "x-Euler angle (rad)", xla
 ax2 = Axis(fig[2, 1], xlabel = "Time (sec)", ylabel = "y-Euler angle (rad)", xlabelsize = fontsize, ylabelsize = fontsize)
 ax3 = Axis(fig[3, 1], xlabel = "Time (sec)", ylabel = "P Matrix Parameters", xlabelsize = fontsize, ylabelsize = fontsize)
 
-# buttoncolor = RGBf(0.3, 0.3, 0.3)
-# buttons = [Button(fig, label=l, buttoncolor=buttoncolor) for l in buttonlabels]
 controller_statustext = Observable("Deactive")
 controller_statuslabel = Label(fig, controller_statustext, fontsize = fontsize)
 jindextext = Observable("j: 1")
@@ -126,10 +134,23 @@ text!(lscene,
 
 lspaceθ = range(π / 2, stop = -π / 2, length = segments)
 lspaceϕ = range(float(π), stop = float(-π), length = segments)
-planematrix = [project(convert_to_cartesian([1.0; θ; ϕ]))- ℝ³(0.0, 0.0, 1.23 * offset) for θ in lspaceθ, ϕ in lspaceϕ]
+planematrix = [project(convert_to_cartesian([1.0; θ; ϕ])) - ℝ³(0.0, 0.0, 1.23 * offset) for θ in lspaceθ, ϕ in lspaceϕ]
 planeobservable = buildsurface(lscene, planematrix, color, transparency = true)
 
-lookat = deepcopy(pivot) + [0.0; 0.0; offset]
+boundarypoints = [Point3f(vec(project(convert_to_cartesian([vec(convert_to_geographic(node))[1]; vec(convert_to_geographic(node))[2]; -vec(convert_to_geographic(node))[3]])))) for node in boundary_nodes[1]]
+boundarypoints = map(x -> x - Point3f(0, 0, 1.23 * offset), boundarypoints)
+boundarycolors = Observable([x for x in 1:length(boundary_nodes[1])])
+lines!(lscene, boundarypoints, linewidth = boundarylinewidth, color = boundarycolors, colormap = :jet, colorrange = (1, length(boundary_nodes[1])), transparency = true)
+
+θ = 29.5926 / 90.0 * π / 2.0
+ϕ = -52.5836 / 180.0 * π
+_position = Observable(Point3f(vec(project(convert_to_cartesian([1.0; θ; ϕ])))))
+unicycle.frameorigin[] = ℝ³(vec(convert(Array{Float64}, vec(_position[] - Point3f(chassis_origin[1], chassis_origin[2], 0))))...)
+
+eyeposition = vec(unicycle.frameorigin[]) + normalize([0.0; 1.0; 0.1]) * 0.7
+originaleyeposition = deepcopy(eyeposition)
+up = [0.0; 0.0; 1.0]
+lookat = Point3f(vec(unicycle.frameorigin[])) + deepcopy(pivot) + [0.0; 0.0; offset]
 update_cam!(lscene.scene, Vec3f(eyeposition...), Vec3f(lookat...), Vec3f(up...))
 
 
@@ -146,26 +167,29 @@ record(lscene.scene, joinpath("gallery", "$modelname.mp4"); framerate = fps) do 
                 for header in headers
                     readings[header] = text[Symbol(header)]
                 end
+                unicycle.yaw[] = readings["yaw"]
                 updatemodel(unicycle, readings)
+                colors = [boundarycolors[][end]]
+                for (index, element) in enumerate(boundarycolors[])
+                    if index == length(boundarycolors[])
+                        continue
+                    end
+                    push!(colors, element)
+                end
+                boundarycolors[] = colors
+                notify(boundarycolors)
                 controller_statustext[] = isapprox(readings["active"], 1.0) ? "Active" : "Deactive"
-                jindextext[] = "j: $(readings["j"])"
-                kindextext[] = "k: $(readings["k"])"
-                planematrix = [project(convert_to_cartesian([1.0; θ; ϕ - progress * 2π]))- ℝ³(0.0, 0.0, 1.23 * offset) for θ in lspaceθ, ϕ in lspaceϕ]
-                updatesurface!(planematrix, planeobservable)
-                global lookat = vec(to_value(unicycle.translation) + ℝ³(0.0, 0.0, offset))
+                jindextext[] = "j:$(readings["j"])"
+                kindextext[] = "k:$(readings["k"])"
+                global lookat = vec(to_value(unicycle.translation) + ℝ³(0.0, 0.0, offset)) + pivot
                 global eyeposition = ℝ³(Float64.(vec(lookat))...) + (0.9 * norm(originaleyeposition - lookat) + 0.1 * cos(progress * 2π)) * normalize(ℝ³(Float64.(vec(originaleyeposition))...) - ℝ³(Float64.(vec(lookat))...))
-                global eyeposition = (exp(-progress * period * 0.5) * ℝ³(5.0, 0.0, 5.0)) + eyeposition
+                global eyeposition = (exp(-progress * period * 0.6) * ℝ³(5.0, 5.0, 5.0)) + eyeposition
                 update_cam!(lscene.scene, Vec3f(vec(eyeposition)...), Vec3f(vec(lookat)...), Vec3f(vec(up)...))
                 break
             end
         end
         sleep(1 / fps)
-        try
-            recordframe!(io)
-            recordtext[] = "frame $i/$iterations"
-        catch e
-            println(e)
-        end
-        
+        recordframe!(io)
+        recordtext[] = "$i/$iterations"
     end
 end

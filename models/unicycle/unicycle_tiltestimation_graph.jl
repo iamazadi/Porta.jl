@@ -6,9 +6,9 @@ using Porta
 
 
 figuresize = (1920, 1080)
-datafilename = "take004_unicycle_tilt_estimation"
+datafilename = "sample2_dec9_unicycle_tiltestimation"
 modelname = "$(datafilename)_graph"
-headers = ["changes", "time", "active", "AX1", "AY1", "AZ1", "AX2", "AY2", "AZ2", "roll", "pitch", "encT", "encB", "j", "k", "P0", "P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11"]
+headers = ["changes", "time", "active", "AX1", "AY1", "AZ1", "AX2", "AY2", "AZ2", "roll", "pitch", "yaw", "encT", "encB", "j", "k", "P0", "P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11"]
 readings = Dict()
 fontsize = 30
 markersize = 10
@@ -54,19 +54,25 @@ ŷ = ℝ³([0.0; 1.0; 0.0])
 ẑ = ℝ³([0.0; 0.0; 1.0])
 # the vectors of the standard basis for the input space ℝ³
 ê = [Vec3f(vec(x̂)), Vec3f(vec(ŷ)), Vec3f(vec(ẑ))]
-# The rotation of the inertial frame Ô to the body frame B̂
-α = 0.0
-transformation = [-sin(α) cos(α) 0.0; -cos(α) -sin(α) 0.0; 0.0 0.0 1.0]
+transformation = [0.0 1.0 0.0; -1.0 0.0 0.0; 0.0 0.0 1.0]
+B_O_R = convert(Matrix{Float64}, transformation * [ê[1] ê[2] ê[3]])
+O_B_R = convert(Matrix{Float64}, inv(B_O_R))
 # The rotation of the local frame of the sensor i to the robot frame B̂
 B_A1_R = convert(Matrix{Float64}, transformation * [ê[1] ê[2] ê[3]])
-α = 30.0 / 180.0 * π # imu2angle
-B_A2_R = convert(Matrix{Float64}, [cos(α) sin(α) 0.0; -sin(α) cos(α) 0.0; 0.0 0.0 1.0] * [ê[1] ê[2] ê[3]])
+A1_B_R = convert(Matrix{Float64}, inv(B_A1_R))
+B_A2_R = convert(Matrix{Float64}, [ê[1] ê[2] ê[3]])
+A2_B_R = convert(Matrix{Float64}, inv(B_A2_R))
 
+wheelradius = 0.075
+offset = 0.012 + wheelradius
+# the robot body origin in the inertial frame Ô
+chassis_origin = Point3f(-0.1, -0.1, -0.02)
 # the pivot point B̂ in the inertial frame Ô
-pivot = Point3f(-0.097, -0.1, -0.032)
+center = Point3f(-0.097, -0.1, -0.032)
+pivot = center - Point3f(0.0, 0.0, wheelradius)
 # the position of sensors mounted on the body in the body frame of reference
 p1 = Point3f(-0.14000000286102293, -0.06500000149011612, -0.06200000151991844)
-p2 = Point3f(-0.04000000286102295, -0.06000000149011612, -0.06000000151991844)
+p2 = Point3f(-0.205, -0.055, -0.06)
 P = [[1.0; vec(p1 - pivot)] [1.0; vec(p2 - pivot)]]
 X = transpose(P) * inv(P * transpose(P))
 
