@@ -4,7 +4,7 @@ Description = "How the reaction wheel unicycle works."
 
 # How the Reaction-Wheel Unicycle Works
 
-![gravity_vector_estimation_upright](./assets/reactionwheelunicycle/gravity_vector_estimation_upright.png)
+![unicycle sidebyside A](./assets/reactionwheelunicycle/unicycle_sidebyside_A.png)
 
 This is a model of a unicycle with two symmetrically attached rotors. One of the reasons the matrix of inertia is not trivial is that the rotors’ axes of rotation do not intersect at a point. The constraint on the system is conservation of angular momentum. The angular velocity of the body is related to the rotor velocities. That relation gives rise to a differential equation in the rotation group Special Orthogonal of real dimension 3 for the robot’s body. Using the Euler parameters of ``SO(3)`` we obtain a local coordinate description of the differential equation, in terms of the roll, pitch and yaw angles. The robot can be repositioned by controlling the rotor velocities. The Linear Quadratic Regulator regulates the roll and pitch angles by a choice of a suitable input.
 
@@ -113,11 +113,15 @@ As you know, in a positioning system including tri-axis gyroscopes and accelerom
 
 In this section, we find an estimator for the roll and pitch angles of a rigid body that has only rotational degrees of freedom. This estimate is based on the measurements of multiple accelerometers that are mounted on the rigid body, such that it is assumed that we know their mounting positions and their directions of orientation. First, we describe the roblem setup in a formal way. Then, we find an estimate of the gravity vector in the frame of the robot. Finally, we use the gravity vector in order to calculate the roll and pitch angles. In this section, we follow the setup described in Sebastian Trimpe and Raffaello D’Andrea (2010) [2].
 
+![telemetry sample 1](./assets/reactionwheelunicycle/telemetry_sample1.png)
+
 ### The Problem Setup
 
 Suppose there is a rigid body that is standing on a fixed pivot point without friction. Therefore, the body has three rotational degrees of freedom, but has no translational degrees of freedom. The origin of the coordinate system of the body, which is denoted by ``\hat{B}``, is at the center of rotation. The inertial reference frame is denoted by ``\hat{O}``, the origin of which is coincident with the origin of the body's frame ``\hat{B}``. On the body, there are ``L`` sensors that are mounted at specific locations ``p_i``, for ``i = 1, ..., L``. It is assumed that the position of sesnors ``^Bp_i`` is known in the reference frame of the body. Each sensor ``\hat{A}_i`` measures the local acceleration along three directions in its local frame. Two rotation matrices are introduced to describe the rotation of the rigid body and the mounting orientaton of the sensors: the first matrix describes the rotation of the inertial reference frame ``\hat{O}`` with respect to the body's frame ``\hat{B}``, and the second matrix determines the rotation of the ``i``th sensor's local reference frame with respect to the body's frame.
 
 ``\left\{ \begin{array}{l} ^{O}_{B}R &\\ ^{A_i}_{B}R \end{array} \right.``
+
+![telemetry sample 2](./assets/reactionwheelunicycle/telemetry_sample2.png)
 
 For example, a vector ``^Bv`` in the body's reference frame can be represented in the inertial reference frame with a matrix-vector multiplication ``^{O}v = ^{O}_{B}R \ ^{B}v``.
 
@@ -346,17 +350,17 @@ The sensors can generate estimates of all system states: the wheels' angular vel
 
 The coordinate frame definitions and the locations of the two IMUs and the pivot point on the robot's chassis are indicated in the figure below.
 
-![gravity_vector_estimation_lean_back](./assets/reactionwheelunicycle/gravity_vector_estimation_lean_back.png)
+![unicycle side by side B](./assets/reactionwheelunicycle/unicycle_sidebyside_B.png)
 
 The position vectors of the sensors are
 
-``^Op_1 = \begin{bmatrix} -0.1400 & -0.0650 & -0.0620 \end{bmatrix}^T`` and
+``^Op_1 = \begin{bmatrix} -0.140 & -0.065 & -0.062 \end{bmatrix}^T`` and
 
-``^Op_2 = \begin{bmatrix} -0.0400 & -0.0600 & -0.0600 \end{bmatrix}^T``.
+``^Op_2 = \begin{bmatrix} -0.205 & -0.055 & -0.06 \end{bmatrix}^T``.
 
 Also the position of the pivot point in the inertial coordinate frame is
 
-``^Opivot = \begin{bmatrix} -0.097 & -0.1 & -0.032 \end{bmatrix}^T``
+``^Opivot = \begin{bmatrix} -0.097 & -0.1 & -0.107 \end{bmatrix}^T``
 
 With this data, matrix ``P`` can be constructed as in equation (10).
 
@@ -380,7 +384,7 @@ Applying the partitioned estimation lemma yields the optimal fusion matrix for e
 
 ``X = P^T (P P^T)^{-1} \in \mathbb{R}^{L \times 4} \longrightarrow X \in \mathbb{R}^{2 \times 4}``,
 
-``X_1^* = \begin{bmatrix} 0.586913 & -11.3087 & 0.747681 & 0.0 \\ 0.446183 & 8.92749 & -3.54337 & 0.0 \end{bmatrix}``.
+``X_1^* = \begin{bmatrix} 1.568 & 15.28 & 20.80 & 8.028 \\ -0.639 & -13.65 & 36.04 & -2.785 \end{bmatrix}``.
 
 In the implementation of the algorithm, all accelerometer measurements are rotated to the body frame and stacked into the matrix ``M(k)`` as in equation (8) at each time step. Then, equations (20) and (26) are implemented to obtain the accelerometric estimates for the pitch and roll angles, ``\hat{\beta}_a(k)`` and ``\hat{\gamma}_a(k)``.
 
@@ -450,16 +454,10 @@ Estimation data during balancing of the robot: comparison of Euler angle estimat
 (green) to the accelerometric estimate of x- and y-Euler angles (blue), and to the accelerometric estimate fused with rate gyro data (orange).
 
 Data sample 1:
-![tilt estimation graph data sample 1](./assets/reactionwheelunicycle/tilt_estimation_graph1.png)
+![the tilt estimation graph, data sample 1](./assets/reactionwheelunicycle/tiltestimation_sample1.png)
 
 Data sample 2:
-![tilt estimation graph data sample 2](./assets/reactionwheelunicycle/tilt_estimation_graph2.png)
-
-Data sample 3:
-![tilt estimation graph data sample 3](./assets/reactionwheelunicycle/tilt_estimation_graph3.png)
-
-Data sample 4:
-![tilt estimation graph data sample 4](./assets/reactionwheelunicycle/tilt_estimation_graph4.png)
+![the tilt estimation graph, data sample 2](./assets/reactionwheelunicycle/tiltestimation_sample2.png)
 
 #### The Micro-Controller Program
 
@@ -634,6 +632,8 @@ typedef struct
   float time;                          // the time that has elapsed since the start up of the microcontroller in seconds
   float changes;                       // the magnitude of the changes to the filter coefficients after one step forward
   float convergenceThreshold;          // the threshold value of the changes to filter coefficients below which the RLS is assumed to be converged
+  int convergenceCounter;              // the number of consecutive times that the changes to filter coefficients are less than the convergence threshold
+  int convergenceMaxCount;             // the maximum number of consecutive times for the changes below the threshold to determine convergence
   Mat34 Q;                             // The matrix of unknown parameters
   Vec3 r;                              // the average of the body angular rate from rate gyro
   Vec3 rDot;                           // the average of the body angular rate in Euler angles
@@ -653,7 +653,6 @@ typedef struct
   CurrentSensor rollingCurrentSensor;  // the rolling wheel's motor current sensor
 } LinearQuadraticRegulator;
 ```
-
 
 There are two fuse bits on the robot for configuration without flashing a program. The first one is connected to the port C of the general purpose input / output, pin 0. The fuse bit is active whenever the connected pin is grounded. The fuse bit deactivates the linear quadratic regulator by clearing the `active` field as a flag in the model structure. Even though the status of the fuse bit 0 is necessary to activate the model, it is not a sufficient condition. The user must connect the fuse bit and also push a blue push button once on the robot for activating the model. The push button is the same blue button that is found on the NUCLEOF401RE board. These two conditions are chained together for safety reasons. If the model is not active, then the robot must stop moving by calling the function `resetActuators`.
 
@@ -729,7 +728,15 @@ if (model.active == 1)
   computeFeedbackPolicy(&model);
   applyFeedbackPolicy(&model);
   stepForward(&model);
-  if (fabs(model.changes) < 2.0)
+  if (fabs(model.changes) < model.convergenceThreshold)
+  {
+    model.convergenceCounter = model.convergenceCounter + 1;
+  }
+  else
+  {
+    model.convergenceCounter = 0;
+  }
+  if (model.convergenceCounter >= model.convergenceMaxCount)
   {
     updateControlPolicy(&model);
   }
@@ -755,15 +762,7 @@ else
 In order to monitor the controller and debug issues, we write the logs periodically to the standard input / output console. The variable `log_counter` is incremented by one every control cycle. Then, the log counter variable `logCounter` is compared to the constnt `logPeriod` for finding out if a cycle should be logged. But it is not a sufficient condition for logging, because a second fuse bit is also rquired for permission to log. The second fuse bit is connected to the port C of the general purpose input / output, pin 1. Whenever the fuse bit pin is grounded, it is activated. Once the fuse bit is active, the local transmission flag `transmit` is set at the relevant control cycle count. The reason for `logPeriod` is to limit the total number of logs per second, as the Micro-Controller Unit (MCU) is too fast for a continuous report. And the second fuse bit is there to turn off logging for saving time, as log transmission takes time away from the control processes. So by using the logical "and" operator `&&` we can combine the logging period condition with the logging fuse bit, in order to manage the frequnecy of transmissions.
 
 ```c
-if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_1) == 0)
-{
-  model.logPeriod = 5;
-}
-else
-{
-  model.logPeriod = 40;
-}
-if (model.logCounter > model.logPeriod)
+if (model.logCounter > model.logPeriod && HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_1) == 0)
 {
   transmit = 1;
 }
@@ -782,8 +781,8 @@ if (transmit == 1)
   model.logCounter = 0;
 
   sprintf(MSG,
-          "active: %0.1f, changes: %0.2f, AX1: %0.2f, AY1: %0.2f, AZ1: %0.2f, | AX2: %0.2f, AY2: %0.2f, AZ2: %0.2f, | roll: %0.2f, pitch: %0.2f, | encT: %0.2f, encB: %0.2f, | j: %0.1f, k: %0.1f, | P0: %0.2f, P1: %0.2f, P2: %0.2f, P3: %0.2f, P4: %0.2f, P5: %0.2f, P6: %0.2f, P7: %0.2f, P8: %0.2f, P9: %0.2f, P10: %0.2f, P11: %0.2f, time: %0.2f, dt: %0.6f\r\n",
-          (float)model.active, model.changes, model.imu1.accX, model.imu1.accY, model.imu1.accZ, model.imu2.accX, model.imu2.accY, model.imu2.accZ, model.imu1.roll, model.imu1.pitch, model.reactionEncoder.radianAngle, model.rollingEncoder.radianAngle, (float)model.j, (float)model.k, getIndexMat12(model.P_n, 0, 0), getIndexMat12(model.P_n, 1, 1), getIndexMat12(model.P_n, 2, 2), getIndexMat12(model.P_n, 3, 3), getIndexMat12(model.P_n, 4, 4), getIndexMat12(model.P_n, 5, 5), getIndexMat12(model.P_n, 6, 6), getIndexMat12(model.P_n, 7, 7), getIndexMat12(model.P_n, 8, 8), getIndexMat12(model.P_n, 9, 9), getIndexMat12(model.P_n, 10, 10), getIndexMat12(model.P_n, 11, 11), model.time, model.dt);
+          "active: %0.1f, changes: %0.2f, | AX1: %0.2f, AY1: %0.2f, AZ1: %0.2f, | AX2: %0.2f, AY2: %0.2f, AZ2: %0.2f, | roll: %0.2f, pitch: %0.2f, yaw: %0.2f, | encT: %0.2f, encB: %0.2f, | j: %0.1f, k: %0.1f, | P0: %0.2f, P1: %0.2f, P2: %0.2f, P3: %0.2f, P4: %0.2f, P5: %0.2f, P6: %0.2f, P7: %0.2f, P8: %0.2f, P9: %0.2f, P10: %0.2f, P11: %0.2f, time: %0.2f, dt: %0.6f\r\n",
+          (float)model.active, model.changes, model.imu1.accX, model.imu1.accY, model.imu1.accZ, model.imu2.accX, model.imu2.accY, model.imu2.accZ, model.imu1.roll, model.imu1.pitch, model.imu1.yaw, model.reactionEncoder.radianAngle, model.rollingEncoder.radianAngle, (float)model.j, (float)model.k, getIndexMat12(model.P_n, 0, 0), getIndexMat12(model.P_n, 1, 1), getIndexMat12(model.P_n, 2, 2), getIndexMat12(model.P_n, 3, 3), getIndexMat12(model.P_n, 4, 4), getIndexMat12(model.P_n, 5, 5), getIndexMat12(model.P_n, 6, 6), getIndexMat12(model.P_n, 7, 7), getIndexMat12(model.P_n, 8, 8), getIndexMat12(model.P_n, 9, 9), getIndexMat12(model.P_n, 10, 10), getIndexMat12(model.P_n, 11, 11), model.time, model.dt);
 
   HAL_UART_Transmit(&huart6, MSG, sizeof(MSG), 1000);
   t2 = DWT->CYCCNT;
@@ -1086,21 +1085,13 @@ float calculateChanges(Mat12 W_1, Mat12 W_2)
 }
 ```
 
-![times j and k and filter changes 1](./assets/reactionwheelunicycle/jkchanges1.png)
+Defined a counter to count the number of times in a row that the reduced absolute sum of the incremental changes to filter coefficients are less than a threshold value (``\Delta W_n < 2.5``). After 5 consecutive changes below the threshold, the policy is updated with the given filter coefficeints. Note that this way of determining the econvergence of the RLS allows us to increase the threshold value, otherwise a smaller threshold is needed if the convergence is determined by the changes at just one contol cycle. By relaxing the threshold value and observing the changes over five control cycles, first good policies are kept longer and second the controller has selects more reliable policies.
 
-In the plot below, we see that time *j* stops incrementing before 52 seconds. The direct cause is that time *k* keeps increasing strictly at the same time stamp. Time *k* is reset back to 1 whenever the incremental *changes* are less than 2.0, ``\Delta W_n < 2.0``. The large *changes* that we see in the plot beginning from 62 seconds should be a consequence of not updating the policy for an extended period of time (for about 20 seconds).
+![times j and k and filter changes, data sample 1](./assets/reactionwheelunicycle/jkchanges_sample1.png)
 
-![times j and k and filter changes 2](./assets/reactionwheelunicycle/jkchanges2.png)
+Time *k* seems to be going up regularly furing the two-minute test run intervals. But the RLS is converged at less than about 100 cycles given that the values of *k* hardly exceed 100 while the controller is active.
 
-In the following figure, time *k* has a large value increase at about 40 seconds. Immediately after that, we see that time *j* has an steady increase over a 55-second interval. However, from 41 seconds until 96 seconds, time *k* deviates from the lower bound 1 for 7 steps at maximum, which are shown as 7 horizontal lines in green. The behavior of the graph of time *k* is reasonable in this case because the value of *k* changes in a regular way. Except for three data points before 41 seconds, the deviation of time *k* is standard as we add probing noise to the input for persistent excitation. The *changes* (as in ``\Delta W_n``) are scattered predominantly around the zero point. For most anomolies in the filter *changes* we have a corresponding anomoly in P matrix parameters. The anomolies of *changes* and *P matrix parameters* occur at the same time, because at those times the model is surprised (a great error value) and so adjusts the P matrix parameters to minimize the error.
-
-![times j and k and filter changes 3](./assets/reactionwheelunicycle/jkchanges3.png)
-
-In the left-side graph of the figure below, time *k* has sudden increases in steps at approximately: 34, 44, 54, 59, 64, 75 and 79 seconds. The same time stamps also show anomolies in the right-hand side graph of *changes*. But the *changes* are made zero, and that's why the greater *changes* snap back to approximately zero quickly. As a fact to be expected, the P matrix parameters have anomolous data points at approximately 35, 42, 54 and 65 seconds, which are coincident with great *changes* in the incremental changes in the filter coefficients. So the figure below shows simultaneous anomolies in time *k*, incremental *changes* in filter coefficients, and *P matrix parameters*. It is normal since a drop in time *k* means small *changes* and that means a policy update to then decrease the least squares error.
-
-![times j and k and filter changes 4](./assets/reactionwheelunicycle/jkchanges4.png)
-
-The criteria to determine when the RLS algorithm converges seems to work when the threshold of the *changes* (``\Delta W_n < 2.0``) is set equal to 2.0. A threshold equal to 1.0 results in suboptimal policies and performance, whereas a threshold of 3.0 produces useless policies.
+![times j and k and filter changes, data sample 2](./assets/reactionwheelunicycle/jkchanges_sample2.png)
 
 ## The Controllability of the Z-Euler Angle
 
