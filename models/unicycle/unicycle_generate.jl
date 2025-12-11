@@ -134,6 +134,11 @@ text!(lscene,
 
 lspaceθ = range(π / 2, stop = -π / 2, length = segments)
 lspaceϕ = range(float(π), stop = float(-π), length = segments)
+spherematrix = [convert_to_cartesian([1.0; θ; ϕ]) for ϕ in lspaceϕ, θ in lspaceθ]
+sphereobservable = buildsurface(lscene, spherematrix, mask, transparency = true)
+spherematrix = [convert_to_cartesian([1.0; θ; ϕ]) for θ in lspaceθ, ϕ in lspaceϕ]
+updatesurface!(spherematrix, sphereobservable)
+
 planematrix = [project(convert_to_cartesian([1.0; θ; ϕ])) - ℝ³(0.0, 0.0, 1.23 * offset) for θ in lspaceθ, ϕ in lspaceϕ]
 planeobservable = buildsurface(lscene, planematrix, color, transparency = true)
 
