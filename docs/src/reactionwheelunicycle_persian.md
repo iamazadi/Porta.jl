@@ -7092,6 +7092,10 @@ Description = "Describes the mathematical model of a reaction wheel unicycle rob
 </div>
 ```
 
+![unicycle sidebyside A](./assets/reactionwheelunicycle/unicycle_sidebyside_A.png)
+
+![unicycle side by side B](./assets/reactionwheelunicycle/unicycle_sidebyside_B.png)
+
 ![theproblemsetup](./assets/reactionwheelunicycle/theproblemsetup.jpeg)
 
 ```@raw html
@@ -8162,6 +8166,11 @@ Description = "Describes the mathematical model of a reaction wheel unicycle rob
 </div>
 ```
 
+
+![the tilt estimation graph, data sample 1](./assets/reactionwheelunicycle/tiltestimation_sample1.png)
+
+![the tilt estimation graph, data sample 2](./assets/reactionwheelunicycle/tiltestimation_sample2.png)
+
 ```@raw html
 <div dir = "rtl">
 <h2>
@@ -8190,43 +8199,46 @@ Description = "Describes the mathematical model of a reaction wheel unicycle rob
 ```C
 typedef struct
 {
-  int16_t accX_offset;
-  int16_t accY_offset;
-  int16_t accZ_offset;
-  double accX_scale;
-  double accY_scale;
-  double accZ_scale;
-  int16_t gyrX_offset;
-  int16_t gyrY_offset;
-  int16_t gyrZ_offset;
-  double gyrX_scale;
-  double gyrY_scale;
-  double gyrZ_scale;
+  int16_t accXOffset;
+  int16_t accYOffset;
+  int16_t accZOffset;
+  float accXScale;
+  float accYScale;
+  float accZScale;
+  int16_t gyrXOffset;
+  int16_t gyrYOffset;
+  int16_t gyrZOffset;
+  float gyrXScale;
+  float gyrYScale;
+  float gyrZScale;
   int16_t rawAccX;
   int16_t rawAccY;
   int16_t rawAccZ;
   int16_t rawGyrX;
   int16_t rawGyrY;
   int16_t rawGyrZ;
-  double accX;
-  double accY;
-  double accZ;
-  double gyrX;
-  double gyrY;
-  double gyrZ;
-  double roll;
-  double pitch;
-  double yaw;
-  double roll_velocity;
-  double pitch_velocity;
-  double yaw_velocity;
-  double roll_acceleration;
-  double pitch_acceleration;
-  double yaw_acceleration;
+  float accX;
+  float accY;
+  float accZ;
+  float gyrX;
+  float gyrY;
+  float gyrZ;
+  float roll;
+  float pitch;
+  float yaw;
+  float roll_velocity;
+  float pitch_velocity;
+  float yaw_velocity;
+  float roll_acceleration;
+  float pitch_acceleration;
+  float yaw_acceleration;
+  Mat3 B_A_R; // The rotation of the local frame of the sensor i to the robot frame B̂
+  Vec3 R;     // accelerometer sensor measurements in the local frame of the sensors
+  Vec3 _R;    // accelerometer sensor measurements in the robot body frame
+  Vec3 G;     // gyro sensor measurements in the local frame of the sensors
+  Vec3 _G;    // gyro sensor measurements in the robot body frame
 } IMU;
 ```
-
-
 
 ```@raw html
 <div dir = "rtl">
@@ -8263,12 +8275,12 @@ void updateIMU1(IMU *sensor) // GY-25 I2C
     sensor->rawGyrX = (raw_data[6] << 8) | raw_data[7];
     sensor->rawGyrY = (raw_data[8] << 8) | raw_data[9];
     sensor->rawGyrZ = (raw_data[10] << 8) | raw_data[11];
-    sensor->accX = sensor->accX_scale * (sensor->rawAccX - sensor->accX_offset);
-    sensor->accY = sensor->accY_scale * (sensor->rawAccY - sensor->accY_offset);
-    sensor->accZ = sensor->accZ_scale * (sensor->rawAccZ - sensor->accZ_offset);
-    sensor->gyrX = sensor->gyrX_scale * (sensor->rawGyrX - sensor->gyrX_offset);
-    sensor->gyrY = sensor->gyrY_scale * (sensor->rawGyrY - sensor->gyrY_offset);
-    sensor->gyrZ = sensor->gyrZ_scale * (sensor->rawGyrZ - sensor->gyrZ_offset);
+    sensor->accX = sensor->accXScale * (sensor->rawAccX - sensor->accXOffset);
+    sensor->accY = sensor->accYScale * (sensor->rawAccY - sensor->accYOffset);
+    sensor->accZ = sensor->accZScale * (sensor->rawAccZ - sensor->accZOffset);
+    sensor->gyrX = sensor->gyrXScale * (sensor->rawGyrX - sensor->gyrXOffset);
+    sensor->gyrY = sensor->gyrYScale * (sensor->rawGyrY - sensor->gyrYOffset);
+    sensor->gyrZ = sensor->gyrZScale * (sensor->rawGyrZ - sensor->gyrZOffset);
   } while (HAL_I2C_GetError(&hi2c1) == HAL_I2C_ERROR_AF);
 
   return;
@@ -8291,27 +8303,19 @@ void updateIMU2(IMU *sensor) // GY-95 USART
   if (uart_receive_ok == 1)
   {
     if (UART1_rxBuffer[0] == UART1_txBuffer[0] && UART1_rxBuffer[1] == UART1_txBuffer[1] && UART1_rxBuffer[2] == UART1_txBuffer[2] && UART1_rxBuffer[3] == UART1_txBuffer[3])
-      {
+    {
       sensor->rawAccX = (UART1_rxBuffer[5] << 8) | UART1_rxBuffer[4];
       sensor->rawAccY = (UART1_rxBuffer[7] << 8) | UART1_rxBuffer[6];
       sensor->rawAccZ = (UART1_rxBuffer[9] << 8) | UART1_rxBuffer[8];
       sensor->rawGyrX = (UART1_rxBuffer[11] << 8) | UART1_rxBuffer[10];
       sensor->rawGyrY = (UART1_rxBuffer[13] << 8) | UART1_rxBuffer[12];
       sensor->rawGyrZ = (UART1_rxBuffer[15] << 8) | UART1_rxBuffer[14];
-      sensor->accX = sensor->accX_scale * (sensor->rawAccX - sensor->accX_offset);
-      sensor->accY = sensor->accY_scale * (sensor->rawAccY - sensor->accY_offset);
-      sensor->accZ = sensor->accZ_scale * (sensor->rawAccZ - sensor->accZ_offset);
-      sensor->gyrX = sensor->gyrX_scale * (sensor->rawGyrX - sensor->gyrX_offset);
-      sensor->gyrY = sensor->gyrY_scale * (sensor->rawGyrY - sensor->gyrY_offset);
-      sensor->gyrZ = sensor->gyrZ_scale * (sensor->rawGyrZ - sensor->gyrZ_offset);
-      double dummyx = cos(angle) * sensor->accX - sin(angle) * sensor->accY;
-      double dummyy = sin(angle) * sensor->accX + cos(angle) * sensor->accY;
-      sensor->accX = -dummyy;
-      sensor->accY = dummyx;
-      dummyx = cos(angle) * sensor->gyrX - sin(angle) * sensor->gyrY;
-      dummyy = sin(angle) * sensor->gyrX + cos(angle) * sensor->gyrY;
-      sensor->gyrX = -dummyy;
-      sensor->gyrY = dummyx;
+      sensor->accX = sensor->accXScale * (sensor->rawAccX - sensor->accXOffset);
+      sensor->accY = sensor->accYScale * (sensor->rawAccY - sensor->accYOffset);
+      sensor->accZ = sensor->accZScale * (sensor->rawAccZ - sensor->accZOffset);
+      sensor->gyrX = sensor->gyrXScale * (sensor->rawGyrX - sensor->gyrXOffset);
+      sensor->gyrY = sensor->gyrYScale * (sensor->rawGyrY - sensor->gyrYOffset);
+      sensor->gyrZ = sensor->gyrZScale * (sensor->rawGyrZ - sensor->gyrZOffset);
       uart_receive_ok = 0;
     }
   }
@@ -8327,64 +8331,6 @@ void updateIMU2(IMU *sensor) // GY-95 USART
 
 </p>
 </div>
-```
-
-```c
-// tilt estimation
-// the pivot point B̂ in the inertial frame Ô
-float pivot[3] = {-0.097, -0.1, -0.032};
-// the position of sensors mounted on the body in the body frame of reference
-float p1[3] = {-0.1400, -0.0650, -0.0620};
-float p2[3] = {-0.0400, -0.0600, -0.0600};
-// the vectors of the standard basis for the input space ℝ³
-float e1[3] = {1.0, 0.0, 0.0};
-float e2[3] = {0.0, 1.0, 0.0};
-float e3[3] = {0.0, 0.0, 1.0};
-// The rotation of the inertial frame Ô to the body frame B̂
-float O_B_R[3][3] = {{1.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, {0.0, 0.0, 1.0}};
-float B_O_R[3][3] = {{1.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, {0.0, 0.0, 1.0}};
-// The rotation of the local frame of the sensor i to the robot frame B̂
-float A1_B_R[3][3] = {{1.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, {0.0, 0.0, 1.0}}; // [ê[2] ê[1] ê[3]]
-float A2_B_R[3][3] = {{1.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, {0.0, 0.0, 1.0}}; // [ê[1] ê[2] ê[3]]
-float B_A1_R[3][3] = {{1.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, {0.0, 0.0, 1.0}}; // LinearAlgebra.inv(A1_B_R)
-float B_A2_R[3][3] = {{1.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, {0.0, 0.0, 1.0}}; // LinearAlgebra.inv(A2_B_R)
-// The matrix of unknown parameters
-float Q[3][4] = {{0.0, 0.0, 0.0, 0.0}, {0.0, 0.0, 0.0, 0.0}, {0.0, 0.0, 0.0, 0.0}};
-// The matrix of sensor locations (known parameters)
-float P[4][2] = {{1.0, 1.0}, {-0.043, 0.057}, {0.035, 0.04}, {-0.03, -0.028}}; // [[1.0; vec(p1 - pivot)] [1.0; vec(p2 - pivot)] [1.0; vec(p3 - pivot)] [1.0; vec(p4 - pivot)]]
-// The optimal fusion matrix
-float X[2][4] = {{0.586913, -11.3087, 0.747681, 0.0}, {0.446183, 8.92749, -3.54337, 0.0}}; // transpose(P) * LinearAlgebra.inv(P * transpose(P))
-// accelerometer sensor measurements in the local frame of the sensors
-float R1[3] = {0.0, 0.0, 0.0};
-float R2[3] = {0.0, 0.0, 0.0};
-// accelerometer sensor measurements in the robot body frame
-float _R1[3] = {0.0, 0.0, 0.0};
-float _R2[3] = {0.0, 0.0, 0.0};
-// all sensor measurements combined
-float Matrix[3][2] = {{0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}};
-// The gravity vector
-float g[3] = {0.0, 0.0, 0.0};
-// y-Euler angle (pitch)
-float beta = 0.0;
-float fused_beta = 0.0;
-// x-Euler angle (roll)
-float gamma1 = 0.0;
-float fused_gamma = 0.0;
-// tuning parameters to minimize estimate variance
-float kappa1 = 0.03;
-float kappa2 = 0.03;
-// the average of the body angular rate from rate gyro
-float r[3] = {0.0, 0.0, 0.0};
-// the average of the body angular rate in Euler angles
-float r_dot[3] = {0.0, 0.0, 0.0};
-// gyro sensor measurements in the local frame of the sensors
-float G1[3] = {0.0, 0.0, 0.0};
-float G2[3] = {0.0, 0.0, 0.0};
-// gyro sensor measurements in the robot body frame
-float _G1[3] = {0.0, 0.0, 0.0};
-float _G2[3] = {0.0, 0.0, 0.0};
-// a matrix transfom from body rates to Euler angular rates
-float E[3][3] = {{0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}};
 ```
 
 ```@raw html
@@ -8430,104 +8376,122 @@ void updateIMU(LinearQuadraticRegulator *model)
 {
   updateIMU1(&(model->imu1));
   updateIMU2(&(model->imu2));
-  R1[0] = model->imu1.accX;
-  R1[1] = model->imu1.accY;
-  R1[2] = model->imu1.accZ;
-  R2[0] = model->imu2.accX;
-  R2[1] = model->imu2.accY;
-  R2[2] = model->imu2.accZ;
+  setIndexVec3(&(model->imu1.R), 0, model->imu1.accX);
+  setIndexVec3(&(model->imu1.R), 1, model->imu1.accY);
+  setIndexVec3(&(model->imu1.R), 2, model->imu1.accZ);
+  setIndexVec3(&(model->imu2.R), 0, model->imu2.accX);
+  setIndexVec3(&(model->imu2.R), 1, model->imu2.accY);
+  setIndexVec3(&(model->imu2.R), 2, model->imu2.accZ);
 
-  _R1[0] = 0.0;
-  _R1[1] = 0.0;
-  _R1[2] = 0.0;
-  _R2[0] = 0.0;
-  _R2[1] = 0.0;
-  _R2[2] = 0.0;
-  for (int i = 0; i < 3; i++) {
-    for (int j = 0; j < 3; j++) {
-      _R1[i] += B_A1_R[i][j] * R1[j];
-      _R2[i] += B_A2_R[i][j] * R2[j];
+  for (int i = 0; i < 3; i++)
+  {
+    setIndexVec3(&(model->imu1._R), i, 0.0);
+    setIndexVec3(&(model->imu2._R), i, 0.0);
+  }
+
+  for (int i = 0; i < 3; i++)
+  {
+    for (int j = 0; j < 3; j++)
+    {
+      setIndexVec3(&(model->imu1._R), i, getIndexVec3(model->imu1._R, i) + getIndexMat3(model->imu1.B_A_R, i, j) * getIndexVec3(model->imu1.R, j));
+      setIndexVec3(&(model->imu2._R), i, getIndexVec3(model->imu2._R, i) + getIndexMat3(model->imu2.B_A_R, i, j) * getIndexVec3(model->imu2.R, j));
     }
   }
 
-  for (int i = 0; i < 3; i++) {
-    Matrix[i][0] = _R1[i];
-    Matrix[i][1] = _R2[i];
+  for (int i = 0; i < 3; i++)
+  {
+    setIndexMat32(&(model->Matrix), i, 0, getIndexVec3(model->imu1._R, i));
+    setIndexMat32(&(model->Matrix), i, 1, getIndexVec3(model->imu2._R, i));
   }
 
-  for (int i = 0; i < 3; i++) {
-    for (int j = 0; j < 4; j++) {
-      Q[i][j] = 0.0;
-      for (int k = 0; k < 2; k++) {
-        Q[i][j] += Matrix[i][k] * X[k][j];
+  for (int i = 0; i < 3; i++)
+  {
+    for (int j = 0; j < 4; j++)
+    {
+      setIndexMat34(&(model->Q), i, j, 0.0);
+      for (int k = 0; k < 2; k++)
+      {
+        setIndexMat34(&(model->Q), i, j, getIndexMat34(model->Q, i, j) + getIndexMat32(model->Matrix, i, k) * getIndexMat24(model->X, k, j));
       }
     }
   }
-  g[0] = Q[0][0];
-  g[1] = Q[1][0];
-  g[2] = Q[2][0];
-  beta = atan2(-g[0], sqrt(pow(g[1], 2) + pow(g[2], 2)));
-  gamma1 = atan2(g[1], g[2]);
+  setIndexVec3(&(model->g), 0, getIndexMat34(model->Q, 0, 0));
+  setIndexVec3(&(model->g), 1, getIndexMat34(model->Q, 1, 0));
+  setIndexVec3(&(model->g), 2, getIndexMat34(model->Q, 2, 0));
+  // setIndexVec3(&(model->g), 0, getIndexVec3(model->imu1.R, 0));
+  // setIndexVec3(&(model->g), 1, getIndexVec3(model->imu1.R, 1));
+  // setIndexVec3(&(model->g), 2, getIndexVec3(model->imu1.R, 2));
+  model->beta = atan2(-getIndexVec3(model->g, 0), sqrt(pow(getIndexVec3(model->g, 1), 2) + pow(getIndexVec3(model->g, 2), 2)));
+  model->gamma = atan2(getIndexVec3(model->g, 1), getIndexVec3(model->g, 2));
 
-  G1[0] = model->imu1.gyrX;
-  G1[1] = model->imu1.gyrY;
-  G1[2] = model->imu1.gyrZ;
-  G2[0] = model->imu2.gyrX;
-  G2[1] = model->imu2.gyrY;
-  G2[2] = model->imu2.gyrZ;
+  setIndexVec3(&(model->imu1.G), 0, model->imu1.gyrX);
+  setIndexVec3(&(model->imu1.G), 1, model->imu1.gyrY);
+  setIndexVec3(&(model->imu1.G), 2, model->imu1.gyrZ);
+  setIndexVec3(&(model->imu2.G), 0, model->imu2.gyrX);
+  setIndexVec3(&(model->imu2.G), 1, model->imu2.gyrY);
+  setIndexVec3(&(model->imu2.G), 2, model->imu2.gyrZ);
 
-  _G1[0] = 0.0;
-  _G1[1] = 0.0;
-  _G1[2] = 0.0;
-  _G2[0] = 0.0;
-  _G2[1] = 0.0;
-  _G2[2] = 0.0;
-  for (int i = 0; i < 3; i++) {
-    for (int j = 0; j < 3; j++) {
-      _G1[i] += B_A1_R[i][j] * G1[j];
-      _G2[i] += B_A2_R[i][j] * G2[j];
+  for (int i = 0; i < 3; i++)
+  {
+    setIndexVec3(&(model->imu1._G), i, 0.0);
+    setIndexVec3(&(model->imu2._G), i, 0.0);
+  }
+
+  for (int i = 0; i < 3; i++)
+  {
+    for (int j = 0; j < 3; j++)
+    {
+      setIndexVec3(&(model->imu1._G), i, getIndexVec3(model->imu1._G, i) + getIndexMat3(model->imu1.B_A_R, i, j) * getIndexVec3(model->imu1.G, j));
+      setIndexVec3(&(model->imu2._G), i, getIndexVec3(model->imu2._G, i) + getIndexMat3(model->imu2.B_A_R, i, j) * getIndexVec3(model->imu2.G, j));
     }
   }
-  for (int i = 0; i < 3; i++) {
-    r[i] = (_G1[i] + _G2[i]) / 2.0;
+  for (int i = 0; i < 3; i++)
+  {
+    setIndexVec3(&(model->r), i, (getIndexVec3(model->imu1._G, i) + getIndexVec3(model->imu2._G, i)) / 2.0);
+    // setIndexVec3(&(model->r), i, getIndexVec3(model->imu1._G, i));
   }
 
-  E[0][0] = 0.0;
-  E[0][1] = sin(gamma1) / cos(beta);
-  E[0][2] = cos(gamma1) / cos(beta);
-  E[1][0] = 0.0;
-  E[1][1] = cos(gamma1);
-  E[1][2] = -sin(gamma1);
-  E[2][0] = 1.0;
-  E[2][1] = sin(gamma1) * tan(beta);
-  E[2][2] = cos(gamma1) * tan(beta);
+  setIndexMat3(&(model->E), 0, 0, 0.0);
+  setIndexMat3(&(model->E), 0, 1, sin(model->gamma) / cos(model->beta));
+  setIndexMat3(&(model->E), 0, 2, cos(model->gamma) / cos(model->beta));
+  setIndexMat3(&(model->E), 1, 0, 0.0);
+  setIndexMat3(&(model->E), 1, 1, cos(model->gamma));
+  setIndexMat3(&(model->E), 1, 2, -sin(model->gamma));
+  setIndexMat3(&(model->E), 2, 0, 1.0);
+  setIndexMat3(&(model->E), 2, 1, sin(model->gamma) * tan(model->beta));
+  setIndexMat3(&(model->E), 2, 2, cos(model->gamma) * tan(model->beta));
 
-  r_dot[0] = 0.0;
-  r_dot[1] = 0.0;
-  r_dot[2] = 0.0;
-  for (int i = 0; i < 3; i++) {
-    for (int j = 0; j < 3; j++) {
-      r_dot[i] += E[i][j] * r[j];
-      r_dot[i] += E[i][j] * r[j];
-      r_dot[i] += E[i][j] * r[j];
-      r_dot[i] += E[i][j] * r[j];
+  for (int i = 0; i < 3; i++)
+  {
+    setIndexVec3(&(model->rDot), i, 0.0);
+  }
+
+  for (int i = 0; i < 3; i++)
+  {
+    for (int j = 0; j < 3; j++)
+    {
+      setIndexVec3(&(model->rDot), i, getIndexVec3(model->rDot, i) + getIndexMat3(model->E, i, j) * getIndexVec3(model->r, j));
     }
   }
 
-  fused_beta = kappa1 * beta + (1.0 - kappa1) * (fused_beta + model->dt * (r_dot[1] / 180.0 * M_PI));
-  fused_gamma = kappa2 * gamma1 + (1.0 - kappa2) * (fused_gamma + model->dt * (r_dot[2] / 180.0 * M_PI));
-  model->imu1.yaw += model->dt * r_dot[0];
+  float rDot0 = getIndexVec3(model->rDot, 0) / 180.0 * M_PI;
+  float rDot1 = getIndexVec3(model->rDot, 1) / 180.0 * M_PI;
+  float rDot2 = -getIndexVec3(model->rDot, 2) / 180.0 * M_PI;
+  model->fusedBeta = model->kappa1 * model->beta + (1.0 - model->kappa1) * (model->fusedBeta + model->dt * rDot1);
+  model->fusedGamma = model->kappa2 * (-model->gamma) + (1.0 - model->kappa2) * (model->fusedGamma + model->dt * rDot2);
+  model->alpha += model->dt * rDot0;
 
-  float _roll = fused_beta;
-  float _pitch = -fused_gamma;
-  float _roll_velocity = ((r_dot[1] / 180.0 * M_PI) + (_roll - model->imu1.roll) / model->dt) / 2.0;
-  float _pitch_velocity = ((-r_dot[2] / 180.0 * M_PI) + (_pitch - model->imu1.pitch) / model->dt) / 2.0;
+  float _roll = model->fusedBeta;
+  float _pitch = model->fusedGamma;
+  float _roll_velocity = (rDot1 + (_roll - model->imu1.roll) / model->dt) / 2.0;
+  float _pitch_velocity = (rDot2 + (_pitch - model->imu1.pitch) / model->dt) / 2.0;
   model->imu1.roll_acceleration = _roll_velocity - model->imu1.roll_velocity;
   model->imu1.pitch_acceleration = _pitch_velocity - model->imu1.pitch_velocity;
   model->imu1.roll_velocity = _roll_velocity;
   model->imu1.pitch_velocity = _pitch_velocity;
   model->imu1.roll = _roll;
   model->imu1.pitch = _pitch;
+  model->imu1.yaw = model->alpha;
 }
 ```
 
@@ -9171,8 +9135,7 @@ void updateIMU(LinearQuadraticRegulator *model)
 </h2>
 <p>
 
-هدف الگوریتم سامانگر خطی درجه دوم در ربات تعادلی تک‌چرخ فراهم‌کردن ورودی‌های کنترل دو موتور گیربکس‌دار است، که در طول زمان بدنه‌ی ربات را نسبت به بردار گرانش زمین تراز نگه می‌دارند. برای پشتیبانی از این هدف، یک ساختمان داده تعریف می‌کنیم تا داده‌های مورد نیاز برای محاسبه کردن خروجی‌های تابع کیفیت و تابع تدبیرگر را در آن ذخیره کنیم. این ساختار به ترتیب شامل میدان‌های زیر می‌باشد: ماتریس صافی، ماتریس خودهمبستگی معکوس، ماتریس تدبیرگر پسخوردی، بردار مجموعه‌ی داده، شماره‌ی گام الگوریتم، شماره‌ی زمان کا، تعداد ابعاد بردار حالت سامانه، تعداد ابعاد بردار ورودی، ضریب وزنی نمایی، ثابت دلتا برای پیش‌مقداردهی ماتریس پی، پرچم پایان فعالیت در محیط، پرچم به‌روزرسانی تدبیرگر، پرچم فعال بودن کنترل کننده‌ی ربات، دوره‌ی زمانی در واحد ثانیه، چرخه‌ی کاری مدولاسیون پهنای پالس موتور چرخ عکس‌العملی، چرخه‌ی کاری مدولاسیون پهنای پالس موتور چرخ اصلی، ساختمان داده‌ی واحد موقعیت‌یاب اینرسیایی ۱، ساختمان داده‌ی واحد موقعیت‌یاب اینرسیایی ۲، رمزنگار چرخ عکس‌العملی، رمزنگار چرخ اصلی، حسگر جریان موتور چرخ عکس‌العملی، و حسگر جریان موتور چرخ اصلی ربات.
-
+هدف الگوریتم سامانگر خطی درجه دوم در ربات تعادلی تک‌چرخ فراهم‌کردن ورودی‌های کنترل دو موتور گیربکس‌دار است، که در طول زمان بدنه‌ی ربات را نسبت به بردار گرانش زمین تراز نگه می‌دارند. برای پشتیبانی از این هدف، یک ساختمان داده تعریف می‌کنیم تا داده‌های مورد نیاز برای محاسبه کردن خروجی‌های تابع کیفیت و تابع تدبیرگر را در آن ذخیره کنیم. این ساختار به ترتیب زیر تعریف شده است.
 </p>
 </div>
 ```
@@ -9183,8 +9146,12 @@ typedef struct
 {
   Mat12 W_n;                           // filter matrix
   Mat12 P_n;                           // inverse autocorrelation matrix
-  Mat210f K_j;                         // feedback policy
-  Vec24f dataset;                      // (xₖ, uₖ, xₖ₊₁, uₖ₊₁)
+  Mat210 K_j;                          // feedback policy
+  Vec12 dataset;                       // (xₖ, uₖ)
+  Vec12 z_n;                           // z_n in RLS
+  Vec12 g_n;                           // g_n in RLS
+  Vec12 alpha_n;                       // alpha_n in RLS
+  float x_n_dot_z_n;                   // the inner product of the x_n (dataset) and z_n
   int j;                               // step number
   int k;                               // time k
   int n;                               // xₖ ∈ ℝⁿ
@@ -9192,9 +9159,46 @@ typedef struct
   float lambda;                        // exponential wighting factor
   float delta;                         // value used to intialize P(0)
   int active;                          // is the model controller active
+  float CPUClock;                      // the CPU clock
   float dt;                            // period in seconds
-  float reactionPWM;                   // reaction wheel's motor PWM duty cycle
-  float rollingPWM;                    // rolling wheel's motor PWM duty cycle
+  float reactionDutyCycle;             // reaction wheel's motor PWM duty cycle
+  float rollingDutyCycle;              // rolling wheel's motor PWM duty cycle
+  float reactionDutyCycleChange;       // the maximum incremental change in the reaction motor's duty cycle
+  float rollingDutyCycleChnage;        // the maximum incremental change in the rolling motor's duty cycle
+  float clippingValue;                 // the clipping value for any of the P matrix elements at which the clipping is applied
+  float clippingFactor;                // the coefficient by which the P matrix elements are rescaled through scalar multiplication
+  float rollSafetyAngle;               // the roll angle in radian beyond which the controller must become deactive for safety
+  float pitchSafetyAngle;              // the pitch angle in radian beyond which the controller must become deactive for safety
+  float kappa1;                        // tuning parameters to minimize estimate variance (the ratio between the accelerometer and the gyroscope in sensor fusion)
+  float kappa2;                        // tuning parameters to minimize estimate variance (the ratio between the accelerometer and the gyroscope in sensor fusion)
+  int maxEpisodeLength;                // the maximum number of interactions with the nevironment before the model becomes deactive for safety
+  int logPeriod;                       // the period between printing two log messages in terms of control cycles
+  int logCounter;                      // the number of control cycles elpased since the last log message printing
+  int maxOutOfBounds;                  // the maximum number of consecutive cycles where states are out of the safety bounds
+  int outOfBoundsCounter;              // the number of consecutive times when either of safety angles have been detected out of bounds
+  float alpha;                         // z-Euler angle (yaw)
+  float beta;                          // y-Euler angle (pitch)
+  float gamma;                         // x-Euler angle (roll)
+  float fusedBeta;                     // y-Euler angle (pitch) as the result of fusing the accelerometer sensor measurements with the gyroscope sensor measurements
+  float fusedGamma;                    // x-Euler angle (roll) as the result of fusing the accelerometer sensor measurements with the gyroscope sensor measurements
+  int noiseQuotient;                   // the quotient of the random number for generating the probing noise
+  float noiseScale;                    // the scale of by which the remainder of the probing noise is to be divided
+  float time;                          // the time that has elapsed since the start up of the microcontroller in seconds
+  float changes;                       // the magnitude of the changes to the filter coefficients after one step forward
+  float convergenceThreshold;          // the threshold value of the changes to filter coefficients below which the RLS is assumed to be converged
+  int convergenceCounter;              // the number of consecutive times that the changes to filter coefficients are less than the convergence threshold
+  int convergenceMaxCount;             // the maximum number of consecutive times for the changes below the threshold to determine convergence
+  Mat34 Q;                             // The matrix of unknown parameters
+  Vec3 r;                              // the average of the body angular rate from rate gyro
+  Vec3 rDot;                           // the average of the body angular rate in Euler angles
+  Mat3 E;                              // a matrix transfom from body rates to Euler angular rates
+  Mat24 X;                             // The optimal fusion matrix
+  Mat32 Matrix;                        // all sensor measurements combined
+  Vec3 g;                              // The gravity vector
+  Mat2 Suu;                            // The input-input kernel
+  Mat2 SuuInverse;                     // the inverse of the input-input kernel
+  Mat210 Sux;                          // the input-state kernel
+  Vec2 u_k;                            // the input vector
   IMU imu1;                            // the first inertial measurement unit
   IMU imu2;                            // the second inertial measurement unit
   Encoder reactionEncoder;             // the reaction wheel encoder
@@ -9208,95 +9212,620 @@ typedef struct
 <div dir = "rtl">
 <p>
 
-از ساختمان داده‌ی سامانگر خطی درجه دوم به عنوان پارامتر ورودی دو تابع مختلف استفاده می‌شود: تابع گام برداشتن به جلو، و تابع به‌روزرسانی تدبیرگر پسخوردی. در کنترل ربات در هر چرخه‌ی کنترلی، یک مرتبه تابع گام برداشتن به جلو فراخوانی می‌شود. اما به ازای هر صد مرتبه اجرا شدن تابع گام برداشتن به جلو (یعنی پس از تمام شدن صد چرخه‌ی کنترلی)، یک مرتبه تابع به‌روزرسانی تدبیرگر فراخوانی می‌شود. به عبارتی دیگر، به طور تقریبی یک هزارم ثانیه طول می‌کشد تا اجرا شدن تابع گام برداشتن به جلو تمام شود، و به طور تقریبی هر یک دهم ثانیه یک بار تدبیرگر پسخوردی به‌روزرسانی می‌شود. دلیل این زمان‌بندی برای اجرای حلقه‌ی کنترلی این است که بر اساس خطای استدلال قیاسی، ماتریس‌های صافی و خودهمبستگی معکوس هنگام اجرا شدن تابع «گام برداشتن به جلو» به‌روزرسانی می‌شوند و بعد از صد بار به‌روزرسانی این ماتریس‌ها (تابع کیفیت) نیاز است که یک بار تدبیرگر پسخوردی به‌روزرسانی شود. این کار به تابع «گام برداشتن به جلو» اجازه می‌دهد تا پیش از به‌روزرسانی تدبیرگر، به اندازه‌ی کافی تابع کیفیت را تغییر دهد. در این صورت شواهد و تجربه‌ی کافی برای به‌روزرسانی تدبیرگر فراهم می‌شود و در نتیجه عملکرد ربات در بازه‌های زمانی طولانی‌تر از قابلیت اطمینان و پایداری بیشتری برخوردار خواهد بود.
+تابع گام برداشتن به جلو تابع کیفیت سامانه به نام کیو را با استفاده از الگوریتم حداقل مربعات بازگشتی تشخیص می‌دهد. آرگومان این تابع یک اشاره‌گر به مدل هدایت‌گر می باشد. این الگوریتم تابع کیفیت کیو را در هر گام به‌روزرسانی می‌کند. در نتیجه، ماتریس صافی دابلیو و ماتریس خودهمبستگی معکوس پی به‌روزرسانی می‌شوند. با به کار بردن الگوریتم حداقل مربعات بازگشتی معادله‌ی زیر را بر حسب پارامتر دابلیو به‌روزرسانی می‌کند:
+
+</p>
+</div>
+```
+
+``W_{j + 1}^T (\phi(z_k) - \gamma \phi(z_{k + 1})) = r(x_k, h_j(x_k))``
+
+``W_{j + 1}^T (\phi(z_k) - \phi(z_{k + 1})) = \frac{1}{2} (x_k^T Q x_k + u_k^T R u_k)``
+
+```c
+void stepForward(LinearQuadraticRegulator *model)
+```
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+بردار ضریب‌های صافی در زمان ان، خطای حداقل مربعات وزن‌دار را کمینه می‌کند.
+
+</p>
+</div>
+```
+
+``\textbf{w}_n = \begin{bmatrix} w_n(0) & w_n(1) & \ldots & w_n(p) \end{bmatrix}^T``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+خطای حداقل مربعات وزن‌دار برابر است با مربع نرم خطا در زمان «آی» ضرب در یک عامل وزن‌دهی نمایی، که روی بازه‌ی زمانی مشاهده جمع می‌شود.
+
+</p>
+</div>
+```
+
+``\Epsilon (n) = \sum_{i = 0}^{n} \lambda^{n - i} | e(i) |^2``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+ضریب وزن‌دهی نمایی (فراموشی) با نام لاندا از صفر بزرگ‌تر است و کمتر یا برابر است با یک.
+
+</p>
+</div>
+```
+
+``0 < \lambda \leq 1``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+مقدار خطا در زمان آی برابر است با تفریق میان سیگنال مطلوب و خروجی صافی.
+
+</p>
+</div>
+```
+
+``e(i) = d(i) - y(i) = d(i) - \textbf{w}_n^T x(i)``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+در تعریف مقدار خطا، دی بر حسب آی بیانگر سیگنال مطلوب در زمان آی است، و ایگرگ بر حسب آی بیانگر خروجی صافی در زمان آی. خروجی صافی حاصل یک ضرب ماتریس در بردار است، یعنی ماتریس ضریب‌های صافی ضرب در بردار داده جدید. از آخرین مجموعه‌ی ضریب‌های صافی در زمان ان برای کمینه کردن خطای حداقل مربعات وزن‌دار (اپسیلون) استفاده می‌شود. همچنین، فرض می‌شود که وزن‌های ماتریس دابلیو در بازه ی زمانی مشاهده ثابت می‌باشند. بازه‌ی زمانی مشاهده دارای دو انتها با مقدارهای صفر و ان است.
+
+</p>
+</div>
+```
+
+``\Epsilon (n)``
+
+``[0, n]``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+برای هدف کمینه کردن خطا، مشتق جزیی خطای حداقل مربعات وزن‌دار نسبت به ضریب‌های صافی باید برابر با صفر شود.
+
+</p>
+</div>
+```
+
+``\frac{\partial \Epsilon (n)}{\partial \textbf{w}_n^* (k)} = 0`` 
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+به ازای کا از صفر تا پی، که پی بیانگر مرتبه‌ی صافی می‌باشد.
+
+</p>
+</div>
+```
+
+``k = 0, 1, ..., p``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+به دنبال نتیجه‌ی معادله‌ی مشتق جزیی برابر با صفر، ضریب‌های صافی با استفاده از ماتریس خودهمبستگی تعیین‌پذیر وزن‌دار نمایی تبدیل می‌شود، تا ماتریس همبستگی متقابل تعیین‌پذیر میان سیگنال مطلوب و بردار داده تازه تولید شود.
+
+</p>
+</div>
+```
+
+``\textbf{R}_x(n) \textbf{w}_n = \textbf{r}_{dx}(n)``
+
+``d(n) = \begin{bmatrix} d(n) & d(n - 1) & \ldots & d(0) \end{bmatrix}^T``
+
+``\textbf{x}(i) = \begin{bmatrix} x(i) & x(i - 1) & \ldots & x(i - p) \end{bmatrix}^T``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+بنابراین، معادله‌های طبیعی تعیین‌پذیر، ضریب‌های بهینه را تعریف می‌کنند. ماتریس خودهمبستگی تعیین‌پذیر وزن‌دار نمایی برای بردار داده تازه به این شکل تعریف می‌شود: مجموع ضرب خارجی بردار داده با خودش، که این جمع به طور نمایی با استفاده از عامل نمایی لاندا داده شده انجام می‌شود.
+
+</p>
+</div>
+```
+
+``\textbf{R}_x(n) \in \mathbb{R}^{(p + 1) \times (p + 1)}``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+از طرفی دیگر، ماتریس همبستگی متقابل تعیین‌پذیر، ضرب بیرونی میان سیگنال مطلوب و بردار داده است.
+
+</p>
+</div>
+```
+
+``\left\{ \begin{array}{l} \textbf{r}_{dx}(n) = \sum_{i = 0}^n \lambda^{n - i} d(i) \textbf{x}^*(i) &\\ \textbf{R}_x(n) = \sum_{i = 0}^n \lambda^{n - i} \textbf{x}^*(i) \textbf{x}^T(i) \end{array} \right.``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+ضرب کردن ماتریس ضریب‌های صافی در ماتریس همبستگی متقابل تعیین‌پذیر از سمت چپ و سپس کسر کردن نتیجه از نرم وزن‌دار سیگنال مطلوب، به ما خطای کمینه را می‌دهد.
+
+</p>
+</div>
+```
+
+``\{\Epsilon(n)\}_{min} = || d(n) ||_\lambda^2 - \textbf{r}_{dx}^H(n) \textbf{w}_n``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+هر دو ماتریس خودهمبستگی معکوس تعیین‌پذیر و همبستگی متقابل تعیین‌پذیر به متغیر زمان ان وابسته هستند. پس به جای اینکه به طور مستقیم معادله‌های طبیعی تعیین‌پذیر را حل کنیم، آسان‌تر است که یک راه حل بازگشتی برای ضریب‌های صافی استنتاج کنیم. یک عبارت تصحیح کننده که به راه حل در زمان ان منهای یک اعمال شود، باعث می‌شود که ضریب‌های صافی در زمان ان به دست آید.
+
+</p>
+</div>
+```
+
+``\textbf{R}_x(n) \textbf{w}_n = \textbf{r}_{dx}(n)``
+
+``\textbf{w}_n = \textbf{w}_{n - 1} + \Delta \textbf{w}_{n - 1}``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+برای یک معادله‌ی بازگشتی، ابتدا ماتریس همبستگی متقابل تعیین‌پذیر در زمان ان بر حسب همبستگی متقابل در زمان ان منهای یک استنتاج می‌شود. برای حل کردن ضریب‌های صافی، هر دو طرف معادله‌های طبیعی تعیین‌پذیر را از سمت چپ در معکوس ماتریس خودهمبستگی تعیین‌پذیر ضرب می‌کنیم:
+
+</p>
+</div>
+```
+
+``\textbf{w}_n = \textbf{R}_x^{-1}(n) \textbf{r}_{dx}(n)``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+دوم، معکوس ماتریس خودهمبستگی تعیین‌پذیر را بر حسب معکوس خودهمبستگی تعیین‌پذیر در گام زمانی پیشین (ان منهای یک) و بردار داده‌ی تازه استنتاج می‌کنیم.
+
+</p>
+</div>
+```
+
+``\textbf{r}_{dx}(n) = \sum_{i = 0}^n \lambda^{n - i} d(i) \textbf{x}^*(i)``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+از یک طرف، همبستگی متقابل می‌تواند به طور بازگشتی به عنوان حاصلضرب همبستگی متقابل گام زمانی پیشین در ضریب وزنی، به اضافه‌ی حاصلضرب سیگنال مطلوب در داده تازه، به‌روزرسانی شود. از طرفی دیگر، ماتریس خودهمبستگی معکوس می‌تواند به طور بازگشتی از خودهمبستگی در گام زمانی قبلی و بردار داده‌ی جدید به این صورت به‌روزرسانی شود: خودهمبستگی پیشین را در ضریب وزنی ضرب کنید و سپس نتیجه‌ی حاصلضرب را با ضرب بیرونی بردار داده‌ی تازه در خودش، جمع کنید.
+
+</p>
+</div>
+```
+
+``\left\{ \begin{array}{l} \textbf{r}_{dx}(n) = \lambda \textbf{r}_{dx}(n - 1) + d(n) \textbf{x}^*(n) &\\ \textbf{R}_x(n) = \lambda \textbf{R}_x(n - 1) + \textbf{x}^*(n) \textbf{x}^T(n) \end{array} \right.``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+به این دلیل که معکوس ماتریس خودهمبستگی مورد توجه ماست، از اتحاد وودبری استفاده می‌کنیم. اتحاد ماتریسی وودبری بیان می‌کند که معکوس یک عبارت از رتبه کا که تصحیح‌کننده‌ی یک ماتریس باشد، می‌تواند با محاسبه کردن یک عبارت رتبه کا که تصحیح‌کننده‌ی معکوس ماتریس اصلی است، به دست آید. بر این اساس، حاصلضرب ضریب وزنی لاندا و ماتریس خودهمبستگی در زمان ان منهای یک، باید به عنوان ماتریس اصلی در نظر گرفته شود، در حالی که جفت بردارهایی که با حرف‌های یو و وی در اتحاد نشان داده شده اند، هر دو برابرند با بردار داده‌ی جدید ایکس.
+
+</p>
+</div>
+```
+
+Woodbury's Identity:
+
+``(\textbf{A} + \textbf{u} \textbf{v}^H)^{-1} = \textbf{A}^{-1} - \frac{\textbf{A}^{-1} \textbf{u} \textbf{v}^H \textbf{A}^{-1}}{1 + \textbf{v}^H \textbf{A}^{-1} \textbf{u}}``
+
+``\left\{ \begin{array}{l} \textbf{A} = \lambda \textbf{R}_x(n - 1) &\\ \textbf{u} = \textbf{v} = \textbf{x}^*(n) \end{array} \right.``
+
+``\textbf{R}_x^{-1}(n) = \lambda^{-1} \textbf{R}_x^{-1} (n - 1) - \frac{\lambda^{-2} \textbf{R}_x^{-1} (n - 1) \textbf{x}^*(n) \textbf{x}^T(n) \textbf{R}_x^{-1}(n - 1)}{1 + \lambda^{-1} \textbf{x}^T(n) \textbf{R}_x^{-1}(n - 1) \textbf{x}^*(n)}``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+با نوشتن معکوس ماتریس خودهمبستگی تعیین‌پذیر با استفاده از اتحاد وودبری، به نتیجه می‌رسیم که این ماتریس در زمان ان دارای دو عبارت است. یکی از عبارت‌ها نسخه‌ای وزن‌دار از معکوس ماتریس خودهمبستگی در زمان ان منهای یک می‌باشد. عبارت دیگری که در محاسبه‌ی معکوس ماتریس خودهمبستگی می‌یابیم، حاصلضرب بردار بهره و بردار داده و معکوس ماتریس خودهمبستگی در زمان ان منهای یک است.
+
+</p>
+</div>
+```
+
+
+``\textbf{P}(n) = \textbf{R}_x^{-1}(n)``
+
+``\textbf{P}(n) = \lambda^{-1} [\textbf{P}(n - 1) - \textbf{g}(n) \textbf{x}^T(n) \textbf{P}(n -1)]``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+بردار بهره، جواب معادله‌ی زیر است:
+
+</p>
+</div>
+```
+
+``\textbf{R}_x(n) \textbf{g}(n) = \textbf{x}^*(n)``
+
+``\textbf{g}(n) = \textbf{P}(n) \textbf{x}^*(n)``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+به این ترتیب، بردار بهره با استفاده از ماتریس خودهمبستگی تعیین‌پذیر تبدیل می‌شود تا بردار داده جدید به دست آید. به بیانی دیگر، می‌توان گفت که بردار داده تازه با معکوس ماتریس خودهمبستگی تعیین‌پذیر تبدیل می‌شود تا بردار بهره به دست آید.
+
+</p>
+</div>
+```
+
+``\textbf{g}(n) = \frac{\lambda^{-1} \textbf{P}(n - 1) \textbf{x}^*(n)}{1 + \lambda^{-1} \textbf{x}^T(n) \textbf{P}(n - 1) \textbf{x}^*(n)}``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+این همانند معادله‌های طبیعی تعیین‌پذیر است، اما با این تفاوت که همبستگی متقابل با بردار داده جایگزین شده است و ضریب‌های صافی با بردار بهره جایگزین شده است.
+
+</p>
+</div>
+```
+
+``\left\{ \begin{array}{l} \textbf{R}_x(n) \textbf{w}_n = \textbf{r}_{dx}(n) &\\ \textbf{R}_x(n) \textbf{g}(n) = \textbf{x}^*(n) \end{array} \right.``
+
+```c
+model->x_n_dot_z_n = 0.0;
+float buffer = 0.0;
+for (int i = 0; i < (model->n + model->m); i++)
+{
+  buffer = getIndexVec12(model->dataset, i) * getIndexVec12(model->z_n, i);
+  if (isnanf(buffer) == 0)
+  {
+    model->x_n_dot_z_n += buffer;
+  }
+}
+if (fabs(model->lambda + model->x_n_dot_z_n) > 0)
+{
+  for (int i = 0; i < (model->n + model->m); i++)
+  {
+    setIndexVec12(&(model->g_n), i, (1.0 / (model->lambda + model->x_n_dot_z_n)) * getIndexVec12(model->z_n, i));
+  }
+}
+else
+{
+  for (int i = 0; i < (model->n + model->m); i++)
+  {
+    setIndexVec12(&(model->g_n), i, (1.0 / model->lambda) * getIndexVec12(model->z_n, i));
+  }
+}
+```
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+استنتاج معادله‌ی به‌روزرسانی زمانی بردار ضریب‌ها رابطه‌ی بازگشتی را تکمیل می‌کند. با این نکته شروع می‌کنیم که تبدیل همبستگی متقابل با استفاده از معکوس خودهمبستگی، به نتیجه‌ی تولید ضریب‌های صافی می‌رسد. سپس، همبستگی متقابل بین بردار داده و سیگنال مطلوب را با جواب رابطه‌ی بازگشتی جایگزین می‌کنیم.
+
+</p>
+</div>
+```
+
+``\left\{ \begin{array}{l} \textbf{w}_n = \textbf{P}(n) \textbf{r}_{dx}(n) &\\ \textbf{r}_{dx}(n) = \lambda \textbf{r}_{dx}(n - 1) + d(n) \textbf{x}^*(n) \end{array} \right.``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+با جایگزین کردن جواب با یک عبارت بازگشتی نیمی از راه حل را طی کرده‌ایم، زیرا در معادله‌ی به‌روزرسانی زمانی هنوز باید ماتریس معکوس خودهمبستگی را با معکوس خودهمبستگی بازگشتی جایگزین کنیم:
+
+</p>
+</div>
+```
+
+``\textbf{w}_n = \lambda \textbf{P}(n) \textbf{r}_{dx}(n - 1) + d(n) \textbf{P}(n) \textbf{x}^*(n)``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+به خاطر بیاورید که تبدیل کردن بردار داده با ماتریس خودهمبستگی معکوس به ما بردار بهره را می‌دهد. اما همچنین نشان دادیم که رابطه‌ی بازگشتی معکوس ماتریس خودهمبستگی شامل بردار بهره می‌شود.
+
+</p>
+</div>
+```
+
+``\left\{ \begin{array}{l} \textbf{P}(n) \textbf{x}^*(n) = \textbf{g}(n) &\\ \textbf{P}(n) = \lambda^{-1} [\textbf{P}(n - 1) - \textbf{g}(n) \textbf{x}^T(n) \textbf{P}(n - 1)] \end{array} \right.``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+با این دو حقیقت، به‌روزرسانی ضریب‌های صافی در زمان ان بازنویسی می‌شود تا بر حسب معکوس ماتریس خودهمبستگی در زمان ان منهای یک به دست آید:
+
+</p>
+</div>
+```
+
+``\textbf{w}_n = [\textbf{P}(n - 1) - \textbf{g}(n) \textbf{x}^T(n) \textbf{P}(n - 1)] \textbf{r}_{dx}(n - 1) + d(n) \textbf{g}(n)``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+تا اینجا، ضریب‌های صافی بر حسب مقدارهای زیر استنتاج شدند: ضریب‌های صافی در زمان ان منهای یک، بردار بهره در زمان ان، سیگنال مطلوب در زمان ان، و بردار داده تازه.
+
+</p>
+</div>
+```
+
+``\textbf{w}_n = \textbf{w}_{n - 1} + \textbf{g}(n) [d(n) - \textbf{w}_{n - 1}^T \textbf{x}(n)]``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+برای ساده کردن رابطه‌ی به‌روزرسانی زمانی، به جای تبدیل همبستگی متقابل با معکوس خودهمبستگی از ضریب‌های صافی در زمان ان منهای یک استفاده می‌کنیم:
+
+</p>
+</div>
+```
+
+``\textbf{P}(n - 1) \textbf{r}_{dx}(n - 1) = \textbf{w}_{n - 1}``
+
+```c
+for (int i = 0; i < (model->n + model->m); i++)
+{
+  setIndexVec12(&(model->alpha_n), i, 0.0);
+}
+for (int i = 0; i < (model->n + model->m); i++)
+{
+  for (int j = 0; j < (model->n + model->m); j++)
+  {
+    setIndexVec12(&(model->alpha_n), i, getIndexVec12(model->alpha_n, i) + 0.0 - getIndexMat12(model->W_n, i, j) * getIndexVec12(model->dataset, j));
+  }
+}
+```
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+در این مرحله، یک ساده‌سازی دیگر برای تعریف کردن اصلاحیه‌ی ضریب‌های صافی انجام می‌دهیم، که شامل تبدیل بردار بهره به وسیله‌ی «خطای استدلال پیش سوی» می‌شود.
+
+</p>
+</div>
+```
+
+``\textbf{w}_n = \textbf{w}_{n - 1} + \alpha(n) \textbf{g}(n)``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+«خطای استدلال پیش‌سوی» یک رابطه‌ی تفریقی است بین سیگنال مطلوب در زمان ان و برآورد سیگنال مطلوب با استفاده از مجموعه‌ی ضریب‌های صافی در زمان ان منهای یک.
+
+</p>
+</div>
+```
+
+``\left\{ \begin{array}{l} \alpha(n) = d(n) - \textbf{w}_{n - 1}^T \textbf{x}(n) &\\ e(n) = d(n) - \textbf{w}_n^T \textbf{x}(n) \end{array} \right.``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+«خطای استدلال پیش‌سوی» که با حرف آلفا نشان داده می‌شود، به عنوان خطایی است که اتفاق می‌افتاد اگر ضریب‌های صافی به‌روزرسانی نمی‌شدند. در حالی که «خطای استدلال آزمون مدارانه» که با حرف ای بیان می‌شود، به عنوان خطایی تعریف می‌شود که پس از به‌روزرسانی بردار وزن‌ها (دابلیو پایین‌نویس ان) روی می‌دهد.
 
 </p>
 </div>
 ```
 
 ```c
-// define arrays for matrix-matrix and matrix-vector multiplication
-float x_k[N];
-float u_k[M];
-float x_k1[N];
-float u_k1[M];
-float z_k[N + M];
-float z_k1[N + M];
-float basisset0[N + M];
-float basisset1[N + M];
-float z_n[N + M];
-float K_j[M][N];
-float g_n[N + M];
-float alpha_n[N + M];
-float S_ux[M][N];
-float S_uu[M][M];
-float S_uu_inverse[M][M];
-```
-
-
-```@raw html
-<div dir = "rtl">
-<p>
-
-در هر بار اجرا شدن حلقه‌ی کنترلی یک بردار تصفیه‌شده‌ی اطلاعاتی تولید می‌شود، که با ضرب کردن ماتریس خودهمبستگی معکوس در بردار حالت سامانه به دست می‌آید. سپس، ماتریس بهره برابر است با نسخه‌ای از بردار تصفیه‌شده‌ی اطلاعاتی که تغییر مقیاس داده شده است. اگر ضریب‌های صافی به‌روزرسانی نشده باشند، پس خطایی رخ خواهد داد، که برابر است با حاصل‌ضرب ضریب‌های صافی در فاصله‌ی میان یک جفت مجموعه‌ی پایه. قالب کلی مجموعه‌ی پایه به شکل زیر است:
-
-</p>
-</div>
-```
-
-``(x_k, u_k, x_{k + 1}, u_{k + 1})``.
-
-
-```@raw html
-<div dir = "rtl">
-<p>
-
-نخستین مجموعه‌ی پایه شامل عضوهای زیر است: زاویه‌ی غلت بدنه‌ی ربات، سرعت زاویه‌ای غلت، شتاب زاویه‌ای غلت، زاویه‌ی تاب بدنه‌ی ربات، سرعت زاویه‌ای تاب، شتاب زاویه‌ای تاب، سرعت زاویه‌ای چرخ عکس‌العملی، سرعت زاویه‌ای چرخ اصلی ربات، سرعت جریان الکتریکی عبورکننده از موتور راه‌انداز چرخ عکس‌العملی، سرعت جریان عبورکننده از سیم‌پیچ موتور راه‌انداز چرخ اصلی، و دامنه‌ی سیگنال‌های ورودی موتورها. پس از اینکه اولین مجموعه‌ی پایه اندازه‌گیری شد، یک تدبیر پس‌خور با ارسال کردن سیگنال‌های کنترلی به موتورها اعمال می‌شود. پس از این که کار انجام شد، حالت سامانه از جمله: داده‌های واحد موقعیت‌یاب اینرسیایی، انکودر موتورها، و جریان مصرفی موتورها به روزرسانی می‌شود.
-
-</p>
-</div>
-```
-
-``x_k \in \mathbb{R^{10}}``
-
-``u_k \in \mathbb{R^2}``
-
-
-```@raw html
-<div dir = "rtl">
-<p>
-
-دومین مجموعه‌ی پایه همانند اولین مجموعه می‌باشد، با این تفاوت که مقدار آن پس از اعمال فرمان کنترلی اندازه‌گیری می‌شود. بنابراین، یک خطای استدلال قیاسی با استفاده از همان ضریب‌های صافی محاسبه می‌شود، که به طور مستقیم با میزان تغییرات در دو مجموعه‌ی پایه (پیش و پس از اعمال فرمان کنترلی) متناسب است. هرگاه خطای استدلال قیاسی نابرابر با صفر باشد، ماتریس صافی باید به‌روزرسانی شود. برای به‌روزرسانی ماتریس صافی، ابتدا خطای استدلال قیاسی در ماتریس بهره ضرب می‌شود و سپس حاصل‌ضرب از ضریب‌های صافی کم می‌شود.
-
-</p>
-</div>
+for (int i = 0; i < (model->n + model->m); i++)
+{
+  setIndexVec12(&(model->z_n), i, 0.0);
+}
+for (int i = 0; i < (model->n + model->m); i++)
+{
+  for (int j = 0; j < (model->n + model->m); j++)
+  {
+    setIndexVec12(&(model->z_n), i, getIndexVec12(model->z_n, i) + getIndexMat12(model->P_n, i, j) * getIndexVec12(model->dataset, j));
+  }
+}
 ```
 
 ```@raw html
 <div dir = "rtl">
 <p>
 
-در پایان، ماتریس خودهمبستگی معکوس به روزرسانی می‌شود. برای به‌روزرسانی ماتریس خودهمبستگی معکوس، حاصل‌ضرب ماتریس بهره در بردار تصفیه‌شده‌ی اطلاعاتی از مقدار قبلی ماتریس خودهمبستگی معکوس کم می‌شود. همچنین برای کاهش دادن اثر به‌روزرسانی‌های قدیمی‌تر بر ماتریس‌های بهره و خودهمبستگی معکوس، باید اندازه‌ی هر به‌روزرسانی را با استفاده از یک ضریب وزنی نمایی تعدیل کرد. به این ترتیب، پس از انجام دادن چندین به‌روزرسانی متوالی، ضریب کاهشی (که مقداری بین صفر تا یک دارد) به تعداد به روزرسانی‌های انجام شده در خودش ضرب می‌شود و این باعث می‌شود که ضریب موثر به‌روزرسانی‌های قدیمی بسیار کوچک شود.
+تعریف بردار اطلاعات تصفیه شده باعث می‌شود تا معادله‌های بردار بهره و معکوس ماتریس خودهمبستگی تعیین‌پذیر ساده شوند.
 
 </p>
 </div>
+```
+
+``\left\{ \begin{array}{l} \textbf{g}(n) = \frac{\lambda^{-1} \textbf{P}(n - 1) \textbf{x}^*(n)}{1 + \lambda^{-1} \textbf{x}^T(n) \textbf{P}(n - 1) \textbf{x}^*(n)} &\\ \textbf{P}(n) = \lambda^{-1} [\textbf{P}(n - 1) - \textbf{g}(n) \textbf{x}^T(n) \textbf{P}(n - 1)] \end{array} \right.``
+
+``\textbf{z}(n) = \textbf{P}(n - 1) \textbf{x}^*(n)``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+بردار اطلاعات تصفیه شده که با نماد زد بر حسب ان در زمان ان بیان می‌شود، تبدیل بردار داده تازه در زمان ان توسط معکوس ماتریس خودهمبستگی در زمان ان منهای یک می‌باشد.
+
+</p>
+</div>
+```
+
+``\left\{ \begin{array}{l} \textbf{g}(n) = \frac{1}{\lambda + \textbf{x}^T(n) \textbf{z}(n)} \textbf{z}(n) &\\ \textbf{P}(n) = \frac{1}{\lambda} [\textbf{P}(n - 1) - \textbf{g}(n) \textbf{z}^H(n)] \end{array} \right.``
+
+```c
+// a backup of old filter coefficients before updating for calculating the magnitude of changes
+Mat12 W_1;
+for (int i = 0; i < (model->n + model->m); i++)
+{
+  for (int j = 0; j < (model->n + model->m); j++)
+  {
+    setIndexMat12(&W_1, i, j, getIndexMat12(model->W_n, i, j));
+    buffer = getIndexMat12(model->W_n, i, j) + getIndexVec12(model->alpha_n, i) * getIndexVec12(model->g_n, j);
+    if (isnanf(buffer) == 0)
+    {
+      setIndexMat12(&(model->W_n), i, j, buffer);
+    }
+  }
+}
+model->changes = calculateChanges(W_1, model->W_n);
+```
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+به طور خلاصه، ما پنج معادله را برای کمینه کردن خطای حداقل مربعات وزن‌دار (اپسیلون بر حسب ان) به شکل بازگشتی استنتاج کردیم: بردار اطلاعات تصفیه‌شده، خطای استدلال پیش‌سوی، بردار بهره، ضریب‌های صافی، و معکوس ماتریس خودهمبستگی. این معادله‌ها اجزایی از یک الگوریتم هستند که حداقل مربعات بازگشتی با وزن نمایی نامیده می‌شود.
+
+</p>
+</div>
+```
+
+``\left\{ \begin{array}{l} \textbf{z}(n) = \textbf{P}(n - 1) \textbf{x}^*(n) &\\ \alpha(n) = d(n) - \textbf{w}_{n - 1}^T \textbf{x}(n) &\\ \textbf{g}(n) = \frac{1}{\lambda + \textbf{x}^T(n) \textbf{z}(n)} \textbf{z}(n) &\\ \textbf{w}_n = \textbf{w}_{n - 1} + \alpha(n) \textbf{g}(n) &\\ \textbf{P}(n) = \frac{1}{\lambda} [\textbf{P}(n - 1) - \textbf{g}(n) \textbf{z}^H(n)] \end{array} \right.``
+
+```c
+int scaleFlag = 0;
+for (int i = 0; i < (model->n + model->m); i++)
+{
+  for (int j = 0; j < (model->n + model->m); j++)
+  {
+    buffer = (1.0 / model->lambda) * (getIndexMat12(model->P_n, i, j) - getIndexVec12(model->g_n, i) * getIndexVec12(model->z_n, j));
+    if (isnanf(buffer) == 0)
+    {
+      if (fabs(buffer) > model->clippingValue)
+      {
+        scaleFlag = 1;
+      }
+      setIndexMat12(&(model->P_n), i, j, buffer);
+    }
+  }
+}
+if (scaleFlag == 1)
+{
+  for (int i = 0; i < (model->n + model->m); i++)
+  {
+    for (int j = 0; j < (model->n + model->m); j++)
+    {
+      setIndexMat12(&(model->P_n), i, j, model->clippingFactor * getIndexMat12(model->P_n, i, j));
+    }
+  }
+}
+```
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+هرگاه که عامل وزن‌دهی برابر با یک باشد، لاندا برابر با یک، این الگوریتم «حداقل مربعات بازگشتی با پنجره‌ی زمانی گسترش‌یابنده» نامیده می‌شود، زیرا دارای حافظه‌ای نامتناهی از مسیر است. یعنی این الگوریتم نمونه‌های دورزی را فراموش نمی‌کند، با این وجود که می‌تواند با یک ضریب فراموشی، لاندا کمتر از یک، تاثیر داده‌های قدیمی‌تر را در طول زمان کاهش دهد. اما گونه‌ی «پنجره‌ی لغزنده»‌ی این الگوریتم می‌تواند داده‌های دورزی را به بهای دو برابر کردن حجم محاسبات فراموش کند.
+
+</p>
+</div>
+```
+
+The growing window RLS: ``\lambda = 1``.
+
+The sliding window RLS: ``\lambda < 1``.
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+به‌روزرسانی بازگشتی ضریب‌های صافی (دابلیو پایین‌نویس ان) و معکوس ماتریس خودهمبستگی (پی بر حسب ان) به شرایط اولیه‌ای برای هر دو عبارت نیاز دارد. یک پیشنهاد می‌تواند این باشد که ماتریس خودهمبستگی تعیین‌پذیر با حاصلضرب ماتریس همانی در یک ثابت مثبت کوچک به نام دلتا پیش‌مقداردهی شود.
+
+</p>
+</div>
+```
+
+``\left\{ \begin{array}{l} \textbf{R}_x(0) = \delta \textbf{I} &\\ \textbf{P}(0) = \delta^{-1} \textbf{I} &\\ \textbf{w}_0 = \textbf{0} \end{array} \right.``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+اما قرار دادن بردار صفر به عنوان ضریب‌های صافی باعث نمی‌شود که خطای حداقل مربعات وزن‌دار (اپسیلون در زمان صفر) کمینه شود. پس ضریب‌های صافی در زمان صفر (دابلیو پایین‌نویس صفر) یک بردار اولیه‌ی بهینه نیست. اما با استفاده از یک ضریب فراموشی نمایی کوچک‌تر از یک (لاندا کوچک‌تر از یک)، هنگامی که زمان ان افزایش یابد سوی‌گیری در جواب حداقل مربعات به سمت صفر میل می‌کند.
+
+</p>
+<p>
+
+یک الگوریتم هدایت‌گر بر پایه یادگیری کیفیت که به جواب مساله‌ی سامانگر خطی درجه دوم گسسته در زمان همگرا می‌شود. این کار با حل کردن معادله‌ی ریکاتی جبری در زمان واقعی (به صورت بلادرنگ) انجام می‌شود، بدون دانستن پویایی سامانه و با استفاده از داده اندازه‌گیری شده در طول مسیر سامانه.
+
+</p>
+<p>
+
+یادگیری کیفیت به طور تکرار‌شونده با دو رابطه‌ی بازگشتی زیر پیاده‌سازی می‌شود:
+
+</p>
+</div>
+```
+
+``W_{j + 1}^T (\phi (z_k) - \gamma \phi (z_{k + 1})) = r (x_k, h_j(x_k))``,
+
+``h_{j + 1} (x_k) = \underset{u}{arg \ min} (W_{j + 1}^T \phi (x_k, u))``,
+
+for all ``x \in X``.
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+مشاهده می‌شود که تابع کیفیت (کیو) سامانگر خطی درجه دوم بر حسب مربع حالت ها و ورودی هاست.
+
+</p>
+</div>
+```
+
+``Q(x_k, u_k) = Q(z_k) \equiv (\frac{1}{2}) z_k^T S z_k``
+
+``z_k = \begin{bmatrix} x_k^T &\\ u_k^T \end{bmatrix}``
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+هر بار که تابع گام برداشتن به جلو فراخوانی شود، برای ردیابی تعداد گام‌های زمانی در تعامل با محیط، متغیر شمارنده‌ی کا به اندازه‌ی یک واحد افزایش می‌یابد. این یادآور متغیر شمارنده جی هست، که تعداد به‌روزرسانی‌های تدبیرگر را در تابع به روزرسانی تدبیرگر می‌شمارد. در تابع گام برداشتن به جلو، شمارنده‌ی کا پیش از بازگشت به تابع اصلی برنامه افزایش می‌یابد. تابع در گام زمانی کا به علاوه یک تکرار می‌شود و ادامه می‌یابد تا الگوریتم حداقل مربعات بازگشتی همگرا شود و بردار پارامتر دابلیو پایین‌نویس جی به علاوه یک پیدا شود.
+
+</p>
+</div>
+```
+
+```c
+model->k = model->k + 1;
 ```
 
 ```c
 typedef struct
 {
-  float row0[N + M];
-  float row1[N + M];
-  float row2[N + M];
-  float row3[N + M];
-  float row4[N + M];
-  float row5[N + M];
-  float row6[N + M];
-  float row7[N + M];
-  float row8[N + M];
-  float row9[N + M];
-  float row10[N + M];
-  float row11[N + M];
+  float row0[12];
+  float row1[12];
+  float row2[12];
+  float row3[12];
+  float row4[12];
+  float row5[12];
+  float row6[12];
+  float row7[12];
+  float row8[12];
+  float row9[12];
+  float row10[12];
+  float row11[12];
 } Mat12;
 ```
 
@@ -9304,7 +9833,7 @@ typedef struct
 <div dir = "rtl">
 <p>
 
-در این ربات تنها دو ماتریس صافی و خودهمبستگی معکوس قابلیت ماندگاری در حافظه را دارند. به طوری که در هر بار اجرای حلقه‌ی کنترلی این دو ماتریس تغییر می‌کنند و تغییرات دو ماتریس در حافظه ذخیره می‌شود تا در اجرای بعدی حلقه جای مقدارهای پیشین را بگیرد. اما برای ساختار ماتریس‌ها به یک آرایه‌ی دو بعدی در حافظه نیاز داریم. به دلیل منابع سخت‌افزاری محدود میکروکنترلرها، اختصاص دادن آرایه‌های بزرگ دو بعدی در حافظه‌ی میکروکنترلر مشکل است. بنابراین در ساختار داده‌ی ماتریس‌های صافی و خودهمبستگی معکوس هر سطر به طور جداگانه یک میدان به خود اختصاص می‌دهد تا شکسته شدن داده در حافظه امکان‌پذیر باشد بدون اینکه دسترسی به ماتریس‌ها سخت شود. دو تابع «نسبت دادن اندیس» و «دریافت اندیس» به منظور دسترسی به عنصرهای ماتریس تعریف شده اند. آرگومان‌های تابع دریافت اندیس شامل یک نسخه از ساختمان داده و دو اندیس سطر و ستون است. خروجی تابع دریافت اندیس یک عدد ممیز شناور است که مقدار درایه‌ی ماتریس را با توجه به اندیس‌های داده شده بر می‌گرداند. در حالی که آرگومان‌های تابع نسبت دادن اندیس شامل یک اشاره‌گر به نسخه‌ی اصلی ماتریس در حافظه است، و علاوه بر اندیس‌های سطر و ستون، با مقداری که به درایه‌ی مورد نظر باید نسبت داده شود نیز همراه است. به این ترتیب با دو تابع دسترسی به ماتریس که تعریف کردیم، عملیات به‌روزرسانی ماتریس‌های صافی و خودهمبستگی معکوس رابطی برنامه‌نویسی مشابه با آرایه‌های دو بعدی زبان برنامه‌نویسی سی پیدا می‌کنند.
+در این ربات دو ماتریس صافی و خودهمبستگی معکوس قابلیت ماندگاری در حافظه را دارند. به طوری که در هر بار اجرای حلقه‌ی کنترلی این دو ماتریس تغییر می‌کنند و تغییرات دو ماتریس در حافظه ذخیره می‌شود تا در اجرای بعدی حلقه جای مقدارهای پیشین را بگیرد. اما برای ساختار ماتریس‌ها به یک آرایه‌ی دو بعدی در حافظه نیاز داریم. به دلیل منابع سخت‌افزاری محدود میکروکنترلرها، اختصاص دادن آرایه‌های بزرگ دو بعدی در حافظه‌ی میکروکنترلر مشکل است. بنابراین در ساختار داده‌ی ماتریس‌های صافی و خودهمبستگی معکوس هر سطر به طور جداگانه یک میدان به خود اختصاص می‌دهد تا شکسته شدن داده در حافظه امکان‌پذیر باشد بدون اینکه دسترسی به ماتریس‌ها سخت شود. دو تابع «نسبت دادن اندیس» و «دریافت اندیس» به منظور دسترسی به عنصرهای ماتریس تعریف شده اند. آرگومان‌های تابع دریافت اندیس شامل یک نسخه از ساختمان داده و دو اندیس سطر و ستون است. خروجی تابع دریافت اندیس یک عدد ممیز شناور است که مقدار درایه‌ی ماتریس را با توجه به اندیس‌های داده شده بر می‌گرداند. در حالی که آرگومان‌های تابع نسبت دادن اندیس شامل یک اشاره‌گر به نسخه‌ی اصلی ماتریس در حافظه است، و علاوه بر اندیس‌های سطر و ستون، با مقداری که به درایه‌ی مورد نظر باید نسبت داده شود نیز همراه است. به این ترتیب با دو تابع دسترسی به ماتریس که تعریف کردیم، عملیات به‌روزرسانی ماتریس‌های صافی و خودهمبستگی معکوس رابطی برنامه‌نویسی مشابه با آرایه‌های دو بعدی زبان برنامه‌نویسی سی پیدا می‌کنند.
 
 </p>
 </div>
@@ -9334,229 +9863,80 @@ to the Q function or the control policy at each step.
 */
 void stepForward(LinearQuadraticRegulator *model)
 {
-  x_k[0] = model->dataset.x0;
-  x_k[1] = model->dataset.x1;
-  x_k[2] = model->dataset.x2;
-  x_k[3] = model->dataset.x3;
-  x_k[4] = model->dataset.x4;
-  x_k[5] = model->dataset.x5;
-  x_k[6] = model->dataset.x6;
-  x_k[7] = model->dataset.x7;
-  x_k[8] = model->dataset.x8;
-  x_k[9] = model->dataset.x9;
-  K_j[0][0] = model->K_j.x00;
-  K_j[0][1] = model->K_j.x01;
-  K_j[0][2] = model->K_j.x02;
-  K_j[0][3] = model->K_j.x03;
-  K_j[0][4] = model->K_j.x04;
-  K_j[0][5] = model->K_j.x05;
-  K_j[0][6] = model->K_j.x06;
-  K_j[0][7] = model->K_j.x07;
-  K_j[0][8] = model->K_j.x08;
-  K_j[0][9] = model->K_j.x09;
-  K_j[1][0] = model->K_j.x10;
-  K_j[1][1] = model->K_j.x11;
-  K_j[1][2] = model->K_j.x12;
-  K_j[1][3] = model->K_j.x13;
-  K_j[1][4] = model->K_j.x14;
-  K_j[1][5] = model->K_j.x15;
-  K_j[1][6] = model->K_j.x16;
-  K_j[1][7] = model->K_j.x17;
-  K_j[1][8] = model->K_j.x18;
-  K_j[1][9] = model->K_j.x19;
-  u_k[0] = 0.0;
-  u_k[1] = 0.0;
-  // feeback policy
-  for (int i = 0; i < model->m; i++)
-  {
-    for (int j = 0; j < model->n; j++)
-    {
-      u_k[i] += -K_j[i][j] * x_k[j];
-    }
-  }
-  // act!
-  model->dataset.x0 = model->imu1.roll / M_PI;
-  model->dataset.x1 = model->imu1.roll_velocity / M_PI;
-  model->dataset.x2 = model->imu1.roll_acceleration / M_PI;
-  model->dataset.x3 = model->imu1.pitch / M_PI;
-  model->dataset.x4 = model->imu1.pitch_velocity / M_PI;
-  model->dataset.x5 = model->imu1.pitch_acceleration / M_PI;
-  model->dataset.x6 = model->reactionEncoder.velocity;
-  model->dataset.x7 = model->rollingEncoder.velocity;
-  model->dataset.x8 = model->reactionCurrentSensor.currentVelocity;
-  model->dataset.x9 = model->rollingCurrentSensor.currentVelocity;
-  model->dataset.x10 = u_k[0];
-  model->dataset.x11 = u_k[1];
-
-  model->reactionPWM += (255.0 * pulseStep) * u_k[0];
-  model->rollingPWM += (255.0 * pulseStep) * u_k[1];
-  model->reactionPWM = fmin(255.0 * 255.0, model->reactionPWM);
-  model->reactionPWM = fmax(-255.0 * 255.0, model->reactionPWM);
-  model->rollingPWM = fmin(255.0 * 255.0, model->rollingPWM);
-  model->rollingPWM = fmax(-255.0 * 255.0, model->rollingPWM);
-  TIM2->CCR1 = (int)fabs(model->rollingPWM);
-  TIM2->CCR2 = (int)fabs(model->reactionPWM);
-  if (model->reactionPWM < 0)
-  {
-    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_RESET);
-    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_SET);
-  }
-  else
-  {
-    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_SET);
-    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_RESET);
-  }
-  if (model->rollingPWM < 0)
-  {
-    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2, GPIO_PIN_RESET);
-    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, GPIO_PIN_SET);
-  }
-  else
-  {
-    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2, GPIO_PIN_SET);
-    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, GPIO_PIN_RESET);
-  }
-
-  // dataset = (xₖ, uₖ, xₖ₊₁, uₖ₊₁)
-  encodeWheel(&(model->reactionEncoder), TIM3->CNT);
-  encodeWheel(&(model->rollingEncoder), TIM4->CNT);
-  senseCurrent(&(model->reactionCurrentSensor), &(model->rollingCurrentSensor));
-  updateIMU(model);
-  model->dataset.x12 = model->imu1.roll / M_PI;
-  model->dataset.x13 = model->imu1.roll_velocity / M_PI;
-  model->dataset.x14 = model->imu1.roll_acceleration / M_PI;
-  model->dataset.x15 = model->imu1.pitch / M_PI;
-  model->dataset.x16 = model->imu1.pitch_velocity / M_PI;
-  model->dataset.x17 = model->imu1.pitch_acceleration / M_PI;
-  model->dataset.x18 = model->reactionEncoder.velocity;
-  model->dataset.x19 = model->rollingEncoder.velocity;
-  model->dataset.x20 = model->reactionCurrentSensor.currentVelocity;
-  model->dataset.x21 = model->rollingCurrentSensor.currentVelocity;
-  x_k1[0] = model->dataset.x12;
-  x_k1[1] = model->dataset.x13;
-  x_k1[2] = model->dataset.x14;
-  x_k1[3] = model->dataset.x15;
-  x_k1[4] = model->dataset.x16;
-  x_k1[5] = model->dataset.x17;
-  x_k1[6] = model->dataset.x18;
-  x_k1[7] = model->dataset.x19;
-  x_k1[8] = model->dataset.x20;
-  x_k1[9] = model->dataset.x21;
-  u_k1[0] = 0.0;
-  u_k1[1] = 0.0;
-  for (int i = 0; i < model->m; i++)
-  {
-    for (int j = 0; j < model->n; j++)
-    {
-      u_k1[i] += -K_j[i][j] * x_k1[j];
-    }
-  }
-  model->dataset.x22 = u_k1[0];
-  model->dataset.x23 = u_k1[1];
-  // Compute the quadratic basis sets ϕ(zₖ), ϕ(zₖ₊₁).
-  z_k[0] = model->dataset.x0;
-  z_k[1] = model->dataset.x1;
-  z_k[2] = model->dataset.x2;
-  z_k[3] = model->dataset.x3;
-  z_k[4] = model->dataset.x4;
-  z_k[5] = model->dataset.x5;
-  z_k[6] = model->dataset.x6;
-  z_k[7] = model->dataset.x7;
-  z_k[8] = model->dataset.x8;
-  z_k[9] = model->dataset.x9;
-  z_k[10] = model->dataset.x10;
-  z_k[11] = model->dataset.x11;
-  z_k1[0] = model->dataset.x12;
-  z_k1[1] = model->dataset.x13;
-  z_k1[2] = model->dataset.x14;
-  z_k1[3] = model->dataset.x15;
-  z_k1[4] = model->dataset.x16;
-  z_k1[5] = model->dataset.x17;
-  z_k1[6] = model->dataset.x18;
-  z_k1[7] = model->dataset.x19;
-  z_k1[8] = model->dataset.x20;
-  z_k1[9] = model->dataset.x21;
-  z_k1[10] = model->dataset.x22;
-  z_k1[11] = model->dataset.x23;
   for (int i = 0; i < (model->n + model->m); i++)
   {
-    basisset0[i] = z_k[i];
-    basisset1[i] = z_k1[i];
-  }
-  // Now perform a one-step update in the parameter vector W by applying RLS to equation (S27).
-  // initialize z_n
-  for (int i = 0; i < (model->n + model->m); i++)
-  {
-    z_n[i] = 0.0;
+    setIndexVec12(&(model->z_n), i, 0.0);
   }
   for (int i = 0; i < (model->n + model->m); i++)
   {
     for (int j = 0; j < (model->n + model->m); j++)
     {
-      z_n[i] += getIndex(model->P_n, i, j) * z_k[j];
+      setIndexVec12(&(model->z_n), i, getIndexVec12(model->z_n, i) + getIndexMat12(model->P_n, i, j) * getIndexVec12(model->dataset, j));
     }
   }
-  z_k_dot_z_n = 0.0;
+  model->x_n_dot_z_n = 0.0;
   float buffer = 0.0;
   for (int i = 0; i < (model->n + model->m); i++)
   {
-    buffer = z_k[i] * z_n[i];
+    buffer = getIndexVec12(model->dataset, i) * getIndexVec12(model->z_n, i);
     if (isnanf(buffer) == 0)
     {
-      z_k_dot_z_n += buffer;
+      model->x_n_dot_z_n += buffer;
     }
   }
-  if (fabs(model->lambda + z_k_dot_z_n) > 0)
+  if (fabs(model->lambda + model->x_n_dot_z_n) > 0)
   {
     for (int i = 0; i < (model->n + model->m); i++)
     {
-      g_n[i] = (1.0 / (model->lambda + z_k_dot_z_n)) * z_n[i];
+      setIndexVec12(&(model->g_n), i, (1.0 / (model->lambda + model->x_n_dot_z_n)) * getIndexVec12(model->z_n, i));
     }
   }
   else
   {
     for (int i = 0; i < (model->n + model->m); i++)
     {
-      g_n[i] = (1.0 / model->lambda) * z_n[i];
+      setIndexVec12(&(model->g_n), i, (1.0 / model->lambda) * getIndexVec12(model->z_n, i));
     }
   }
-  // αₙ = dₙ - transpose(wₙ₋₁) * xₙ
-  // initialize alpha_n
   for (int i = 0; i < (model->n + model->m); i++)
   {
-    alpha_n[i] = 0.0;
+    setIndexVec12(&(model->alpha_n), i, 0.0);
   }
   for (int i = 0; i < (model->n + model->m); i++)
   {
     for (int j = 0; j < (model->n + model->m); j++)
     {
-      alpha_n[i] += getIndex(model->W_n, i, j) * (basisset0[j] - basisset1[j]); // checked manually
+      setIndexVec12(&(model->alpha_n), i, getIndexVec12(model->alpha_n, i) + 0.0 - getIndexMat12(model->W_n, i, j) * getIndexVec12(model->dataset, j));
     }
   }
+  // a backup of old filter coefficients before updating for calculating the magnitude of changes
+  Mat12 W_1;
   for (int i = 0; i < (model->n + model->m); i++)
   {
     for (int j = 0; j < (model->n + model->m); j++)
     {
-      buffer = getIndex(model->W_n, i, j) + (alpha_n[i] * g_n[j]);
+      setIndexMat12(&W_1, i, j, getIndexMat12(model->W_n, i, j));
+      buffer = getIndexMat12(model->W_n, i, j) + getIndexVec12(model->alpha_n, i) * getIndexVec12(model->g_n, j);
       if (isnanf(buffer) == 0)
       {
-        setIndex(&(model->W_n), i, j, buffer); // checked manually
+        setIndexMat12(&(model->W_n), i, j, buffer);
       }
     }
   }
+  model->changes = calculateChanges(W_1, model->W_n);
   int scaleFlag = 0;
   for (int i = 0; i < (model->n + model->m); i++)
   {
     for (int j = 0; j < (model->n + model->m); j++)
     {
-      buffer = (1.0 / model->lambda) * (getIndex(model->P_n, i, j) - g_n[i] * z_n[j]);
+      buffer = (1.0 / model->lambda) * (getIndexMat12(model->P_n, i, j) - getIndexVec12(model->g_n, i) * getIndexVec12(model->z_n, j));
       if (isnanf(buffer) == 0)
       {
-        if (fabs(buffer) > clipping)
+        if (fabs(buffer) > model->clippingValue)
         {
           scaleFlag = 1;
         }
-        setIndex(&(model->P_n), i, j, buffer); // checked manually
+        setIndexMat12(&(model->P_n), i, j, buffer);
       }
     }
   }
@@ -9566,7 +9946,7 @@ void stepForward(LinearQuadraticRegulator *model)
     {
       for (int j = 0; j < (model->n + model->m); j++)
       {
-        setIndex(&(model->P_n), i, j, 0.9 * getIndex(model->P_n, i, j)); // checked manually
+        setIndexMat12(&(model->P_n), i, j, model->clippingFactor * getIndexMat12(model->P_n, i, j));
       }
     }
   }
@@ -9575,6 +9955,8 @@ void stepForward(LinearQuadraticRegulator *model)
   return;
 }
 ```
+
+![telemetry sample 1](./assets/reactionwheelunicycle/telemetry_sample1.png)
 
 ```@raw html
 <div dir = "rtl">
@@ -9586,18 +9968,7 @@ void stepForward(LinearQuadraticRegulator *model)
 </div>
 ```
 
-```c
-z_k1_dot_z_n = 0.0;
-float buffer = 0.0;
-for (int i = 0; i < (model->n + model->m); i++)
-{
-  buffer = z_k1[i] * z_n[i];
-  if (isnanf(buffer) == 0)
-  {
-    z_k1_dot_z_n += buffer;
-  }
-}
-```
+![telemetry sample 2](./assets/reactionwheelunicycle/telemetry_sample2.png)
 
 ```@raw html
 <div dir = "rtl">
@@ -9616,40 +9987,38 @@ void updateControlPolicy(LinearQuadraticRegulator *model)
   // Q(xₖ, uₖ) ≡ 0.5 * transpose([xₖ; uₖ]) * S * [xₖ; uₖ] = 0.5 * transpose([xₖ; uₖ]) * [Sₓₓ Sₓᵤ; Sᵤₓ Sᵤᵤ] * [xₖ; uₖ]
   model->k = 1;
   model->j = model->j + 1;
-  // initialize the filter matrix
-  // putBuffer(model->m + model->n, model->m + model->n, W_n, model->W_n);
 
   for (int i = 0; i < model->m; i++)
   {
     for (int j = 0; j < model->n; j++)
     {
-      S_ux[i][j] = getIndex(model->W_n, model->n + i, j);
+      setIndexMat210(&(model->Sux), i, j, getIndexMat12(model->W_n, model->n + i, j));
     }
   }
   for (int i = 0; i < model->m; i++)
   {
     for (int j = 0; j < model->m; j++)
     {
-      S_uu[i][j] = getIndex(model->W_n, model->n + i, model->n + j);
+      setIndexMat2(&(model->Suu), i, j, getIndexMat12(model->W_n, model->n + i, model->n + j));
     }
   }
 
   // Perform the control update using (S24), which is uₖ = -S⁻¹ᵤᵤ * Sᵤₓ * xₖ
   // uₖ = -S⁻¹ᵤᵤ * Sᵤₓ * xₖ
-  float determinant = S_uu[1][1] * S_uu[2][2] - S_uu[1][2] * S_uu[2][1];
+  float determinant = getIndexMat2(model->Suu, 1, 1) * getIndexMat2(model->Suu, 2, 2) - getIndexMat2(model->Suu, 1, 2) * getIndexMat2(model->Suu, 2, 1);
   // check the rank of S_uu to see if it's equal to 2 (invertible matrix)
-  if (fabs(determinant) > 0.0001) // greater than zero
+  if (fabs(determinant) > 0.001) // greater than zero
   {
-    S_uu_inverse[0][0] = S_uu[1][1] / determinant;
-    S_uu_inverse[0][1] = -S_uu[0][1] / determinant;
-    S_uu_inverse[1][0] = -S_uu[1][0] / determinant;
-    S_uu_inverse[1][1] = S_uu[0][0] / determinant;
+    setIndexMat2(&(model->SuuInverse), 0, 0, getIndexMat2(model->Suu, 1, 1) / determinant);
+    setIndexMat2(&(model->SuuInverse), 0, 1, -getIndexMat2(model->Suu, 0, 1) / determinant);
+    setIndexMat2(&(model->SuuInverse), 1, 0, -getIndexMat2(model->Suu, 1, 0) / determinant);
+    setIndexMat2(&(model->SuuInverse), 1, 1, getIndexMat2(model->Suu, 0, 0) / determinant);
     // initialize the gain matrix
     for (int i = 0; i < model->m; i++)
     {
       for (int j = 0; j < model->n; j++)
       {
-        K_j[i][j] = 0.0;
+        setIndexMat210(&(model->K_j), i, j, 0.0);
       }
     }
     for (int i = 0; i < model->m; i++)
@@ -9658,34 +10027,68 @@ void updateControlPolicy(LinearQuadraticRegulator *model)
       {
         for (int k = 0; k < model->m; k++)
         {
-          K_j[i][j] += S_uu_inverse[i][k] * S_ux[k][j];
+          setIndexMat210(&(model->K_j), i, j, getIndexMat210(model->K_j, i, j) + getIndexMat2(model->SuuInverse, i, k) * getIndexMat210(model->Sux, k, j));
         }
       }
     }
-    model->K_j.x00 = K_j[0][0];
-    model->K_j.x01 = K_j[0][1];
-    model->K_j.x02 = K_j[0][2];
-    model->K_j.x03 = K_j[0][3];
-    model->K_j.x04 = K_j[0][4];
-    model->K_j.x05 = K_j[0][5];
-    model->K_j.x06 = K_j[0][6];
-    model->K_j.x07 = K_j[0][7];
-    model->K_j.x08 = K_j[0][8];
-    model->K_j.x09 = K_j[0][9];
-    model->K_j.x10 = K_j[1][0];
-    model->K_j.x11 = K_j[1][1];
-    model->K_j.x12 = K_j[1][2];
-    model->K_j.x13 = K_j[1][3];
-    model->K_j.x14 = K_j[1][4];
-    model->K_j.x15 = K_j[1][5];
-    model->K_j.x16 = K_j[1][6];
-    model->K_j.x17 = K_j[1][7];
-    model->K_j.x18 = K_j[1][8];
-    model->K_j.x19 = K_j[1][9];
   }
   return;
 }
 ```
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+گام زمانی «جی» تنها زمانی افزایش می‌یابد که گام زمانی «کا» به مقدار یک بازگردد. اما زمان کا وقتی به یک برمی‌گردد که الگوریتم حداقل مربعات بازگشتی به یک جواب همگرا شود. «تغییرات» تدریجی که به ضریب‌های صافی اعمال می‌شوند، با جمع کردن قدر مطلق به‌روزرسانی‌های تدریجی ضریب‌های صافی به دست می‌آید.
+
+</p>
+</div>
+```
+
+``\Delta W_n = abs(W_n - W_{n - 1})``
+
+```c
+float calculateChanges(Mat12 W_1, Mat12 W_2)
+{
+  float changes = 0.0;
+  for (int i = 0; i < 12; i++)
+  {
+    for (int j = 0; j < 12; j++)
+    {
+      changes += fabs(getIndexMat12(W_2, i, j) - getIndexMat12(W_1, i, j));
+    }
+  }
+  return changes;
+}
+```
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+یک شمارنده تعریف کرده‌ایم تا دفعات پشت سر همی که اندازه‌ی تغییرات تدریجی ضریب‌های صافی کوچک‌تر از یک آستانه باشد را بشمارد. پس از پنج تغییر کوچک‌تر از آستانه که به صورت متوالی تکرار شود، تدبیرگر با ضریب‌های صافی داده شده به‌روزرسانی می‌شود. توجه کنید که این شیوه‌ی تعیین کردن شرط همگرایی الگوریتم حداقل مربعات بازگشتی به ما اجازه می‌دهد تا مقدار آستانه را بیشتر کنیم. در غیر این صورت به اندازه‌ی آستانه‌ی کوچک‌تری نیاز داریم تا همگرایی جواب الگوریتم را بر اساس فقط یک دوره‌ی اجرا تعیین کنیم. با راحت‌تر شدن آستانه تغییرات تدریجی و مشاهده کردن تغییرات در خلال پنج دوره‌ی اجرایی، اول اینکه تدبیرگرهای خوب برای مدت زمان طولانی‌تری نگه داشته می‌شوند، و دوم اینکه هدایت‌گر سامانه تدبیرگرهای قابل اطمینان‌تری گزینش می‌کند.
+
+</p>
+</div>
+```
+
+``\Delta W_n < 2.5``
+
+![times j and k and filter changes, data sample 1](./assets/reactionwheelunicycle/jkchanges_sample1.png)
+
+```@raw html
+<div dir = "rtl">
+<p>
+
+در نمودار بالا به نظر می‌رسد که گام زمانی «کا» در طول اجرای دو دقیقه‌ای آزمایشی به طور مرتب بالا می‌رود. اما با توجه به اینکه هنگامی که هدایت‌گر فعال است، مقدار کا به ندرت بیشتر از ۱۰۰ واحد می‌شود، الگوریتم حداقل مربعات بازگشتی در کمتر از ۱۰۰ دفعه تکرار همگرا می‌شود.
+
+</p>
+</div>
+```
+
+![times j and k and filter changes, data sample 2](./assets/reactionwheelunicycle/jkchanges_sample2.png)
+
 
 ```@raw html
 <div dir = "rtl">
@@ -9698,58 +10101,6 @@ void updateControlPolicy(LinearQuadraticRegulator *model)
 ```
 
 ![buttonsandlights](./assets/reactionwheelunicycle/schematics/buttonsandlights.jpeg)
-
-```@raw html
-<div dir = "rtl">
-<p>
-
-پارامترهای الگوریتم حداقل مربعات بازگشتی:
-
-</p>
-</div>
-```
-
-``p = Filter \ order``
-
-``\lambda = Exponential \ weighting \ factor``
-
-``\delta = Value \ used \ to \ initialize \ \textbf{P}(0)``
-
-```@raw html
-<div dir = "rtl">
-<p>
-
-پیش‌مقداردهی الگوریتم حداقل مربعات بازگشتی:
-
-</p>
-</div>
-```
-
-``\textbf{w}_0 = \textbf{0}``
-
-``\textbf{P}(0) = \delta^{-1} \textbf{I}``
-
-```@raw html
-<div dir = "rtl">
-<p>
-
-محاسبات الگوریتم حداقل مربعات بازگشتی:
-
-</p>
-</div>
-```
-
-``For \ n = 1, 2, ... \ compute``
-
-``\textbf{z}(n) = \textbf{P}(n - 1) x^*(n)``
-
-``\textbf{g}(n) = \frac{1}{\lambda + \textbf{x}^T(n) \textbf{z}(n)} \textbf{z}(n)``
-
-``\alpha(n) = d(n) - \textbf{w}_{n - 1}^T \textbf{x}(n)``
-
-``\textbf{w}_n = \textbf{w}_{n - 1} + \alpha(n) \textbf{g}(n)``
-
-``\textbf{P}(n) = \frac{1}{\lambda} [\textbf{P}(n - 1) - \textbf{g}(n) \textbf{z}^H(n)]``
 
 ```@raw html
 <div dir = "rtl">
@@ -9800,7 +10151,7 @@ model.dt = dt;
 ```c
 while (1)
 {
-  t1 = DWT->CYCCNT;
+  elapsedTime1 = DWT->CYCCNT;
 
   if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_0) == 0)
   {
@@ -9813,13 +10164,19 @@ while (1)
   else
   {
     model.active = 0;
-    model.reactionPWM = 0.0;
-    model.rollingPWM = 0.0;
-    TIM2->CCR1 = 0;
-    TIM2->CCR2 = 0;
+    resetActuators(&model);
   }
 
-  if (fabs(model.imu1.roll) > roll_safety_angle || fabs(model.imu1.pitch) > pitch_safety_angle || model.k > max_episode_length)
+  if (fabs(model.imu1.roll) > model.rollSafetyAngle || fabs(model.imu1.pitch) > model.pitchSafetyAngle || model.j > model.maxEpisodeLength)
+  {
+    model.outOfBoundsCounter = model.outOfBoundsCounter + 1;
+  }
+  else
+  {
+    model.outOfBoundsCounter = fmax(0, model.outOfBoundsCounter - 1);
+  }
+
+  if (model.outOfBoundsCounter > model.maxOutOfBounds)
   {
     model.active = 0;
     HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
@@ -9827,56 +10184,63 @@ while (1)
 
   if (model.active == 1)
   {
+    t1 = DWT->CYCCNT;
+    updateSensors(&model);
+    computeFeedbackPolicy(&model);
+    applyFeedbackPolicy(&model);
     stepForward(&model);
+    if (fabs(model.changes) < model.convergenceThreshold)
+    {
+      model.convergenceCounter = model.convergenceCounter + 1;
+    }
+    else
+    {
+      model.convergenceCounter = 0;
+    }
+    if (model.convergenceCounter >= model.convergenceMaxCount)
+    {
+      updateControlPolicy(&model);
+    }
+    model.logCounter = model.logCounter + 1;
+    t2 = DWT->CYCCNT;
+    diff = t2 - t1;
+    model.dt = (float)diff / model.CPUClock;
   }
   else
   {
-    model.reactionPWM = 0.0;
-    model.rollingPWM = 0.0;
-    TIM2->CCR1 = 0;
-    TIM2->CCR2 = 0;
-    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_RESET);
-    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_RESET);
-    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2, GPIO_PIN_RESET);
-    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, GPIO_PIN_RESET);
-    encodeWheel(&model.reactionEncoder, TIM3->CNT);
-    encodeWheel(&model.rollingEncoder, TIM4->CNT);
-    senseCurrent(&(model.reactionCurrentSensor), &(model.rollingCurrentSensor));
-    updateIMU(&model);
-  }
-  if (model.k % updatePolicyPeriod == 0)
-  {
-    updateControlPolicy(&model);
+    t1 = DWT->CYCCNT;
+    resetActuators(&model);
+    updateSensors(&model);
+    computeFeedbackPolicy(&model);
+    model.logCounter = model.logCounter + 1;
+    t2 = DWT->CYCCNT;
+    diff = t2 - t1;
+    model.dt = (float)diff / model.CPUClock;
   }
 
-  model.imu1.yaw += dt * r_dot[2];
-
-  t2 = DWT->CYCCNT;
-  diff = t2 - t1;
-  dt = (float)diff / CPU_CLOCK;
-  model.dt = dt;
-
-  log_counter++;
-  if (log_counter > LOG_CYCLE && HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_1) == 0)
+  if (model.logCounter > model.logPeriod && HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_1) == 0)
   {
     transmit = 1;
   }
   if (transmit == 1)
   {
+    t1 = DWT->CYCCNT;
     transmit = 0;
-    log_counter = 0;
+    model.logCounter = 0;
 
-    if (log_status == 0)
-    {
-      sprintf(MSG,
-              "AX1: %0.2f, AY1: %0.2f, AZ1: %0.2f, | AX2: %0.2f, AY2: %0.2f, AZ2: %0.2f, | roll: %0.2f, pitch: %0.2f, | encT: %0.2f, encB: %0.2f, | P0: %0.2f, P1: %0.2f, P2: %0.2f, P3: %0.2f, P4: %0.2f, dt: %0.6f\r\n",
-              model.imu1.accX, model.imu1.accY, model.imu1.accZ, model.imu2.accX, model.imu2.accY, model.imu2.accZ, model.imu1.roll, model.imu1.pitch, model.reactionEncoder.radianAngle, model.rollingEncoder.radianAngle, getIndex(model.P_n, 0, 0), getIndex(model.P_n, 1, 1), getIndex(model.P_n, 2, 2), getIndex(model.P_n, 3, 3), getIndex(model.P_n, 4, 4), dt);
-      log_status = 0;
-    }
+    sprintf(MSG,
+            "active: %0.1f, changes: %0.2f, | AX1: %0.2f, AY1: %0.2f, AZ1: %0.2f, | AX2: %0.2f, AY2: %0.2f, AZ2: %0.2f, | roll: %0.2f, pitch: %0.2f, yaw: %0.2f, | encT: %0.2f, encB: %0.2f, | j: %0.1f, k: %0.1f, | P0: %0.2f, P1: %0.2f, P2: %0.2f, P3: %0.2f, P4: %0.2f, P5: %0.2f, P6: %0.2f, P7: %0.2f, P8: %0.2f, P9: %0.2f, P10: %0.2f, P11: %0.2f, time: %0.2f, dt: %0.6f\r\n",
+            (float)model.active, model.changes, model.imu1.accX, model.imu1.accY, model.imu1.accZ, model.imu2.accX, model.imu2.accY, model.imu2.accZ, model.fusedBeta, model.fusedGamma, model.alpha, model.reactionEncoder.radianAngle, model.rollingEncoder.radianAngle, (float)model.j, (float)model.k, getIndexMat12(model.P_n, 0, 0), getIndexMat12(model.P_n, 1, 1), getIndexMat12(model.P_n, 2, 2), getIndexMat12(model.P_n, 3, 3), getIndexMat12(model.P_n, 4, 4), getIndexMat12(model.P_n, 5, 5), getIndexMat12(model.P_n, 6, 6), getIndexMat12(model.P_n, 7, 7), getIndexMat12(model.P_n, 8, 8), getIndexMat12(model.P_n, 9, 9), getIndexMat12(model.P_n, 10, 10), getIndexMat12(model.P_n, 11, 11), model.time, model.dt);
 
     HAL_UART_Transmit(&huart6, MSG, sizeof(MSG), 1000);
+    t2 = DWT->CYCCNT;
+    diff = t2 - t1;
+    model.dt += (float)diff / model.CPUClock;
   }
   // Rinse and repeat :)
+  elapsedTime2 = DWT->CYCCNT;
+  elapsedTime = elapsedTime2 - elapsedTime1;
+  model.time += (float)elapsedTime / model.CPUClock;
 }
 ```
 
@@ -9905,11 +10269,12 @@ while (1)
 ```c
 typedef struct
 {
-  int pulse_per_revolution;    // the number of pulses per revolution
-  int value;                   // the counter
-  double angle;                // the absolute angle
-  double velocity;             // the angular velocity
-  double acceleration;         // the angular acceleration
+  int pulse_per_revolution; // the number of pulses per revolution
+  int value;                // the counter
+  float radianAngle;        // the angle in radian
+  float angle;              // the absolute angle
+  float velocity;           // the angular velocity
+  float acceleration;       // the angular acceleration
 } Encoder;
 ```
 
@@ -9940,11 +10305,25 @@ typedef struct
 ```c
 void encodeWheel(Encoder *encoder, int newValue)
 {
+  int difference = newValue - encoder->value;
+  if (abs(difference) > 30000)
+  {
+    if (newValue > 30000)
+    {
+      difference = (newValue - 65535) - encoder->value;
+    }
+    else
+    {
+      difference = newValue - (encoder->value - 65535);
+    }
+  }
   encoder->value = newValue;
-  double angle = sin((float)(encoder->value % encoder->pulse_per_revolution) / (double) encoder->pulse_per_revolution * 2.0 * M_PI);
-  double velocity = angle - encoder->angle;
-  double acceleration = velocity - encoder->velocity;
-  encoder->angle = angle;
+  float angle = encoder->radianAngle + (float)difference / (float)encoder->pulse_per_revolution * 2.0 * M_PI;
+  // encoder->radianAngle = (float)(encoder->value % encoder->pulse_per_revolution) / (float)encoder->pulse_per_revolution * 2.0 * M_PI;
+  // float angle = sin(encoder->radianAngle);
+  float velocity = angle - encoder->radianAngle;
+  float acceleration = velocity - encoder->velocity;
+  encoder->radianAngle = angle;
   encoder->velocity = velocity;
   encoder->acceleration = acceleration;
   return;
@@ -9978,10 +10357,10 @@ void encodeWheel(Encoder *encoder, int newValue)
 ```c
 typedef struct
 {
-  double currentScale;
+  float currentScale;
   int current0;
   int current1;
-  double currentVelocity;
+  float currentVelocity;
 } CurrentSensor;
 ```
 
@@ -10004,8 +10383,8 @@ void senseCurrent(CurrentSensor *reactionCurrentSensor, CurrentSensor *rollingCu
   rollingCurrentSensor->current1 = rollingCurrentSensor->current0;
   reactionCurrentSensor->current0 = (AD_RES_BUFFER[0] << 4);
   rollingCurrentSensor->current0 = (AD_RES_BUFFER[1] << 4);
-  reactionCurrentSensor->currentVelocity = (double) (reactionCurrentSensor->current0 - reactionCurrentSensor->current1) / reactionCurrentSensor->currentScale;
-  rollingCurrentSensor->currentVelocity = (double) (rollingCurrentSensor->current0 - rollingCurrentSensor->current1) / rollingCurrentSensor->currentScale;
+  reactionCurrentSensor->currentVelocity = (float)(reactionCurrentSensor->current0 - reactionCurrentSensor->current1) / reactionCurrentSensor->currentScale;
+  rollingCurrentSensor->currentVelocity = (float)(rollingCurrentSensor->current0 - rollingCurrentSensor->current1) / rollingCurrentSensor->currentScale;
 }
 ```
 

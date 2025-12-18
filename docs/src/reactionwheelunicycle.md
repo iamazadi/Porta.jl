@@ -57,7 +57,7 @@ Among positioning peripherals, sensors that measure the acceleration, the rotati
 
 Every accelerometer based on Micro Electro Mechanical Systems (MEMS) has some sort of moving part inside of it, such that it moves under the influence of external forces. This part is held in place using a spring structure, and the displacement caused by the external force on it, is measured using various methods such as the change in capacitance. The Hooke's law states that the force excerted by a spring is directly proportional to the displacement caused by that force. Then, knowing the spring constant (the force per unit of distance traveled) and the mass of the part, this displacement is transformed to its equivalent acceleration. Therefore, MEMS accelerometers measure an external force excerted on the moving part. That is why these accelerometers measure the static acceleration (the Earth's gravity) and the dynamical acceleration (due to changes in velocity) the same and decomposing the two measurements is your responsibility. In this way, if the direction of the accelerometer is in the direction of the Earth's gravitational field, then the measurement value is the representation of the acceleration due to motion in addition to the gravitational acceleration (``9.8 \frac{m}{s^2}``). And if the direction of the measurement of the sensor is in the horizontal direction (perpendicular to the gravitational field of the Earth) then only the dynamical acceleration is measured and gravity will not have any effect on the measurement. So, in case a one-axis accelerometer (capable of measuring in one of the directions of the coordinate system) is used in a system, the orientation of it must be specified with respect to the gravitational direction so that the static acceleration is computable.
 
-![two_axis_accelerometer](./assets/reactionwheelunicycle/two_axis_accelerometer.jpeg)
+![two-axis accelerometer](./assets/reactionwheelunicycle/two_axis_accelerometer.jpeg)
 
 Using a two-axis accelerometer for measuring the direction of the Earth's gravity in the plane perpendicular to the Earth. In this figure, the orientation of the two-axis accelerometer (X-Y) with respect to the horizontal direction is computable using the given relation.
 
@@ -65,7 +65,7 @@ Using a two-axis accelerometer for measuring the direction of the Earth's gravit
 
 Now, imagine that you have two or three accelerometers such that their directions of measurement are mutually orthogonal (like the X, Y, and Z coordinate axes of the standard Cartesian coordinate system). If the velocity of this set is constant and only the static accelration due to gravity acts on it, by comparing the ratio of the measured accelerations across the axes, the orientation angle of the set with respect to the direction of gravity is computable. This is the way that many electronic balances and mobile robots use to measure the angle of orientation with respect to the direction of gravity.
 
-![tri_axis_accelerometer](./assets/reactionwheelunicycle/tri_axis_accelerometer.jpeg)
+![tri-axis accelerometer](./assets/reactionwheelunicycle/tri_axis_accelerometer.jpeg)
 
 Using a tri-axis accelerometer for measuring the direction of the Earth's gravity in the three-dimensional space. In this figure, the orientation of the three-axis accelerometer (X-Y-Z) with respect to the hirozontal plane and the direction of gravity is computable using the given relations.
 
@@ -81,7 +81,7 @@ Many manufacturers, make two-axis and tri-axis accelerometers as one chip, where
 
 One of the fundamental problems of using accelerometrs to measure deviation, is the effect of dynamical accelerations (caused by changes in velocity) on the measurement of direction. For example, if you install such a device on a car and want to measure the slope of the road, the measured direction is correct as long as the vehicle has constant velocity. But when the car's velocity changes, the vector of dynamical acceleration is added to the vector of static acceleration and your measuring device measures the direction of this new vector (which is different from the direction of the Earth's gravity). One other disadvantage of accelerometers is the sensitivity to vibrations and the production of noisy results.
 
-![estimating_the_road_slope](./assets/reactionwheelunicycle/estimating_the_road_slope.jpeg)
+![estimating the road slope](./assets/reactionwheelunicycle/estimating_the_road_slope.jpeg)
 
 Estimating the slope of the road through measuring the direction of gravity using the accelerometer that is embedded in the car. In (a) the car has positive acceleration (increasing velocity), and in (b) without acceleration (constant velocity), and in (c) the car has negative acceleration (braking). As you can see, only in the figure (b) the direction of gravitational acceleration and the slope of the road are measured correctly.
 
@@ -97,7 +97,7 @@ Unlike accelerometers, a gyroscope is not generally sensitive to vibrations and 
 
 Like MESMS accelerometers, MEMS gyroscopes are manufactured in small sizes with afforable prices, and many manufacturers provide two or three gyroscopes in a single electronic package for measurements along different directions that are perpendicular with respect to one another.
 
-![tri_axis_gyroscope](./assets/reactionwheelunicycle/tri_axis_gyroscope.jpeg)
+![tri-axis gyroscope](./assets/reactionwheelunicycle/tri_axis_gyroscope.jpeg)
 
 A three-axis gyroscope measures the angular velocity about three mutually perpenducular axes (X, Y and Z). Ususally, the right-handed rotation about each axis is denoted by the positive sign and the left-handed rotation is denoted by the negative sign. The angular velocity is expressed in terms of degrees per second ``\frac{deg}{s}``. In flying vehicles such as rockets and airplanes and also some mobile robots, the names Roll, Yaw and Pitch are used to label the rotation axes. The axes Roll, Yaw and Pitch are not necessarily aligned with the X, Y and Z axes and this fact depends on the assignment of the coordinate system axes to the mobile object.
 
@@ -402,7 +402,7 @@ Integrating the rate estimates in equation (27) yields estimates for the Euler a
 
 ``\left\{ \begin{array}{l} \hat{\beta}(k) = \kappa_1 \hat{\beta}_a(k) + (1 - \kappa_1) (\hat{\beta}(k - 1) + T \hat{\dot{\beta}}(k)) &\\ \hat{\gamma}(k) = \kappa_2 \hat{\gamma}_a(k) + (1 - \kappa_2) (\hat{\gamma}(k - 1) + T \hat{\dot{\gamma}}(k)) \end{array} \right.``,  (Equation 28)
 
-where ``T`` is the sampling time (the same as `dt` in the LQR struct) and ``\kappa_1`` and ``\kappa_2`` are tuning parameters that may be chosen such that the variance of the estimate is minimized given the noise specifications of accelerometers and rate gyros. For the application presented in this project, ``\kappa_1 = \kappa_2 = 0.01`` was used.
+where ``T`` is the sampling time (the same as `dt` in the LQR struct) and ``\kappa_1`` and ``\kappa_2`` are tuning parameters that may be chosen such that the variance of the estimate is minimized given the noise specifications of accelerometers and rate gyros. For the application presented in this project, ``\kappa_1 = \kappa_2 = 0.05`` was used.
 
 ### The Experimental Results
 
@@ -518,6 +518,9 @@ void updateIMU(LinearQuadraticRegulator *model)
   setIndexVec3(&(model->g), 0, getIndexMat34(model->Q, 0, 0));
   setIndexVec3(&(model->g), 1, getIndexMat34(model->Q, 1, 0));
   setIndexVec3(&(model->g), 2, getIndexMat34(model->Q, 2, 0));
+  // setIndexVec3(&(model->g), 0, getIndexVec3(model->imu1.R, 0));
+  // setIndexVec3(&(model->g), 1, getIndexVec3(model->imu1.R, 1));
+  // setIndexVec3(&(model->g), 2, getIndexVec3(model->imu1.R, 2));
   model->beta = atan2(-getIndexVec3(model->g, 0), sqrt(pow(getIndexVec3(model->g, 1), 2) + pow(getIndexVec3(model->g, 2), 2)));
   model->gamma = atan2(getIndexVec3(model->g, 1), getIndexVec3(model->g, 2));
 
@@ -545,6 +548,7 @@ void updateIMU(LinearQuadraticRegulator *model)
   for (int i = 0; i < 3; i++)
   {
     setIndexVec3(&(model->r), i, (getIndexVec3(model->imu1._G, i) + getIndexVec3(model->imu2._G, i)) / 2.0);
+    // setIndexVec3(&(model->r), i, getIndexVec3(model->imu1._G, i));
   }
 
   setIndexMat3(&(model->E), 0, 0, 0.0);
@@ -570,20 +574,24 @@ void updateIMU(LinearQuadraticRegulator *model)
     }
   }
 
-  model->fusedBeta = model->kappa1 * model->beta + (1.0 - model->kappa1) * (model->fusedBeta + model->dt * (getIndexVec3(model->rDot, 1) / 180.0 * M_PI));
-  model->fusedGamma = model->kappa2 * model->gamma + (1.0 - model->kappa2) * (model->fusedGamma + model->dt * (getIndexVec3(model->rDot, 2) / 180.0 * M_PI));
-  model->imu1.yaw += model->dt * getIndexVec3(model->rDot, 0);
+  float rDot0 = getIndexVec3(model->rDot, 0) / 180.0 * M_PI;
+  float rDot1 = getIndexVec3(model->rDot, 1) / 180.0 * M_PI;
+  float rDot2 = -getIndexVec3(model->rDot, 2) / 180.0 * M_PI;
+  model->fusedBeta = model->kappa1 * model->beta + (1.0 - model->kappa1) * (model->fusedBeta + model->dt * rDot1);
+  model->fusedGamma = model->kappa2 * (-model->gamma) + (1.0 - model->kappa2) * (model->fusedGamma + model->dt * rDot2);
+  model->alpha += model->dt * rDot0;
 
   float _roll = model->fusedBeta;
-  float _pitch = -model->fusedGamma;
-  float _roll_velocity = ((getIndexVec3(model->rDot, 1) / 180.0 * M_PI) + (_roll - model->imu1.roll) / model->dt) / 2.0;
-  float _pitch_velocity = ((-getIndexVec3(model->rDot, 2) / 180.0 * M_PI) + (_pitch - model->imu1.pitch) / model->dt) / 2.0;
+  float _pitch = model->fusedGamma;
+  float _roll_velocity = (rDot1 + (_roll - model->imu1.roll) / model->dt) / 2.0;
+  float _pitch_velocity = (rDot2 + (_pitch - model->imu1.pitch) / model->dt) / 2.0;
   model->imu1.roll_acceleration = _roll_velocity - model->imu1.roll_velocity;
   model->imu1.pitch_acceleration = _pitch_velocity - model->imu1.pitch_velocity;
   model->imu1.roll_velocity = _roll_velocity;
   model->imu1.pitch_velocity = _pitch_velocity;
   model->imu1.roll = _roll;
   model->imu1.pitch = _pitch;
+  model->imu1.yaw = model->alpha;
 }
 ```
 
@@ -627,6 +635,7 @@ typedef struct
   int logCounter;                      // the number of control cycles elpased since the last log message printing
   int maxOutOfBounds;                  // the maximum number of consecutive cycles where states are out of the safety bounds
   int outOfBoundsCounter;              // the number of consecutive times when either of safety angles have been detected out of bounds
+  float alpha;                         // z-Euler angle (yaw)
   float beta;                          // y-Euler angle (pitch)
   float gamma;                         // x-Euler angle (roll)
   float fusedBeta;                     // y-Euler angle (pitch) as the result of fusing the accelerometer sensor measurements with the gyroscope sensor measurements
@@ -786,7 +795,7 @@ if (transmit == 1)
 
   sprintf(MSG,
           "active: %0.1f, changes: %0.2f, | AX1: %0.2f, AY1: %0.2f, AZ1: %0.2f, | AX2: %0.2f, AY2: %0.2f, AZ2: %0.2f, | roll: %0.2f, pitch: %0.2f, yaw: %0.2f, | encT: %0.2f, encB: %0.2f, | j: %0.1f, k: %0.1f, | P0: %0.2f, P1: %0.2f, P2: %0.2f, P3: %0.2f, P4: %0.2f, P5: %0.2f, P6: %0.2f, P7: %0.2f, P8: %0.2f, P9: %0.2f, P10: %0.2f, P11: %0.2f, time: %0.2f, dt: %0.6f\r\n",
-          (float)model.active, model.changes, model.imu1.accX, model.imu1.accY, model.imu1.accZ, model.imu2.accX, model.imu2.accY, model.imu2.accZ, model.imu1.roll, model.imu1.pitch, model.imu1.yaw, model.reactionEncoder.radianAngle, model.rollingEncoder.radianAngle, (float)model.j, (float)model.k, getIndexMat12(model.P_n, 0, 0), getIndexMat12(model.P_n, 1, 1), getIndexMat12(model.P_n, 2, 2), getIndexMat12(model.P_n, 3, 3), getIndexMat12(model.P_n, 4, 4), getIndexMat12(model.P_n, 5, 5), getIndexMat12(model.P_n, 6, 6), getIndexMat12(model.P_n, 7, 7), getIndexMat12(model.P_n, 8, 8), getIndexMat12(model.P_n, 9, 9), getIndexMat12(model.P_n, 10, 10), getIndexMat12(model.P_n, 11, 11), model.time, model.dt);
+          (float)model.active, model.changes, model.imu1.accX, model.imu1.accY, model.imu1.accZ, model.imu2.accX, model.imu2.accY, model.imu2.accZ, model.fusedBeta, model.fusedGamma, model.alpha, model.reactionEncoder.radianAngle, model.rollingEncoder.radianAngle, (float)model.j, (float)model.k, getIndexMat12(model.P_n, 0, 0), getIndexMat12(model.P_n, 1, 1), getIndexMat12(model.P_n, 2, 2), getIndexMat12(model.P_n, 3, 3), getIndexMat12(model.P_n, 4, 4), getIndexMat12(model.P_n, 5, 5), getIndexMat12(model.P_n, 6, 6), getIndexMat12(model.P_n, 7, 7), getIndexMat12(model.P_n, 8, 8), getIndexMat12(model.P_n, 9, 9), getIndexMat12(model.P_n, 10, 10), getIndexMat12(model.P_n, 11, 11), model.time, model.dt);
 
   HAL_UART_Transmit(&huart6, MSG, sizeof(MSG), 1000);
   t2 = DWT->CYCCNT;
@@ -816,7 +825,7 @@ Set the baudrate of `uart6` to 921600, for the wifi module HC-25. The HC-25 modu
 
 ## Step Forward
 
-The function `stepForward` identifies the Q function using RLS with the given pointer to the `model`. The algorithm updates the Q function at each step. As a result, the filter matrix `W_n` and the inverse auto-correlation matrix `P_n` are updated. Performs a one-step update in the parameter vector W by applying RLS to equation.
+The function `stepForward` identifies the Q function using RLS with the given pointer to the `model`. The algorithm updates the Q function at each step. As a result, the filter matrix `W_n` and the inverse auto-correlation matrix `P_n` are updated. Performs a one-step update in the parameter vector ``W`` by applying RLS to the equation:
 
 ``W_{j + 1}^T (\phi(z_k) - \gamma \phi(z_{k + 1})) = r(x_k, h_j(x_k))``
 
@@ -1072,7 +1081,7 @@ void updateControlPolicy(LinearQuadraticRegulator *model)
 
 ### The Relation Between Time k and the Incremental Changes to Filter Coefficients
 
-Time *j* is incremented if only time *k* is reset to the value of 1. But, time k is reset after the RLS algorithm converges. The incremental *changes* that are made to the filter coefficients ``\Delta W_n = \Sigma (W_n - W_{n - 1})`` is calculated by summing up the absolute value of the incremental updates to the filter coefficients.
+Time *j* is incremented if only time *k* is reset to the value of 1. But, time k is reset after the RLS algorithm converges. The incremental *changes* that are made to the filter coefficients ``\Delta W_n = abs(W_n - W_{n - 1})`` is calculated by summing up the absolute value of the incremental updates to the filter coefficients.
 
 ```c
 float calculateChanges(Mat12 W_1, Mat12 W_2)
@@ -1089,11 +1098,11 @@ float calculateChanges(Mat12 W_1, Mat12 W_2)
 }
 ```
 
-Defined a counter to count the number of times in a row that the reduced absolute sum of the incremental changes to filter coefficients are less than a threshold value (``\Delta W_n < 2.5``). After 5 consecutive changes below the threshold, the policy is updated with the given filter coefficeints. Note that this way of determining the econvergence of the RLS allows us to increase the threshold value, otherwise a smaller threshold is needed if the convergence is determined by the changes at just one contol cycle. By relaxing the threshold value and observing the changes over five control cycles, first good policies are kept longer and second the controller has selects more reliable policies.
+Defined a counter to count the number of times in a row that the reduced absolute sum of the incremental changes to filter coefficients are less than a threshold value (``\Delta W_n < 2.5``). After 5 consecutive changes below the threshold, the policy is updated with the given filter coefficeints. Note that this way of determining the econvergence of the RLS allows us to increase the threshold value, otherwise a smaller threshold is needed if the convergence is determined by the changes at just one contol cycle. By relaxing the threshold value and observing the changes over five control cycles, first good policies are kept longer and second the controller selects more reliable policies.
 
 ![times j and k and filter changes, data sample 1](./assets/reactionwheelunicycle/jkchanges_sample1.png)
 
-Time *k* seems to be going up regularly furing the two-minute test run intervals. But the RLS is converged at less than about 100 cycles given that the values of *k* hardly exceed 100 while the controller is active.
+Time *k* seems to be going up regularly during the two-minute test run intervals. But the RLS is converged at less than about 100 cycles given that the values of *k* hardly exceed 100 while the controller is active.
 
 ![times j and k and filter changes, data sample 2](./assets/reactionwheelunicycle/jkchanges_sample2.png)
 
