@@ -75,7 +75,7 @@ attributespath = "data/naturalearth/geometry-attributes.csv"
 nodespath = "data/naturalearth/geometry-nodes.csv"
 countries = loadcountries(attributespath, nodespath)
 # boundary_names = ["Iran"]
-boundary_names = ["United States of America"]
+boundary_names = ["Iran"]
 boundary_nodes = Vector{Vector{ℝ³}}()
 for i in eachindex(countries["name"])
     for name in boundary_names
@@ -148,8 +148,6 @@ lines!(lscene, boundarypoints, linewidth = boundarylinewidth, color = boundaryco
 
 # θ = 29.5926 / 90.0 * π / 2.0
 # ϕ = -52.5836 / 180.0 * π
-θ = 38.7946 / 90.0 * π / 2.0
-ϕ = 106.5348 / 180.0 * π
 _position = Observable(Point3f(vec(project(convert_to_cartesian([1.0; θ; ϕ])))))
 unicycle.frameorigin[] = ℝ³(vec(convert(Array{Float64}, vec(_position[] - Point3f(chassis_origin[1], chassis_origin[2], 0))))...)
 
