@@ -13,13 +13,13 @@ ipaddress = "192.168.4.1"
 portnumber = 10000
 figuresize = (1920, 1080)
 modelname = "unicycle_tilt_estimation"
-headers = ["changes", "time", "active", "AX1", "AY1", "AZ1", "AX2", "AY2", "AZ2", "roll", "pitch", "encT", "encB", "j", "k", "P0", "P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11"]
+headers = ["changes", "time", "active", "AX1", "AY1", "AZ1", "AX2", "AY2", "AZ2", "GX1", "GY1", "GZ1", "GX2", "GY2", "GZ2", "roll", "pitch", "yaw", "encT", "encB", "j", "k", "P0", "P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11"]
 readings = Dict()
 segments = 30
 fontsize = 30
 chassis_colormap = :Pastel1_9
 rollingwheel_colormap = :autumn
-reactionwheel_colormap = :glasbey_bw_minc_20_hue_330_100_n256
+reactionwheel_colormap = :picasso
 markersize = 10
 ballsize = 0.01
 linewidth = 0.01
@@ -59,8 +59,8 @@ A1_B_R = convert(Matrix{Float64}, inv(B_A1_R))
 B_A2_R = convert(Matrix{Float64}, [ê[1] ê[2] ê[3]])
 # B_A2_R = [-sin(α) cos(α) 0.0; -cos(α) -sin(α) 0.0; 0.0 0.0 1.0] # this is equal to B_O_R * B_A2_R the same as the one that is used on the device
 A2_B_R = convert(Matrix{Float64}, inv(B_A2_R))
-maxplotnumber = 400
-timeaxiswindow= 15.0
+maxplotnumber = 200
+timeaxiswindow= 7.5
 fps = 24
 minutes = 1
 iterations = minutes * 60 * fps
@@ -130,8 +130,10 @@ on(events(fig).tick) do tick
         # calculate(readings)
         allkeys = keys(readings)
         flag = all([x ∈ allkeys for x in headers]) && all([!isnothing(readings[x]) for x in headers])
-        global counter = counter + 1
-        if flag && isapprox(counter % 5, 0)
+        if flag
+            global counter = counter + 1
+        end
+        if flag && isapprox(counter % 30, 0)
             if run == true
                 for header in headers
                     push!(data[header], readings[header])

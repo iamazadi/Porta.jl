@@ -7,22 +7,22 @@ using DataFrames
 using Porta
 
 
-figuresize = (1854, 1012)
-modelname = "sample2_dec13_unicycle_tiltestimation"
-headers = ["changes", "time", "active", "AX1", "AY1", "AZ1", "AX2", "AY2", "AZ2", "roll", "pitch", "yaw", "encT", "encB", "j", "k", "P0", "P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11"]
+figuresize = (1853, 1011)
+modelname = "sample1_dec25_unicycle_tiltestimation"
+headers = ["changes", "time", "active", "AX1", "AY1", "AZ1", "AX2", "AY2", "AZ2", "GX1", "GY1", "GZ1", "GX2", "GY2", "GZ2", "roll", "pitch", "yaw", "encT", "encB", "j", "k", "P0", "P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11"]
 readings = Dict()
 segments = 360
 fontsize = 30
 textfontsize = 0.05
-chassis_colormap = :speed
-rollingwheel_colormap = :solar
-reactionwheel_colormap = :thermal
+chassis_colormap = :neon
+rollingwheel_colormap = :redgreensplit
+reactionwheel_colormap = :pastel
 markersize = 10
 ballsize = 0.01
 linewidth = 0.01
 boundarylinewidth = 10
 arrowsize = Vec3f(0.03, 0.03, 0.06)
-arrowscale = 0.3
+arrowscale = 0.25
 smallarrowscale = arrowscale * 0.5
 chassis_stl_path = joinpath("data", "unicycle", "unicycle_chassis.STL")
 rollingwheel_stl_path = joinpath("data", "unicycle", "unicycle_main_wheel.STL")
@@ -56,8 +56,8 @@ A1_B_R = convert(Matrix{Float64}, inv(B_A1_R))
 B_A2_R = convert(Matrix{Float64}, [ê[1] ê[2] ê[3]])
 # B_A2_R = [-sin(α) cos(α) 0.0; -cos(α) -sin(α) 0.0; 0.0 0.0 1.0] # this is equal to B_O_R * B_A2_R the same as the one that is used on the device
 A2_B_R = convert(Matrix{Float64}, inv(B_A2_R))
-maxplotnumber = 800
-timeaxiswindow= 30.0
+maxplotnumber = 400
+timeaxiswindow= 15.0
 fps = 24
 data = Dict()
 for header in headers
@@ -74,7 +74,6 @@ color = load("data/basemap_mask.png")
 attributespath = "data/naturalearth/geometry-attributes.csv"
 nodespath = "data/naturalearth/geometry-nodes.csv"
 countries = loadcountries(attributespath, nodespath)
-# boundary_names = ["Iran"]
 boundary_names = ["Iran"]
 boundary_nodes = Vector{Vector{ℝ³}}()
 for i in eachindex(countries["name"])
@@ -131,28 +130,27 @@ text!(lscene,
     markerspace = :data
 )
 
-lspaceθ = range(π / 2, stop = -π / 2, length = segments)
-lspaceϕ = range(float(π), stop = float(-π), length = segments)
-spherematrix = [convert_to_cartesian([1.0; θ; ϕ]) for ϕ in lspaceϕ, θ in lspaceθ]
-sphereobservable = buildsurface(lscene, spherematrix, mask, transparency = true)
-spherematrix = [convert_to_cartesian([1.0; θ; ϕ]) for θ in lspaceθ, ϕ in lspaceϕ]
-updatesurface!(spherematrix, sphereobservable)
+# lspaceθ = range(π / 2, stop = -π / 2, length = segments)
+# lspaceϕ = range(float(π), stop = float(-π), length = segments)
+# spherematrix = [convert_to_cartesian([1.0; θ; ϕ]) for ϕ in lspaceϕ, θ in lspaceθ]
+# sphereobservable = buildsurface(lscene, spherematrix, mask, transparency = true)
+# spherematrix = [convert_to_cartesian([1.0; θ; ϕ]) for θ in lspaceθ, ϕ in lspaceϕ]
+# updatesurface!(spherematrix, sphereobservable)
 
-planematrix = [project(convert_to_cartesian([1.0; θ; ϕ])) - ℝ³(0.0, 0.0, 1.23 * offset) for θ in lspaceθ, ϕ in lspaceϕ]
-planeobservable = buildsurface(lscene, planematrix, color, transparency = true)
+# planematrix = [project(convert_to_cartesian([1.0; θ; ϕ])) - ℝ³(0.0, 0.0, 1.23 * offset) for θ in lspaceθ, ϕ in lspaceϕ]
+# planeobservable = buildsurface(lscene, planematrix, color, transparency = true)
 
 boundarypoints = [Point3f(vec(project(convert_to_cartesian([vec(convert_to_geographic(node))[1]; vec(convert_to_geographic(node))[2]; -vec(convert_to_geographic(node))[3]])))) for node in boundary_nodes[1]]
 boundarypoints = map(x -> x - Point3f(0, 0, 1.23 * offset), boundarypoints)
 boundarycolors = Observable([x for x in 1:length(boundary_nodes[1])])
 lines!(lscene, boundarypoints, linewidth = boundarylinewidth, color = boundarycolors, colormap = :jet, colorrange = (1, length(boundary_nodes[1])), transparency = true)
 
-# θ = 29.5926 / 90.0 * π / 2.0
-# ϕ = -52.5836 / 180.0 * π
+θ = 29.5926 / 90.0 * π / 2.0
+ϕ = -52.5836 / 180.0 * π
 _position = Observable(Point3f(vec(project(convert_to_cartesian([1.0; θ; ϕ])))))
 unicycle.frameorigin[] = ℝ³(vec(convert(Array{Float64}, vec(_position[] - Point3f(chassis_origin[1], chassis_origin[2], 0))))...)
 
-eyeposition = vec(unicycle.frameorigin[]) + normalize([1.0; 0.1; 0.1]) * 0.7
-originaleyeposition = deepcopy(eyeposition)
+eyeposition = vec(unicycle.frameorigin[]) + normalize([0.2; 1.0; 0.4]) * 0.6
 up = [0.0; 0.0; 1.0]
 lookat = Point3f(vec(unicycle.frameorigin[])) + [0.0; 0.0; 2offset]
 update_cam!(lscene.scene, Vec3f(eyeposition...), Vec3f(lookat...), Vec3f(up...))
@@ -186,9 +184,10 @@ record(lscene.scene, joinpath("gallery", "$modelname.mp4"); framerate = fps) do 
                 jindextext[] = "j:$(readings["j"])"
                 kindextext[] = "k:$(readings["k"])"
                 global lookat = vec(to_value(unicycle.translation) + ℝ³(0.0, 0.0, 2offset))
-                global eyeposition = ℝ³(Float64.(vec(lookat))...) + (0.9 * norm(originaleyeposition - lookat) + 0.1 * cos(progress * 2π)) * normalize(ℝ³(Float64.(vec(originaleyeposition))...) - ℝ³(Float64.(vec(lookat))...))
-                # global eyeposition = (exp(-progress * period * 0.6) * ℝ³(5.0, 5.0, 5.0)) + eyeposition
-                update_cam!(lscene.scene, Vec3f(vec(eyeposition)...), Vec3f(vec(lookat)...), Vec3f(vec(up)...))
+                _eyeposition = lookat + 0.6 .* normalize(eyeposition - lookat)
+                # global eyeposition = ℝ³(Float64.(vec(lookat))...) + normalize(ℝ³(Float64.(vec(originaleyeposition))...) - ℝ³(Float64.(vec(lookat))...))
+                # global eyeposition = (exp(-progress * period * 0.5) * ℝ³(5.0, 5.0, 5.0)) + eyeposition
+                update_cam!(lscene.scene, Vec3f(vec(_eyeposition)...), Vec3f(vec(lookat)...), Vec3f(vec(up)...))
                 break
             end
         end
