@@ -7,7 +7,7 @@ using Porta
 
 # to plot the j and k time indices along with the changes in filter coefficients in one graph
 figuresize = (1920, 1080)
-datafilename = "sample2_dec9_unicycle_tiltestimation"
+datafilename = "sample1_dec25_unicycle_tiltestimation"
 modelname = "$(datafilename)_jkchanges"
 headers = ["changes", "time", "active", "AX1", "AY1", "AZ1", "AX2", "AY2", "AZ2", "roll", "pitch", "yaw", "encT", "encB", "j", "k", "P0", "P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11"]
 readings = Dict()

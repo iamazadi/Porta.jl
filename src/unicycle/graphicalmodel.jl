@@ -265,9 +265,9 @@ function updatemodel(unicycle::Unicycle, readings::Dict)
     R1 = acc1
     R2 = acc2
 
-    # M = [B_A1_R * R1 B_A2_R * R2]
-    # ĝ = (M*X)[:, 1]
-    ĝ = deepcopy(R1)
+    M = [unicycle.B_A1_R * R1 unicycle.B_A2_R * R2]
+    ĝ = (M * unicycle.X)[:, 1]
+    # ĝ = deepcopy(R1)
     β = atan(-ĝ[1], √(ĝ[2]^2 + ĝ[3]^2))
     γ = atan(ĝ[2], ĝ[3])
 
@@ -279,15 +279,17 @@ function updatemodel(unicycle::Unicycle, readings::Dict)
     # @assert(isapprox(-γ, pitch, atol = 1e-2), "The pitch angle $pitch is not equal to minus gamma -$γ.")
     # println("roll: $roll, γ: $γ, pitch: $pitch, β: $β.")
     # println("x_euler_angle_raw: $x_euler_angle_raw, x_euler_angle_estimate: $x_euler_angle_estimate, y_euler_angle_raw: $y_euler_angle_raw, y_euler_angle_estimate: $y_euler_angle_estimate.")
-    q = ℍ(yaw, ẑ) * ℍ(roll, x̂) * ℍ(pitch, ŷ)
+    q = ℍ(yaw, ẑ) * ℍ(pitch, ŷ) * ℍ(roll, x̂)
     # O_B_R = unicycle.O_B_R * mat33(q)
     O_B_R = mat33(q)
     # B_O_R = inv(O_B_R)
 
     wheelradius = 0.075
     offset = 0.012 + wheelradius
-    distance = -rolling_angle * wheelradius
-    movement = unicycle.frameorigin[] + rotate(ℝ³(distance, 0.0, 0.0), ℍ(readings["yaw"], ẑ))
+    # distance = -rolling_angle * wheelradius
+    # movement = unicycle.frameorigin[] + rotate(ℝ³(distance, 0.0, 0.0), ℍ(readings["yaw"], ẑ))
+    # movement = unicycle.frameorigin[] + ℝ³(vec(inv(unicycle.B_O_R) * [readings["x"]; readings["y"]; readings["z"]])...)
+    movement = unicycle.frameorigin[] + ℝ³(([readings["x"]; readings["y"]; readings["z"]])...)
 
     # g = q * chassis_q0
     # rotate!(robot, Quaternion(g))

@@ -8,11 +8,11 @@ using Porta
 
 
 figuresize = (1853, 1011)
-modelname = "sample1_dec25_unicycle_tiltestimation"
-headers = ["changes", "time", "active", "AX1", "AY1", "AZ1", "AX2", "AY2", "AZ2", "GX1", "GY1", "GZ1", "GX2", "GY2", "GZ2", "roll", "pitch", "yaw", "encT", "encB", "j", "k", "P0", "P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11"]
+modelname = "sample1_dec26_unicycle_tiltestimation"
+headers = ["x", "y", "z", "changes", "time", "active", "AX1", "AY1", "AZ1", "AX2", "AY2", "AZ2", "GX1", "GY1", "GZ1", "GX2", "GY2", "GZ2", "roll", "pitch", "yaw", "encT", "encB", "j", "k", "P0", "P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11"]
 readings = Dict()
 segments = 360
-fontsize = 30
+fontsize = 32
 textfontsize = 0.05
 chassis_colormap = :neon
 rollingwheel_colormap = :redgreensplit
@@ -130,20 +130,33 @@ text!(lscene,
     markerspace = :data
 )
 
-# lspaceθ = range(π / 2, stop = -π / 2, length = segments)
-# lspaceϕ = range(float(π), stop = float(-π), length = segments)
+lspaceθ = range(π / 2, stop = -π / 2, length = segments)
+lspaceϕ = range(float(π), stop = float(-π), length = segments)
 # spherematrix = [convert_to_cartesian([1.0; θ; ϕ]) for ϕ in lspaceϕ, θ in lspaceθ]
-# sphereobservable = buildsurface(lscene, spherematrix, mask, transparency = true)
+# sphereobservable = buildsurface(lscene, spherematrix, color, transparency = true)
 # spherematrix = [convert_to_cartesian([1.0; θ; ϕ]) for θ in lspaceθ, ϕ in lspaceϕ]
 # updatesurface!(spherematrix, sphereobservable)
 
-# planematrix = [project(convert_to_cartesian([1.0; θ; ϕ])) - ℝ³(0.0, 0.0, 1.23 * offset) for θ in lspaceθ, ϕ in lspaceϕ]
-# planeobservable = buildsurface(lscene, planematrix, color, transparency = true)
+planematrix = [project(convert_to_cartesian([1.0; θ; ϕ])) - ℝ³(0.0, 0.0, 1.23 * offset) for θ in lspaceθ, ϕ in lspaceϕ]
+planeobservable = buildsurface(lscene, planematrix, color, transparency = true)
 
 boundarypoints = [Point3f(vec(project(convert_to_cartesian([vec(convert_to_geographic(node))[1]; vec(convert_to_geographic(node))[2]; -vec(convert_to_geographic(node))[3]])))) for node in boundary_nodes[1]]
 boundarypoints = map(x -> x - Point3f(0, 0, 1.23 * offset), boundarypoints)
 boundarycolors = Observable([x for x in 1:length(boundary_nodes[1])])
 lines!(lscene, boundarypoints, linewidth = boundarylinewidth, color = boundarycolors, colormap = :jet, colorrange = (1, length(boundary_nodes[1])), transparency = true)
+
+pathpoints = Observable(Point3f[])
+pathcolors = Observable(Int[])
+lines!(lscene, pathpoints, linewidth = boundarylinewidth, color = pathcolors, colormap = :rainbow, colorrange = (1, iterations), transparency = true)
+
+for i in -10:10
+    xpoints = [Point3f(x, i, -1.23 * offset) for x in range(-10.0, stop = 10.0, length = segments)]
+    ypoints = [Point3f(i, y, -1.23 * offset) for y in range(-10.0, stop = 10.0, length = segments)]
+    colors = collect(1:segments)
+    lines!(lscene, xpoints, linewidth = boundarylinewidth / 2, color = colors, colormap = :ocean, colorrange = (1, segments), transparency = true)
+    lines!(lscene, ypoints, linewidth = boundarylinewidth / 2, color = colors, colormap = :ocean, colorrange = (1, segments), transparency = true)
+end
+
 
 θ = 29.5926 / 90.0 * π / 2.0
 ϕ = -52.5836 / 180.0 * π
@@ -180,6 +193,10 @@ record(lscene.scene, joinpath("gallery", "$modelname.mp4"); framerate = fps) do 
                 end
                 boundarycolors[] = colors
                 notify(boundarycolors)
+                push!(pathcolors[], i)
+                push!(pathpoints[], unicycle.pivot_observable[])
+                notify(pathcolors)
+                notify(pathpoints)
                 controller_statustext[] = isapprox(readings["active"], 1.0) ? "Active" : "Deactive"
                 jindextext[] = "j:$(readings["j"])"
                 kindextext[] = "k:$(readings["k"])"
