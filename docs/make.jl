@@ -11,7 +11,8 @@ makedocs(
         "Reaction Wheel Unicycle" => "reactionwheelunicycle.md",
         "Multivariable Calculus" => "multivariablecalculus.md",
         "The Maxwell Field (Persian)" => "maxwellfield_persian.md",
-        "The Unicycle (Persian)" => "reactionwheelunicycle_persian.md"
+        "The Unicycle (Persian)" => "reactionwheelunicycle_persian.md",
+        "Infrared Communication" => "infraredcommunication.md"
     ],
 )
 

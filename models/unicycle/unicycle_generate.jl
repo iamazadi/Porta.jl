@@ -8,15 +8,15 @@ using Porta
 
 
 figuresize = (1853, 1011)
-modelname = "sample1_dec26_unicycle_tiltestimation"
+modelname = "sample2_dec26_unicycle_tiltestimation"
 headers = ["x", "y", "z", "changes", "time", "active", "AX1", "AY1", "AZ1", "AX2", "AY2", "AZ2", "GX1", "GY1", "GZ1", "GX2", "GY2", "GZ2", "roll", "pitch", "yaw", "encT", "encB", "j", "k", "P0", "P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11"]
 readings = Dict()
 segments = 360
 fontsize = 32
 textfontsize = 0.05
-chassis_colormap = :neon
-rollingwheel_colormap = :redgreensplit
-reactionwheel_colormap = :pastel
+chassis_colormap = :gold
+rollingwheel_colormap = :jet
+reactionwheel_colormap = :island
 markersize = 10
 ballsize = 0.01
 linewidth = 0.01
@@ -163,7 +163,7 @@ end
 _position = Observable(Point3f(vec(project(convert_to_cartesian([1.0; θ; ϕ])))))
 unicycle.frameorigin[] = ℝ³(vec(convert(Array{Float64}, vec(_position[] - Point3f(chassis_origin[1], chassis_origin[2], 0))))...)
 
-eyeposition = vec(unicycle.frameorigin[]) + normalize([0.2; 1.0; 0.4]) * 0.6
+eyeposition = vec(unicycle.frameorigin[]) + normalize([0.1; 1.0; 0.1]) * 0.6
 up = [0.0; 0.0; 1.0]
 lookat = Point3f(vec(unicycle.frameorigin[])) + [0.0; 0.0; 2offset]
 update_cam!(lscene.scene, Vec3f(eyeposition...), Vec3f(lookat...), Vec3f(up...))
@@ -201,7 +201,7 @@ record(lscene.scene, joinpath("gallery", "$modelname.mp4"); framerate = fps) do 
                 jindextext[] = "j:$(readings["j"])"
                 kindextext[] = "k:$(readings["k"])"
                 global lookat = vec(to_value(unicycle.translation) + ℝ³(0.0, 0.0, 2offset))
-                _eyeposition = lookat + 0.6 .* normalize(eyeposition - lookat)
+                _eyeposition = lookat + 0.5 .* normalize(eyeposition - lookat)
                 # global eyeposition = ℝ³(Float64.(vec(lookat))...) + normalize(ℝ³(Float64.(vec(originaleyeposition))...) - ℝ³(Float64.(vec(lookat))...))
                 # global eyeposition = (exp(-progress * period * 0.5) * ℝ³(5.0, 5.0, 5.0)) + eyeposition
                 update_cam!(lscene.scene, Vec3f(vec(_eyeposition)...), Vec3f(vec(lookat)...), Vec3f(vec(up)...))

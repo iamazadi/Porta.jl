@@ -6,7 +6,7 @@ using Porta
 
 
 figuresize = (1920, 1080)
-datafilename = "sample1_dec25_unicycle_tiltestimation"
+datafilename = "sample2_dec26_unicycle_tiltestimation"
 modelname = "$(datafilename)_graph"
 headers = ["changes", "time", "active", "AX1", "AY1", "AZ1", "AX2", "AY2", "AZ2", "roll", "pitch", "yaw", "encT", "encB", "j", "k", "P0", "P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11"]
 readings = Dict()
