@@ -65,11 +65,13 @@ struct TangentBundle
         lines!(lscene, tangentcircle, color = GLMakie.@lift(collect(1:length($tangentcircle))), linewidth = linewidth, colorrange = (1, segments), colormap = colormap, transparency = transparency)
         ps = @lift([$origin, $origin, $tangenttail])
         ns = @lift([$a, $c, $tangenthead])
-        arrows!(lscene,
+        arrows3d!(lscene,
             ps, ns, fxaa = true, # turn on anti-aliasing
             color = color,
-            linewidth = arrowlinewidth, arrowsize = arrowsize,
-            align = :origin, transparency = transparency
+            tipradius = arrowsize[1],
+            tiplength = arrowsize[3],
+            tailradius = arrowlinewidth,
+            align = :tail, transparency = transparency
         )
         titles = ["O", name, "-$name", "π($name)"]
         rotation = gettextrotation(lscene)

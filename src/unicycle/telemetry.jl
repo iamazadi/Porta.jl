@@ -46,7 +46,11 @@ function make_sprite(scene::GLMakie.Scene, parent::Any, origin::GLMakie.Point3f,
         GLMakie.rotate!(child, GLMakie.Quaternion(rotation))
         GLMakie.scale!(child, scale, scale, scale)
         centered = stl.position .- GLMakie.Point3f(center_of_mass...)
-        stl = GeometryBasics.Mesh(GeometryBasics.meta(centered, normals = stl.normals), GeometryBasics.faces(stl))
+        ps = GeometryBasics.coordinates(stl) .- GLMakie.Point3f(center_of_mass...)
+        fs = GeometryBasics.faces(stl)
+        # generate normals per face (this creates a FaceView as well)
+        ns = GeometryBasics.face_normals(ps, fs)
+        stl = GeometryBasics.Mesh(ps, fs, normal = ns)
         GLMakie.translate!(child, origin) # translates the visual mesh in the viewport
     else
         # if we don't have an origin, we need to correct for the parents translation

@@ -121,7 +121,7 @@ function markframe(name::String, label::String, islabeled::Dict{String, Bool},
         _ps, _ns, fxaa = true, # turn on anti-aliasing
         color = colors,
         linewidth = linewidth / 2.0, arrowsize = arrowsize,
-        align = :origin,
+        align = :tail,
         visible = visible
     )
     GLMakie.text!(lscene,

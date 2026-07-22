@@ -111,8 +111,12 @@ struct Unicycle1
         # get the transformation of the parent
         ptrans = GLMakie.Transformation(parent)
         centeroffset = GLMakie.Point3f(center_of_mass...) - Point3f(0.0, offset / chassis_scale, 0.0)
-        centered = map(x -> x - centeroffset, chassis_stl.position)
-        chassis_stl = GeometryBasics.Mesh(GeometryBasics.meta(centered, normals = chassis_stl.normals), GeometryBasics.faces(chassis_stl))
+        ps = GeometryBasics.coordinates(chassis_stl)
+        fs = GeometryBasics.faces(chassis_stl)
+        # generate normals per face (this creates a FaceView as well)
+        ns = GeometryBasics.face_normals(ps, fs)
+        ps = map(x -> x - centeroffset, ps)
+        chassis_stl = GeometryBasics.Mesh(ps, fs, normal = ns)
         GLMakie.rotate!(child, GLMakie.Quaternion(chassisrotation))
         GLMakie.scale!(child, chassis_scale, chassis_scale, chassis_scale)
         robot = GLMakie.mesh!(lscene, chassis_stl; color = [tri[1][2] for tri in chassis_stl for i in 1:3], colormap = chassis_colormap, transformation = child, transparency = true)
@@ -130,11 +134,13 @@ struct Unicycle1
         acceleration_vector_tails = Observable([Point3f(R1_tail...)])
         acceleration_vector_heads = Observable([Vec3f(R1...),])
         acceleration_vector_colors = [:lime]
-        arrows!(lscene,
+        arrows3d!(lscene,
             acceleration_vector_tails, acceleration_vector_heads, fxaa=true, # turn on anti-aliasing
             color = acceleration_vector_colors,
-            linewidth = linewidth, arrowsize = arrowsize,
-            align=:origin
+            tipradius = arrowsize[1],
+            tiplength = arrowsize[3],
+            tailradius = linewidth,
+            align=:tail
         )
 
         pivotball = meshscatter!(lscene, pivot_observable, markersize = ballsize, color = :gold)
@@ -146,18 +152,22 @@ struct Unicycle1
         sensorframe_heads = Observable(map(x -> Vec3f(B_O_R * x .* smallarrowscale), [B_A1_R * ê[1], B_A1_R * ê[2], B_A1_R * ê[3]]))
 
         arrowcolors = [:red, :green, :blue]
-        arrows!(lscene,
+        arrows3d!(lscene,
             pivot_ps, pivot_ns, fxaa=true, # turn on anti-aliasing
             color = arrowcolors,
-            linewidth = linewidth, arrowsize = arrowsize,
-            align = :origin
+            tipradius = arrowsize[1],
+            tiplength = arrowsize[3],
+            tailradius = linewidth,
+            align = :tail
         )
         arrowcolors = [:crimson, :chartreuse4, :indigo]
-        arrows!(lscene,
+        arrows3d!(lscene,
             sensorframe_tails, sensorframe_heads, fxaa=true, # turn on anti-aliasing
             color = arrowcolors,
-            linewidth = linewidth, arrowsize = arrowsize,
-            align = :origin
+            tipradius = arrowsize[1],
+            tiplength = arrowsize[3],
+            tailradius = linewidth,
+            align = :tail
         )
 
         lspaceθ = range(π / 2, stop = -π / 2, length = segments)

@@ -21,14 +21,14 @@ basemap = Basemap(lscene, x, gauge, M, chart, segments, color, transparency = tr
 
 matrix = getsurface(basemap.observable, segments, segments)
 x = ℍ(normalize(ℝ⁴(rand(4))))
-update!(basemap, x, gauge, M)
+Porta.update!(basemap, x, gauge, M)
 _matrix = getsurface(basemap.observable, segments, segments)
 
 @test all([!isapprox(matrix[i, j], _matrix[i, j]) for i in 1:segments for j in 1:segments])
 
 matrix = getsurface(basemap.observable, segments, segments)
 chart = (rand() * -π / 4, rand() * π / 4, rand() * -π / 4, rand() * π / 4)
-update!(basemap, chart)
+Porta.update!(basemap, chart)
 _matrix = getsurface(basemap.observable, segments, segments)
 
 @test all([!isapprox(matrix[i, j], _matrix[i, j]) for i in 1:segments for j in 1:segments])
@@ -37,6 +37,6 @@ _matrix = getsurface(basemap.observable, segments, segments)
 matrix = getsurface(basemap.observable, segments, segments)
 x = ℍ(normalize(ℝ⁴(rand(4))))
 M = rand(4, 4)
-update!(basemap, x, gauge, M, chart)
+Porta.update!(basemap, x, gauge, M, chart)
 _matrix = getsurface(basemap.observable, segments, segments)
 @test all([!isapprox(matrix[i, j], _matrix[i, j]) for i in 1:segments for j in 1:segments])
