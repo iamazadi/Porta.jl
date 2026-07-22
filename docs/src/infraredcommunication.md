@@ -1024,6 +1024,7 @@ value: -1, codeword: 0 0 1 1 0 1 1, parity: 0, syndrome: 0 1 0  corrected: 4   0
 value: -1, codeword: 0 1 1 0 1 0 1, parity: 0, syndrome: 0 0 1  corrected: 14  0 1 1 0 1 0 0
 ```
 
+# References
 
 ```@raw html
 <div dir = "rtl">

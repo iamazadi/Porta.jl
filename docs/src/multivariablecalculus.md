@@ -681,8 +681,198 @@ The volume is equal to: ``S = (32 - 8 + 2) - (4 - 10 + 0.5) = 26 - (-5.5) = 26 +
 
 ``\int \int_A f(x, y) dA = \int_a^b \int_c^{h(x)} f(x,y) dy \ dx``.
 
-# The Applications of Double Integrals
+- The fourth type of region is neither normal to ``x`` nor to ``y``.
+
+![22](./assets/multivariablecalculus/22.jpg)
+
+In this case, the region is divided into two or more subregions, such that each one is normal to at least one variable.
+
+``\int \int_A f(x, y) = \int \int_{A_1} f(x, y) \ dy \ dx + \int \int_{A_2} f(x, y) \ dy \ dx``.
+
+``A_1`` and ``A_2`` are subregions normal to the vaiable ``y``.
+
+
+### Example
+
+Let the region ``A`` be bounded by the lines below:
+
+``y = x``, ``y = 2x``, ``x = 1``, ``x = 2``.
+
+Write the volume of the surface of ``f(x, y)`` over the region as a double integral.
+
+![23](./assets/multivariablecalculus/23.jpg)
+
+``\int \int_A f(x, y) \ dA = \int_1^2 \int_x^{2x} f(x, y) \ dy \ dx``.
+
+### Example
+
+Suppose that the region ``A`` is bounded by the following lines:
+
+``y = x``, ``y = \frac{1}{2}x``, ``y = 5 - x``.
+
+Write the volume of the surface of ``f(x, y)`` and the region as a double integral.
+
+![24](./assets/multivariablecalculus/24.jpg)
+
+``\int \int_A f(x, y) \ dA = \int \int_{A_1} f(x, y) \ dy \ dx + \int \int_{A_2} f(x, y) \ dy \ dx = \int_0^{\frac{5}{2}} \int_{\frac{1}{2} x}^{x} f(x, y) \ dy \ dx + \int_{\frac{5}{2}}^{\frac{10}{3}} \int_{\frac{1}{2} x}^{5 - x} f(x, y) \ dy \ dx``
+
+## Changing the Order of Integration in Double Integrals
+
+Sometimes the given double integral is not solvable with the existing order. For example the following integral is not solvable:
+
+``\int \int e^{y^2} \ dy \ dx``
+
+Because the inner integral does not have a solution:
+
+``\int e^{y^2} \ dy``
+
+### Example
+
+Solve the integral below by changing the order of interation if possible.
+
+‍‍``\int_0^1 \int_x^1 e^{y^2} \ dy \ dx``
+
+First, we need to see whether the integration region is normal to the variable ``x`` or not. Because we want to make the differential of ``x`` the first in the integration. The integration region:
+
+``\left\{ \begin{array}{l} x \leq y \leq 1 &\\ 0 \leq x \leq 1 \end{array} \right.``
+
+``\left\{ \begin{array}{l} x = y, y = 1 &\\ x = 0, x = 1 \end{array} \right.``
+
+![25](./assets/multivariablecalculus/25.jpg)
+
+
+This region is normal to ``x``.
+
+``\int_0^1 \int_0^y e^{y^2} \ dx \ dy = \int_0^1 (xe^{y^2}|_0^y) dy = \int_0^1 (ye^{y^2} - 0) dy = \frac{1}{2} e^{y^2}|_0^1 = \frac{1}{2} (e - 1)``
+
+#### Note
+
+``\int xe^{x^2} \ dx``,
+
+``u = x^2``,
+
+``du = 2x \ dx``,
+
+``\frac{1}{2} \int e^u \ du = \frac{1}{2} e^u = \frac{1}{2} e^{x^2}``.
+
+
+### Example
+
+Solve this integral by changing the order of integration if possible.
+
+``\int_0^1 \int_{\sqrt{y}}^1 sin(\pi x^3) \ dx \ dy``
+
+The integration region:
+
+``\left\{ \begin{array}{l} \sqrt{y} \leq x \leq 1 &\\ 0 \leq y \leq 1 \end{array} \right.``
+
+``\left\{ \begin{array}{l} x = \sqrt{y}, x = 1 &\\ y = 0, y = 1 \end{array} \right.``
+
+``\left\{ \begin{array}{l} x^2 = y, x = 1 &\\ y = 0, y = 1 \end{array} \right.``
+
+![26](./assets/multivariablecalculus/26.jpg)
+
+This region is normal to ``y``.
+
+``\int_0^1 \int_0^{x^2} sin(\pi x^3) \ dy \ dx = \int_0^1 (y \ sin(\pi x^3)|_0^{x^2}) \ dx = \int_0^1 (x^2 \ sin(\pi x^3) - 0) \ dx``
+
+``\int_0^1 (x^2 \ sin(\pi x^3) - 0) \ dx = -\frac{1}{3 \pi} cos(\pi x^3)|_0^1 = -\frac{1}{3 \pi} (cos(\pi) - cos(0)) = -\frac{1}{3 \pi} (-1 - 1) = \frac{2}{3 \pi}``
+
+## Polar Corrdinates
+
+The coordinate system must be compatible and free of contradictions. Also, there must be a one-to-one correspondence between the coordinates and the point. Showing the coordinates of a point using variables ``r`` and ``\theta`` results in a new coordinate system called the polar coordinates. In the polar coordinates the vriable ``r`` determines the distance between the point and the origin of the system. And varibale ``\theta`` specifies the angle that the connecting line between the point and the origin makes with the positive direction of the ``x`` axis.
+
+![27](./assets/multivariablecalculus/27.jpg)
+
+``A = (x, y) = (r \ cos(\theta), r \ sin(\theta))``
+
+``A = (r, \theta)``
+
+``sin(\theta) = \frac{y}{r}``
+
+``cos(\theta) = \frac{x}{r}``
+
+``\tan(\theta) = \frac{y}{x}``
+
+#### Pythagorean Theorem
+
+``r^2 = x^2 + y^2``
+
+#### Note
+
+The formula of a circle centered at the origin with radius ``r``:
+
+``x^2 + y^2 = r^2``
+
+![28](./assets/multivariablecalculus/28.jpg)
+
+The formula of a circle centered at ``(\alpha, \beta)`` with radius ``r``:
+
+``(x - \alpha)^2 + (y - \beta)^2 = r^2``
+
+![29](./assets/multivariablecalculus/29.jpg)
+
+#### Note
+
+For transforming a double integral from the Cartesian coordinate system to the polar coordinate system, change the order of integration as follows:
+
+``r \ dr \ d\theta``
+
+### Example
+
+If the integration region ``A`` is bounded to a pair of circles in the first and second quadrants:
+
+``\left\{ \begin{array}{l} x^2 + y^2 = 1 &\\ x^2 + y^2 = 4 \end{array} \right.``
+
+then solve the following integral in polar coordinates.
+
+``\int \int_A e^{x^2 + y^2} \ dx \ dy``
+
+![30](./assets/multivariablecalculus/30.jpg)
+
+``\int \int_A e^{x^2 + y^2} \ dx \ dy = \int_0^{\pi} \int_1^2 e^{r^2} \ r \ dr \ d\theta = \int_0^{\pi} (\frac{1}{2} e^{r^2} |_1^2) d\theta``
+
+``\int_0^{\pi} (\frac{1}{2} e^{r^2} |_1^2) d\theta = \int_0^{\pi} \frac{1}{2} (e^{2^2} - e^{1^2}) d\theta``
+
+``\int_0^{\pi} \frac{1}{2} (e^{2^2} - e^{1^2}) d\theta = \int_0^{\pi} \frac{1}{2} (e^4 - e^1) d\theta = (\frac{\theta}{2} (e^4 - e) |_0^{\pi})``
+
+``(\frac{\theta}{2} (e^4 - e) |_0^{\pi}) = \frac{\pi}{2} (e^4 - e) - 0 = \frac{\pi}{2} (e^4 - e)``.
+
+### Example
+
+Solve the integral below in the polar coordinate system.
+
+``\int_0^1 \int_0^{\sqrt{1 - y^2}} sin(x^2 + y^2) \ dx \ dy``
+
+![31](./assets/multivariablecalculus/31.jpg)
+
+``\left\{ \begin{array}{l} 0 \leq x \leq \sqrt{1 - y^2} &\\ 0 \leq y \leq 1 \end{array} \right.``
+
+``\left\{ \begin{array}{l} x = 0, x = \sqrt{1 - y^2} &\\ y = 0, y = 1 \end{array} \right.``
+
+``\left\{ \begin{array}{l} x = 0, x^2 + y^2 = 1 &\\ y = 0, y = 1 \end{array} \right.``
+
+``\int_0^{\frac{\pi}{2}} \int_0^1 sin(r^2) r \ dr \ d\theta = \int_0^{\frac{\pi}{2}} -\frac{1}{2} cos(r^2) |_0^1 d\theta``
+
+``\int_0^{\frac{\pi}{2}} -\frac{1}{2} cos(r^2) |_0^1 d\theta = \int_0^{\frac{\pi}{2}} ((-\frac{1}{2} cos(1)) - (-\frac{1}{2} cos(0))) d\theta``
+
+``\int_0^{\frac{\pi}{2}} ((-\frac{1}{2} cos(1)) - (-\frac{1}{2} cos(0))) d\theta = \int_0^\frac{\pi}{2} (-\frac{1}{2} cos(1) + \frac{1}{2}) d\theta``
+
+``\int_0^\frac{\pi}{2} (-\frac{1}{2} cos(1) + \frac{1}{2}) d\theta = (\frac{1}{2} - \frac{1}{2} cos(1)) \theta |_0^\frac{\pi}{2}``
+
+``(\frac{1}{2} - \frac{1}{2} cos(1)) \theta |_0^\frac{\pi}{2} = \frac{\pi}{2} (\frac{1}{2} - \frac{1}{2} cos(1)) = \frac{\pi}{4} (1 - cos(1))``.
+
+
+#### The Method of Changing Variables
+
+``sin(x^2) dx``,
+
+``u = x^2``,
+
+``du = 2x \ dx``,
+
+``\int x \ sin(x^2) dx = \frac{1}{2} \int sin(u) du = \frac{1}{2} (-cos(u)) = -\frac{1}{2} cos(x^2)``.
 
 # Reference
 
-- Dr. M.A. Kerayeh Chyan, General mathematics 2, 2021.
+- Dr. M.A. Kerayeh Chyan, General Mathematics 2, 2021.
