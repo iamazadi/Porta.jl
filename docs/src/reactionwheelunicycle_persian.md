@@ -2,7 +2,7 @@
 Description = "Describes the mathematical model of a reaction wheel unicycle robot."
 ```
 
-# The Electric Poer System
+# The Electric Power System
 
 ![slide 1](./assets/reactionwheelunicycle/DIY/IMG_0944.png)
 ![slide 2](./assets/reactionwheelunicycle/DIY/IMG_0945.png)

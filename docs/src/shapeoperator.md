@@ -4,6 +4,30 @@ Description = "The Shape Operator"
 
 # The Shape Operator
 
+## The Basics
+
+### Introduction
+
+### Basic Concepts
+
+## Represetations and structure theory
+
+## Associated Vector Bundles
+
+### Group Actions
+
+### Fiber Bundles
+
+## Connections and Curvature
+
+## Spinors
+
+### Spinors
+
+### Summary
+
+A linear transformation maps point ``(x, y)`` to ``(x^\prime, y^\prime)``. Linear transformations are denoted by ``T``.
+
 ![linear transformaton](./assets/shapeoperator/lineartransformation.jpg)
 
 ![coordinate system](./assets/shapeoperator/coordinatesystem.jpg)

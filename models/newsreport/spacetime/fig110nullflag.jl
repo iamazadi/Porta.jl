@@ -5,7 +5,7 @@ using Porta
 
 
 figuresize = (4096, 2160)
-segments = 360
+segments = 60
 frames_number = 360
 modelname = "fig110nullflag"
 
@@ -21,7 +21,7 @@ mask = load("data/basemap_mask.png")
 
 makefigure() = Figure(size = figuresize)
 fig = with_theme(makefigure, theme_black())
-pl = PointLight(Point3f(0), RGBf(0.0862, 0.0862, 0.0862))
+pl = PointLight(RGBf(0.0862, 0.0862, 0.0862), Point3f(0))
 al = AmbientLight(RGBf(0.9, 0.9, 0.9))
 lscene = LScene(fig[1, 1], show_axis=false, scenekw = (lights = [pl, al], clear=true, backgroundcolor = :white))
 
@@ -41,8 +41,9 @@ generate() = 2rand() - 1 + im * (2rand() - 1)
 κv = 𝕍(κ)
 κ′v = 𝕍(κ′)
 
-arrowsize = Vec3f(0.06, 0.08, 0.1)
-linewidth = 0.04
+tiplength = 0.06
+tipradius = 0.02
+shaftradius = 0.01
 origin = Observable(Point3f(0.0, 0.0, 0.0))
 northpole = Observable(Point3f(0.0, 0.0, 1.0))
 κtail = Observable(Point3f(vec(project(normalize(ℍ(vec(κ′v)))))...))
@@ -52,14 +53,15 @@ northpole = Observable(Point3f(0.0, 0.0, 1.0))
 ps = @lift([$origin, $κhead, $origin, $κhead1])
 ns = @lift([$κhead, normalize($κtail - $κhead), $κhead1, normalize($κtail1 - $κhead1)])
 colorants = [:red, :green]
-arrows!(lscene,
+arrows3d!(lscene,
     ps, ns, fxaa = true, # turn on anti-aliasing
     color = [colorants..., colorants...],
-    linewidth = linewidth, arrowsize = arrowsize,
-    align = :origin
+    shaftradius = shaftradius, tipradius = tipradius,
+    tiplength = tiplength,
+    align = :tail
 )
 
-linewidth = 20
+linewidth = 10
 κlinepoints = []
 κlines = []
 κlinecolors = []
