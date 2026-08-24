@@ -67,7 +67,7 @@ makefigure() = Figure(size = figuresize)
 fig = with_theme(makefigure, theme_black())
 pl = PointLight(RGBf(0.0862, 0.0862, 0.0862), Point3f(0))
 al = AmbientLight(RGBf(0.9, 0.9, 0.9))
-lscene = LScene(fig[1, 1], show_axis=false, scenekw = (lights = [pl, al], clear=true, backgroundcolor = :black))
+lscene = LScene(fig[1, 1], show_axis=false, scenekw = (lights = [pl, al], clear=true, backgroundcolor = :white))
 rotation = gettextrotation(lscene)
 
 # planematrix = makestereographicprojectionplane(M, T = float(-T), segments = segments)
@@ -75,10 +75,10 @@ rotation = gettextrotation(lscene)
 
 # origin = Observable(Point3f(0.0, 0.0, 0.0))
 northpole = Observable(Point3f(0.0, 0.0, 1.0))
-meshscatter!(lscene, northpole, markersize = markersize, color = :black)
+meshscatter!(lscene, northpole, markersize = markersize, color = :gold)
 # meshscatter!(lscene, origin, markersize = markersize, color = :gold)
 # titles = ["O", "N"]
-title = Observable("s, t, θ, ϕ, ψ")
+title = Observable("s, τ, θ, ϕ, ψ")
 text!(lscene,
     @lift(map(x -> Point3f(vec((isnan(x) ? ẑ : x))), [$northpole])),
     text = title,
@@ -89,15 +89,16 @@ text!(lscene,
     markerspace = :data
 )
 
+lspace1 = range(-π, stop = float(π), length = segments3)
+lspace2 = range(-π / 2, stop = π / 2, length = segments3)
+sphere = [convert_to_cartesian([1.0; θ; ϕ]) for θ in lspace2, ϕ in lspace1]
+
 ##### Set 1
 s1 = rand()
 τ = rand()
 t1 = τ
 T1 = sign(t1)
 
-lspace1 = range(-π, stop = float(π), length = segments3)
-lspace2 = range(-π / 2, stop = π / 2, length = segments3)
-sphere = [convert_to_cartesian([1.0; θ; ϕ]) for θ in lspace2, ϕ in lspace1]
 twosurface = map(x -> 𝕍(t1, vec(T1 * √abs(t1) * x)...), sphere)
 spinvectors = map(x -> SpinVector(vec(ω(vec(x)..., s1))..., Int(T1)), twosurface)
 spinvectorpairs_set1 = map(x -> calculatespinvectorpairs(x, Int(T1)), spinvectors)
@@ -108,6 +109,7 @@ heads_set1 = []
 tails1_set1 = []
 heads1_set1 = []
 flagplanes_set1 = []
+fibers = []
 for (index, pair) in enumerate(vectorpairs_set1)
     color = RGBAf(convert_hsvtorgb([float(index) / float(length(vectorpairs_set1)) * 359.0; 1.0; 1.0])..., 1.0)
     tail = Observable(Point3f(vec(project(normalize(ℍ(vec(pair[2])))))...))
@@ -129,8 +131,8 @@ for (index, pair) in enumerate(vectorpairs_set1)
         tiplength = tiplength,
         align = :tail
     )
-    # flagplanematrix = makeflagplane(pair[1], pair[2] - pair[1], float(T1), segments = segments3)
-    # flagplanecolor = fill(color, segments3, segments3)
+    # flagplanematrix = makeflagplane(pair[1], pair[2] - pair[1], float(T1), segments = 9)
+    # flagplanecolor = fill(color, 9, 9)
     # flagplaneobservable = buildsurface(lscene, flagplanematrix, flagplanecolor, transparency = false)
     # push!(flagplanes_set1, flagplaneobservable)
     # meshscatter!(lscene, head, markersize = markersize, color = color)
@@ -140,7 +142,12 @@ for (index, pair) in enumerate(vectorpairs_set1)
     # segmentP = @lift([$northpole, $head, $head1])
     # lines!(lscene, segmentP, linewidth = linewidth, color = segmentcolors, colormap = :plasma, colorrange = (1, 3), transparency = true)
     segmentP = @lift([$head, $head1])
-    lines!(lscene, segmentP, linewidth = linewidth, color = segmentcolors, colormap = :plasma, colorrange = (1, 2), transparency = true)
+    # lines!(lscene, segmentP, linewidth = linewidth, color = segmentcolors, colormap = :sun, colorrange = (1, 2), transparency = true)
+    lines!(lscene, segmentP, linewidth = linewidth, color = color, transparency = true)
+
+    fiber = Observable([Point3f(project(normalize((ℍ(vec(pair[1])) * ℍ(exp(K(3) * α)))))) for α in range(0, stop = 2π, length = segments3)])
+    lines!(lscene, fiber, linewidth = linewidth, color = color)
+    push!(fibers, fiber)
 end
 
 planematrix = makestereographicprojectionplane(M, T = float(T), segments = segments)
@@ -332,59 +339,61 @@ animate(frame::Int) = begin
     println("Frame: $frame, Stage: $stage, Total Stages: $totalstages, Progress: $stageprogress")
 
     if stage == 1
-        global s1 = 2stageprogress - 1.0
-        global τ = -1.0
+        global s1 = cos(2π * stageprogress)
+        global τ = 1.0
         global θ = 0.0
         global ϕ = 0.0
         global ψ = 0.0
-        title[] = "s = $(round(s1, digits = 4))"
+        title[] = "helicity = $(round(s1, digits = 3))"
     end
     if stage == 2
-        global s1 = references
-        global τ = 2stageprogress - 1.0
+        global s1 = 1.0
+        global τ = cos(2π * stageprogress)
         global θ = 0.0
         global ϕ = 0.0
         global ψ = 0.0
-        title[] = "t = $(round(τ, digits = 4))"
+        title[] = "time = $(round(τ, digits = 3))"
     end
     if stage == 3
-        global s1 = references
-        global τ = referencet
-        global θ = stageprogress * 2π
-        global ϕ = 0.0
+        global s1 = 1.0
+        global τ = 1.0
+        global θ = 0.0
+        global ϕ = sin(stageprogress * 2π) * π
         global ψ = 0.0
-        title[] = "θ = $(round(θ, digits = 4))"
+        title[] = "K1 = $(round(ϕ, digits = 3))"
     end
     if stage == 4
-        global s1 = references
-        global τ = referencet
-        global θ = 0.0
-        global ϕ = stageprogress * 2π
+        global s1 = 1.0
+        global τ = 1.0
+        global θ = sin(stageprogress * 2π) * π
+        global ϕ = 0.0
         global ψ = 0.0
-        title[] = "ϕ = $(round(ϕ, digits = 4))"
+        title[] = "K2 = $(round(θ, digits = 3))"
     end
     if stage == 5
-        global s1 = references
-        global τ = referencet
+        global s1 = 1.0
+        global τ = 1.0
         global θ = 0.0
         global ϕ = 0.0
-        global ψ = stageprogress * 2π
-        title[] = "ψ = $(round(ψ, digits = 4))"
+        global ψ = sin(stageprogress * 2π) * π
+        title[] = "K3 = $(round(ψ, digits = 3))"
     end
-    
-    t1 = τ
-    T1 = sign(t1)
 
     lspace1 = range(-π, stop = float(π), length = segments3)
     lspace2 = range(-π / 2, stop = π / 2, length = segments3)
     sphere = [convert_to_cartesian([1.0; θ; ϕ]) for θ in lspace2, ϕ in lspace1]
+    
+    t1 = τ
+    T1 = sign(t1)
+
     twosurface = map(x -> 𝕍(t1, vec(T1 * √abs(t1) * x)...), sphere)
     spinvectors = map(x -> SpinVector(vec(ω(vec(x)..., s1))..., Int(T1)), twosurface)
     spinvectorpairs_set1 = map(x -> calculatespinvectorpairs(x, Int(T1)), spinvectors)
     # vectorpairs_set1 = map(x -> (𝕍(x[1]), 𝕍(x[2])), spinvectorpairs_set1)
 
-    
-    spintransform = SpinTransformation(θ, ϕ, ψ)
+    # spintransform = SpinTransformation(θ, ϕ, ψ)
+    q = ℍ(exp(ϕ * K(1) + θ * K(2)) + ψ * K(3))
+    spintransform = SpinTransformation(mat(q))
     spherematrix = makesphere(spintransform, T1, segments = segments2)
     planematrix = makestereographicprojectionplane(spintransform, T = T1, segments = segments)
     updatesurface!(spherematrix, sphereobservable1)
@@ -404,12 +413,15 @@ animate(frame::Int) = begin
     for (index, pair) in enumerate(spinvectorpairs_set1)
         κ = 𝕍(spintransform * pair[1])
         κ′ = 𝕍(spintransform * pair[2])
-        # flagplanematrix = makeflagplane(κ, 𝕍(normalize(vec(κ′ - κ))), float(T1), segments = segments3)
+        # flagplanematrix = makeflagplane(κ, 𝕍(normalize(vec(κ′ - κ))), float(T1), segments = 9)
         # updatesurface!(flagplanematrix, flagplanes_set1[index])
         heads_set1[index][] = Point3f(project(ℍ(normalize(vec(κ)))))
         tails_set1[index][] = Point3f(project(normalize(ℍ(vec(κ′)))))
         tails1_set1[index][] = Point3f(projectontoplane(κ′))
         heads1_set1[index][] = Point3f(projectontoplane(κ))
+
+        # fibers[index][] = [Point3f(project(q * normalize(ℍ(vec(pair[1])) * ℍ(exp(K(3) * α))))) for α in range(0, stop = 2π, length = segments3)]
+        fibers[index][] = [Point3f(project(ℍ(exp(K(3) * α)) * normalize(ℍ(vec(κ))))) for α in range(0, stop = 2π, length = segments3)]
     end
     # for (index, pair) in enumerate(spinvectorpairs_set2)
     #     κ = 𝕍(spintransform * pair[1])
