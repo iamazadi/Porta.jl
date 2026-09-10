@@ -14,7 +14,8 @@ Make a 2-surface of the horizontal section at point `x` after transformation wit
 function make(x::ℍ, gauge::Float64, M::Matrix{Float64}, segments::Integer; chart::NTuple{4, Float64} = (-π / 4, π / 4, -π / 4, π / 4))
     lspaceθ = range(chart[1], stop = chart[2], length = segments)
     lspaceϕ = range(chart[3], stop = chart[4], length = segments)
-    [project(normalize(M * (x * ℍ(exp(θ * K(1) + -ϕ * K(2)) * exp(gauge * K(3)))))) for ϕ in lspaceϕ, θ in lspaceθ]
+    # [project(normalize(M * (ℍ(exp(θ * K(1) + -ϕ * K(2)) * exp(gauge * K(3))) * x))) for ϕ in lspaceϕ, θ in lspaceθ]
+    [project(normalize(M * (ℍ(exp(gauge * K(2)) * exp(θ * K(1) + -ϕ * K(3))) * x))) for ϕ in lspaceϕ, θ in lspaceθ]
 end
 
 

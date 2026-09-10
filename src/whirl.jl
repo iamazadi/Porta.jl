@@ -19,7 +19,8 @@ Make the vertical subspace of the boundary `x`, with the given heights `gauge1` 
 """
 function make(x::Vector{ℍ}, gauge1::Float64, gauge2::Float64, M::Matrix{Float64}, segments::Integer)
     lspacegauge = range(gauge1, stop = gauge2, length = segments)
-    [project(normalize(M * (x[i] * ℍ(exp(K(3) * gauge))))) for i in 1:length(x), gauge in lspacegauge]
+    # [project(normalize(M * (ℍ(exp(K(3) * gauge)) * x[i]))) for i in 1:length(x), gauge in lspacegauge]
+    [project(normalize(M * (ℍ(exp(K(2) * gauge)) * x[i]))) for i in 1:length(x), gauge in lspacegauge]
 end
 
 
