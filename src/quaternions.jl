@@ -43,7 +43,7 @@ struct ℍ
     ℍ(a::Float64, b::Float64, c::Float64, d::Float64) = new(a, b, c, d)
     ℍ(a::ℝ⁴) = ℍ(vec(a)...)
     ℍ(v::Vector{Float64}) = ℍ(v...)
-    ℍ(z::Vector{<:Complex}) = ℍ(real(z[1]), real(z[2]), imag(z[1]), imag(z[2]))
+    ℍ(z::Vector{<:Complex}) = ℍ(real(z[1]), imag(z[1]), real(z[2]), imag(z[2]))
     ℍ(m::Matrix{Float64}) = ℍ(m[1,1], m[1,2], m[1,3], m[1,4])
     ℍ(M::Matrix{<:Complex}) = begin
         if isapprox(M, elI)
