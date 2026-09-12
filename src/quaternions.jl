@@ -82,7 +82,7 @@ Base.vec(q::ℍ) = [q.a; q.b; q.c; q.d]
 
 Print a string representation of the given quaternion `q`.
 """
-Base.show(io::IO, q::ℍ) = print(io, "($(round(q.a, digits = 4)) + $(round(q.b, digits = 4)) i + $(round(q.c, digits = 4)) j + $(round(q.d, digits = 4)) k) ∈ ℍ")
+Base.show(io::IO, q::ℍ) = print(io, "($(round(q.a, digits = 2)) + $(round(q.b, digits = 2)) i + $(round(q.c, digits = 2)) j + $(round(q.d, digits = 2)) k) ∈ ℍ")
 
 
 """
