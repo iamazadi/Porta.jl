@@ -21,6 +21,7 @@ export det
 export K
 export J
 export R
+export complexvec
 
 
 # The global constants defining elementary ℍs
@@ -83,6 +84,17 @@ Base.vec(q::ℍ) = [q.a; q.b; q.c; q.d]
 Print a string representation of the given quaternion `q`.
 """
 Base.show(io::IO, q::ℍ) = print(io, "($(round(q.a, digits = 2)) + $(round(q.b, digits = 2)) i + $(round(q.c, digits = 2)) j + $(round(q.d, digits = 2)) k) ∈ ℍ")
+
+
+"""
+    complexvec(q)
+
+Return a complex 2-vector representation of the given number `q` ∈ ℂ².
+"""
+complexvec(q::ℍ) = begin
+	a, b, c, d = vec(q)
+	[a + im * b; c + im * d]
+end
 
 
 """
