@@ -2,6 +2,7 @@ import Base.:+
 import Base.:-
 import Base.:*
 import GLMakie.Point3f
+import GLMakie.Point
 import GLMakie.Vec3f
 import LinearAlgebra.cross
 
@@ -72,6 +73,7 @@ end
 Convert a point from type Point3f in Makie to ℝ³ for interoperability, with the given point `p`.
 """
 ℝ³(p::Point3f) = ℝ³(Float64.(vec(p))...)
+ℝ³(p::Point{3, Float64}) = ℝ³(Float64.(vec(p))...)
 
 
 """
