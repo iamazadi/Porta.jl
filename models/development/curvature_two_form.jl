@@ -28,7 +28,7 @@ linewidth3 = linewidth / 3.0
 markersize = 0.02
 fontsize = 0.2
 # camera configuration
-eyeposition_distance = float(π) * 0.7
+eyeposition_distance = float(π) * 0.8
 eyeposition = normalize(ℝ³(0.0, 1.0, 1.0)) * eyeposition_distance
 lookat = ℝ³(0.0, 0.0, 0.0)
 up = normalize(ℝ³(0.0, 0.0, 1.0))
@@ -46,7 +46,7 @@ M = Identity(4)
 color = GLMakie.RGBAf(0.0, 1.0, 0.0, 0.75)
 reference_point = ℍ(exp(0.0 * longitudescale * K(1) + 0.0 * latitudescale * K(3))) * q
 mask = load("data/basemap_mask.png")
-transparency = 0.6
+transparency = 0.7
 ϵ = 1e-3
 ϵ4 = 0.02
 _ψ = rand() * 2π
@@ -152,10 +152,15 @@ z₀ = @lift(complexvec($P)[1])
 z₁ = @lift(complexvec($P)[2])
 z̅₀ = @lift(conj(complexvec($P)[1]))
 z̅₁ = @lift(conj(complexvec($P)[2]))
+
 ψ = Observable(_ψ)
 # The tangent spaces of the unit sphere in ℂ²: TS³ = { (X₀, X₁) ∈ ℂ² | z̅₀ X₀ + z̅₁ X₁ = 0 }
-X′ = @lift(ℍ(exp(sin($ψ) * ϵ * K(1) + cos($ψ) * ϵ * K(3))) * $P - $P)
+K_direcion_liealgebra = @lift(sin($ψ) * ϵ * K(1) + cos($ψ) * ϵ * K(3))
+P′ = @lift(ℍ(exp($K_direcion_liealgebra)) * $P)
+X′ = @lift($P′ - $P)
+X̅′ = @lift(ℍ(conj.(complexvec($X′))))
 X = @lift(normalize($X′))
+X̅ = @lift(normalize($X̅′))
 X₀ = @lift(complexvec($X)[1])
 X₁ = @lift(complexvec($X)[2])
 X̅₀ = @lift(conj($X₀))
@@ -166,25 +171,56 @@ X̅₁ = @lift(conj($X₁))
 α̅₀ = X̅₀
 α̅₁ = X̅₁
 A = @lift(0.5 * ($z̅₀ * $α₀ - $z₀ * $α̅₀ + $z̅₁ * $α₁ - $z₁ * $α̅₁))
+
+dz₀ = @lift((compute_connection_A($P, ℍ(exp($K_direcion_liealgebra)) * ℍ([$z₀ + ϵ; $z₁])) - compute_connection_A($P, ℍ(exp($K_direcion_liealgebra)) * $P)))
+dz₁ = @lift((compute_connection_A($P, ℍ(exp($K_direcion_liealgebra)) * ℍ([$z₀; $z₁ + ϵ])) - compute_connection_A($P, ℍ(exp($K_direcion_liealgebra)) * $P)))
+dz̅₀ = @lift((compute_connection_A($P, ℍ(exp($K_direcion_liealgebra)) * ℍ([$z̅₀ + ϵ; $z̅₁])) - compute_connection_A($P, ℍ(exp($K_direcion_liealgebra)) * $P)))
+dz̅₁ = @lift((compute_connection_A($P, ℍ(exp($K_direcion_liealgebra)) * ℍ([$z̅₀; $z̅₁ + ϵ])) - compute_connection_A($P, ℍ(exp($K_direcion_liealgebra)) * $P)))
+dz₀_observable = @lift(normalize(Point3f(ℝ³($dz₀ * normalize(Point3f(project(ℍ([$z₀ + ϵ; $z₁]))) - $P_observable)))))
+dz₁_observable = @lift(normalize(Point3f(ℝ³($dz₁ * normalize(Point3f(project(ℍ([$z₀; $z₁ + ϵ]))) - $P_observable)))))
+dz̅₀_observable = @lift(normalize(Point3f(ℝ³($dz̅₀ * normalize(Point3f(project(ℍ([$z̅₀ + ϵ; $z̅₁]))) - $P_observable)))))
+dz̅₁_observable = @lift(normalize(Point3f(ℝ³($dz̅₁ * normalize(Point3f(project(ℍ([$z̅₀; $z̅₁ + ϵ]))) - $P_observable)))))
+dz₀1 = @lift(compute_connection_A($P, ℍ(exp(ϵ * K(1))) * ℍ([$z₀ + ϵ; $z₁])) - compute_connection_A($P, ℍ(exp(K(1))) * $P))
+dz₀2 = @lift(compute_connection_A($P, ℍ(exp(ϵ * K(2))) * ℍ([$z₀ + ϵ; $z₁])) - compute_connection_A($P, ℍ(exp(K(2))) * $P))
+dz₀3 = @lift(compute_connection_A($P, ℍ(exp(ϵ * K(3))) * ℍ([$z₀ + ϵ; $z₁])) - compute_connection_A($P, ℍ(exp(K(3))) * $P))
+dz₁1 = @lift(compute_connection_A($P, ℍ(exp(ϵ * K(1))) * ℍ([$z₀; $z₁ + ϵ])) - compute_connection_A($P, ℍ(exp(K(1))) * $P))
+dz₁2 = @lift(compute_connection_A($P, ℍ(exp(ϵ * K(2))) * ℍ([$z₀; $z₁ + ϵ])) - compute_connection_A($P, ℍ(exp(K(2))) * $P))
+dz₁3 = @lift(compute_connection_A($P, ℍ(exp(ϵ * K(3))) * ℍ([$z₀; $z₁ + ϵ])) - compute_connection_A($P, ℍ(exp(K(3))) * $P))
+dz̅₀1 = @lift(compute_connection_A($P, ℍ(exp(ϵ * K(1))) * ℍ([$z̅₀ + ϵ; $z̅₁])) - compute_connection_A($P, ℍ(exp(K(1))) * $P))
+dz̅₀2 = @lift(compute_connection_A($P, ℍ(exp(ϵ * K(2))) * ℍ([$z̅₀ + ϵ; $z̅₁])) - compute_connection_A($P, ℍ(exp(K(2))) * $P))
+dz̅₀3 = @lift(compute_connection_A($P, ℍ(exp(ϵ * K(3))) * ℍ([$z̅₀ + ϵ; $z̅₁])) - compute_connection_A($P, ℍ(exp(K(3))) * $P))
+dz̅₁1 = @lift(compute_connection_A($P, ℍ(exp(ϵ * K(1))) * ℍ([$z̅₀; $z̅₁ + ϵ])) - compute_connection_A($P, ℍ(exp(K(1))) * $P))
+dz̅₁2 = @lift(compute_connection_A($P, ℍ(exp(ϵ * K(2))) * ℍ([$z̅₀; $z̅₁ + ϵ])) - compute_connection_A($P, ℍ(exp(K(2))) * $P))
+dz̅₁3 = @lift(compute_connection_A($P, ℍ(exp(ϵ * K(3))) * ℍ([$z̅₀; $z̅₁ + ϵ])) - compute_connection_A($P, ℍ(exp(K(3))) * $P))
+# A¹ = @lift((1.0 / ϵ) * (compute_connection_A($P, ℍ(exp(K(1))) * ℍ([$z₀ + ϵ; $z₁])) - compute_connection_A($P, ℍ(exp(K(1))) * $P)))
+# A² = @lift((1.0 / ϵ) * (compute_connection_A($P, ℍ(exp(K(2))) * ℍ([$z₀; $z₁ + ϵ])) - compute_connection_A($P, ℍ(exp(K(2))) * $P)))
+# A¹_observable = @lift(normalize(Point3f(project(ℍ(exp($A¹ * K(1))) * $P)) - $P_observable))
+# A²_observable = @lift(normalize(Point3f(project(ℍ(exp($A² * K(2))) * $P)) - $P_observable))
+# A³_observable = @lift(normalize(Point3f(project(ℍ(exp($A³ * K(3))) * $P)) - $P_observable))
+# _A = @lift(normalize(Point3f(project(ℍ(exp($A¹ * K(1) * $)))) - $P_observable))
+
 P1 = @lift(ℍ(exp(ϵ * K(1))) * $P)
 P2 = @lift(ℍ(exp(ϵ * K(2))) * $P)
 P3 = @lift(ℍ(exp(ϵ * K(3))) * $P)
 K1 = @lift(normalize($P1 - $P))
 K2 = @lift(normalize($P2 - $P))
 K3 = @lift(normalize($P3 - $P))
-
 F¹ = @lift(ℍ([$α₀; $α̅₀]))
 F² = @lift(ℍ([$α₁; $α̅₁]))
-Fᴬ_magnitude = @lift(norm($F¹ + $F²))
 Fᴬ = @lift(-normalize($F¹ + $F²))
-F¹_observable = @lift(Point3f(project($F¹))- $P_observable)
-F²_observable = @lift(Point3f(project($F²))- $P_observable)
-Fᴬ_observable = @lift(Point3f(project($Fᴬ))- $P_observable)
+Fᴬ_magnitude = @lift(norm($Fᴬ))
+# F¹_observable = @lift(Point3f(project($F¹)) - $P_observable)
+# F²_observable = @lift(Point3f(project($F²)) - $P_observable)
+# Fᴬ_observable = @lift(Point3f(project($Fᴬ)) - $P_observable)
+F¹_observable = @lift(Point3f(project($F¹)))
+F²_observable = @lift(Point3f(project($F²)))
+Fᴬ_observable = @lift(Point3f(project($Fᴬ)))
 X_observable = @lift(normalize(Point3f(project($X′))))
-twoform_colorants = [:orange, :cyan, :black, :purple]
+X̅_observable = @lift(normalize(Point3f(project($X̅′))))
+twoform_colorants = [:purple, :navyblue, :red, :green, :blue, :yellow]
 arrows3d!(lscene1,
-	@lift([$P_observable, $P_observable, $P_observable, $P_observable]),
-	@lift([$F¹_observable, $F²_observable, $Fᴬ_observable, $X_observable]),
+	@lift([$P_observable, $P_observable, $P_observable, $P_observable, $P_observable, $P_observable]),
+	@lift([$X_observable, $X̅_observable, $dz₀_observable, $dz₁_observable, $dz̅₀_observable, $dz̅₁_observable]),
 	fxaa = true, # turn on anti-aliasing
 	color = twoform_colorants,
 	shaftradius = shaftradius, tipradius = tipradius,
@@ -192,17 +228,17 @@ arrows3d!(lscene1,
 	align = :tail,
 )
 arrows3d!(lscene2,
-	@lift([$P_observable, $P_observable, $P_observable, $P_observable]),
-	@lift([$F¹_observable, $F²_observable, $Fᴬ_observable, $X_observable]),
+	@lift([$P_observable, $P_observable, $P_observable, $P_observable, $P_observable, $P_observable]),
+	@lift([$X_observable, $X̅_observable, $dz₀_observable, $dz₁_observable, $dz̅₀_observable, $dz̅₁_observable]),
 	fxaa = true, # turn on anti-aliasing
 	color = twoform_colorants,
 	shaftradius = shaftradius, tipradius = tipradius,
 	tiplength = tiplength,
 	align = :tail,
 )
-twoform_titles = @lift(["α₀ ^ α̅₀", "α₁ ^ α̅₁", "Fᴬ = " * string(round($Fᴬ_magnitude, digits = 3)), "X"])
+twoform_titles = @lift(["X", "X̅", "dz₀ = " * string(round($dz₀, digits = 2)), "dz₁ = " * string(round($dz₁, digits = 2)), "dz̅₀ = " * string(round($dz̅₀, digits = 2)), "dz̅₁ = " * string(round($dz̅₁, digits = 2))])
 text!(lscene1,
-	@lift(map(x -> x + $P_observable, [$F¹_observable, $F²_observable, $Fᴬ_observable, $X_observable])),
+	@lift(map(x -> x + $P_observable, [$X_observable, $X̅_observable, $dz₀_observable, $dz₁_observable, $dz̅₀_observable, $dz̅₁_observable])),
 	text = twoform_titles,
 	color = twoform_colorants,
 	rotation = rotation1,
@@ -211,7 +247,7 @@ text!(lscene1,
 	markerspace = :data,
 )
 text!(lscene2,
-	@lift(map(x -> x + $P_observable, [$F¹_observable, $F²_observable, $Fᴬ_observable, $X_observable])),
+	@lift(map(x -> x + $P_observable, [$X_observable, $X̅_observable,  $dz₀_observable, $dz₁_observable, $dz̅₀_observable, $dz̅₁_observable])),
 	text = twoform_titles,
 	color = twoform_colorants,
 	rotation = rotation2,
@@ -221,9 +257,15 @@ text!(lscene2,
 )
 
 twoform_color = fill(RGBAf(0.0, 0.0, 0.0, transparency), 2, 2)
-twoform_plane = @lift([ℝ³($P_observable) ℝ³($P_observable + $F¹_observable); ℝ³($P_observable + $F²_observable) ℝ³($P_observable + $F¹_observable + $F²_observable)])
-buildsurface(lscene1, twoform_plane, twoform_color, transparency = false)
-buildsurface(lscene2, twoform_plane, twoform_color, transparency = false)
+# twoform_plane = @lift([ℝ³($P_observable) ℝ³($P_observable + $F¹_observable); ℝ³($P_observable + $F²_observable) ℝ³($P_observable + $F¹_observable + $F²_observable)])
+# buildsurface(lscene1, twoform_plane, twoform_color, transparency = false)
+# buildsurface(lscene2, twoform_plane, twoform_color, transparency = false)
+twoform_plane0 = @lift([ℝ³($P_observable) ℝ³($P_observable + $dz₀_observable); ℝ³($P_observable + $dz̅₀_observable) ℝ³($P_observable + $dz₀_observable + $dz̅₀_observable)])
+twoform_plane1 = @lift([ℝ³($P_observable) ℝ³($P_observable + $dz₁_observable); ℝ³($P_observable + $dz̅₁_observable) ℝ³($P_observable + $dz₁_observable + $dz̅₁_observable)])
+buildsurface(lscene1, twoform_plane0, twoform_color, transparency = false)
+buildsurface(lscene1, twoform_plane1, twoform_color, transparency = false)
+buildsurface(lscene2, twoform_plane0, twoform_color, transparency = false)
+buildsurface(lscene2, twoform_plane1, twoform_color, transparency = false)
 
 K1_observable = @lift(Point3f(normalize(project($P1) - ℝ³($P_observable))))
 K2_observable = @lift(Point3f(normalize(project($P2) - ℝ³($P_observable))))
@@ -287,18 +329,18 @@ buildsurface(lscene1, K1K2_surface, K1K2_color, transparency = true)
 buildsurface(lscene1, K1K3_surface, K1K3_color, transparency = true)
 buildsurface(lscene1, K2K3_surface, K2K3_color, transparency = true)
 
-v1_K1K2 = @lift(dot($F¹, $K1) * $K1 + dot($F¹, $K2) * $K2)
-v1_K1K3 = @lift(dot($F¹, $K1) * $K1 + dot($F¹, $K3) * $K3)
-v1_K2K3 = @lift(dot($F¹, $K2) * $K2 + dot($F¹, $K3) * $K3)
-v2_K1K2 = @lift(dot($F², $K1) * $K1 + dot($F², $K2) * $K2)
-v2_K1K3 = @lift(dot($F², $K1) * $K1 + dot($F², $K3) * $K3)
-v2_K2K3 = @lift(dot($F², $K2) * $K2 + dot($F², $K3) * $K3)
-v1_K1K2_observable = @lift(Point3f(ℝ³(dot($F¹, $K1) * $K1_observable + dot($F¹, $K2) * $K2_observable)))
-v1_K1K3_observable = @lift(Point3f(ℝ³(dot($F¹, $K1) * $K1_observable + dot($F¹, $K3) * $K3_observable)))
-v1_K2K3_observable = @lift(Point3f(ℝ³(dot($F¹, $K2) * $K2_observable + dot($F¹, $K3) * $K3_observable)))
-v2_K1K2_observable = @lift(Point3f(ℝ³(dot($F², $K1) * $K1_observable + dot($F², $K2) * $K2_observable)))
-v2_K1K3_observable = @lift(Point3f(ℝ³(dot($F², $K1) * $K1_observable + dot($F², $K3) * $K3_observable)))
-v2_K2K3_observable = @lift(Point3f(ℝ³(dot($F², $K2) * $K2_observable + dot($F², $K3) * $K3_observable)))
+v1_K1K2 = @lift($dz₀1 * $K1 + $dz₀2 * $K2)
+v1_K1K3 = @lift($dz₀1 * $K1 + $dz₀3 * $K3)
+v1_K2K3 = @lift($dz₀2 * $K2 + $dz₀3 * $K3)
+v2_K1K2 = @lift($dz̅₀1 * $K1 + $dz̅₀2 * $K2)
+v2_K1K3 = @lift($dz̅₀1 * $K1 + $dz̅₀3 * $K3)
+v2_K2K3 = @lift($dz̅₀2 * $K2 + $dz̅₀3 * $K3)
+v1_K1K2_observable = @lift(Point3f(ℝ³($dz₀1 * $K1_observable + $dz₀2 * $K2_observable)))
+v1_K1K3_observable = @lift(Point3f(ℝ³($dz₀1 * $K1_observable + $dz₀3 * $K3_observable)))
+v1_K2K3_observable = @lift(Point3f(ℝ³($dz₀2 * $K2_observable + $dz₀3 * $K3_observable)))
+v2_K1K2_observable = @lift(Point3f(ℝ³($dz̅₀1 * $K1_observable + $dz̅₀2 * $K2_observable)))
+v2_K1K3_observable = @lift(Point3f(ℝ³($dz̅₀1 * $K1_observable + $dz̅₀3 * $K3_observable)))
+v2_K2K3_observable = @lift(Point3f(ℝ³($dz̅₀2 * $K2_observable + $dz̅₀3 * $K3_observable)))
 v_K1K2_color = fill(RGBAf(1.0, 1.0, 0.5, transparency), 2, 2)
 v_K1K3_color = fill(RGBAf(1.0, 0.5, 1.0, transparency), 2, 2)
 v_K2K3_color = fill(RGBAf(0.5, 1.0, 1.0, transparency), 2, 2)
@@ -316,15 +358,15 @@ lines!(lscene1, K1K2_area, linewidth = linewidth, color = v_K1K2_color[1], color
 lines!(lscene1, K1K3_area, linewidth = linewidth, color = v_K1K3_color[1], colorrange = colorrange, colormap = :rainbow, transparency = true)
 lines!(lscene1, K2K3_area, linewidth = linewidth, color = v_K2K3_color[1], colorrange = colorrange, colormap = :rainbow, transparency = true)
 
-v1_K1K2_segment = @lift([$P_observable + $F¹_observable, $P_observable + $v1_K1K2_observable])
-v1_K1K3_segment = @lift([$P_observable + $F¹_observable, $P_observable + $v1_K1K3_observable])
-v1_K2K3_segment = @lift([$P_observable + $F¹_observable, $P_observable + $v1_K2K3_observable])
-v2_K1K2_segment = @lift([$P_observable + $F²_observable, $P_observable + $v2_K1K2_observable])
-v2_K1K3_segment = @lift([$P_observable + $F²_observable, $P_observable + $v2_K1K3_observable])
-v2_K2K3_segment = @lift([$P_observable + $F²_observable, $P_observable + $v2_K2K3_observable])
-v12_K1K2_segment = @lift([$P_observable + $F¹_observable + $F²_observable, $P_observable + $v1_K1K2_observable + $v2_K1K2_observable])
-v12_K1K3_segment = @lift([$P_observable + $F¹_observable + $F²_observable, $P_observable + $v1_K1K3_observable + $v2_K1K3_observable])
-v12_K2K3_segment = @lift([$P_observable + $F¹_observable + $F²_observable, $P_observable + $v1_K2K3_observable + $v2_K2K3_observable])
+v1_K1K2_segment = @lift([$P_observable + $dz₀_observable, $P_observable + $v1_K1K2_observable])
+v1_K1K3_segment = @lift([$P_observable + $dz₀_observable, $P_observable + $v1_K1K3_observable])
+v1_K2K3_segment = @lift([$P_observable + $dz₀_observable, $P_observable + $v1_K2K3_observable])
+v2_K1K2_segment = @lift([$P_observable + $dz̅₀_observable, $P_observable + $v2_K1K2_observable])
+v2_K1K3_segment = @lift([$P_observable + $dz̅₀_observable, $P_observable + $v2_K1K3_observable])
+v2_K2K3_segment = @lift([$P_observable + $dz̅₀_observable, $P_observable + $v2_K2K3_observable])
+v12_K1K2_segment = @lift([$P_observable + $dz₀_observable + $dz̅₀_observable, $P_observable + $v1_K1K2_observable + $v2_K1K2_observable])
+v12_K1K3_segment = @lift([$P_observable + $dz₀_observable + $dz̅₀_observable, $P_observable + $v1_K1K3_observable + $v2_K1K3_observable])
+v12_K2K3_segment = @lift([$P_observable + $dz₀_observable + $dz̅₀_observable, $P_observable + $v1_K2K3_observable + $v2_K2K3_observable])
 lines!(lscene1, v1_K1K2_segment, linewidth = linewidth2, color = v_K1K2_color[1], colorrange = colorrange, colormap = :rainbow, transparency = true)
 lines!(lscene1, v1_K1K3_segment, linewidth = linewidth2, color = v_K1K3_color[1], colorrange = colorrange, colormap = :rainbow, transparency = true)
 lines!(lscene1, v1_K2K3_segment, linewidth = linewidth2, color = v_K2K3_color[1], colorrange = colorrange, colormap = :rainbow, transparency = true)
@@ -344,12 +386,12 @@ buildsurface(lscene3, _K1K2_surface, K1K2_color, transparency = true)
 buildsurface(lscene3, _K1K3_surface, K1K3_color, transparency = true)
 buildsurface(lscene3, _K2K3_surface, K2K3_color, transparency = true)
 
-_v1_K1K2_observable = @lift(Point3f(dot($F¹, $K1) * x̂ + dot($F¹, $K2) * ŷ))
-_v1_K1K3_observable = @lift(Point3f(dot($F¹, $K1) * x̂ + dot($F¹, $K3) * ẑ))
-_v1_K2K3_observable = @lift(Point3f(dot($F¹, $K2) * ŷ + dot($F¹, $K3) * ẑ))
-_v2_K1K2_observable = @lift(Point3f(dot($F², $K1) * x̂ + dot($F², $K2) * ŷ))
-_v2_K1K3_observable = @lift(Point3f(dot($F², $K1) * x̂ + dot($F², $K3) * ẑ))
-_v2_K2K3_observable = @lift(Point3f(dot($F², $K2) * ŷ + dot($F², $K3) * ẑ))
+_v1_K1K2_observable = @lift(Point3f($dz₀1 * x̂ + $dz₀2 * ŷ))
+_v1_K1K3_observable = @lift(Point3f($dz₀1 * x̂ + $dz₀3 * ẑ))
+_v1_K2K3_observable = @lift(Point3f($dz₀2 * ŷ + $dz₀3 * ẑ))
+_v2_K1K2_observable = @lift(Point3f($dz̅₀1 * x̂ + $dz̅₀2 * ŷ))
+_v2_K1K3_observable = @lift(Point3f($dz̅₀1 * x̂ + $dz̅₀3 * ẑ))
+_v2_K2K3_observable = @lift(Point3f($dz̅₀2 * ŷ + $dz̅₀3 * ẑ))
 _v_K1K2_color = fill(RGBAf(1.0, 1.0, 0.0, transparency), 2, 2)
 _v_K1K3_color = fill(RGBAf(1.0, 0.0, 1.0, transparency), 2, 2)
 _v_K2K3_color = fill(RGBAf(0.0, 1.0, 1.0, transparency), 2, 2)
@@ -367,19 +409,25 @@ lines!(lscene3, _K1K2_area, linewidth = linewidth, color = _v_K1K2_color[1], col
 lines!(lscene3, _K1K3_area, linewidth = linewidth, color = _v_K1K3_color[1], colorrange = colorrange, colormap = :rainbow, transparency = true)
 lines!(lscene3, _K2K3_area, linewidth = linewidth, color = _v_K2K3_color[1], colorrange = colorrange, colormap = :rainbow, transparency = true)
 
-_F¹ = @lift(Point3f(dot($F¹, $K1) * x̂ + dot($F¹, $K2) * ŷ + dot($F¹, $K3) * ẑ))
-_F² = @lift(Point3f(dot($F², $K1) * x̂ + dot($F², $K2) * ŷ + dot($F², $K3) * ẑ))
-_Fᴬ = @lift(Point3f(dot($Fᴬ, $K1) * x̂ + dot($Fᴬ, $K2) * ŷ + dot($Fᴬ, $K3) * ẑ))
+# _F¹ = @lift(Point3f($dz₀1 * x̂ + dz₀2 * ŷ + dz₀3 * ẑ))
+# _F² = @lift(Point3f(dz̅₀1 * x̂ + dz̅₀2 * ŷ + dz̅₀3 * ẑ))
+# _Fᴬ = @lift(Point3f(dot($Fᴬ, $K1) * x̂ + dot($Fᴬ, $K2) * ŷ + dot($Fᴬ, $K3) * ẑ))
 _X = @lift(Point3f(dot($X, $K1) * x̂ + dot($X, $K2) * ŷ + dot($X, $K3) * ẑ))
-_v1_K1K2_segment = @lift([$_F¹, $_v1_K1K2_observable])
-_v1_K1K3_segment = @lift([$_F¹, $_v1_K1K3_observable])
-_v1_K2K3_segment = @lift([$_F¹, $_v1_K2K3_observable])
-_v2_K1K2_segment = @lift([$_F², $_v2_K1K2_observable])
-_v2_K1K3_segment = @lift([$_F², $_v2_K1K3_observable])
-_v2_K2K3_segment = @lift([$_F², $_v2_K2K3_observable])
-_v12_K1K2_segment = @lift([$_F¹ + $_F², $_v1_K1K2_observable + $_v2_K1K2_observable])
-_v12_K1K3_segment = @lift([$_F¹ + $_F², $_v1_K1K3_observable + $_v2_K1K3_observable])
-_v12_K2K3_segment = @lift([$_F¹ + $_F², $_v1_K2K3_observable + $_v2_K2K3_observable])
+_X̅ = @lift(Point3f(dot($X̅, $K1) * x̂ + dot($X̅, $K2) * ŷ + dot($X̅, $K3) * ẑ))
+_dz₀_observable = @lift(Point3f(normalize($dz₀1 * x̂ + $dz₀2 * ŷ + $dz₀3 * ẑ)))
+_dz₁_observable = @lift(Point3f(normalize($dz₁1 * x̂ + $dz₁2 * ŷ + $dz₁3 * ẑ)))
+_dz̅₀_observable = @lift(Point3f(normalize($dz̅₀1 * x̂ + $dz̅₀2 * ŷ + $dz̅₀3 * ẑ)))
+_dz̅₁_observable = @lift(Point3f(normalize($dz̅₁1 * x̂ + $dz̅₁2 * ŷ + $dz̅₁3 * ẑ)))
+# area = @lift($dz₀1 * dz₀3)
+_v1_K1K2_segment = @lift([$_dz₀_observable, $_v1_K1K2_observable])
+_v1_K1K3_segment = @lift([$_dz₀_observable, $_v1_K1K3_observable])
+_v1_K2K3_segment = @lift([$_dz₀_observable, $_v1_K2K3_observable])
+_v2_K1K2_segment = @lift([$_dz̅₀_observable, $_v2_K1K2_observable])
+_v2_K1K3_segment = @lift([$_dz̅₀_observable, $_v2_K1K3_observable])
+_v2_K2K3_segment = @lift([$_dz̅₀_observable, $_v2_K2K3_observable])
+_v12_K1K2_segment = @lift([$_dz₀_observable + $_dz̅₀_observable, $_v1_K1K2_observable + $_v2_K1K2_observable])
+_v12_K1K3_segment = @lift([$_dz₀_observable + $_dz̅₀_observable, $_v1_K1K3_observable + $_v2_K1K3_observable])
+_v12_K2K3_segment = @lift([$_dz₀_observable + $_dz̅₀_observable, $_v1_K2K3_observable + $_v2_K2K3_observable])
 lines!(lscene3, _v1_K1K2_segment, linewidth = linewidth3, color = _v_K1K2_color[1], colorrange = colorrange, colormap = :rainbow, transparency = true)
 lines!(lscene3, _v1_K1K3_segment, linewidth = linewidth3, color = _v_K1K3_color[1], colorrange = colorrange, colormap = :rainbow, transparency = true)
 lines!(lscene3, _v1_K2K3_segment, linewidth = linewidth3, color = _v_K2K3_color[1], colorrange = colorrange, colormap = :rainbow, transparency = true)
@@ -389,7 +437,7 @@ lines!(lscene3, _v2_K2K3_segment, linewidth = linewidth3, color = _v_K2K3_color[
 lines!(lscene3, _v12_K1K2_segment, linewidth = linewidth3, color = _v_K1K2_color[1], colorrange = colorrange, colormap = :rainbow, transparency = true)
 lines!(lscene3, _v12_K1K3_segment, linewidth = linewidth3, color = _v_K1K3_color[1], colorrange = colorrange, colormap = :rainbow, transparency = true)
 lines!(lscene3, _v12_K2K3_segment, linewidth = linewidth3, color = _v_K2K3_color[1], colorrange = colorrange, colormap = :rainbow, transparency = true)
-_v1v2_area = @lift([Point3f(O), $_F¹, $_F¹ + $_F², $_F², Point3f(O)])
+_v1v2_area = @lift([Point3f(O), $_dz₀_observable, $_dz₀_observable + $_dz̅₀_observable, $_dz̅₀_observable, Point3f(O)])
 lines!(lscene3, _v1v2_area, linewidth = linewidth, color = twoform_color[1], colorrange = colorrange, colormap = :rainbow, transparency = false)
 
 arrows3d!(lscene3,
@@ -412,11 +460,14 @@ text!(lscene3,
 )
 
 _twoform_color = fill(RGBAf(0.25, 0.25, 0.25, transparency), 2, 2)
-_twoform_plane = @lift([ℝ³(0.0, 0.0, 0.0) ℝ³($_F¹); ℝ³($_F²) ℝ³($_F¹ + $_F²)])
-buildsurface(lscene3, _twoform_plane, _twoform_color, transparency = false)
+_twoform_plane0 = @lift([ℝ³(0.0, 0.0, 0.0) ℝ³($_dz₀_observable); ℝ³($_dz̅₀_observable) ℝ³($_dz₀_observable + $_dz̅₀_observable)])
+_twoform_plane1 = @lift([ℝ³(0.0, 0.0, 0.0) ℝ³($_dz₁_observable); ℝ³($_dz̅₁_observable) ℝ³($_dz₁_observable + $_dz̅₁_observable)])
+buildsurface(lscene3, _twoform_plane0, _twoform_color, transparency = false)
+buildsurface(lscene3, _twoform_plane1, _twoform_color, transparency = false)
+heads = @lift([$_X, $_X̅, $_dz₀_observable, $_dz₁_observable, $_dz̅₀_observable, $_dz̅₁_observable])
 arrows3d!(lscene3,
-	[Point3f(0.0, 0.0, 0.0), Point3f(0.0, 0.0, 0.0), Point3f(0.0, 0.0, 0.0), Point3f(0.0, 0.0, 0.0)],
-	@lift([$_F¹, $_F², $_Fᴬ, $_X]),
+	[Point3f(0.0, 0.0, 0.0), Point3f(0.0, 0.0, 0.0), Point3f(0.0, 0.0, 0.0), Point3f(0.0, 0.0, 0.0), Point3f(0.0, 0.0, 0.0), Point3f(0.0, 0.0, 0.0)],
+	heads,
 	fxaa = true, # turn on anti-aliasing
 	color = twoform_colorants,
 	shaftradius = shaftradius, tipradius = tipradius,
@@ -424,7 +475,7 @@ arrows3d!(lscene3,
 	align = :tail,
 )
 text!(lscene3,
-	@lift([$_F¹, $_F², $_Fᴬ, $_X]),
+	heads,
 	text = twoform_titles,
 	color = twoform_colorants,
 	rotation = rotation3,
@@ -463,26 +514,28 @@ animate(frame::Int) = begin
 	end
 
 	if stage ∉ stage_sprites
-		color = RGBAf(convert_hsvtorgb([max(0.0, min(359.0, progress * 359.0)); 1.0; 1.0])..., transparency / 2.0)
+		color = RGBAf(convert_hsvtorgb([max(0.0, min(359.0, progress * 359.0)); 1.0; 1.0])..., transparency / 3.0)
 		arrows3d!(lscene2,
 			[P_observable[], P_observable[], P_observable[]],
-			[0.3 * F¹_observable[], 0.3 * F²_observable[], 0.3 * Fᴬ_observable[]],
+			[0.66 * dz₀_observable[], 0.66 * dz̅₀_observable[], 0.66 * Fᴬ_observable[]],
 			fxaa = true, # turn on anti-aliasing
 			color = twoform_colorants,
-			shaftradius = shaftradius / 3, tipradius = tipradius / 3,
-			tiplength = tiplength / 3,
+			shaftradius = shaftradius / 2, tipradius = tipradius / 2,
+			tiplength = tiplength / 2,
 			align = :tail,
 		)
-		_twoform_plane = [ℝ³(P_observable[]) ℝ³(P_observable[] + 0.3 * F¹_observable[]); ℝ³(P_observable[] + 0.3 * F²_observable[]) ℝ³(P_observable[] + 0.3 * F¹_observable[] + 0.3 * F²_observable[])]
 		_twoform_color = fill(color, 2, 2)
-		buildsurface(lscene2, _twoform_plane, _twoform_color, transparency = true)
+		buildsurface(lscene1, twoform_plane0[], _twoform_color, transparency = true)
+		buildsurface(lscene1, twoform_plane1[], _twoform_color, transparency = true)
+		buildsurface(lscene2, twoform_plane0[], _twoform_color, transparency = true)
+		buildsurface(lscene2, twoform_plane1[], _twoform_color, transparency = true)
 		push!(stage_sprites, stage)
 	end
 
 	lookat = ℝ³(P_observable[])
 	_eyeposition = rotate(eyeposition, ℍ(progress * 4π, ℝ³(0.0, 0.0, 1.0)))
 	updatecamera!(lscene1, _eyeposition, lookat, up)
-	updatecamera!(lscene2, _eyeposition, lookat, up)
+	updatecamera!(lscene2, 1.1 * _eyeposition, lookat, up)
 	updatecamera!(lscene3, _eyeposition, ℝ³(0.0, 0.0, 0.0), up)
 end
 
