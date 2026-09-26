@@ -14,6 +14,18 @@ compute_connection_A(point::ℍ, adjacentpoint::ℍ) = begin
 end
 
 
+ϕ(p::ℍ, u::Matrix; ϵ::Float64 = 1e-3) = begin
+	z₀, z₁ = complexvec(p)
+	p′ = ℍ(exp(ϵ * u)) * p
+	dp = normalize(ℍ(vec(p′) - vec(p)))
+	X₀ = complexvec(dp)[1]
+	X₁ = complexvec(dp)[2]
+	α₀ = X₀
+	α₁ = X₁
+	abs(0.5 * (conj(z₀) * α₀ - z₀ * conj(α₀) + conj(z₁) * α₁ - z₁ * conj(α₁)))
+end
+
+
 modelname = "curvature_two_form"
 totalstages = 30
 figuresize = (1920, 1080)
@@ -91,8 +103,8 @@ end
 for i in eachindex(boundary_nodes)
 	_points = Vector{ℍ}()
 	for node in boundary_nodes[i]
-		r, θ, ϕ = convert_to_geographic(node)
-		push!(_points, ℍ(exp(ϕ * longitudescale * K(1) + θ * latitudescale * K(3))) * q)
+		r, θ, _ϕ = convert_to_geographic(node)
+		push!(_points, ℍ(exp(_ϕ * longitudescale * K(1) + θ * latitudescale * K(3))) * q)
 	end
 	push!(points, _points)
 end
@@ -192,12 +204,19 @@ dz̅₀3 = @lift(compute_connection_A($P, ℍ(exp(ϵ * K(3))) * ℍ([$z̅₀ + �
 dz̅₁1 = @lift(compute_connection_A($P, ℍ(exp(ϵ * K(1))) * ℍ([$z̅₀; $z̅₁ + ϵ])) - compute_connection_A($P, ℍ(exp(K(1))) * $P))
 dz̅₁2 = @lift(compute_connection_A($P, ℍ(exp(ϵ * K(2))) * ℍ([$z̅₀; $z̅₁ + ϵ])) - compute_connection_A($P, ℍ(exp(K(2))) * $P))
 dz̅₁3 = @lift(compute_connection_A($P, ℍ(exp(ϵ * K(3))) * ℍ([$z̅₀; $z̅₁ + ϵ])) - compute_connection_A($P, ℍ(exp(K(3))) * $P))
-# A¹ = @lift((1.0 / ϵ) * (compute_connection_A($P, ℍ(exp(K(1))) * ℍ([$z₀ + ϵ; $z₁])) - compute_connection_A($P, ℍ(exp(K(1))) * $P)))
-# A² = @lift((1.0 / ϵ) * (compute_connection_A($P, ℍ(exp(K(2))) * ℍ([$z₀; $z₁ + ϵ])) - compute_connection_A($P, ℍ(exp(K(2))) * $P)))
-# A¹_observable = @lift(normalize(Point3f(project(ℍ(exp($A¹ * K(1))) * $P)) - $P_observable))
-# A²_observable = @lift(normalize(Point3f(project(ℍ(exp($A² * K(2))) * $P)) - $P_observable))
-# A³_observable = @lift(normalize(Point3f(project(ℍ(exp($A³ * K(3))) * $P)) - $P_observable))
-# _A = @lift(normalize(Point3f(project(ℍ(exp($A¹ * K(1) * $)))) - $P_observable))
+
+u = Observable(K(1))
+v = Observable(K(3))
+ϕᵤ = @lift(ϕ($P, $u))
+ϕᵥ = @lift(ϕ($P, $v))
+∇ᵤ = @lift(ϕ(ℍ(exp(ϵ * $u)) * $P, $v) - ϕ($P, $v))
+∇ᵥ = @lift(ϕ(ℍ(exp(ϵ * $v)) * $P, $u) - ϕ($P, $u))
+p₁ = @lift(ℍ(exp(ϵ * $u)) * $P)
+p₂ = @lift(ℍ(exp(ϵ * $v)) * $p₁)
+p₃ = @lift(ℍ(exp(ϵ * -$u)) * $p₂)
+p₄ = @lift(ℍ(exp(ϵ * -$v)) * $p₃)
+commutator = @lift(ϕ($P, mat4($p₄ - $P)))
+dϕ = @lift($∇ᵤ - $∇ᵥ - $commutator)
 
 P1 = @lift(ℍ(exp(ϵ * K(1))) * $P)
 P2 = @lift(ℍ(exp(ϵ * K(2))) * $P)
@@ -247,7 +266,7 @@ text!(lscene1,
 	markerspace = :data,
 )
 text!(lscene2,
-	@lift(map(x -> x + $P_observable, [$X_observable, $X̅_observable,  $dz₀_observable, $dz₁_observable, $dz̅₀_observable, $dz̅₁_observable])),
+	@lift(map(x -> x + $P_observable, [$X_observable, $X̅_observable, $dz₀_observable, $dz₁_observable, $dz̅₀_observable, $dz̅₁_observable])),
 	text = twoform_titles,
 	color = twoform_colorants,
 	rotation = rotation2,
@@ -379,9 +398,9 @@ lines!(lscene1, v12_K2K3_segment, linewidth = linewidth2, color = v_K2K3_color[1
 
 # scene 3: 2-form basis
 
-_K1K2_surface = [(-x̂ - ŷ) (-x̂ + ŷ); (x̂ - ŷ) (x̂ + ŷ)]
-_K1K3_surface = [(-x̂ - ẑ) (-x̂ + ẑ); (x̂ - ẑ) (x̂ + ẑ)]
-_K2K3_surface = [(-ŷ - ẑ) (-ŷ + ẑ); (ŷ - ẑ) (ŷ + ẑ)]
+_K1K2_surface = [(-x̂-ŷ)   (-x̂+ŷ); (x̂-ŷ)   (x̂+ŷ)]
+_K1K3_surface = [(-x̂-ẑ)   (-x̂+ẑ); (x̂-ẑ)   (x̂+ẑ)]
+_K2K3_surface = [(-ŷ-ẑ)   (-ŷ+ẑ); (ŷ-ẑ)   (ŷ+ẑ)]
 buildsurface(lscene3, _K1K2_surface, K1K2_color, transparency = true)
 buildsurface(lscene3, _K1K3_surface, K1K3_color, transparency = true)
 buildsurface(lscene3, _K2K3_surface, K2K3_color, transparency = true)
@@ -484,6 +503,86 @@ text!(lscene3,
 	markerspace = :data,
 )
 
+
+
+u = Observable(K(1))
+v = Observable(K(3))
+ϕᵤ = @lift(ϕ($P, $u))
+ϕᵥ = @lift(ϕ($P, $v))
+∇ᵤ = @lift((1.0 / ϵ) * (ϕ(ℍ(exp(ϵ * $u)) * $P, $v) - $ϕᵥ))
+∇ᵥ = @lift((1.0 / ϵ) * (ϕ(ℍ(exp(ϵ * $v)) * $P, $u) - $ϕᵤ))
+pᵤ = @lift(ℍ(exp(ϵ * $u)) * $P)
+pᵥ = @lift(ℍ(exp(ϵ * $v)) * $P)
+pᵤᵥ = @lift(ℍ(exp(ϵ * $v)) * $pᵤ)
+pᵥᵤ = @lift(ℍ(exp(ϵ * $u)) * $pᵥ)
+pᵤᵥ_ᵤ = @lift(ℍ(exp(ϵ * -$u)) * $pᵤᵥ)
+pᵤᵥ_ᵤᵥ = @lift(ℍ(exp(ϵ * -$v)) * $pᵤᵥ_ᵤ)
+commutator = @lift(ϕ($P, mat4($pᵤᵥ_ᵤᵥ - $P)))
+dϕ = @lift($∇ᵤ - $∇ᵥ - $commutator)
+
+u_observable = @lift(Point3f(normalize(project($pᵤ) - project($P))))
+v_observable = @lift(Point3f(normalize(project($pᵥ) - project($P))))
+uv_observable = @lift(Point3f(normalize(project($pᵤᵥ) - project($pᵤ))))
+vu_observable = @lift(Point3f(normalize(project($pᵥᵤ) - project($pᵥ))))
+uv_u_observable = @lift(Point3f(normalize(project($pᵤᵥ_ᵤ) - project($pᵤᵥ))))
+uv_uv_observable = @lift(Point3f(normalize(project($pᵤᵥ_ᵤᵥ) - project($pᵤᵥ_ᵤ))))
+commutator_observable = @lift(Point3f(normalize(project($pᵤᵥ_ᵤᵥ) - project($P))))
+final_point = @lift(Point3f(project($pᵤᵥ_ᵤᵥ)))
+
+titles = @lift(["ϕ(u) = " * string(round($ϕᵤ, digits = 2)), "ϕ(v) = " * string(round($ϕᵥ, digits = 2)),
+	"∇ᵤ(v) = " * string(round($∇ᵤ, digits = 2)), "∇ᵥ(u) = " * string(round($∇ᵥ, digits = 2)),
+	"ϕ([u, v]) = " * string(round($commutator, digits = 2)), "dϕ = " * string(round($dϕ, digits = 2))])
+colorants = [:red, :green, :blue, :yellow, :black]
+arrows3d!(lscene1,
+	@lift([$P_observable, $P_observable, $P_observable + $v_observable, $P_observable + $u_observable, $final_point]),
+	@lift([$u_observable, $v_observable, $vu_observable, $uv_observable, $commutator_observable]),
+	fxaa = true, # turn on anti-aliasing
+	color = colorants,
+	shaftradius = shaftradius, tipradius = tipradius,
+	tiplength = tiplength,
+	align = :tail,
+)
+arrows3d!(lscene2,
+	@lift([$P_observable, $P_observable, $P_observable + $v_observable, $P_observable + $u_observable, $final_point]),
+	@lift([$u_observable, $v_observable, $vu_observable, $uv_observable, $commutator_observable]),
+	fxaa = true, # turn on anti-aliasing
+	color = colorants,
+	shaftradius = shaftradius, tipradius = tipradius,
+	tiplength = tiplength,
+	align = :tail,
+)
+text_position = @lift(
+	map(
+		x -> Point3f(ℝ³(x)),
+		[
+			$P_observable + 0.5 * $u_observable,
+			$P_observable + 0.5 * $v_observable,
+			$P_observable + $v_observable + 0.5 * $vu_observable,
+			$P_observable + $u_observable + 0.5 * $uv_observable,
+			$final_point + 0.5 * $commutator_observable,
+			$final_point + $commutator_observable,
+		],
+	)
+)
+text!(lscene1,
+	text_position,
+	text = titles,
+	color = [colorants; :silver],
+	rotation = rotation1,
+	align = (:left, :baseline),
+	fontsize = fontsize,
+	markerspace = :data,
+)
+text!(lscene2,
+	text_position,
+	text = titles,
+	color = [colorants; :silver],
+	rotation = rotation2,
+	align = (:left, :baseline),
+	fontsize = fontsize,
+	markerspace = :data,
+)
+
 trace_created = false
 trace_linecolors = Observable([1])
 colorrange = collect(1:frames_number)
@@ -499,7 +598,7 @@ animate(frame::Int) = begin
 
 	ψ[] = progress * 2π
 	global ϵ5 = ϵ4 + sin(progress * 2π) * ϵ4 / 3.0
-	
+
 	P′[] = P[]
 	P[] = ℍ(exp(sin(stageprogress * 2π) * ϵ5 * K(1) + cos(stageprogress * 2π) * ϵ5 * K(3))) * P′[]
 
@@ -529,6 +628,24 @@ animate(frame::Int) = begin
 		buildsurface(lscene1, twoform_plane1[], _twoform_color, transparency = true)
 		buildsurface(lscene2, twoform_plane0[], _twoform_color, transparency = true)
 		buildsurface(lscene2, twoform_plane1[], _twoform_color, transparency = true)
+		arrows3d!(lscene1,
+			[P_observable[], P_observable[], P_observable[] + v_observable[], P_observable[] + u_observable[], final_point[]],
+			[u_observable[], v_observable[], vu_observable[], uv_observable[], commutator_observable[]],
+			fxaa = true, # turn on anti-aliasing
+			color = colorants,
+			shaftradius = shaftradius, tipradius = tipradius,
+			tiplength = tiplength,
+			align = :tail,
+		)
+		arrows3d!(lscene2,
+			[P_observable[], P_observable[], P_observable[] + v_observable[], P_observable[] + u_observable[], final_point[]],
+			[u_observable[], v_observable[], vu_observable[], uv_observable[], commutator_observable[]],
+			fxaa = true, # turn on anti-aliasing
+			color = colorants,
+			shaftradius = shaftradius, tipradius = tipradius,
+			tiplength = tiplength,
+			align = :tail,
+		)
 		push!(stage_sprites, stage)
 	end
 
