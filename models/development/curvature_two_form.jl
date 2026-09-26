@@ -503,8 +503,6 @@ text!(lscene3,
 	markerspace = :data,
 )
 
-
-
 u = Observable(K(1))
 v = Observable(K(3))
 ϕᵤ = @lift(ϕ($P, $u))
@@ -520,13 +518,21 @@ pᵤᵥ_ᵤᵥ = @lift(ℍ(exp(ϵ * -$v)) * $pᵤᵥ_ᵤ)
 commutator = @lift(ϕ($P, mat4($pᵤᵥ_ᵤᵥ - $P)))
 dϕ = @lift($∇ᵤ - $∇ᵥ - $commutator)
 
-u_observable = @lift(Point3f(normalize(project($pᵤ) - project($P))))
-v_observable = @lift(Point3f(normalize(project($pᵥ) - project($P))))
-uv_observable = @lift(Point3f(normalize(project($pᵤᵥ) - project($pᵤ))))
-vu_observable = @lift(Point3f(normalize(project($pᵥᵤ) - project($pᵥ))))
-uv_u_observable = @lift(Point3f(normalize(project($pᵤᵥ_ᵤ) - project($pᵤᵥ))))
-uv_uv_observable = @lift(Point3f(normalize(project($pᵤᵥ_ᵤᵥ) - project($pᵤᵥ_ᵤ))))
-commutator_observable = @lift(Point3f(normalize(project($pᵤᵥ_ᵤᵥ) - project($P))))
+# u_observable = @lift(Point3f(normalize(project($pᵤ) - project($P))))
+# v_observable = @lift(Point3f(normalize(project($pᵥ) - project($P))))
+# uv_observable = @lift(Point3f(normalize(project($pᵤᵥ) - project($pᵤ))))
+# vu_observable = @lift(Point3f(normalize(project($pᵥᵤ) - project($pᵥ))))
+# uv_u_observable = @lift(Point3f(normalize(project($pᵤᵥ_ᵤ) - project($pᵤᵥ))))
+# uv_uv_observable = @lift(Point3f(normalize(project($pᵤᵥ_ᵤᵥ) - project($pᵤᵥ_ᵤ))))
+# commutator_observable = @lift(Point3f(normalize(project($pᵤᵥ_ᵤᵥ) - project($P))))
+
+u_observable = @lift(Point3f(normalize(project($pᵤ - $P))))
+v_observable = @lift(Point3f(normalize(project($pᵥ - $P))))
+uv_observable = @lift(Point3f(normalize(project($pᵤᵥ - $pᵤ))))
+vu_observable = @lift(Point3f(normalize(project($pᵥᵤ - $pᵥ))))
+uv_u_observable = @lift(Point3f(normalize(project($pᵤᵥ_ᵤ - $pᵤᵥ))))
+uv_uv_observable = @lift(Point3f(normalize(project($pᵤᵥ_ᵤᵥ - $pᵤᵥ_ᵤ))))
+commutator_observable = @lift(Point3f(normalize(project($pᵤᵥ_ᵤᵥ - $P))))
 final_point = @lift(Point3f(project($pᵤᵥ_ᵤᵥ)))
 
 titles = @lift(["ϕ(u) = " * string(round($ϕᵤ, digits = 2)), "ϕ(v) = " * string(round($ϕᵥ, digits = 2)),
@@ -542,6 +548,20 @@ arrows3d!(lscene1,
 	tiplength = tiplength,
 	align = :tail,
 )
+arrows3d!(lscene2,
+	@lift([$P_observable, $P_observable, $P_observable + $v_observable, $P_observable + $u_observable, $final_point]),
+	@lift([$u_observable, $v_observable, $vu_observable, $uv_observable, $commutator_observable]),
+	fxaa = true, # turn on anti-aliasing
+	color = colorants,
+	shaftradius = shaftradius, tipradius = tipradius,
+	tiplength = tiplength,
+	align = :tail,
+)
+# _u_observable = @lift(Point3f(dot($u, $K1) * x̂ + dot($X, $K2) * ŷ + dot($X, $K3) * ẑ))
+# _v_observable = 
+# _vu_observable = 
+# _uv_observable = 
+# _commutator_observable = 
 arrows3d!(lscene2,
 	@lift([$P_observable, $P_observable, $P_observable + $v_observable, $P_observable + $u_observable, $final_point]),
 	@lift([$u_observable, $v_observable, $vu_observable, $uv_observable, $commutator_observable]),
